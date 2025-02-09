@@ -29,10 +29,34 @@ export const Hero = () => {
     }
   ];
 
+  const resumeTemplates = [
+    {
+      name: "Professional",
+      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Professional+Resume",
+      description: "Perfect for corporate and traditional industries"
+    },
+    {
+      name: "Modern",
+      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Modern+Resume",
+      description: "Ideal for creative and tech roles"
+    },
+    {
+      name: "Executive",
+      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Executive+Resume",
+      description: "Designed for senior positions and leadership roles"
+    },
+    {
+      name: "Simple",
+      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Simple+Resume",
+      description: "Clean and straightforward for any profession"
+    }
+  ];
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-accent via-accent/50 to-white py-20 sm:py-32">
+    <section className="relative overflow-hidden bg-gradient-to-br from-accent via-accent/50 to-white">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM2MzY2RjEiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0aDR2NGgtNHpNNDAgMzBoNHY0aC00ek0zMiAzMmg0djRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40" />
-      <div className="container relative">
+      
+      <div className="container relative py-20 sm:py-32">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="mb-6 text-4xl font-bold tracking-tight text-secondary animate-fade-up sm:text-5xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover">
             Land Your Dream Job with an AI-Tailored Resume
@@ -85,7 +109,59 @@ export const Hero = () => {
             </div>
           </div>
         </div>
+
+        {/* Resume Templates Showcase */}
+        <div className="mt-32 text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-secondary sm:text-4xl mb-6 animate-fade-up">
+            Rise Above the Rest with ATS-Optimized Resume Templates
+          </h2>
+          <p className="text-lg text-muted-foreground mb-12 animate-fade-up" style={{ animationDelay: '100ms' }}>
+            Choose from our professionally designed templates, all crafted to pass ATS systems with flying colors
+          </p>
+
+          <div className="relative h-[600px] w-full max-w-4xl mx-auto overflow-hidden">
+            <div className="flex gap-6 animate-slide-templates">
+              {resumeTemplates.map((template, index) => (
+                <div
+                  key={template.name}
+                  className="relative min-w-[300px] bg-white rounded-lg shadow-xl overflow-hidden transition-all duration-300 hover:scale-105"
+                  style={{ animationDelay: `${index * 200}ms` }}
+                >
+                  <div className="relative h-[400px] w-full">
+                    <img
+                      src={template.image}
+                      alt={`${template.name} Resume Template`}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="p-6 text-left">
+                    <h3 className="text-xl font-semibold text-secondary mb-2">{template.name}</h3>
+                    <p className="text-muted-foreground">{template.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes slideTemplates {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(calc(-300px * 4 - 1.5rem * 4));
+          }
+        }
+        .animate-slide-templates {
+          display: flex;
+          animation: slideTemplates 20s linear infinite;
+        }
+        .animate-slide-templates:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 };
