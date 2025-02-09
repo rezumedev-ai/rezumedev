@@ -7,18 +7,22 @@ import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 
 const Index = () => {
   return (
     <main className="min-h-screen bg-white">
-      <Hero />
-      <Process />
-      <Features />
-      <ResumeTemplates />
-      <Testimonials />
-      <FAQ />
-      <CTA />
-      <Footer />
+      <Header />
+      <div className="pt-16"> {/* Add padding to account for fixed header */}
+        <Hero />
+        <Process />
+        <Features />
+        <ResumeTemplates />
+        <Testimonials />
+        <FAQ />
+        <CTA />
+        <Footer />
+      </div>
     </main>
   );
 };
