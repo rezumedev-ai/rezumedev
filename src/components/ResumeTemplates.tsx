@@ -39,10 +39,10 @@ export const ResumeTemplates = () => {
   return (
     <section className="py-20 bg-white sm:py-32">
       <div className="container">
-        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-secondary mb-4 animate-fade-up bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover text-center">
-          Professional Resume Templates That Get You Hired
+        <h2 className="text-4xl font-bold text-secondary mb-4 text-center">
+          Resume Templates
         </h2>
-        <p className="text-lg md:text-xl text-muted-foreground mb-16 animate-fade-up max-w-2xl mx-auto text-center" style={{ animationDelay: '100ms' }}>
+        <p className="text-lg text-muted-foreground mb-16 max-w-2xl mx-auto text-center">
           Each template is expertly crafted to pass ATS systems while making your experience shine
         </p>
 
@@ -101,3 +101,4 @@ export const ResumeTemplates = () => {
     </section>
   );
 };
+
