@@ -6,6 +6,7 @@ import { ResumeTemplates } from "@/components/ResumeTemplates";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -17,6 +18,7 @@ const Index = () => {
       <Testimonials />
       <FAQ />
       <CTA />
+      <Footer />
     </main>
   );
 };
