@@ -52,7 +52,12 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <Link to="/" className="inline-block">
+            <h1 className="text-3xl font-bold text-primary hover:text-primary-hover transition-colors">
+              Rezume.dev
+            </h1>
+          </Link>
+          <h2 className="mt-6 text-2xl font-bold text-gray-900">
             Welcome back
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -118,3 +123,4 @@ const Login = () => {
 };
 
 export default Login;
+

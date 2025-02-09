@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, User, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +58,12 @@ const SignUp = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <Link to="/" className="inline-block">
+            <h1 className="text-3xl font-bold text-primary hover:text-primary-hover transition-colors">
+              Rezume.dev
+            </h1>
+          </Link>
+          <h2 className="mt-6 text-2xl font-bold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -124,6 +130,13 @@ const SignUp = () => {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
+
+            <div className="text-center text-sm">
+              <span className="text-gray-600">Already have an account? </span>
+              <Link to="/login" className="font-medium text-primary hover:text-primary-hover">
+                Sign in
+              </Link>
+            </div>
           </form>
         </div>
       </div>
@@ -132,3 +145,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+
