@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, User, Lock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,12 +16,41 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const fullName = formData.get("fullName") as string;
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Account created successfully!",
+        description: "Welcome to Rezume.dev",
+      });
+      
+      // Auth state change listener will handle navigation
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error creating account",
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
+    } finally {
       setIsLoading(false);
-      navigate("/onboarding");
-    }, 1500);
+    }
   };
 
   return (
@@ -85,6 +115,7 @@ const SignUp = () => {
                     required
                     className="pl-10"
                     placeholder="••••••••"
+                    minLength={6}
                   />
                 </div>
               </div>
