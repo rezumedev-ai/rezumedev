@@ -102,23 +102,39 @@
 }
 
 @keyframes slideTemplates {
-  0%, 100% {
+  0%, 20% {
     transform: translateX(0);
+    opacity: 1;
   }
-  25% {
+  23%, 25% {
+    opacity: 0;
+  }
+  25%, 45% {
     transform: translateX(calc(-300px - 1.5rem));
+    opacity: 1;
   }
-  50% {
+  48%, 50% {
+    opacity: 0;
+  }
+  50%, 70% {
     transform: translateX(calc(-600px - 3rem));
+    opacity: 1;
   }
-  75% {
+  73%, 75% {
+    opacity: 0;
+  }
+  75%, 95% {
     transform: translateX(calc(-900px - 4.5rem));
+    opacity: 1;
+  }
+  98%, 100% {
+    opacity: 0;
   }
 }
 
 .animate-slide-templates {
   display: flex;
-  animation: slideTemplates 20s ease-in-out infinite;
+  animation: slideTemplates 24s ease-in-out infinite;
 }
 
 .animate-slide-templates:hover {

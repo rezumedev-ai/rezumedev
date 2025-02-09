@@ -31,22 +31,22 @@ export const Hero = () => {
   const resumeTemplates = [
     {
       name: "Executive",
-      image: "https://placehold.co/600x800/4F46E5/ffffff/png?text=Executive+Resume",
+      image: "/lovable-uploads/executive-resume.png",
       description: "Commanding resume design for C-suite executives and senior leaders, highlighting strategic achievements and board experience"
     },
     {
       name: "Tech Professional",
-      image: "https://placehold.co/600x800/4338CA/ffffff/png?text=Tech+Professional",
+      image: "/lovable-uploads/tech-resume.png",
       description: "Optimized for software engineers and IT professionals, featuring technical skills matrix and project highlights"
     },
     {
       name: "Creative Director",
-      image: "https://placehold.co/600x800/3730A3/ffffff/png?text=Creative+Director",
+      image: "/lovable-uploads/creative-resume.png",
       description: "Portfolio-style resume for creative professionals, showcasing visual projects and brand campaigns"
     },
     {
       name: "Data Scientist",
-      image: "https://placehold.co/600x800/312E81/ffffff/png?text=Data+Scientist",
+      image: "/lovable-uploads/data-resume.png",
       description: "Data-driven layout highlighting statistical achievements, machine learning projects, and research publications"
     }
   ];
@@ -112,10 +112,10 @@ export const Hero = () => {
         {/* Resume Templates Showcase */}
         <div className="mt-32 text-center">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-secondary mb-4 animate-fade-up bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover">
-            Stand Out with ATS-Optimized Resume Templates
+            Land Your Dream Job with Professional Resume Templates
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground mb-16 animate-fade-up max-w-2xl mx-auto" style={{ animationDelay: '100ms' }}>
-            Each template is expertly crafted to pass Applicant Tracking Systems and catch the recruiter's eye
+            Each template is expertly crafted to pass ATS systems while making your experience shine
           </p>
 
           <div className="relative max-w-4xl mx-auto overflow-hidden">
@@ -123,14 +123,14 @@ export const Hero = () => {
               {resumeTemplates.map((template, index) => (
                 <div
                   key={template.name}
-                  className="relative min-w-[300px] bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                  className="relative min-w-[300px] bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:z-10"
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
-                  <div className="relative h-[400px] w-full bg-gradient-to-br from-primary/90 to-primary">
+                  <div className="relative h-[400px] w-full bg-gradient-to-br from-primary/90 to-primary overflow-hidden">
                     <img
                       src={template.image}
                       alt={`${template.name} Resume Template`}
-                      className="object-cover w-full h-full mix-blend-overlay"
+                      className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
                     />
                   </div>
                   <div className="p-6 text-left">
