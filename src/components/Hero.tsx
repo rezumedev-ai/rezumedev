@@ -1,4 +1,3 @@
-
 import { ArrowRight, FileText, Target, Award, CheckCircle2 } from 'lucide-react';
 
 export const Hero = () => {
@@ -31,24 +30,24 @@ export const Hero = () => {
 
   const resumeTemplates = [
     {
-      name: "Professional",
-      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Professional+Resume",
-      description: "Perfect for corporate and traditional industries"
-    },
-    {
-      name: "Modern",
-      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Modern+Resume",
-      description: "Ideal for creative and tech roles"
-    },
-    {
       name: "Executive",
-      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Executive+Resume",
-      description: "Designed for senior positions and leadership roles"
+      image: "https://placehold.co/600x800/4F46E5/ffffff/png?text=Executive+Resume",
+      description: "Commanding resume design for C-suite executives and senior leaders, highlighting strategic achievements and board experience"
     },
     {
-      name: "Simple",
-      image: "https://placehold.co/600x800/eef2ff/6366f1/png?text=Simple+Resume",
-      description: "Clean and straightforward for any profession"
+      name: "Tech Professional",
+      image: "https://placehold.co/600x800/4338CA/ffffff/png?text=Tech+Professional",
+      description: "Optimized for software engineers and IT professionals, featuring technical skills matrix and project highlights"
+    },
+    {
+      name: "Creative Director",
+      image: "https://placehold.co/600x800/3730A3/ffffff/png?text=Creative+Director",
+      description: "Portfolio-style resume for creative professionals, showcasing visual projects and brand campaigns"
+    },
+    {
+      name: "Data Scientist",
+      image: "https://placehold.co/600x800/312E81/ffffff/png?text=Data+Scientist",
+      description: "Data-driven layout highlighting statistical achievements, machine learning projects, and research publications"
     }
   ];
 
@@ -112,31 +111,31 @@ export const Hero = () => {
 
         {/* Resume Templates Showcase */}
         <div className="mt-32 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-secondary sm:text-4xl mb-6 animate-fade-up">
-            Rise Above the Rest with ATS-Optimized Resume Templates
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-secondary mb-4 animate-fade-up bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover">
+            Stand Out with ATS-Optimized Resume Templates
           </h2>
-          <p className="text-lg text-muted-foreground mb-12 animate-fade-up" style={{ animationDelay: '100ms' }}>
-            Choose from our professionally designed templates, all crafted to pass ATS systems with flying colors
+          <p className="text-lg md:text-xl text-muted-foreground mb-16 animate-fade-up max-w-2xl mx-auto" style={{ animationDelay: '100ms' }}>
+            Each template is expertly crafted to pass Applicant Tracking Systems and catch the recruiter's eye
           </p>
 
-          <div className="relative h-[600px] w-full max-w-4xl mx-auto overflow-hidden">
+          <div className="relative max-w-4xl mx-auto overflow-hidden">
             <div className="flex gap-6 animate-slide-templates">
               {resumeTemplates.map((template, index) => (
                 <div
                   key={template.name}
-                  className="relative min-w-[300px] bg-white rounded-lg shadow-xl overflow-hidden transition-all duration-300 hover:scale-105"
+                  className="relative min-w-[300px] bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
-                  <div className="relative h-[400px] w-full">
+                  <div className="relative h-[400px] w-full bg-gradient-to-br from-primary/90 to-primary">
                     <img
                       src={template.image}
                       alt={`${template.name} Resume Template`}
-                      className="object-cover w-full h-full"
+                      className="object-cover w-full h-full mix-blend-overlay"
                     />
                   </div>
                   <div className="p-6 text-left">
                     <h3 className="text-xl font-semibold text-secondary mb-2">{template.name}</h3>
-                    <p className="text-muted-foreground">{template.description}</p>
+                    <p className="text-muted-foreground text-sm">{template.description}</p>
                   </div>
                 </div>
               ))}

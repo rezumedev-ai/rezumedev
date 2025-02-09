@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -101,17 +102,23 @@
 }
 
 @keyframes slideTemplates {
-  0% {
+  0%, 100% {
     transform: translateX(0);
   }
-  100% {
-    transform: translateX(calc(-300px * 4 - 1.5rem * 4));
+  25% {
+    transform: translateX(calc(-300px - 1.5rem));
+  }
+  50% {
+    transform: translateX(calc(-600px - 3rem));
+  }
+  75% {
+    transform: translateX(calc(-900px - 4.5rem));
   }
 }
 
 .animate-slide-templates {
   display: flex;
-  animation: slideTemplates 20s linear infinite;
+  animation: slideTemplates 20s ease-in-out infinite;
 }
 
 .animate-slide-templates:hover {
