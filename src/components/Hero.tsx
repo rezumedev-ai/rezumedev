@@ -8,25 +8,15 @@ export const Hero = () => {
       <div className="container relative">
         <div className="mx-auto max-w-3xl text-center animate-fade-up">
           <h1 className="mb-6 text-4xl font-bold tracking-tight text-secondary sm:text-5xl md:text-6xl">
-            Your AI-Powered Resume, Tailored to Get You Hired Faster
+            Land Your Dream Job with an AI-Tailored Resume
           </h1>
-          <p className="mb-6 text-lg text-muted-foreground sm:text-xl">
+          <p className="mb-10 text-lg text-muted-foreground sm:text-xl">
             Simply enter your details, and let AI craft a job-winning resume tailored to your industry.
           </p>
-          <div className="mb-8">
-            <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white transition-all bg-primary rounded-full hover:bg-primary-hover hover:scale-105">
-              Get Your AI-Optimized Resume in Minutes – Start Free!
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <p className="mt-3 text-sm text-muted-foreground">
-              No credit card required | Instant download
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-8 p-4 bg-white/80 rounded-xl backdrop-blur-sm">
-            <p className="text-sm font-medium text-muted-foreground">Trusted by 10,000+ job seekers</p>
-            <div className="w-px h-6 bg-border"></div>
-            <p className="text-sm font-medium text-muted-foreground">95% interview success rate</p>
-          </div>
+          <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white transition-all bg-primary rounded-full hover:bg-primary-hover hover:scale-105">
+            Build Your Resume Now
+            <ArrowRight className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </section>
