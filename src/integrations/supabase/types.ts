@@ -9,6 +9,104 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_suggestions: {
+        Row: {
+          created_at: string
+          id: string
+          priority: string
+          resume_id: string
+          section: string
+          suggestion: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          priority?: string
+          resume_id: string
+          section: string
+          suggestion: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          priority?: string
+          resume_id?: string
+          section?: string
+          suggestion?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_suggestions_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cover_letters: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      job_applications: {
+        Row: {
+          application_date: string | null
+          company_name: string
+          created_at: string
+          id: string
+          job_title: string
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_date?: string | null
+          company_name: string
+          created_at?: string
+          id?: string
+          job_title: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_date?: string | null
+          company_name?: string
+          created_at?: string
+          id?: string
+          job_title?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -30,6 +128,39 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          content: Json
+          created_at: string
+          downloads: number | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          downloads?: number | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          downloads?: number | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views?: number | null
         }
         Relationships: []
       }
