@@ -9,11 +9,11 @@ export const Hero = () => {
     },
     {
       name: "Disney",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Disney%2B_logo.svg",
+      logo: "/lovable-uploads/1de1d500-e16a-46d6-9037-19cf6739f790.png",
     },
     {
       name: "HCL",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/HCL_Technologies_logo.svg",
+      logo: "/lovable-uploads/d2779dee-4e73-4126-8900-b7d93b6692e3.png",
     },
     {
       name: "Booking.com",
