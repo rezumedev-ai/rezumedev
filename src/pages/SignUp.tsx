@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Google, Linkedin, Mail, User, Lock } from "lucide-react";
+import { Globe, Mail, User, Lock } from "lucide-react";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +123,7 @@ const SignUp = () => {
               onClick={() => handleSocialSignUp("google")}
               disabled={isLoading}
             >
-              <Google className="h-5 w-5 mr-2" />
+              <Globe className="h-5 w-5 mr-2" />
               Google
             </Button>
             <Button
@@ -132,7 +132,7 @@ const SignUp = () => {
               onClick={() => handleSocialSignUp("linkedin")}
               disabled={isLoading}
             >
-              <Linkedin className="h-5 w-5 mr-2" />
+              <Globe className="h-5 w-5 mr-2" />
               LinkedIn
             </Button>
           </div>
