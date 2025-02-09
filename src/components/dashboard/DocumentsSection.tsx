@@ -26,9 +26,9 @@ export function DocumentsSection({ resumes }: DocumentsSectionProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold text-gray-900">Documents</h2>
+          <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Documents</h2>
         </div>
         <Button onClick={() => handleCreateNew('resume')}>
           <Plus className="w-4 h-4 mr-2" />
@@ -36,9 +36,9 @@ export function DocumentsSection({ resumes }: DocumentsSectionProps) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {resumes?.map((resume) => (
-          <Card key={resume.id} className="p-6 hover:shadow-md transition-shadow">
+          <Card key={resume.id} className="p-4 md:p-6 hover:shadow-md transition-shadow">
             <div className="space-y-4">
               <h3 className="font-medium text-gray-900">{resume.title || 'Untitled'}</h3>
               <p className="text-sm text-gray-500">
@@ -54,7 +54,7 @@ export function DocumentsSection({ resumes }: DocumentsSectionProps) {
         ))}
 
         <Card 
-          className="p-6 border-dashed hover:shadow-md transition-shadow cursor-pointer" 
+          className="p-4 md:p-6 border-dashed hover:shadow-md transition-shadow cursor-pointer" 
           onClick={() => handleCreateNew('resume')}
         >
           <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-2">
