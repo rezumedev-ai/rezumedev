@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Globe, Mail, User, Lock } from "lucide-react";
+import { Mail, User, Lock } from "lucide-react";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,16 +17,6 @@ const SignUp = () => {
     setIsLoading(true);
     
     // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate("/onboarding");
-    }, 1500);
-  };
-
-  const handleSocialSignUp = (provider: string) => {
-    setIsLoading(true);
-    
-    // Simulate social sign-in
     setTimeout(() => {
       setIsLoading(false);
       navigate("/onboarding");
@@ -45,7 +35,7 @@ const SignUp = () => {
           </p>
         </div>
         
-        <div className="mt-8 space-y-6">
+        <div className="mt-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div>
@@ -104,38 +94,6 @@ const SignUp = () => {
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleSocialSignUp("google")}
-              disabled={isLoading}
-            >
-              <Globe className="h-5 w-5 mr-2" />
-              Google
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleSocialSignUp("linkedin")}
-              disabled={isLoading}
-            >
-              <Globe className="h-5 w-5 mr-2" />
-              LinkedIn
-            </Button>
-          </div>
         </div>
       </div>
     </div>
