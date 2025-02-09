@@ -5,15 +5,15 @@ export const Hero = () => {
   const companies = [
     {
       name: "Apple",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Apple-logo.png",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
     },
     {
       name: "Disney",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/8/84/Disney_wordmark_logo.svg",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Disney%2B_logo.svg",
     },
     {
       name: "HCL",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/3/30/HCL_Technologies_logo_2021.svg",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/HCL_Technologies_logo.svg",
     },
     {
       name: "Booking.com",
@@ -25,7 +25,7 @@ export const Hero = () => {
     },
     {
       name: "Meta",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Meta_logo.svg",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
     }
   ];
 
@@ -72,13 +72,13 @@ export const Hero = () => {
               {companies.map((company, index) => (
                 <div
                   key={company.name}
-                  className="group flex items-center justify-center h-12"
+                  className="group flex items-center justify-center h-16"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <img
                     src={company.logo}
                     alt={`${company.name} logo`}
-                    className="max-h-8 w-auto mx-auto grayscale opacity-70 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 object-contain"
+                    className="h-8 w-auto mx-auto grayscale opacity-70 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 object-contain"
                   />
                 </div>
               ))}
