@@ -66,16 +66,6 @@ export default {
             transform: 'translateY(0)'
           },
         },
-        'fade-up-delayed': {
-          '0%, 50%': { 
-            opacity: '0',
-            transform: 'translateY(10px)'
-          },
-          '100%': {
-            opacity: '1',
-            transform: 'translateY(0)'
-          },
-        },
         'fade-in': {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
@@ -89,44 +79,12 @@ export default {
             opacity: '1',
             transform: 'scale(1)'
           },
-        },
-        'float': {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        'float-delayed': {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        'pulse-subtle': {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.05)' },
-        },
-        'shine': {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' },
-        },
-        'gradient': {
-          '0%, 100%': { 
-            'background-size': '200% 200%',
-            'background-position': 'left center'
-          },
-          '50%': {
-            'background-size': '200% 200%',
-            'background-position': 'right center'
-          }
         }
       },
       animation: {
-        'fade-up': 'fade-up 0.6s ease-out forwards',
-        'fade-up-delayed': 'fade-up-delayed 0.8s ease-out forwards',
-        'fade-in': 'fade-in 0.4s ease-out',
-        'scale-up': 'scale-up 0.4s ease-out',
-        'float': 'float 6s ease-in-out infinite',
-        'float-delayed': 'float-delayed 7s ease-in-out infinite',
-        'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite',
-        'shine': 'shine 1.5s ease-in-out infinite',
-        'gradient': 'gradient 8s ease infinite',
+        'fade-up': 'fade-up 0.5s ease-out',
+        'fade-in': 'fade-in 0.3s ease-out',
+        'scale-up': 'scale-up 0.3s ease-out',
       }
     }
   },
