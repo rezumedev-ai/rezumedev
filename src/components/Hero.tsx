@@ -144,24 +144,6 @@ export const Hero = () => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes slideTemplates {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(-300px * 4 - 1.5rem * 4));
-          }
-        }
-        .animate-slide-templates {
-          display: flex;
-          animation: slideTemplates 20s linear infinite;
-        }
-        .animate-slide-templates:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </section>
   );
 };
