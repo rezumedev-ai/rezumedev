@@ -1,5 +1,5 @@
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FileText, Target, Award, CheckCircle2 } from 'lucide-react';
 
 export const Hero = () => {
   return (
@@ -17,6 +17,25 @@ export const Hero = () => {
             Build Your Resume Now
             <ArrowRight className="w-5 h-5" />
           </button>
+
+          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4 animate-fade-up" style={{ animationDelay: '300ms' }}>
+            <div className="flex flex-col items-center p-4 bg-white/50 backdrop-blur-sm rounded-lg">
+              <FileText className="w-8 h-8 text-primary mb-2" />
+              <p className="text-sm font-medium text-muted-foreground">ATS Optimized</p>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-white/50 backdrop-blur-sm rounded-lg">
+              <Target className="w-8 h-8 text-primary mb-2" />
+              <p className="text-sm font-medium text-muted-foreground">Industry Targeted</p>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-white/50 backdrop-blur-sm rounded-lg">
+              <Award className="w-8 h-8 text-primary mb-2" />
+              <p className="text-sm font-medium text-muted-foreground">Top Rated</p>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-white/50 backdrop-blur-sm rounded-lg">
+              <CheckCircle2 className="w-8 h-8 text-primary mb-2" />
+              <p className="text-sm font-medium text-muted-foreground">Verified Results</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

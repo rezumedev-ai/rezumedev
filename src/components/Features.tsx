@@ -1,19 +1,22 @@
 
-import { Check } from 'lucide-react';
+import { ShieldCheck, Target, MousePointerClick } from 'lucide-react';
 
 export const Features = () => {
   const features = [
     {
       title: "ATS-Optimized",
       description: "Engineered to pass Applicant Tracking Systems with ease",
+      icon: ShieldCheck
     },
     {
       title: "Industry-Specific",
       description: "Tailored content matching your target job requirements",
+      icon: Target
     },
     {
       title: "Easy to Use",
       description: "Intuitive interface with step-by-step guidance",
+      icon: MousePointerClick
     },
   ];
 
@@ -31,7 +34,7 @@ export const Features = () => {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="flex items-center justify-center w-12 h-12 mb-4 text-white transition-transform bg-primary rounded-xl group-hover:scale-110">
-                <Check className="w-6 h-6" />
+                <feature.icon className="w-6 h-6" />
               </div>
               <h3 className="mb-2 text-xl font-semibold text-secondary">
                 {feature.title}
