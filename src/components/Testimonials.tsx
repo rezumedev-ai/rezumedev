@@ -90,24 +90,6 @@ export const Testimonials = () => {
           <CarouselPrevious className="hidden md:flex" />
           <CarouselNext className="hidden md:flex" />
         </Carousel>
-
-        <div className="mt-24">
-          <h3 className="mb-12 text-2xl font-bold text-center text-secondary">
-            Our Users Got Hired At
-          </h3>
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
-            {['Apple', 'Disney', 'HCL', 'Booking.com', 'DHL'].map((company) => (
-              <div
-                key={company}
-                className="flex items-center justify-center p-6 transition-all bg-white border rounded-xl hover:shadow-md group"
-              >
-                <p className="text-xl font-bold text-secondary group-hover:text-primary transition-colors">
-                  {company}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );

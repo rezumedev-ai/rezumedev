@@ -2,6 +2,33 @@
 import { ArrowRight, FileText, Target, Award, CheckCircle2 } from 'lucide-react';
 
 export const Hero = () => {
+  const companies = [
+    {
+      name: "Apple",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+    },
+    {
+      name: "Disney",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Disney%2B_logo.svg",
+    },
+    {
+      name: "HCL",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/HCL_Technologies_logo.svg",
+    },
+    {
+      name: "Booking.com",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/b/be/Booking.com_logo.svg",
+    },
+    {
+      name: "DHL",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg",
+    },
+    {
+      name: "Meta",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
+    }
+  ];
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-accent via-accent/50 to-white py-20 sm:py-32">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM2MzY2RjEiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0aDR2NGgtNHpNNDAgMzBoNHY0aC00ek0zMiAzMmg0djRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40" />
@@ -34,6 +61,27 @@ export const Hero = () => {
             <div className="flex flex-col items-center p-4 bg-white/50 backdrop-blur-sm rounded-lg">
               <CheckCircle2 className="w-8 h-8 text-primary mb-2" />
               <p className="text-sm font-medium text-muted-foreground">Verified Results</p>
+            </div>
+          </div>
+
+          <div className="mt-20 animate-fade-up" style={{ animationDelay: '400ms' }}>
+            <p className="text-sm font-medium text-muted-foreground mb-8">
+              OUR USERS GOT HIRED AT
+            </p>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-8 items-center justify-center">
+              {companies.map((company, index) => (
+                <div
+                  key={company.name}
+                  className="group"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <img
+                    src={company.logo}
+                    alt={`${company.name} logo`}
+                    className="h-8 w-auto mx-auto grayscale opacity-70 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
