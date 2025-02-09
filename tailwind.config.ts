@@ -30,9 +30,9 @@ export default {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: '#0D9488',
+          DEFAULT: '#6366F1',
           foreground: '#FFFFFF',
-          hover: '#0F766E'
+          hover: '#4F46E5'
         },
         secondary: {
           DEFAULT: '#1E293B',
@@ -43,8 +43,8 @@ export default {
           foreground: '#64748B'
         },
         accent: {
-          DEFAULT: '#F0FDFA',
-          foreground: '#0D9488'
+          DEFAULT: '#EEF2FF',
+          foreground: '#6366F1'
         }
       },
       fontFamily: {
@@ -79,12 +79,21 @@ export default {
             opacity: '1',
             transform: 'scale(1)'
           },
+        },
+        'pulse-gentle': {
+          '0%, 100%': {
+            transform: 'scale(1)'
+          },
+          '50%': {
+            transform: 'scale(1.05)'
+          }
         }
       },
       animation: {
         'fade-up': 'fade-up 0.5s ease-out',
         'fade-in': 'fade-in 0.3s ease-out',
         'scale-up': 'scale-up 0.3s ease-out',
+        'pulse-gentle': 'pulse-gentle 3s infinite'
       }
     }
   },
