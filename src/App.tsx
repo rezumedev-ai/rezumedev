@@ -15,6 +15,7 @@ import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import Pricing from "./pages/Pricing";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<BlogPost />} />
             <Route
               path="/dashboard"
               element={
