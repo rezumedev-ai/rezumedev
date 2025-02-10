@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Json } from "@/integrations/supabase/types";
 
 const TOTAL_STEPS = 7;
 
@@ -151,31 +151,18 @@ export default function ResumeBuilder() {
 
   const saveProgress = async () => {
     const isNew = !id;
-    
-    type ResumeUpsert = {
-      id?: string;
-      user_id?: string;
-      title: string;
-      personal_info: ResumeData['personal_info'];
-      professional_summary: ResumeData['professional_summary'];
-      work_experience: WorkExperience[];
-      education: Education[];
-      skills: ResumeData['skills'];
-      certifications: Certification[];
-      current_step: number;
-      completion_status: 'draft' | 'completed';
-    }
 
-    const upsertData: ResumeUpsert = {
+    // Convert our strongly typed data to Json type for Supabase
+    const upsertData = {
       ...(id ? { id } : {}),
       user_id: user?.id,
       title: formData.professional_summary.title || "Untitled Resume",
-      personal_info: formData.personal_info,
-      professional_summary: formData.professional_summary,
-      work_experience: formData.work_experience,
-      education: formData.education,
-      skills: formData.skills,
-      certifications: formData.certifications,
+      personal_info: formData.personal_info as Json,
+      professional_summary: formData.professional_summary as Json,
+      work_experience: formData.work_experience as unknown as Json[],
+      education: formData.education as unknown as Json[],
+      skills: formData.skills as Json,
+      certifications: formData.certifications as unknown as Json[],
       current_step: currentStep,
       completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft'
     };
