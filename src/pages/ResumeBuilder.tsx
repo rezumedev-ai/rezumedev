@@ -138,12 +138,12 @@ export default function ResumeBuilder() {
   useEffect(() => {
     if (resume) {
       setFormData({
-        personal_info: resume.personal_info as ResumeData['personal_info'],
-        professional_summary: resume.professional_summary as ResumeData['professional_summary'],
-        work_experience: resume.work_experience as WorkExperience[] || [],
-        education: resume.education as Education[] || [],
-        skills: resume.skills as ResumeData['skills'] || { hard_skills: [], soft_skills: [] },
-        certifications: resume.certifications as Certification[] || []
+        personal_info: (resume.personal_info || {}) as ResumeData['personal_info'],
+        professional_summary: (resume.professional_summary || {}) as ResumeData['professional_summary'],
+        work_experience: (resume.work_experience || []) as unknown as WorkExperience[],
+        education: (resume.education || []) as unknown as Education[],
+        skills: (resume.skills || { hard_skills: [], soft_skills: [] }) as ResumeData['skills'],
+        certifications: (resume.certifications || []) as unknown as Certification[]
       });
       setCurrentStep(resume.current_step || 1);
     }
@@ -151,21 +151,38 @@ export default function ResumeBuilder() {
 
   const saveProgress = async () => {
     const isNew = !id;
+    
+    type ResumeUpsert = {
+      id?: string;
+      user_id?: string;
+      title: string;
+      personal_info: ResumeData['personal_info'];
+      professional_summary: ResumeData['professional_summary'];
+      work_experience: WorkExperience[];
+      education: Education[];
+      skills: ResumeData['skills'];
+      certifications: Certification[];
+      current_step: number;
+      completion_status: 'draft' | 'completed';
+    }
+
+    const upsertData: ResumeUpsert = {
+      ...(id ? { id } : {}),
+      user_id: user?.id,
+      title: formData.professional_summary.title || "Untitled Resume",
+      personal_info: formData.personal_info,
+      professional_summary: formData.professional_summary,
+      work_experience: formData.work_experience,
+      education: formData.education,
+      skills: formData.skills,
+      certifications: formData.certifications,
+      current_step: currentStep,
+      completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft'
+    };
+
     const { data, error } = await supabase
       .from("resumes")
-      .upsert({
-        ...(id ? { id } : {}),
-        user_id: user?.id,
-        title: formData.professional_summary.title || "Untitled Resume",
-        personal_info: formData.personal_info,
-        professional_summary: formData.professional_summary,
-        work_experience: formData.work_experience,
-        education: formData.education,
-        skills: formData.skills,
-        certifications: formData.certifications,
-        current_step: currentStep,
-        completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft'
-      })
+      .upsert(upsertData)
       .select()
       .single();
 
