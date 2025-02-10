@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,9 +12,16 @@ import { useToast } from "@/hooks/use-toast";
 const TOTAL_STEPS = 7;
 
 interface FormData {
-  fullName?: string;
-  title?: string;
-  [key: string]: any;
+  fullName: string;
+  title: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  summary?: string;
+  experience?: any[];
+  education?: any[];
+  skills?: string[];
+  [key: string]: any; // Allow for dynamic fields
 }
 
 const questions = [
@@ -44,7 +50,10 @@ export default function ResumeBuilder() {
   const queryClient = useQueryClient();
   
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>({});
+  const [formData, setFormData] = useState<FormData>({
+    fullName: "",
+    title: "",
+  });
 
   const { data: resume } = useQuery({
     queryKey: ["resume", id],
