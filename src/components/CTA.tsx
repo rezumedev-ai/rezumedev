@@ -1,5 +1,6 @@
 
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const CTA = () => {
   return (
@@ -12,10 +13,13 @@ export const CTA = () => {
           <p className="mb-8 text-lg text-muted-foreground">
             Join thousands of professionals who've landed their dream jobs with our AI-powered resumes.
           </p>
-          <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white transition-all bg-primary rounded-full hover:bg-primary-hover hover:scale-105 shadow-lg hover:shadow-primary/25 animate-pulse-gentle">
+          <Link 
+            to="/signup"
+            className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white transition-all bg-primary rounded-full hover:bg-primary-hover hover:scale-105 shadow-lg hover:shadow-primary/25 animate-pulse-gentle"
+          >
             Start Building Now
             <ArrowRight className="w-5 h-5" />
-          </button>
+          </Link>
         </div>
       </div>
     </section>

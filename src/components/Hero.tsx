@@ -1,5 +1,6 @@
 
 import { ArrowRight, FileText, Target, Award, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const Hero = () => {
   const companies = [
@@ -41,10 +42,14 @@ export const Hero = () => {
           <p className="mb-10 text-lg text-muted-foreground sm:text-xl animate-fade-up" style={{ animationDelay: '100ms' }}>
             Simply enter your details, and let AI craft a job-winning resume tailored to your industry.
           </p>
-          <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white transition-all bg-primary rounded-full hover:bg-primary-hover hover:scale-105 shadow-lg hover:shadow-primary/25 animate-fade-up animate-pulse-gentle" style={{ animationDelay: '200ms' }}>
+          <Link 
+            to="/signup"
+            className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white transition-all bg-primary rounded-full hover:bg-primary-hover hover:scale-105 shadow-lg hover:shadow-primary/25 animate-fade-up animate-pulse-gentle"
+            style={{ animationDelay: '200ms' }}
+          >
             Build Your Resume Now
             <ArrowRight className="w-5 h-5" />
-          </button>
+          </Link>
 
           <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4 animate-fade-up" style={{ animationDelay: '300ms' }}>
             <div className="flex flex-col items-center p-4 bg-white/50 backdrop-blur-sm rounded-lg">
