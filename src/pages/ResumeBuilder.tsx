@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,6 +10,12 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const TOTAL_STEPS = 7;
+
+interface FormData {
+  fullName?: string;
+  title?: string;
+  [key: string]: any;
+}
 
 const questions = [
   {
@@ -38,7 +43,7 @@ export default function ResumeBuilder() {
   const queryClient = useQueryClient();
   
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<FormData>({});
 
   const { data: resume } = useQuery({
     queryKey: ["resume", id],
@@ -155,7 +160,6 @@ export default function ResumeBuilder() {
           <Card className="p-6">
             <h3 className="text-lg font-medium mb-4">Preview</h3>
             <div className="prose max-w-none">
-              {/* Add preview content based on formData */}
               <pre className="text-sm text-gray-600">
                 {JSON.stringify(formData, null, 2)}
               </pre>
