@@ -8,13 +8,6 @@ import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { lazy, Suspense } from "react";
-
-// Lazy load components that are not immediately visible
-const LazyTestimonials = lazy(() => import("@/components/Testimonials"));
-const LazyFAQ = lazy(() => import("@/components/FAQ"));
-const LazyCTA = lazy(() => import("@/components/CTA"));
-const LazyFooter = lazy(() => import("@/components/Footer"));
 
 const Index = () => {
   return (
@@ -25,12 +18,10 @@ const Index = () => {
         <Process />
         <Features />
         <ResumeTemplates />
-        <Suspense fallback={<div className="h-96 flex items-center justify-center">Loading...</div>}>
-          <LazyTestimonials />
-          <LazyFAQ />
-          <LazyCTA />
-          <LazyFooter />
-        </Suspense>
+        <Testimonials />
+        <FAQ />
+        <CTA />
+        <Footer />
       </div>
     </main>
   );
