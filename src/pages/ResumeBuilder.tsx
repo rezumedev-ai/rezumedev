@@ -112,10 +112,28 @@ export default function ResumeBuilder() {
       setFormData({
         personal_info: resume.personal_info as ResumeData['personal_info'],
         professional_summary: resume.professional_summary as ResumeData['professional_summary'],
-        work_experience: (resume.work_experience || []) as WorkExperience[],
-        education: (resume.education || []) as Education[],
+        work_experience: (resume.work_experience as Json[] || []).map((exp) => ({
+          jobTitle: (exp as any).jobTitle || "",
+          companyName: (exp as any).companyName || "",
+          location: (exp as any).location,
+          startDate: (exp as any).startDate || "",
+          endDate: (exp as any).endDate || "",
+          isCurrentJob: (exp as any).isCurrentJob || false,
+          responsibilities: ((exp as any).responsibilities || []) as string[]
+        })),
+        education: (resume.education as Json[] || []).map((edu) => ({
+          degreeName: (edu as any).degreeName || "",
+          schoolName: (edu as any).schoolName || "",
+          startDate: (edu as any).startDate || "",
+          endDate: (edu as any).endDate || "",
+          isCurrentlyEnrolled: (edu as any).isCurrentlyEnrolled || false
+        })),
         skills: (resume.skills || { hard_skills: [], soft_skills: [] }) as ResumeData['skills'],
-        certifications: (resume.certifications || []) as Certification[]
+        certifications: (resume.certifications as Json[] || []).map((cert) => ({
+          name: (cert as any).name || "",
+          organization: (cert as any).organization || "",
+          completionDate: (cert as any).completionDate || ""
+        }))
       });
       setCurrentStep(resume.current_step || 1);
     }
