@@ -74,7 +74,14 @@ export default function ResumeBuilder() {
 
   useEffect(() => {
     if (resume) {
-      setFormData(resume.builder_progress || { fullName: "", title: "" });
+      const defaultData: FormData = {
+        fullName: "",
+        title: ""
+      };
+      setFormData(prev => ({
+        ...defaultData,
+        ...(resume.builder_progress as FormData || {})
+      }));
       setCurrentStep(resume.current_step || 1);
     }
   }, [resume]);
