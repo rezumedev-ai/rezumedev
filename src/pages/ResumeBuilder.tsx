@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -73,7 +74,7 @@ export default function ResumeBuilder() {
 
   useEffect(() => {
     if (resume) {
-      setFormData(resume.builder_progress || {});
+      setFormData(resume.builder_progress || { fullName: "", title: "" });
       setCurrentStep(resume.current_step || 1);
     }
   }, [resume]);
