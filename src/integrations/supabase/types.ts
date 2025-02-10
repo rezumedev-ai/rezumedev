@@ -136,43 +136,58 @@ export type Database = {
       }
       resumes: {
         Row: {
-          builder_progress: Json | null
+          certifications: Json[] | null
           completion_status: string | null
           content: Json
           created_at: string
           current_step: number | null
           downloads: number | null
+          education: Json[] | null
           id: string
+          personal_info: Json | null
+          professional_summary: Json | null
+          skills: Json | null
           title: string
           updated_at: string
           user_id: string
           views: number | null
+          work_experience: Json[] | null
         }
         Insert: {
-          builder_progress?: Json | null
+          certifications?: Json[] | null
           completion_status?: string | null
           content?: Json
           created_at?: string
           current_step?: number | null
           downloads?: number | null
+          education?: Json[] | null
           id?: string
+          personal_info?: Json | null
+          professional_summary?: Json | null
+          skills?: Json | null
           title: string
           updated_at?: string
           user_id: string
           views?: number | null
+          work_experience?: Json[] | null
         }
         Update: {
-          builder_progress?: Json | null
+          certifications?: Json[] | null
           completion_status?: string | null
           content?: Json
           created_at?: string
           current_step?: number | null
           downloads?: number | null
+          education?: Json[] | null
           id?: string
+          personal_info?: Json | null
+          professional_summary?: Json | null
+          skills?: Json | null
           title?: string
           updated_at?: string
           user_id?: string
           views?: number | null
+          work_experience?: Json[] | null
         }
         Relationships: []
       }

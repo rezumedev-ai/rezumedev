@@ -7,40 +7,87 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const TOTAL_STEPS = 7;
 
-interface FormData {
-  fullName: string;
-  title: string;
-  email?: string;
-  phone?: string;
+interface WorkExperience {
+  jobTitle: string;
+  companyName: string;
   location?: string;
-  summary?: string;
-  experience?: any[];
-  education?: any[];
-  skills?: string[];
-  [key: string]: any; // Allow for dynamic fields
+  startDate: string;
+  endDate: string;
+  isCurrentJob?: boolean;
+  responsibilities: string[];
+}
+
+interface Education {
+  degreeName: string;
+  schoolName: string;
+  startDate: string;
+  endDate: string;
+  isCurrentlyEnrolled?: boolean;
+}
+
+interface Certification {
+  name: string;
+  organization: string;
+  completionDate: string;
+}
+
+interface ResumeData {
+  personal_info: {
+    fullName: string;
+    email: string;
+    phone: string;
+    linkedin?: string;
+    website?: string;
+  };
+  professional_summary: {
+    title: string;
+    summary: string;
+  };
+  work_experience: WorkExperience[];
+  education: Education[];
+  skills: {
+    hard_skills: string[];
+    soft_skills: string[];
+  };
+  certifications: Certification[];
 }
 
 const questions = [
   {
     id: 1,
-    title: "What's your full name?",
+    title: "Personal Information",
+    description: "Let's start with your basic information",
     fields: [
-      { name: "fullName", type: "text", label: "Full Name", placeholder: "John Doe" }
+      { name: "fullName", label: "Full Name", type: "text", required: true },
+      { name: "email", label: "Email", type: "email", required: true },
+      { name: "phone", label: "Phone Number", type: "tel", required: true },
+      { name: "linkedin", label: "LinkedIn Profile", type: "url", required: false },
+      { name: "website", label: "Portfolio/Website", type: "url", required: false }
     ]
   },
   {
     id: 2,
-    title: "What's your professional title?",
+    title: "Professional Summary",
+    description: "Tell us about your career objectives",
     fields: [
-      { name: "title", type: "text", label: "Professional Title", placeholder: "Software Engineer" }
+      { name: "title", label: "Desired Job Title", type: "text", required: true },
+      { 
+        name: "summary", 
+        label: "Professional Summary", 
+        type: "textarea", 
+        required: true,
+        placeholder: "Write 3-4 sentences about your experience and key achievements..."
+      }
     ]
   },
-  // Add more questions as needed
+  // ... Work Experience, Education, Skills, and Certifications steps will be implemented next
 ];
 
 export default function ResumeBuilder() {
@@ -51,9 +98,25 @@ export default function ResumeBuilder() {
   const queryClient = useQueryClient();
   
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    title: "",
+  const [formData, setFormData] = useState<ResumeData>({
+    personal_info: {
+      fullName: "",
+      email: "",
+      phone: "",
+      linkedin: "",
+      website: ""
+    },
+    professional_summary: {
+      title: "",
+      summary: ""
+    },
+    work_experience: [],
+    education: [],
+    skills: {
+      hard_skills: [],
+      soft_skills: []
+    },
+    certifications: []
   });
 
   const { data: resume } = useQuery({
@@ -74,14 +137,14 @@ export default function ResumeBuilder() {
 
   useEffect(() => {
     if (resume) {
-      const defaultData: FormData = {
-        fullName: "",
-        title: ""
-      };
-      setFormData(prev => ({
-        ...defaultData,
-        ...(resume.builder_progress as FormData || {})
-      }));
+      setFormData({
+        personal_info: resume.personal_info || formData.personal_info,
+        professional_summary: resume.professional_summary || formData.professional_summary,
+        work_experience: resume.work_experience || [],
+        education: resume.education || [],
+        skills: resume.skills || { hard_skills: [], soft_skills: [] },
+        certifications: resume.certifications || []
+      });
       setCurrentStep(resume.current_step || 1);
     }
   }, [resume]);
@@ -93,11 +156,15 @@ export default function ResumeBuilder() {
       .upsert({
         id: id || undefined,
         user_id: user?.id,
-        title: formData.title || "Untitled Resume",
-        builder_progress: formData,
+        title: formData.professional_summary.title || "Untitled Resume",
+        personal_info: formData.personal_info,
+        professional_summary: formData.professional_summary,
+        work_experience: formData.work_experience,
+        education: formData.education,
+        skills: formData.skills,
+        certifications: formData.certifications,
         current_step: currentStep,
-        completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft',
-        content: {} // We'll populate this when the user completes all steps
+        completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft'
       })
       .select()
       .single();
@@ -119,7 +186,34 @@ export default function ResumeBuilder() {
     return data;
   };
 
+  const handleInputChange = (section: keyof ResumeData, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }));
+  };
+
   const handleNext = async () => {
+    const currentFields = questions[currentStep - 1].fields;
+    const currentSection = currentStep === 1 ? 'personal_info' : 'professional_summary';
+    
+    // Validate required fields
+    const missingFields = currentFields
+      .filter(field => field.required && !formData[currentSection][field.name])
+      .map(field => field.label);
+
+    if (missingFields.length > 0) {
+      toast({
+        title: "Required Fields Missing",
+        description: `Please fill in: ${missingFields.join(", ")}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     await saveProgress();
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(prev => prev + 1);
@@ -136,15 +230,11 @@ export default function ResumeBuilder() {
     }
   };
 
-  const handleSkip = () => {
-    handleNext();
-  };
-
   const currentQuestion = questions[currentStep - 1];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-8">
         <div className="space-y-4">
           <h1 className="text-2xl font-semibold text-center">Build Your Resume</h1>
           <Progress value={(currentStep / TOTAL_STEPS) * 100} className="w-full" />
@@ -153,23 +243,41 @@ export default function ResumeBuilder() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <Card className="p-6 space-y-6">
-            <h2 className="text-xl font-medium">{currentQuestion.title}</h2>
+            <div>
+              <h2 className="text-xl font-medium">{currentQuestion.title}</h2>
+              <p className="text-sm text-gray-500 mt-1">{currentQuestion.description}</p>
+            </div>
+
             <div className="space-y-4">
               {currentQuestion.fields.map(field => (
                 <div key={field.name} className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
                     {field.label}
+                    {field.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
-                  <input
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    className="w-full p-2 border rounded-md"
-                    value={formData[field.name] || ""}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      [field.name]: e.target.value
-                    }))}
-                  />
+                  {field.type === 'textarea' ? (
+                    <Textarea
+                      placeholder={field.placeholder}
+                      value={formData[currentStep === 1 ? 'personal_info' : 'professional_summary'][field.name] || ''}
+                      onChange={(e) => handleInputChange(
+                        currentStep === 1 ? 'personal_info' : 'professional_summary',
+                        field.name,
+                        e.target.value
+                      )}
+                      className="min-h-[100px]"
+                    />
+                  ) : (
+                    <Input
+                      type={field.type}
+                      placeholder={field.placeholder}
+                      value={formData[currentStep === 1 ? 'personal_info' : 'professional_summary'][field.name] || ''}
+                      onChange={(e) => handleInputChange(
+                        currentStep === 1 ? 'personal_info' : 'professional_summary',
+                        field.name,
+                        e.target.value
+                      )}
+                    />
+                  )}
                 </div>
               ))}
             </div>
@@ -178,9 +286,38 @@ export default function ResumeBuilder() {
           <Card className="p-6">
             <h3 className="text-lg font-medium mb-4">Preview</h3>
             <div className="prose max-w-none">
-              <pre className="text-sm text-gray-600">
-                {JSON.stringify(formData, null, 2)}
-              </pre>
+              <div className="space-y-6">
+                {/* Personal Information Preview */}
+                <div>
+                  <h4 className="text-xl font-bold">{formData.personal_info.fullName}</h4>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    {formData.personal_info.email && (
+                      <p>{formData.personal_info.email}</p>
+                    )}
+                    {formData.personal_info.phone && (
+                      <p>{formData.personal_info.phone}</p>
+                    )}
+                    {formData.personal_info.linkedin && (
+                      <p>{formData.personal_info.linkedin}</p>
+                    )}
+                    {formData.personal_info.website && (
+                      <p>{formData.personal_info.website}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Professional Summary Preview */}
+                {formData.professional_summary.title && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">
+                      {formData.professional_summary.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 mt-2">
+                      {formData.professional_summary.summary}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </Card>
         </div>
@@ -189,9 +326,6 @@ export default function ResumeBuilder() {
           <Button onClick={handlePrevious} variant="outline">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
-          </Button>
-          <Button onClick={handleSkip} variant="ghost">
-            Skip for now
           </Button>
           <Button onClick={handleNext}>
             {currentStep === TOTAL_STEPS ? "Finish" : "Next"}
