@@ -18,9 +18,6 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              Templates
-            </Link>
             <Link to="/features" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
               Features
             </Link>
@@ -56,13 +53,6 @@ export const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4">
             <nav className="flex flex-col space-y-4">
-              <Link
-                to="/templates"
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Templates
-              </Link>
               <Link
                 to="/features"
                 className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"

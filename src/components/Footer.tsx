@@ -29,9 +29,6 @@ export const Footer = () => {
             <h3 className="font-semibold text-lg text-secondary mb-4">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/templates" className="text-sm text-muted-foreground hover:text-primary transition-colors">Templates</Link>
-              </li>
-              <li>
                 <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link>
               </li>
               <li>
