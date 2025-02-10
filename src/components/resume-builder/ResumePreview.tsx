@@ -15,9 +15,32 @@ interface ResumePreviewProps {
     summary: string;
   };
   workExperience?: WorkExperience[];
+  education?: {
+    degreeName: string;
+    schoolName: string;
+    startDate: string;
+    endDate: string;
+    isCurrentlyEnrolled?: boolean;
+  }[];
+  skills?: {
+    hard_skills: string[];
+    soft_skills: string[];
+  };
+  certifications?: {
+    name: string;
+    organization: string;
+    completionDate: string;
+  }[];
 }
 
-export function ResumePreview({ personalInfo, professionalSummary, workExperience }: ResumePreviewProps) {
+export function ResumePreview({
+  personalInfo,
+  professionalSummary,
+  workExperience,
+  education,
+  skills,
+  certifications
+}: ResumePreviewProps) {
   return (
     <div className="prose max-w-none">
       <div className="space-y-6">
@@ -62,6 +85,65 @@ export function ResumePreview({ personalInfo, professionalSummary, workExperienc
                       <li key={idx} className="text-sm text-gray-600">{resp}</li>
                     ))}
                   </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Education Preview */}
+        {education && education.length > 0 && (
+          <div>
+            <h4 className="font-medium text-gray-900">Education</h4>
+            <div className="space-y-4 mt-2">
+              {education.map((edu, index) => (
+                <div key={index} className="border-l-2 border-gray-200 pl-4">
+                  <h5 className="font-medium text-gray-800">{edu.degreeName}</h5>
+                  <p className="text-sm text-gray-600">{edu.schoolName}</p>
+                  <p className="text-sm text-gray-500">
+                    {formatDate(edu.startDate)} - {edu.isCurrentlyEnrolled ? 'Present' : formatDate(edu.endDate)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Skills Preview */}
+        {skills && (skills.hard_skills.length > 0 || skills.soft_skills.length > 0) && (
+          <div>
+            <h4 className="font-medium text-gray-900">Skills</h4>
+            {skills.hard_skills.length > 0 && (
+              <div className="mt-2">
+                <h5 className="text-sm font-medium text-gray-700">Technical Skills</h5>
+                <p className="text-sm text-gray-600">
+                  {skills.hard_skills.join(", ")}
+                </p>
+              </div>
+            )}
+            {skills.soft_skills.length > 0 && (
+              <div className="mt-2">
+                <h5 className="text-sm font-medium text-gray-700">Soft Skills</h5>
+                <p className="text-sm text-gray-600">
+                  {skills.soft_skills.join(", ")}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Certifications Preview */}
+        {certifications && certifications.length > 0 && (
+          <div>
+            <h4 className="font-medium text-gray-900">Certifications</h4>
+            <div className="space-y-2 mt-2">
+              {certifications.map((cert, index) => (
+                <div key={index} className="border-l-2 border-gray-200 pl-4">
+                  <h5 className="font-medium text-gray-800">{cert.name}</h5>
+                  <p className="text-sm text-gray-600">{cert.organization}</p>
+                  <p className="text-sm text-gray-500">
+                    Completed: {formatDate(cert.completionDate)}
+                  </p>
                 </div>
               ))}
             </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +11,9 @@ import { Json } from "@/integrations/supabase/types";
 import { PersonalInfoStep } from "@/components/resume-builder/PersonalInfoStep";
 import { ProfessionalSummaryStep } from "@/components/resume-builder/ProfessionalSummaryStep";
 import { WorkExperienceStep } from "@/components/resume-builder/WorkExperienceStep";
+import { EducationStep } from "@/components/resume-builder/EducationStep";
+import { SkillsStep } from "@/components/resume-builder/SkillsStep";
+import { CertificationsStep } from "@/components/resume-builder/CertificationsStep";
 import { ResumePreview } from "@/components/resume-builder/ResumePreview";
 import { StepProgress } from "@/components/resume-builder/StepProgress";
 
@@ -227,6 +229,34 @@ export default function ResumeBuilder() {
         });
         return false;
       }
+    } else if (currentStep === 4 && formData.education.length > 0) {
+      const hasInvalidEducation = formData.education.some(edu => {
+        const isEndDateRequired = !edu.isCurrentlyEnrolled;
+        return !edu.degreeName || !edu.schoolName || !edu.startDate || 
+               (isEndDateRequired && !edu.endDate);
+      });
+
+      if (hasInvalidEducation) {
+        toast({
+          title: "Incomplete Education",
+          description: "Please fill in all required fields for each education entry",
+          variant: "destructive"
+        });
+        return false;
+      }
+    } else if (currentStep === 6 && formData.certifications.length > 0) {
+      const hasInvalidCertification = formData.certifications.some(cert => {
+        return !cert.name || !cert.organization || !cert.completionDate;
+      });
+
+      if (hasInvalidCertification) {
+        toast({
+          title: "Incomplete Certification",
+          description: "Please fill in all required fields for each certification",
+          variant: "destructive"
+        });
+        return false;
+      }
     }
     return true;
   };
@@ -272,6 +302,40 @@ export default function ResumeBuilder() {
             formData={formData.work_experience}
             onChange={(experiences) => setFormData(prev => ({ ...prev, work_experience: experiences }))}
           />
+        );
+      case 4:
+        return (
+          <EducationStep
+            formData={formData.education}
+            onChange={(education) => setFormData(prev => ({ ...prev, education }))}
+          />
+        );
+      case 5:
+        return (
+          <SkillsStep
+            formData={formData.skills}
+            onChange={(skills) => setFormData(prev => ({ ...prev, skills }))}
+          />
+        );
+      case 6:
+        return (
+          <CertificationsStep
+            formData={formData.certifications}
+            onChange={(certifications) => setFormData(prev => ({ ...prev, certifications }))}
+          />
+        );
+      case 7:
+        return (
+          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+            <ResumePreview
+              personalInfo={formData.personal_info}
+              professionalSummary={formData.professional_summary}
+              workExperience={formData.work_experience}
+              education={formData.education}
+              skills={formData.skills}
+              certifications={formData.certifications}
+            />
+          </div>
         );
       default:
         return null;
@@ -325,32 +389,41 @@ export default function ResumeBuilder() {
       <div className="max-w-5xl mx-auto space-y-8">
         <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="p-6 space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-xl font-medium text-gray-900">
-                {getStepTitle()}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {getStepDescription()}
-              </p>
-            </div>
-
-            {renderStep()}
-          </Card>
-
-          <div className="space-y-4">
-            <Card className="p-6 sticky top-8">
-              <h3 className="text-lg font-medium mb-4">Preview</h3>
-              <div className="max-h-[calc(100vh-16rem)] overflow-y-auto">
-                <ResumePreview
-                  personalInfo={formData.personal_info}
-                  professionalSummary={formData.professional_summary}
-                  workExperience={formData.work_experience}
-                />
+        <div className={currentStep === 7 ? "" : "grid md:grid-cols-2 gap-8"}>
+          {currentStep !== 7 && (
+            <Card className="p-6 space-y-6">
+              <div className="space-y-2">
+                <h2 className="text-xl font-medium text-gray-900">
+                  {getStepTitle()}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {getStepDescription()}
+                </p>
               </div>
+
+              {renderStep()}
             </Card>
-          </div>
+          )}
+
+          {currentStep !== 7 && (
+            <div className="space-y-4">
+              <Card className="p-6 sticky top-8">
+                <h3 className="text-lg font-medium mb-4">Preview</h3>
+                <div className="max-h-[calc(100vh-16rem)] overflow-y-auto">
+                  <ResumePreview
+                    personalInfo={formData.personal_info}
+                    professionalSummary={formData.professional_summary}
+                    workExperience={formData.work_experience}
+                    education={formData.education}
+                    skills={formData.skills}
+                    certifications={formData.certifications}
+                  />
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {currentStep === 7 && renderStep()}
         </div>
 
         <div className="flex justify-between">
