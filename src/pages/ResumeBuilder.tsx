@@ -11,12 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Json } from "@/integrations/supabase/types";
 import { PersonalInfoStep } from "@/components/resume-builder/PersonalInfoStep";
 import { ProfessionalSummaryStep } from "@/components/resume-builder/ProfessionalSummaryStep";
+import { WorkExperienceStep } from "@/components/resume-builder/WorkExperienceStep";
 import { ResumePreview } from "@/components/resume-builder/ResumePreview";
 import { StepProgress } from "@/components/resume-builder/StepProgress";
 
 const TOTAL_STEPS = 7;
 
-interface WorkExperience {
+export interface WorkExperience {
   jobTitle: string;
   companyName: string;
   location?: string;
@@ -109,12 +110,12 @@ export default function ResumeBuilder() {
   useEffect(() => {
     if (resume) {
       setFormData({
-        personal_info: (resume.personal_info || {}) as ResumeData['personal_info'],
-        professional_summary: (resume.professional_summary || {}) as ResumeData['professional_summary'],
-        work_experience: (resume.work_experience || []) as unknown as WorkExperience[],
-        education: (resume.education || []) as unknown as Education[],
+        personal_info: resume.personal_info as ResumeData['personal_info'],
+        professional_summary: resume.professional_summary as ResumeData['professional_summary'],
+        work_experience: (resume.work_experience || []) as WorkExperience[],
+        education: (resume.education || []) as Education[],
         skills: (resume.skills || { hard_skills: [], soft_skills: [] }) as ResumeData['skills'],
-        certifications: (resume.certifications || []) as unknown as Certification[]
+        certifications: (resume.certifications || []) as Certification[]
       });
       setCurrentStep(resume.current_step || 1);
     }
@@ -170,33 +171,50 @@ export default function ResumeBuilder() {
     }));
   };
 
-  const handleNext = async () => {
-    const currentFields = currentStep === 1 
-      ? [
-          { name: "fullName", label: "Full Name", required: true },
-          { name: "email", label: "Email", required: true },
-          { name: "phone", label: "Phone Number", required: true }
-        ]
-      : [
-          { name: "title", label: "Job Title", required: true },
-          { name: "summary", label: "Professional Summary", required: true }
-        ];
-    
-    const currentSection = currentStep === 1 ? 'personal_info' : 'professional_summary';
-    
-    // Validate required fields
-    const missingFields = currentFields
-      .filter(field => field.required && !formData[currentSection][field.name])
-      .map(field => field.label);
-
-    if (missingFields.length > 0) {
-      toast({
-        title: "Required Fields Missing",
-        description: `Please fill in: ${missingFields.join(", ")}`,
-        variant: "destructive"
+  const validateCurrentStep = () => {
+    if (currentStep === 1) {
+      const requiredFields = ['fullName', 'email', 'phone'];
+      const missingFields = requiredFields.filter(field => !formData.personal_info[field as keyof typeof formData.personal_info]);
+      if (missingFields.length > 0) {
+        toast({
+          title: "Required Fields Missing",
+          description: `Please fill in: ${missingFields.join(", ")}`,
+          variant: "destructive"
+        });
+        return false;
+      }
+    } else if (currentStep === 2) {
+      const requiredFields = ['title', 'summary'];
+      const missingFields = requiredFields.filter(field => !formData.professional_summary[field as keyof typeof formData.professional_summary]);
+      if (missingFields.length > 0) {
+        toast({
+          title: "Required Fields Missing",
+          description: `Please fill in: ${missingFields.join(", ")}`,
+          variant: "destructive"
+        });
+        return false;
+      }
+    } else if (currentStep === 3 && formData.work_experience.length > 0) {
+      const hasInvalidExperience = formData.work_experience.some(exp => {
+        const isEndDateRequired = !exp.isCurrentJob;
+        return !exp.jobTitle || !exp.companyName || !exp.startDate || 
+               (isEndDateRequired && !exp.endDate) || exp.responsibilities.some(r => !r.trim());
       });
-      return;
+
+      if (hasInvalidExperience) {
+        toast({
+          title: "Incomplete Work Experience",
+          description: "Please fill in all required fields for each work experience entry",
+          variant: "destructive"
+        });
+        return false;
+      }
     }
+    return true;
+  };
+
+  const handleNext = async () => {
+    if (!validateCurrentStep()) return;
 
     await saveProgress();
     if (currentStep < TOTAL_STEPS) {
@@ -214,6 +232,76 @@ export default function ResumeBuilder() {
     }
   };
 
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <PersonalInfoStep
+            formData={formData.personal_info}
+            onChange={(field, value) => handleInputChange('personal_info', field, value)}
+          />
+        );
+      case 2:
+        return (
+          <ProfessionalSummaryStep
+            formData={formData.professional_summary}
+            onChange={(field, value) => handleInputChange('professional_summary', field, value)}
+          />
+        );
+      case 3:
+        return (
+          <WorkExperienceStep
+            formData={formData.work_experience}
+            onChange={(experiences) => setFormData(prev => ({ ...prev, work_experience: experiences }))}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getStepTitle = () => {
+    switch (currentStep) {
+      case 1:
+        return "Personal Information";
+      case 2:
+        return "Professional Summary";
+      case 3:
+        return "Work Experience";
+      case 4:
+        return "Education";
+      case 5:
+        return "Skills";
+      case 6:
+        return "Certifications";
+      case 7:
+        return "Review & Finish";
+      default:
+        return "";
+    }
+  };
+
+  const getStepDescription = () => {
+    switch (currentStep) {
+      case 1:
+        return "Let's start with your basic information";
+      case 2:
+        return "Tell us about your career objectives";
+      case 3:
+        return "Add your relevant work history";
+      case 4:
+        return "Add your educational background";
+      case 5:
+        return "List your key skills";
+      case 6:
+        return "Add any relevant certifications";
+      case 7:
+        return "Review your resume and make final adjustments";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-5xl mx-auto space-y-8">
@@ -221,38 +309,30 @@ export default function ResumeBuilder() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <Card className="p-6 space-y-6">
-            <div>
-              <h2 className="text-xl font-medium">
-                {currentStep === 1 ? "Personal Information" : "Professional Summary"}
+            <div className="space-y-2">
+              <h2 className="text-xl font-medium text-gray-900">
+                {getStepTitle()}
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {currentStep === 1 
-                  ? "Let's start with your basic information"
-                  : "Tell us about your career objectives"
-                }
+              <p className="text-sm text-gray-500">
+                {getStepDescription()}
               </p>
             </div>
 
-            {currentStep === 1 ? (
-              <PersonalInfoStep
-                formData={formData.personal_info}
-                onChange={(field, value) => handleInputChange('personal_info', field, value)}
-              />
-            ) : (
-              <ProfessionalSummaryStep
-                formData={formData.professional_summary}
-                onChange={(field, value) => handleInputChange('professional_summary', field, value)}
-              />
-            )}
+            {renderStep()}
           </Card>
 
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Preview</h3>
-            <ResumePreview
-              personalInfo={formData.personal_info}
-              professionalSummary={formData.professional_summary}
-            />
-          </Card>
+          <div className="space-y-4">
+            <Card className="p-6 sticky top-8">
+              <h3 className="text-lg font-medium mb-4">Preview</h3>
+              <div className="max-h-[calc(100vh-16rem)] overflow-y-auto">
+                <ResumePreview
+                  personalInfo={formData.personal_info}
+                  professionalSummary={formData.professional_summary}
+                  workExperience={formData.work_experience}
+                />
+              </div>
+            </Card>
+          </div>
         </div>
 
         <div className="flex justify-between">
@@ -260,7 +340,7 @@ export default function ResumeBuilder() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <Button onClick={handleNext}>
+          <Button onClick={handleNext} className="bg-primary hover:bg-primary/90">
             {currentStep === TOTAL_STEPS ? "Finish" : "Next"}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
