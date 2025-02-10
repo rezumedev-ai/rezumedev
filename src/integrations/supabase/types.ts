@@ -136,8 +136,11 @@ export type Database = {
       }
       resumes: {
         Row: {
+          builder_progress: Json | null
+          completion_status: string | null
           content: Json
           created_at: string
+          current_step: number | null
           downloads: number | null
           id: string
           title: string
@@ -146,8 +149,11 @@ export type Database = {
           views: number | null
         }
         Insert: {
+          builder_progress?: Json | null
+          completion_status?: string | null
           content?: Json
           created_at?: string
+          current_step?: number | null
           downloads?: number | null
           id?: string
           title: string
@@ -156,8 +162,11 @@ export type Database = {
           views?: number | null
         }
         Update: {
+          builder_progress?: Json | null
+          completion_status?: string | null
           content?: Json
           created_at?: string
+          current_step?: number | null
           downloads?: number | null
           id?: string
           title?: string

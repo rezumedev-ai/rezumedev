@@ -4,12 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
-  FileText,
-  Briefcase,
-  PieChart,
-  Lightbulb,
-  DollarSign,
-  Headphones,
   Settings,
   HelpCircle,
   LogOut,
@@ -18,17 +12,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarProps {
-  activeSection: string;
-  setActiveSection: (section: string) => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-export function Sidebar({ activeSection, setActiveSection, isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -48,6 +43,12 @@ export function Sidebar({ activeSection, setActiveSection, isOpen, onClose }: Si
     "fixed top-0 h-full w-64 bg-white border-r border-gray-200 p-6 transition-all duration-300 ease-in-out z-40",
     isMobile ? (isOpen ? "left-0" : "-left-64") : "left-0"
   );
+
+  const menuItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
+    { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
+  ];
 
   return (
     <>
@@ -76,33 +77,23 @@ export function Sidebar({ activeSection, setActiveSection, isOpen, onClose }: Si
             </div>
             <div>
               <h3 className="font-medium">{profile?.full_name || 'User'}</h3>
-              <p className="text-sm text-gray-500">Set your target role</p>
+              <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
 
           <nav className="space-y-1">
-            {[
-              { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-              { id: 'documents', icon: FileText, label: 'Documents' },
-              { id: 'jobs', icon: Briefcase, label: 'Jobs' },
-              { id: 'jobTracker', icon: PieChart, label: 'Job Tracker' },
-              { id: 'interviewPrep', icon: Lightbulb, label: 'Interview Prep' },
-              { id: 'salaryAnalyzer', icon: DollarSign, label: 'Salary Analyzer' },
-              { id: 'coaching', icon: Headphones, label: 'Coaching' },
-              { id: 'settings', icon: Settings, label: 'Settings' },
-              { id: 'help', icon: HelpCircle, label: 'Help & Support' },
-            ].map(({ id, icon: Icon, label }) => (
+            {menuItems.map(({ id, icon: Icon, label, path }) => (
               <button
                 key={id}
                 onClick={() => {
-                  setActiveSection(id);
+                  navigate(path);
                   if (isMobile && onClose) {
                     onClose();
                   }
                 }}
                 className={cn(
                   "w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors text-left",
-                  activeSection === id
+                  location.pathname === path
                     ? "bg-blue-50 text-blue-600"
                     : "text-gray-600 hover:bg-gray-50"
                 )}

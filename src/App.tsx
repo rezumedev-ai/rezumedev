@@ -10,6 +10,7 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
+import ResumeBuilder from "./pages/ResumeBuilder";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
@@ -53,6 +54,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/resume-builder/:id?"
+              element={
+                <ProtectedRoute>
+                  <ResumeBuilder />
                 </ProtectedRoute>
               }
             />
