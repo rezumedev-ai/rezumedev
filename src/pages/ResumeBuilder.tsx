@@ -138,12 +138,12 @@ export default function ResumeBuilder() {
   useEffect(() => {
     if (resume) {
       setFormData({
-        personal_info: resume.personal_info || formData.personal_info,
-        professional_summary: resume.professional_summary || formData.professional_summary,
-        work_experience: resume.work_experience || [],
-        education: resume.education || [],
-        skills: resume.skills || { hard_skills: [], soft_skills: [] },
-        certifications: resume.certifications || []
+        personal_info: resume.personal_info as ResumeData['personal_info'],
+        professional_summary: resume.professional_summary as ResumeData['professional_summary'],
+        work_experience: resume.work_experience as WorkExperience[] || [],
+        education: resume.education as Education[] || [],
+        skills: resume.skills as ResumeData['skills'] || { hard_skills: [], soft_skills: [] },
+        certifications: resume.certifications as Certification[] || []
       });
       setCurrentStep(resume.current_step || 1);
     }
@@ -154,7 +154,7 @@ export default function ResumeBuilder() {
     const { data, error } = await supabase
       .from("resumes")
       .upsert({
-        id: id || undefined,
+        ...(id ? { id } : {}),
         user_id: user?.id,
         title: formData.professional_summary.title || "Untitled Resume",
         personal_info: formData.personal_info,
