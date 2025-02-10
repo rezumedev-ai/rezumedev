@@ -1,12 +1,23 @@
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <main className="container max-w-4xl px-4 py-16 mx-auto">
+        <div className="mb-8">
+          <Link to="/">
+            <Button variant="ghost" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </div>
         <h1 className="mb-8 text-4xl font-bold text-secondary">Privacy Policy</h1>
         <div className="prose prose-slate max-w-none">
           <p className="text-lg text-muted-foreground mb-6">Last updated: {new Date().toLocaleDateString()}</p>
