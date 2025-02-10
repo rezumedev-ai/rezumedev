@@ -1,16 +1,18 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Json } from "@/integrations/supabase/types";
+import { PersonalInfoStep } from "@/components/resume-builder/PersonalInfoStep";
+import { ProfessionalSummaryStep } from "@/components/resume-builder/ProfessionalSummaryStep";
+import { ResumePreview } from "@/components/resume-builder/ResumePreview";
+import { StepProgress } from "@/components/resume-builder/StepProgress";
 
 const TOTAL_STEPS = 7;
 
@@ -58,37 +60,6 @@ interface ResumeData {
   };
   certifications: Certification[];
 }
-
-const questions = [
-  {
-    id: 1,
-    title: "Personal Information",
-    description: "Let's start with your basic information",
-    fields: [
-      { name: "fullName", label: "Full Name", type: "text", required: true },
-      { name: "email", label: "Email", type: "email", required: true },
-      { name: "phone", label: "Phone Number", type: "tel", required: true },
-      { name: "linkedin", label: "LinkedIn Profile", type: "url", required: false },
-      { name: "website", label: "Portfolio/Website", type: "url", required: false }
-    ]
-  },
-  {
-    id: 2,
-    title: "Professional Summary",
-    description: "Tell us about your career objectives",
-    fields: [
-      { name: "title", label: "Desired Job Title", type: "text", required: true },
-      { 
-        name: "summary", 
-        label: "Professional Summary", 
-        type: "textarea", 
-        required: true,
-        placeholder: "Write 3-4 sentences about your experience and key achievements..."
-      }
-    ]
-  },
-  // ... Work Experience, Education, Skills, and Certifications steps will be implemented next
-];
 
 export default function ResumeBuilder() {
   const { id } = useParams();
@@ -152,7 +123,6 @@ export default function ResumeBuilder() {
   const saveProgress = async () => {
     const isNew = !id;
 
-    // Convert our strongly typed data to Json type for Supabase
     const upsertData = {
       ...(id ? { id } : {}),
       user_id: user?.id,
@@ -201,7 +171,17 @@ export default function ResumeBuilder() {
   };
 
   const handleNext = async () => {
-    const currentFields = questions[currentStep - 1].fields;
+    const currentFields = currentStep === 1 
+      ? [
+          { name: "fullName", label: "Full Name", required: true },
+          { name: "email", label: "Email", required: true },
+          { name: "phone", label: "Phone Number", required: true }
+        ]
+      : [
+          { name: "title", label: "Job Title", required: true },
+          { name: "summary", label: "Professional Summary", required: true }
+        ];
+    
     const currentSection = currentStep === 1 ? 'personal_info' : 'professional_summary';
     
     // Validate required fields
@@ -234,95 +214,44 @@ export default function ResumeBuilder() {
     }
   };
 
-  const currentQuestion = questions[currentStep - 1];
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-5xl mx-auto space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-2xl font-semibold text-center">Build Your Resume</h1>
-          <Progress value={(currentStep / TOTAL_STEPS) * 100} className="w-full" />
-          <p className="text-center text-sm text-gray-500">Step {currentStep} of {TOTAL_STEPS}</p>
-        </div>
+        <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
         <div className="grid md:grid-cols-2 gap-8">
           <Card className="p-6 space-y-6">
             <div>
-              <h2 className="text-xl font-medium">{currentQuestion.title}</h2>
-              <p className="text-sm text-gray-500 mt-1">{currentQuestion.description}</p>
+              <h2 className="text-xl font-medium">
+                {currentStep === 1 ? "Personal Information" : "Professional Summary"}
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {currentStep === 1 
+                  ? "Let's start with your basic information"
+                  : "Tell us about your career objectives"
+                }
+              </p>
             </div>
 
-            <div className="space-y-4">
-              {currentQuestion.fields.map(field => (
-                <div key={field.name} className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    {field.label}
-                    {field.required && <span className="text-red-500 ml-1">*</span>}
-                  </label>
-                  {field.type === 'textarea' ? (
-                    <Textarea
-                      placeholder={field.placeholder}
-                      value={formData[currentStep === 1 ? 'personal_info' : 'professional_summary'][field.name] || ''}
-                      onChange={(e) => handleInputChange(
-                        currentStep === 1 ? 'personal_info' : 'professional_summary',
-                        field.name,
-                        e.target.value
-                      )}
-                      className="min-h-[100px]"
-                    />
-                  ) : (
-                    <Input
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      value={formData[currentStep === 1 ? 'personal_info' : 'professional_summary'][field.name] || ''}
-                      onChange={(e) => handleInputChange(
-                        currentStep === 1 ? 'personal_info' : 'professional_summary',
-                        field.name,
-                        e.target.value
-                      )}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
+            {currentStep === 1 ? (
+              <PersonalInfoStep
+                formData={formData.personal_info}
+                onChange={(field, value) => handleInputChange('personal_info', field, value)}
+              />
+            ) : (
+              <ProfessionalSummaryStep
+                formData={formData.professional_summary}
+                onChange={(field, value) => handleInputChange('professional_summary', field, value)}
+              />
+            )}
           </Card>
 
           <Card className="p-6">
             <h3 className="text-lg font-medium mb-4">Preview</h3>
-            <div className="prose max-w-none">
-              <div className="space-y-6">
-                {/* Personal Information Preview */}
-                <div>
-                  <h4 className="text-xl font-bold">{formData.personal_info.fullName}</h4>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    {formData.personal_info.email && (
-                      <p>{formData.personal_info.email}</p>
-                    )}
-                    {formData.personal_info.phone && (
-                      <p>{formData.personal_info.phone}</p>
-                    )}
-                    {formData.personal_info.linkedin && (
-                      <p>{formData.personal_info.linkedin}</p>
-                    )}
-                    {formData.personal_info.website && (
-                      <p>{formData.personal_info.website}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Professional Summary Preview */}
-                {formData.professional_summary.title && (
-                  <div>
-                    <h4 className="font-medium text-gray-900">
-                      {formData.professional_summary.title}
-                    </h4>
-                    <p className="text-sm text-gray-600 mt-2">
-                      {formData.professional_summary.summary}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ResumePreview
+              personalInfo={formData.personal_info}
+              professionalSummary={formData.professional_summary}
+            />
           </Card>
         </div>
 
