@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -147,10 +148,10 @@ export default function ResumeBuilder() {
                     placeholder={field.placeholder}
                     className="w-full p-2 border rounded-md"
                     value={formData[field.name] || ""}
-                    onChange={(e) => setFormData({
-                      ...formData,
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
                       [field.name]: e.target.value
-                    })}
+                    }))}
                   />
                 </div>
               ))}
