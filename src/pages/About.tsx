@@ -11,18 +11,26 @@ const About = () => {
       <Header />
       <main className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 md:mb-16 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-4 md:mb-6">About Us</h1>
-            <p className="text-lg md:text-xl text-muted-foreground">Empowering careers through AI-powered resumes</p>
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 relative animate-fade-up">
+              <span className="text-secondary">Our </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                Story
+              </span>
+              <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground animate-fade-up" style={{ animationDelay: '100ms' }}>
+              Empowering careers through AI-powered resumes
+            </p>
           </div>
 
           <div className="max-w-3xl mx-auto">
-            <div className="prose animate-fade-up">
+            <div className="prose animate-fade-up" style={{ animationDelay: '200ms' }}>
               <p>At Rezume.dev, we believe everyone deserves a chance to showcase their best professional self.</p>
               <p>Our mission is to democratize access to high-quality resume creation tools, powered by the latest AI technology.</p>
             </div>
 
-            <div className="mt-12 text-center animate-fade-up">
+            <div className="mt-12 text-center animate-fade-up" style={{ animationDelay: '300ms' }}>
               <Button size="lg" asChild>
                 <Link to="/contact" className="group">
                   Get in Touch

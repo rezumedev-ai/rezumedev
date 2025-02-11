@@ -29,13 +29,21 @@ const Contact = () => {
       <Header />
       <main className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 md:mb-16 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-4 md:mb-6">Contact Us</h1>
-            <p className="text-lg md:text-xl text-muted-foreground">Get in touch with our team</p>
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 relative animate-fade-up">
+              <span className="text-secondary">Get in </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                Touch
+              </span>
+              <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground animate-fade-up" style={{ animationDelay: '100ms' }}>
+              We'd love to hear from you
+            </p>
           </div>
 
           <div className="max-w-lg mx-auto">
-            <form onSubmit={handleSubmit} className="space-y-6 animate-fade-up">
+            <form onSubmit={handleSubmit} className="space-y-6 animate-fade-up" style={{ animationDelay: '200ms' }}>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-secondary mb-2">Name</label>
                 <Input id="name" required />

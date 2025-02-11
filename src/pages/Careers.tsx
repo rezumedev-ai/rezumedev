@@ -1,8 +1,6 @@
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const Careers = () => {
   return (
@@ -10,35 +8,28 @@ const Careers = () => {
       <Header />
       <main className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 md:mb-16 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-4 md:mb-6">Join Our Team</h1>
-            <p className="text-lg md:text-xl text-muted-foreground">Help us shape the future of resume creation</p>
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 relative animate-fade-up">
+              <span className="text-secondary">Join Our </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                Team
+              </span>
+              <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground animate-fade-up" style={{ animationDelay: '100ms' }}>
+              Help us shape the future of resume creation
+            </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="grid gap-6 animate-fade-up">
-              {positions.map((position, index) => (
-                <div 
-                  key={position.title}
-                  className="p-6 rounded-lg border bg-card"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-semibold text-secondary">{position.title}</h3>
-                      <p className="text-muted-foreground">{position.location}</p>
-                    </div>
-                    <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-                      {position.type}
-                    </span>
-                  </div>
-                  <p className="text-muted-foreground mb-4">{position.description}</p>
-                  <Button variant="outline" className="group">
-                    Apply Now
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
-              ))}
+            <div className="text-center p-12 rounded-2xl bg-gradient-to-br from-accent/30 to-accent/10 backdrop-blur-sm animate-fade-up" style={{ animationDelay: '200ms' }}>
+              <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-4">
+                Exciting Opportunities Coming Soon! 🚀
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                We're currently working on bringing some amazing career opportunities to our team. 
+                Check back soon or follow us on social media to be the first to know when positions become available.
+              </p>
             </div>
           </div>
         </div>
@@ -47,21 +38,5 @@ const Careers = () => {
     </div>
   );
 };
-
-const positions = [
-  {
-    title: "Senior Frontend Developer",
-    location: "Remote",
-    type: "Full-time",
-    description: "We're looking for a Senior Frontend Developer to help build the next generation of our resume creation platform."
-  },
-  {
-    title: "AI Engineer",
-    location: "Remote",
-    type: "Full-time",
-    description: "Join us in developing cutting-edge AI solutions for resume optimization and content generation."
-  },
-  // Add more positions as needed
-];
 
 export default Careers;

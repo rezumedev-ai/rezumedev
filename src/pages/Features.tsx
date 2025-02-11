@@ -14,9 +14,12 @@ const Features = () => {
         <section className="py-20 bg-gradient-to-b from-accent/50 to-white">
           <div className="container px-4 mx-auto">
             <div className="max-w-3xl mx-auto text-center">
-              <h1 className="mb-6 text-4xl font-bold tracking-tight text-secondary sm:text-5xl md:text-6xl animate-fade-up">
-                Features That Make Your Resume{" "}
-                <span className="text-primary">Stand Out</span>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 relative animate-fade-up">
+                <span className="text-secondary">Powerful </span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                  Features
+                </span>
+                <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
               </h1>
               <p className="mb-8 text-lg text-muted-foreground sm:text-xl animate-fade-up" style={{ animationDelay: '100ms' }}>
                 Discover how our AI-powered platform makes resume creation effortless,
