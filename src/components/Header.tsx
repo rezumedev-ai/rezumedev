@@ -74,40 +74,42 @@ export const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 animate-expand">
-            <nav className="flex flex-col space-y-4">
-              <Link
-                to="/features"
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Features
-              </Link>
-              <Link
-                to="/pricing"
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-              <Link
-                to="/blog"
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Blog
-              </Link>
-              <div className="pt-4 space-y-2">
-                <Button variant="ghost" className="w-full hover-lift" asChild>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    Log in
-                  </Link>
-                </Button>
-                <Button className="w-full hover-lift" asChild>
-                  <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                    Get Started
-                  </Link>
-                </Button>
+          <div className="md:hidden absolute left-0 right-0 top-16 bg-white shadow-lg border-t animate-expand z-50">
+            <nav className="container mx-auto px-4 py-4">
+              <div className="flex flex-col space-y-4">
+                <Link
+                  to="/features"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-4 py-2 rounded-lg hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Features
+                </Link>
+                <Link
+                  to="/pricing"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-4 py-2 rounded-lg hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Pricing
+                </Link>
+                <Link
+                  to="/blog"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-4 py-2 rounded-lg hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+                <div className="pt-4 space-y-2 border-t">
+                  <Button variant="ghost" className="w-full hover-lift" asChild>
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                      Log in
+                    </Link>
+                  </Button>
+                  <Button className="w-full hover-lift" asChild>
+                    <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+                      Get Started
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </nav>
           </div>
