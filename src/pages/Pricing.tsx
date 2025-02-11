@@ -12,13 +12,20 @@ const Pricing = () => {
         <div className="container mx-auto px-4">
           {/* Header Section */}
           <div className="text-center mb-16 animate-fade-up">
-            <h1 className="text-4xl md:text-5xl font-bold text-secondary mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-              Simple, Transparent Pricing
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 relative">
+              <span className="text-secondary">Simple, </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                Transparent Pricing
+              </span>
+              <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: '200ms' }}>
               Choose the plan that works best for you. Get started for free and upgrade anytime.
             </p>
-            <div className="inline-block bg-accent/50 backdrop-blur-sm px-6 py-3 rounded-full animate-pulse">
+            <div 
+              className="inline-block bg-accent/50 backdrop-blur-sm px-6 py-3 rounded-full animate-bounce hover:scale-105 transition-transform cursor-pointer"
+              style={{ animationDuration: '3s' }}
+            >
               <p className="text-primary font-medium">🎉 Currently FREE during our beta phase!</p>
             </div>
           </div>
