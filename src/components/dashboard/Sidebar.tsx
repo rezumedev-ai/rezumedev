@@ -40,7 +40,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   });
 
   const sidebarClasses = cn(
-    "fixed top-0 h-full w-64 bg-white border-r border-gray-200 p-6 transition-all duration-300 ease-in-out z-40",
+    "fixed top-0 h-full w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 transition-all duration-300 ease-in-out z-40 shadow-lg",
     isMobile ? (isOpen ? "left-0" : "-left-64") : "left-0"
   );
 
@@ -54,7 +54,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {isMobile && isOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 z-30 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 transition-opacity duration-300"
           onClick={onClose}
         />
       )}
@@ -70,14 +70,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </Button>
         )}
 
-        <div className="space-y-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+        <div className="space-y-6 animate-fade-up">
+          <div className="flex items-center space-x-3 p-2 rounded-lg bg-primary/5">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-medium">
               {profile?.full_name?.[0] || user?.email?.[0] || 'U'}
             </div>
             <div>
-              <h3 className="font-medium">{profile?.full_name || 'User'}</h3>
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              <h3 className="font-medium text-gray-900">{profile?.full_name || 'User'}</h3>
+              <p className="text-sm text-gray-500 truncate max-w-[140px]">{user?.email}</p>
             </div>
           </div>
 
@@ -92,10 +92,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   }
                 }}
                 className={cn(
-                  "w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors text-left",
+                  "w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200",
                   location.pathname === path
-                    ? "bg-blue-50 text-blue-600"
-                    : "text-gray-600 hover:bg-gray-50"
+                    ? "bg-primary text-white shadow-md hover:shadow-lg"
+                    : "text-gray-600 hover:bg-primary/5"
                 )}
               >
                 <Icon className="w-5 h-5" />
@@ -107,7 +107,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         <Button
           variant="ghost"
-          className="absolute bottom-6 left-6 text-gray-600 hover:text-gray-900"
+          className="absolute bottom-6 left-6 text-gray-600 hover:text-gray-900 hover:bg-red-50 hover:text-red-600 transition-colors"
           onClick={signOut}
         >
           <LogOut className="w-5 h-5 mr-2" />

@@ -48,9 +48,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50">
       {isMobile && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b p-4">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b p-4">
           <Button
             variant="ghost"
             size="icon"
@@ -70,13 +70,14 @@ export default function Dashboard() {
       <div className={`${isMobile ? 'mt-16' : 'ml-64'} transition-all duration-300 ease-in-out`}>
         <div className="p-4 md:p-8">
           <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
-                Hi, {profile?.full_name?.split(' ')[0] || 'there'}!
+            <div className="animate-fade-up">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">{profile?.full_name?.split(' ')[0] || 'there'}!</span>
               </h1>
-              <p className="text-gray-600 mt-2">
-                Create and manage your professional resumes
+              <p className="text-gray-600 text-lg animate-fade-up" style={{ animationDelay: '100ms' }}>
+                Create and manage your professional resumes with ease
               </p>
+              <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
             </div>
 
             <ResumeList resumes={resumes || []} onCreateNew={handleCreateNew} />
