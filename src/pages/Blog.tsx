@@ -39,9 +39,13 @@ const Blog = () => {
       <main className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           {/* Header Section */}
-          <div className="text-center mb-12 md:mb-16 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-4 md:mb-6">Career Insights & Tips</h1>
-            <p className="text-lg md:text-xl text-muted-foreground">Expert advice to help you succeed in your job search</p>
+          <div className="text-center mb-12 md:mb-16 animate-fade-up">
+            <h1 className="text-4xl md:text-5xl font-bold text-secondary mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+              Career Insights & Tips
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Expert advice to help you succeed in your job search journey
+            </p>
           </div>
 
           {/* Blog Posts Grid */}
@@ -49,23 +53,23 @@ const Blog = () => {
             {blogPosts.map((post, index) => (
               <article 
                 key={post.id}
-                className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow animate-fade-up"
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden animate-fade-up"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="relative">
+                <div className="relative overflow-hidden">
                   <img
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-48 object-cover rounded-t-lg"
+                    className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="bg-primary/90 text-white px-3 py-1 rounded-full text-sm">
+                    <span className="bg-primary/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
                       {post.category}
                     </span>
                   </div>
                 </div>
-                <div className="p-4 md:p-6">
+                <div className="p-6 md:p-8">
                   <h2 className="text-xl font-semibold text-secondary mb-3 group-hover:text-primary transition-colors line-clamp-2">
                     {post.title}
                   </h2>
@@ -96,4 +100,3 @@ const Blog = () => {
 };
 
 export default Blog;
-
