@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
-import { Menu, Save, User, Bell, Shield, Keyboard } from "lucide-react";
+import { Menu, Save, User, Bell, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -20,16 +20,19 @@ export default function Settings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user?.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profile:", error);
+        throw error;
+      }
       return data;
     },
   });
@@ -48,10 +51,39 @@ export default function Settings() {
       toast({
         title: "Settings updated",
         description: "Your changes have been saved successfully.",
-        duration: 3000,
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Error updating settings",
+        description: "Failed to save your changes. Please try again.",
       });
     },
   });
+
+  const handlePasswordReset = async () => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(user?.email || '', {
+        redirectTo: `${window.location.origin}/settings`,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for instructions to reset your password.",
+      });
+    } catch (error) {
+      console.error("Error sending password reset:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to send password reset email. Please try again.",
+      });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +96,10 @@ export default function Settings() {
       desktop_notifications: formData.get("desktopNotifications") === "on",
     });
   };
+
+  if (isLoading) {
+    return <div className="p-4">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50">
@@ -159,19 +195,31 @@ export default function Settings() {
                   <div className="space-y-4 bg-white/80 backdrop-blur-sm rounded-lg p-6 border border-gray-200/50">
                     <div className="space-y-2">
                       <Label>Password</Label>
-                      <Button variant="outline" className="w-full sm:w-auto" onClick={() => {
-                        toast({
-                          title: "Password reset email sent",
-                          description: "Check your email for instructions to reset your password.",
-                          duration: 3000,
-                        });
-                      }}>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full sm:w-auto"
+                        onClick={handlePasswordReset}
+                      >
                         Change Password
                       </Button>
                     </div>
                     <div className="space-y-2">
                       <Label>Two-Factor Authentication</Label>
-                      <Button variant="outline" className="w-full sm:w-auto">Enable 2FA</Button>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full sm:w-auto"
+                        onClick={() => {
+                          toast({
+                            title: "Coming Soon",
+                            description: "Two-factor authentication will be available in a future update.",
+                          });
+                        }}
+                      >
+                        Enable 2FA
+                      </Button>
+                      <p className="text-sm text-gray-500">Two-factor authentication is coming soon.</p>
                     </div>
                   </div>
                 </TabsContent>
