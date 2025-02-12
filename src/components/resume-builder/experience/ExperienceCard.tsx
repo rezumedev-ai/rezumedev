@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Trash2, Briefcase } from "lucide-react";
-import { WorkExperience } from "@/pages/ResumeBuilder";
+import { WorkExperience } from "@/types/resume";
 import { ResponsibilitiesSection } from "./ResponsibilitiesSection";
 
 interface ExperienceCardProps {

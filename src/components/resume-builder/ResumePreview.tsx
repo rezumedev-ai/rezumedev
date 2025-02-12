@@ -1,5 +1,5 @@
 
-import { WorkExperience } from "@/pages/ResumeBuilder";
+import { WorkExperience } from "@/types/resume";
 import { formatDate } from "@/lib/utils";
 
 interface ResumePreviewProps {

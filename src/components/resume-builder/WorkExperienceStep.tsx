@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { WorkExperience } from "@/pages/ResumeBuilder";
+import { WorkExperience } from "@/types/resume";
 import { ExperienceCard } from "./experience/ExperienceCard";
 
 interface WorkExperienceStepProps {
