@@ -13,7 +13,7 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-white">
       <Header />
-      <div className="pt-16"> {/* Add padding to account for fixed header */}
+      <div className="pt-16">
         <Hero />
         <Process />
         <Features />
