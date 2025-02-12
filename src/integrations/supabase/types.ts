@@ -140,6 +140,45 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_content: {
+        Row: {
+          certifications: Json[]
+          created_at: string
+          education: Json[]
+          id: string
+          personal_info: Json
+          professional_summary: Json
+          skills: Json
+          updated_at: string
+          user_id: string | null
+          work_experience: Json[]
+        }
+        Insert: {
+          certifications?: Json[]
+          created_at?: string
+          education?: Json[]
+          id?: string
+          personal_info?: Json
+          professional_summary?: Json
+          skills?: Json
+          updated_at?: string
+          user_id?: string | null
+          work_experience?: Json[]
+        }
+        Update: {
+          certifications?: Json[]
+          created_at?: string
+          education?: Json[]
+          id?: string
+          personal_info?: Json
+          professional_summary?: Json
+          skills?: Json
+          updated_at?: string
+          user_id?: string | null
+          work_experience?: Json[]
+        }
+        Relationships: []
+      }
       resume_quiz_responses: {
         Row: {
           created_at: string | null
