@@ -15,6 +15,7 @@ interface TemplateSelectorProps {
 export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string>("professional");
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -55,7 +56,45 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps) {
       return;
     }
 
-    onTemplateSelect(selectedTemplate, selectedStyle);
+    try {
+      setIsLoading(true);
+
+      // Create a new resume
+      const { data: resume, error: resumeError } = await supabase
+        .from('resumes')
+        .insert([
+          {
+            user_id: user.id,
+            title: 'Untitled Resume',
+            template_id: selectedTemplate,
+            style_preference: selectedStyle,
+            content: {},
+            current_step: 1
+          }
+        ])
+        .select()
+        .single();
+
+      if (resumeError) throw resumeError;
+
+      // Navigate to the resume builder with the new resume ID
+      navigate(`/resume-builder/${resume.id}`);
+
+      toast({
+        title: "Resume Created",
+        description: "Let's start building your resume!",
+      });
+
+    } catch (error) {
+      console.error('Error creating resume:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create resume. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -108,8 +147,12 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps) {
       </div>
 
       <div className="mt-8 flex justify-end">
-        <Button onClick={handleContinue} className="min-w-[200px]">
-          Continue
+        <Button 
+          onClick={handleContinue} 
+          className="min-w-[200px]"
+          disabled={isLoading}
+        >
+          {isLoading ? "Creating..." : "Continue"}
           <ArrowRight className="ml-2 w-4 h-4" />
         </Button>
       </div>

@@ -140,6 +140,76 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_quiz_responses: {
+        Row: {
+          created_at: string | null
+          id: string
+          question_key: string
+          response: Json | null
+          resume_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          question_key: string
+          response?: Json | null
+          resume_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          question_key?: string
+          response?: Json | null
+          resume_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_quiz_responses_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resume_sections: {
+        Row: {
+          content: Json | null
+          created_at: string | null
+          id: string
+          order_index: number | null
+          resume_id: string | null
+          section_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          order_index?: number | null
+          resume_id?: string | null
+          section_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string | null
+          id?: string
+          order_index?: number | null
+          resume_id?: string | null
+          section_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_sections_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resumes: {
         Row: {
           certifications: Json[] | null
