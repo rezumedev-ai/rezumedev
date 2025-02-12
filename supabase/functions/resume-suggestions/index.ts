@@ -20,13 +20,21 @@ serve(async (req) => {
     let prompt = '';
     switch (type) {
       case 'summary':
-        prompt = `Write a professional and concise summary for a ${jobTitle} position. Keep it under 4 sentences and highlight key professional qualities. Make it impactful and modern.`;
+        prompt = `Write a professional and concise summary for a ${jobTitle} position. 
+                 Focus only on general professional qualities and aspirations WITHOUT making assumptions about years of experience or specific achievements.
+                 Keep it under 3 sentences and make it impactful and modern.
+                 Start with "Motivated professional seeking a position as a ${jobTitle}..."`;
         break;
       case 'skills':
-        prompt = `List 10 most relevant technical skills and 5 soft skills for a ${jobTitle} position. Format as JSON with two arrays: "technical_skills" and "soft_skills". Only return the JSON.`;
+        prompt = `For a ${jobTitle} position, provide:
+                 1. A list of 10 most relevant technical skills (hard skills) that are commonly required or beneficial
+                 2. A list of 5 important soft skills that would make someone successful in this role
+                 Format as JSON with two arrays: "technical_skills" and "soft_skills". Only return the JSON.`;
         break;
       case 'responsibilities':
-        prompt = `Suggest 5 key job responsibilities for a ${jobTitle} position. Format them as a JSON array of strings. Only return the JSON array.`;
+        prompt = `List 5 key job responsibilities that are typically expected for a ${jobTitle} position.
+                 Focus on common industry-standard duties without making assumptions about seniority level.
+                 Format them as a JSON array of strings. Only return the JSON array.`;
         break;
       default:
         throw new Error('Invalid suggestion type');
@@ -41,11 +49,18 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a professional resume writer with expertise in career development and job search.' },
+          { 
+            role: 'system', 
+            content: 'You are a professional resume writer with expertise in career development and job search. Provide clear, professional suggestions without making assumptions about experience level unless specifically provided.' 
+          },
           { role: 'user', content: prompt }
         ],
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
 
     const data = await response.json();
     const suggestion = data.choices[0].message.content;

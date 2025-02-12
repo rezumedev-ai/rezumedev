@@ -2,9 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Briefcase } from "lucide-react";
+import { Plus, Trash2, Briefcase, Sparkles } from "lucide-react";
 import { WorkExperience } from "@/pages/ResumeBuilder";
 import { Card } from "@/components/ui/card";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface WorkExperienceStepProps {
   formData: WorkExperience[];
@@ -12,6 +15,9 @@ interface WorkExperienceStepProps {
 }
 
 export function WorkExperienceStep({ formData, onChange }: WorkExperienceStepProps) {
+  const [generatingForIndex, setGeneratingForIndex] = useState<number | null>(null);
+  const { toast } = useToast();
+
   const addExperience = () => {
     onChange([
       ...formData,
@@ -78,6 +84,54 @@ export function WorkExperienceStep({ formData, onChange }: WorkExperienceStepPro
       return exp;
     });
     onChange(updatedExperiences);
+  };
+
+  const generateResponsibilities = async (experienceIndex: number) => {
+    const jobTitle = formData[experienceIndex].jobTitle;
+    
+    if (!jobTitle) {
+      toast({
+        title: "Job Title Required",
+        description: "Please enter a job title first to generate relevant responsibilities.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setGeneratingForIndex(experienceIndex);
+    try {
+      const { data, error } = await supabase.functions.invoke('resume-suggestions', {
+        body: { type: 'responsibilities', jobTitle }
+      });
+
+      if (error) throw error;
+
+      const responsibilities = JSON.parse(data.suggestion);
+      const updatedExperiences = formData.map((exp, i) => {
+        if (i === experienceIndex) {
+          return {
+            ...exp,
+            responsibilities: responsibilities
+          };
+        }
+        return exp;
+      });
+      
+      onChange(updatedExperiences);
+      toast({
+        title: "Responsibilities Generated",
+        description: "Review and customize the suggested responsibilities to match your experience.",
+      });
+    } catch (error) {
+      console.error('Error generating responsibilities:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate responsibilities. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingForIndex(null);
+    }
   };
 
   return (
@@ -172,15 +226,27 @@ export function WorkExperienceStep({ formData, onChange }: WorkExperienceStepPro
               <label className="text-sm font-medium text-gray-700">
                 Key Responsibilities <span className="text-red-500">*</span>
               </label>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addResponsibility(index)}
-                className="text-xs"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                Add Responsibility
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => generateResponsibilities(index)}
+                  disabled={generatingForIndex === index}
+                  className="text-xs"
+                >
+                  <Sparkles className="w-4 h-4 mr-1" />
+                  {generatingForIndex === index ? "Generating..." : "Suggest Responsibilities"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addResponsibility(index)}
+                  className="text-xs"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Responsibility
+                </Button>
+              </div>
             </div>
 
             {experience.responsibilities.map((resp, respIndex) => (
