@@ -223,6 +223,8 @@ export type Database = {
           personal_info: Json | null
           professional_summary: Json | null
           skills: Json | null
+          style_preference: string | null
+          template_id: string | null
           title: string
           updated_at: string
           user_id: string
@@ -241,6 +243,8 @@ export type Database = {
           personal_info?: Json | null
           professional_summary?: Json | null
           skills?: Json | null
+          style_preference?: string | null
+          template_id?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -259,6 +263,8 @@ export type Database = {
           personal_info?: Json | null
           professional_summary?: Json | null
           skills?: Json | null
+          style_preference?: string | null
+          template_id?: string | null
           title?: string
           updated_at?: string
           user_id?: string
