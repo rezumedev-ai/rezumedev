@@ -9,10 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface TemplateSelectorProps {
-  onTemplateSelect: (templateId: string, style: string) => void;
+  onTemplateSelect?: (templateId: string, style: string) => void;
 }
 
-export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps) {
+export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {}) {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string>("professional");
   const [isLoading, setIsLoading] = useState(false);
@@ -76,6 +76,11 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps) {
         .single();
 
       if (resumeError) throw resumeError;
+
+      // Call the onTemplateSelect prop if provided
+      if (onTemplateSelect) {
+        onTemplateSelect(selectedTemplate, selectedStyle);
+      }
 
       // Navigate to the resume builder with the new resume ID
       navigate(`/resume-builder/${resume.id}`);
