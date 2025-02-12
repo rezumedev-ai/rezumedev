@@ -24,6 +24,7 @@ import Careers from "./pages/Careers";
 import Guides from "./pages/Guides";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
+import NewResume from "./pages/NewResume";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -72,6 +73,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Help />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/new-resume"
+              element={
+                <ProtectedRoute>
+                  <NewResume />
                 </ProtectedRoute>
               }
             />

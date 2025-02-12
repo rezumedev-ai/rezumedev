@@ -53,6 +53,10 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
     navigate(`/resume-builder/${id}`);
   };
 
+  const handleCreateNew = () => {
+    navigate("/new-resume");
+  };
+
   return (
     <div className="animate-fade-up" style={{ animationDelay: '200ms' }}>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
@@ -60,7 +64,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
           <h2 className="text-2xl md:text-3xl font-bold">Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Resumes</span></h2>
           <p className="text-gray-600">Create and manage your professional documents</p>
         </div>
-        <Button onClick={onCreateNew} className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-opacity">
+        <Button onClick={handleCreateNew} className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-opacity">
           <Plus className="w-4 h-4 mr-2" />
           Create New
         </Button>
@@ -116,7 +120,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
 
         <Card 
           className="p-4 md:p-6 border-dashed hover:border-primary/50 transition-all duration-300 cursor-pointer bg-white/50 backdrop-blur-sm animate-fade-up group"
-          onClick={onCreateNew}
+          onClick={handleCreateNew}
           style={{ animationDelay: `${(resumes.length + 3) * 100}ms` }}
         >
           <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-2">
