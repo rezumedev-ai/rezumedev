@@ -315,6 +315,7 @@ export default function ResumeBuilder() {
           <SkillsStep
             formData={formData.skills}
             onChange={(skills) => setFormData(prev => ({ ...prev, skills }))}
+            jobTitle={formData.professional_summary.title}
           />
         );
       case 6:

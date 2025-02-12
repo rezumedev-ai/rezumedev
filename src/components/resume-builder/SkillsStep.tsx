@@ -1,8 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Skills {
   hard_skills: string[];
@@ -12,9 +15,13 @@ interface Skills {
 interface SkillsStepProps {
   formData: Skills;
   onChange: (skills: Skills) => void;
+  jobTitle?: string;
 }
 
-export function SkillsStep({ formData, onChange }: SkillsStepProps) {
+export function SkillsStep({ formData, onChange, jobTitle }: SkillsStepProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
+
   const addSkill = (type: 'hard_skills' | 'soft_skills') => {
     onChange({
       ...formData,
@@ -38,8 +45,61 @@ export function SkillsStep({ formData, onChange }: SkillsStepProps) {
     });
   };
 
+  const generateSkills = async () => {
+    if (!jobTitle) {
+      toast({
+        title: "Job Title Required",
+        description: "Please complete the Professional Summary section first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('resume-suggestions', {
+        body: { type: 'skills', jobTitle }
+      });
+
+      if (error) throw error;
+
+      const suggestedSkills = JSON.parse(data.suggestion);
+      onChange({
+        hard_skills: suggestedSkills.technical_skills,
+        soft_skills: suggestedSkills.soft_skills
+      });
+
+      toast({
+        title: "Skills Generated",
+        description: "Review and customize the suggested skills to match your experience.",
+      });
+    } catch (error) {
+      console.error('Error generating skills:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate skills. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={generateSkills}
+          disabled={isGenerating}
+          className="text-xs"
+        >
+          <Sparkles className="w-4 h-4 mr-1" />
+          {isGenerating ? "Generating..." : "Suggest Skills with AI"}
+        </Button>
+      </div>
+
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-medium text-gray-900">Technical Skills</h3>
