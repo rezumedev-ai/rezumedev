@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { QuizFlow } from "@/components/resume-builder/QuizFlow";
@@ -5,6 +6,8 @@ import { ResumePreview } from "@/components/resume-builder/ResumePreview";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { WorkExperience } from "@/types/resume";
+import { Json } from "@/integrations/supabase/types";
 
 export default function ResumeBuilder() {
   const { id } = useParams();
@@ -66,12 +69,34 @@ export default function ResumeBuilder() {
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <ResumePreview
-            personalInfo={resume.personal_info}
-            professionalSummary={resume.professional_summary}
-            workExperience={resume.work_experience}
-            education={resume.education}
-            skills={resume.skills}
-            certifications={resume.certifications}
+            personalInfo={resume.personal_info as {
+              fullName: string;
+              email: string;
+              phone: string;
+              linkedin?: string;
+              website?: string;
+            }}
+            professionalSummary={resume.professional_summary as {
+              title: string;
+              summary: string;
+            }}
+            workExperience={resume.work_experience as WorkExperience[]}
+            education={resume.education as {
+              degreeName: string;
+              schoolName: string;
+              startDate: string;
+              endDate: string;
+              isCurrentlyEnrolled?: boolean;
+            }[]}
+            skills={resume.skills as {
+              hard_skills: string[];
+              soft_skills: string[];
+            }}
+            certifications={resume.certifications as {
+              name: string;
+              organization: string;
+              completionDate: string;
+            }[]}
             isEditable={true}
             onUpdate={handleUpdate}
           />

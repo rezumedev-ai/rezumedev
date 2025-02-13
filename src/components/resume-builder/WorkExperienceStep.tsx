@@ -7,9 +7,10 @@ import { ExperienceCard } from "./experience/ExperienceCard";
 interface WorkExperienceStepProps {
   formData: WorkExperience[];
   onChange: (experiences: WorkExperience[]) => void;
+  hideAiSuggestions?: boolean;
 }
 
-export function WorkExperienceStep({ formData, onChange }: WorkExperienceStepProps) {
+export function WorkExperienceStep({ formData, onChange, hideAiSuggestions = false }: WorkExperienceStepProps) {
   const addExperience = () => {
     onChange([
       ...formData,
@@ -48,6 +49,7 @@ export function WorkExperienceStep({ formData, onChange }: WorkExperienceStepPro
           index={index}
           onUpdate={(field, value) => updateExperience(index, field, value)}
           onRemove={() => removeExperience(index)}
+          hideAiSuggestions={hideAiSuggestions}
         />
       ))}
 
