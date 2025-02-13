@@ -36,6 +36,10 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       linkedin: "",
       website: "",
     },
+    professional_summary: {
+      title: "",
+      summary: ""
+    },
     work_experience: [] as any[],
     education: [] as any[],
     certifications: [] as any[],
@@ -43,6 +47,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
 
   const steps = [
     { type: "personal_info", title: "Personal Information", icon: <User className="w-6 h-6" /> },
+    { type: "professional_summary", title: "Job Title", icon: <Briefcase className="w-6 h-6" /> },
     { type: "work_experience", title: "Work Experience", icon: <Briefcase className="w-6 h-6" /> },
     { type: "education", title: "Education", icon: <GraduationCap className="w-6 h-6" /> },
     { type: "certifications", title: "Certifications", icon: <Award className="w-6 h-6" /> },
@@ -93,23 +98,46 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       required: false,
       placeholder: "https://johndoe.com",
       inputType: "url"
+    },
+    {
+      id: "jobTitle",
+      text: "What's your desired job title?",
+      type: "professional_summary",
+      field: "title",
+      required: true,
+      placeholder: "e.g. Senior Software Engineer",
+      inputType: "text"
     }
   ];
 
   const currentQuestion = questions[currentQuestionIndex];
 
   const handleInputChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      personal_info: {
-        ...prev.personal_info,
-        [currentQuestion.field]: value,
-      }
-    }));
+    if (currentQuestion.type === "professional_summary") {
+      setFormData(prev => ({
+        ...prev,
+        professional_summary: {
+          ...prev.professional_summary,
+          [currentQuestion.field]: value,
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        personal_info: {
+          ...prev.personal_info,
+          [currentQuestion.field]: value,
+        }
+      }));
+    }
   };
 
   const handleNext = async () => {
-    if (currentQuestion.required && !formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info]) {
+    const currentValue = currentQuestion.type === "professional_summary" 
+      ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary]
+      : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info];
+
+    if (currentQuestion.required && !currentValue) {
       toast({
         title: "Required Field",
         description: "Please fill out this field to continue",
@@ -119,44 +147,56 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
 
     if (currentQuestionIndex === questions.length - 1) {
-      try {
-        const { error } = await supabase
-          .from('resumes')
-          .update({
-            personal_info: formData.personal_info,
-            work_experience: formData.work_experience,
-            education: formData.education,
-            certifications: formData.certifications,
-            current_step: 2,
-          })
-          .eq('id', resumeId);
-
-        if (error) throw error;
-        
-        onComplete();
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to save your information. Please try again.",
-          variant: "destructive",
-        });
-      }
+      setCurrentStep(prev => prev + 1);
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  const handleStepComplete = async () => {
+    try {
+      const { error } = await supabase
+        .from('resumes')
+        .update({
+          personal_info: formData.personal_info,
+          professional_summary: formData.professional_summary,
+          work_experience: formData.work_experience,
+          education: formData.education,
+          certifications: formData.certifications,
+          current_step: currentStep + 1,
+        })
+        .eq('id', resumeId);
+
+      if (error) throw error;
+      
+      if (currentStep === steps.length - 1) {
+        onComplete();
+      } else {
+        setCurrentStep(prev => prev + 1);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save your information. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
+    } else if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
     }
   };
 
-  const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const progressPercentage = ((currentStep + 1) / steps.length) * 100;
 
   const renderStep = () => {
     switch (steps[currentStep].type) {
       case "personal_info":
+      case "professional_summary":
         return (
           <AnimatePresence mode="wait">
             <motion.div
@@ -183,7 +223,11 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
               >
                 <Input
                   type={currentQuestion.inputType}
-                  value={formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info]}
+                  value={
+                    currentQuestion.type === "professional_summary"
+                      ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary]
+                      : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info]
+                  }
                   onChange={(e) => handleInputChange(e.target.value)}
                   placeholder={currentQuestion.placeholder}
                   required={currentQuestion.required}
@@ -294,17 +338,17 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           <Button
             variant="outline"
             onClick={handleBack}
-            disabled={currentQuestionIndex === 0}
+            disabled={currentStep === 0 && currentQuestionIndex === 0}
             className="transition-all duration-300 hover:shadow-md"
           >
             <ArrowLeft className="mr-2 w-4 h-4" />
             Back
           </Button>
           <Button 
-            onClick={handleNext}
+            onClick={currentQuestionIndex === questions.length - 1 ? handleStepComplete : handleNext}
             className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md"
           >
-            {currentQuestionIndex === questions.length - 1 ? "Complete" : "Next"}
+            {currentStep === steps.length - 1 ? "Complete" : "Next"}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </motion.div>
@@ -315,7 +359,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Question {currentQuestionIndex + 1} of {questions.length}
+          Step {currentStep + 1} of {steps.length}
         </motion.div>
       </div>
     </div>
