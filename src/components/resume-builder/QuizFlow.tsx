@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { ArrowRight, ArrowLeft, Briefcase, GraduationCap, Award, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { WorkExperienceStep } from "./WorkExperienceStep";
+import { EducationStep } from "./EducationStep";
+import { CertificationsStep } from "./CertificationsStep";
 
 interface QuizFlowProps {
   resumeId: string;
