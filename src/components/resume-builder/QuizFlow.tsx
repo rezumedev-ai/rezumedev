@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -152,6 +151,92 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
 
   const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
 
+  const renderStep = () => {
+    switch (steps[currentStep].type) {
+      case "personal_info":
+        return (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentQuestionIndex}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="space-y-6"
+            >
+              <motion.h2 
+                className="text-3xl font-bold text-gray-900 mb-8"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                {currentQuestion.text}
+              </motion.h2>
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Input
+                  type={currentQuestion.inputType}
+                  value={formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info]}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  placeholder={currentQuestion.placeholder}
+                  required={currentQuestion.required}
+                  className="text-lg p-6 border-2 focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                />
+                {currentQuestion.required && (
+                  <p className="text-sm text-gray-500 mt-2">* Required field</p>
+                )}
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        );
+      case "work_experience":
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <WorkExperienceStep
+              formData={formData.work_experience}
+              onChange={(experiences) => setFormData(prev => ({ ...prev, work_experience: experiences }))}
+            />
+          </motion.div>
+        );
+      case "education":
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <EducationStep
+              formData={formData.education}
+              onChange={(education) => setFormData(prev => ({ ...prev, education }))}
+            />
+          </motion.div>
+        );
+      case "certifications":
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <CertificationsStep
+              formData={formData.certifications}
+              onChange={(certifications) => setFormData(prev => ({ ...prev, certifications }))}
+            />
+          </motion.div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
       <div className="max-w-2xl w-full mx-auto p-6">
@@ -194,43 +279,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentQuestionIndex}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="space-y-6"
-            >
-              <motion.h2 
-                className="text-3xl font-bold text-gray-900 mb-8"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                {currentQuestion.text}
-              </motion.h2>
-
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                <Input
-                  type={currentQuestion.inputType}
-                  value={formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info]}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  placeholder={currentQuestion.placeholder}
-                  required={currentQuestion.required}
-                  className="text-lg p-6 border-2 focus:ring-2 focus:ring-primary/20 transition-all duration-300"
-                />
-                {currentQuestion.required && (
-                  <p className="text-sm text-gray-500 mt-2">* Required field</p>
-                )}
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
+          {renderStep()}
         </motion.div>
 
         <motion.div 
