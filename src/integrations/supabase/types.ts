@@ -140,6 +140,36 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_questions: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          question_key: string
+          question_text: string
+          question_type: Database["public"]["Enums"]["quiz_question_type"]
+          required: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index: number
+          question_key: string
+          question_text: string
+          question_type: Database["public"]["Enums"]["quiz_question_type"]
+          required?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          question_key?: string
+          question_text?: string
+          question_type?: Database["public"]["Enums"]["quiz_question_type"]
+          required?: boolean | null
+        }
+        Relationships: []
+      }
       resume_content: {
         Row: {
           certifications: Json[]
@@ -320,7 +350,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      quiz_question_type:
+        | "personal_info"
+        | "work_experience"
+        | "education"
+        | "certification"
     }
     CompositeTypes: {
       [_ in never]: never

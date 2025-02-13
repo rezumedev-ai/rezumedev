@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { QuizFlow } from "./QuizFlow";
 
 interface TemplateSelectorProps {
   onTemplateSelect?: (templateId: string, style: string) => void;
@@ -16,6 +17,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string>("professional");
   const [isLoading, setIsLoading] = useState(false);
+  const [resumeId, setResumeId] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -77,18 +79,12 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
 
       if (resumeError) throw resumeError;
 
+      setResumeId(resume.id);
+
       // Call the onTemplateSelect prop if provided
       if (onTemplateSelect) {
         onTemplateSelect(selectedTemplate, selectedStyle);
       }
-
-      // Navigate to the resume builder with the new resume ID
-      navigate(`/resume-builder/${resume.id}`);
-
-      toast({
-        title: "Resume Created",
-        description: "Let's start building your resume!",
-      });
 
     } catch (error) {
       console.error('Error creating resume:', error);
@@ -101,6 +97,20 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
       setIsLoading(false);
     }
   };
+
+  const handleQuizComplete = () => {
+    if (resumeId) {
+      navigate(`/resume-builder/${resumeId}`);
+      toast({
+        title: "Resume Created",
+        description: "Let's enhance your resume with AI assistance!",
+      });
+    }
+  };
+
+  if (resumeId) {
+    return <QuizFlow resumeId={resumeId} onComplete={handleQuizComplete} />;
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
