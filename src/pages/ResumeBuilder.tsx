@@ -1,7 +1,9 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { QuizFlow } from "@/components/resume-builder/QuizFlow";
 import { ResumePreview } from "@/components/resume-builder/ResumePreview";
+import { LoadingState } from "@/components/resume-builder/LoadingState";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +18,7 @@ export default function ResumeBuilder() {
   const { data: resume, isLoading } = useQuery({
     queryKey: ['resume', id],
     queryFn: async () => {
+      if (!id) return null;
       const { data, error } = await supabase
         .from('resumes')
         .select('*')
@@ -59,32 +62,11 @@ export default function ResumeBuilder() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold mb-2">Preparing Your Resume</h2>
-          <p className="text-gray-600">Please wait while we enhance your resume with AI suggestions...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState status="loading" />;
   }
 
   if (resume?.completion_status === 'enhancing') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-lg">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-6"></div>
-          <h2 className="text-2xl font-semibold mb-3">Enhancing Your Resume</h2>
-          <p className="text-gray-600 mb-4">
-            Our AI is analyzing your experience and crafting professional descriptions...
-          </p>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-primary h-2 rounded-full animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingState status="enhancing" />;
   }
 
   if (resume?.completion_status === 'completed') {
