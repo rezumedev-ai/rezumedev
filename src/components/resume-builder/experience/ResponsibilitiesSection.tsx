@@ -10,9 +10,15 @@ interface ResponsibilitiesSectionProps {
   jobTitle: string;
   responsibilities: string[];
   onUpdate: (responsibilities: string[]) => void;
+  hideAiSuggestions?: boolean;
 }
 
-export function ResponsibilitiesSection({ jobTitle, responsibilities, onUpdate }: ResponsibilitiesSectionProps) {
+export function ResponsibilitiesSection({ 
+  jobTitle, 
+  responsibilities, 
+  onUpdate,
+  hideAiSuggestions = false 
+}: ResponsibilitiesSectionProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -73,16 +79,18 @@ export function ResponsibilitiesSection({ jobTitle, responsibilities, onUpdate }
           Key Responsibilities <span className="text-red-500">*</span>
         </label>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={generateResponsibilities}
-            disabled={isGenerating}
-            className="text-xs"
-          >
-            <Sparkles className="w-4 h-4 mr-1" />
-            {isGenerating ? "Generating..." : "Suggest Responsibilities"}
-          </Button>
+          {!hideAiSuggestions && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={generateResponsibilities}
+              disabled={isGenerating}
+              className="text-xs"
+            >
+              <Sparkles className="w-4 h-4 mr-1" />
+              {isGenerating ? "Generating..." : "Suggest Responsibilities"}
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
