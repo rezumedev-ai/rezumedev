@@ -290,6 +290,13 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             education={formData.education}
             skills={formData.skills}
             certifications={formData.certifications}
+            isEditable={true}
+            onUpdate={(section, value) => {
+              setFormData(prev => ({
+                ...prev,
+                [section]: value
+              }));
+            }}
           />
         </div>
         <div className="flex justify-between">
@@ -363,6 +370,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             <WorkExperienceStep
               formData={formData.work_experience}
               onChange={(experiences) => setFormData(prev => ({ ...prev, work_experience: experiences }))}
+              hideAiSuggestions={true}
             />
           </motion.div>
         );
