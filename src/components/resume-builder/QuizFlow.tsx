@@ -13,6 +13,7 @@ import { QuestionForm } from "./quiz/QuestionForm";
 import { QuizProgress, quizSteps } from "./quiz/QuizProgress";
 import { questions } from "./quiz/questions";
 import { ResumeData } from "@/types/resume";
+import { Json } from "@/integrations/supabase/types";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -91,14 +92,15 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const handleStepComplete = async () => {
     if (currentStep === quizSteps.length - 1) {
       try {
+        // Cast the arrays to Json[] type to satisfy TypeScript
         const { error } = await supabase
           .from('resumes')
           .update({
-            personal_info: formData.personal_info,
-            professional_summary: formData.professional_summary,
-            work_experience: formData.work_experience,
-            education: formData.education,
-            certifications: formData.certifications,
+            personal_info: formData.personal_info as Json,
+            professional_summary: formData.professional_summary as Json,
+            work_experience: formData.work_experience as unknown as Json[],
+            education: formData.education as unknown as Json[],
+            certifications: formData.certifications as unknown as Json[],
             completion_status: 'enhancing'
           })
           .eq('id', resumeId);
