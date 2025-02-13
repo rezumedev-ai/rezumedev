@@ -80,23 +80,23 @@ export default function ResumeBuilder() {
               title: string;
               summary: string;
             }}
-            workExperience={resume.work_experience as WorkExperience[]}
-            education={resume.education as {
+            workExperience={(resume.work_experience as unknown as WorkExperience[]) || []}
+            education={(resume.education as {
               degreeName: string;
               schoolName: string;
               startDate: string;
               endDate: string;
               isCurrentlyEnrolled?: boolean;
-            }[]}
-            skills={resume.skills as {
+            }[]) || []}
+            skills={(resume.skills as {
               hard_skills: string[];
               soft_skills: string[];
-            }}
-            certifications={resume.certifications as {
+            }) || { hard_skills: [], soft_skills: [] }}
+            certifications={(resume.certifications as {
               name: string;
               organization: string;
               completionDate: string;
-            }[]}
+            }[]) || []}
             isEditable={true}
             onUpdate={handleUpdate}
           />

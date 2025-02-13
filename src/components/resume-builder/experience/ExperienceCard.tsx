@@ -11,9 +11,10 @@ interface ExperienceCardProps {
   index: number;
   onUpdate: (field: keyof WorkExperience, value: any) => void;
   onRemove: () => void;
+  hideAiSuggestions?: boolean;
 }
 
-export function ExperienceCard({ experience, index, onUpdate, onRemove }: ExperienceCardProps) {
+export function ExperienceCard({ experience, index, onUpdate, onRemove, hideAiSuggestions = false }: ExperienceCardProps) {
   return (
     <Card className="p-6 relative space-y-4 animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
       <Button
@@ -103,6 +104,7 @@ export function ExperienceCard({ experience, index, onUpdate, onRemove }: Experi
         jobTitle={experience.jobTitle}
         responsibilities={experience.responsibilities}
         onUpdate={(responsibilities) => onUpdate("responsibilities", responsibilities)}
+        hideAiSuggestions={hideAiSuggestions}
       />
     </Card>
   );
