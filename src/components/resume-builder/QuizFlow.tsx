@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { WorkExperienceStep } from "./WorkExperienceStep";
 import { EducationStep } from "./EducationStep";
 import { CertificationsStep } from "./CertificationsStep";
+import { ResumePreview } from "./ResumePreview";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -27,6 +28,8 @@ interface Question {
 export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     personal_info: {
@@ -43,6 +46,10 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     work_experience: [] as any[],
     education: [] as any[],
     certifications: [] as any[],
+    skills: {
+      hard_skills: [] as string[],
+      soft_skills: [] as string[],
+    }
   });
 
   const steps = [
@@ -154,8 +161,69 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   };
 
   const handleStepComplete = async () => {
+    if (currentStep === steps.length - 1) {
+      await enhanceResume();
+    } else {
+      try {
+        const { error } = await supabase
+          .from('resumes')
+          .update({
+            personal_info: formData.personal_info,
+            professional_summary: formData.professional_summary,
+            work_experience: formData.work_experience,
+            education: formData.education,
+            certifications: formData.certifications,
+            current_step: currentStep + 1,
+          })
+          .eq('id', resumeId);
+
+        if (error) throw error;
+        
+        setCurrentStep(prev => prev + 1);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to save your information. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleBack = () => {
+    if (showPreview) {
+      setShowPreview(false);
+    } else if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    } else if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleFinish = async () => {
     try {
       const { error } = await supabase
+        .from('resumes')
+        .update({
+          completion_status: 'completed'
+        })
+        .eq('id', resumeId);
+
+      if (error) throw error;
+      onComplete();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to complete resume. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const enhanceResume = async () => {
+    setIsEnhancing(true);
+    try {
+      const { data: resumeData, error: resumeError } = await supabase
         .from('resumes')
         .update({
           personal_info: formData.personal_info,
@@ -165,33 +233,78 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           certifications: formData.certifications,
           current_step: currentStep + 1,
         })
-        .eq('id', resumeId);
+        .eq('id', resumeId)
+        .select()
+        .single();
+
+      if (resumeError) throw resumeError;
+
+      const { data, error } = await supabase.functions.invoke('enhance-resume', {
+        body: { resumeData }
+      });
 
       if (error) throw error;
-      
-      if (currentStep === steps.length - 1) {
-        onComplete();
-      } else {
-        setCurrentStep(prev => prev + 1);
-      }
+
+      setFormData(prev => ({
+        ...prev,
+        professional_summary: {
+          ...prev.professional_summary,
+          summary: data.suggestions.professional_summary
+        },
+        skills: data.suggestions.skills,
+        work_experience: prev.work_experience.map((exp, idx) => ({
+          ...exp,
+          responsibilities: data.suggestions.enhanced_work_experience[idx]?.responsibilities || exp.responsibilities
+        }))
+      }));
+
+      toast({
+        title: "Resume Enhanced",
+        description: "Your resume has been optimized with AI suggestions.",
+      });
+
+      setShowPreview(true);
     } catch (error) {
+      console.error('Error enhancing resume:', error);
       toast({
         title: "Error",
-        description: "Failed to save your information. Please try again.",
+        description: "Failed to enhance resume. Please try again.",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleBack = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
-    } else if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+    } finally {
+      setIsEnhancing(false);
     }
   };
 
   const progressPercentage = ((currentStep + 1) / steps.length) * 100;
+
+  if (showPreview) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-xl shadow-xl p-8 mb-6">
+          <h2 className="text-2xl font-bold mb-6">Preview Your Enhanced Resume</h2>
+          <ResumePreview
+            personalInfo={formData.personal_info}
+            professionalSummary={formData.professional_summary}
+            workExperience={formData.work_experience}
+            education={formData.education}
+            skills={formData.skills}
+            certifications={formData.certifications}
+          />
+        </div>
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={handleBack}>
+            <ArrowLeft className="mr-2 w-4 h-4" />
+            Edit Resume
+          </Button>
+          <Button onClick={handleFinish}>
+            Complete Resume
+            <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const renderStep = () => {
     switch (steps[currentStep].type) {
