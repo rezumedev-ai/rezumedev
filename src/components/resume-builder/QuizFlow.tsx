@@ -52,14 +52,6 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
   });
 
-  const steps = [
-    { type: "personal_info", title: "Personal Information", icon: <User className="w-6 h-6" /> },
-    { type: "professional_summary", title: "Job Title", icon: <Briefcase className="w-6 h-6" /> },
-    { type: "work_experience", title: "Work Experience", icon: <Briefcase className="w-6 h-6" /> },
-    { type: "education", title: "Education", icon: <GraduationCap className="w-6 h-6" /> },
-    { type: "certifications", title: "Certifications", icon: <Award className="w-6 h-6" /> },
-  ];
-
   const questions: Question[] = [
     {
       id: "fullName",
@@ -162,8 +154,6 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
 
   const handleStepComplete = async () => {
     if (currentStep === steps.length - 1) {
-      await enhanceResume();
-    } else {
       try {
         const { error } = await supabase
           .from('resumes')
@@ -173,13 +163,14 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             work_experience: formData.work_experience,
             education: formData.education,
             certifications: formData.certifications,
-            current_step: currentStep + 1,
+            completion_status: 'enhancing'
           })
           .eq('id', resumeId);
 
         if (error) throw error;
         
-        setCurrentStep(prev => prev + 1);
+        setShowPreview(true);
+        await enhanceResume();
       } catch (error) {
         toast({
           title: "Error",
@@ -187,6 +178,8 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           variant: "destructive",
         });
       }
+    } else {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
@@ -275,6 +268,13 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       setIsEnhancing(false);
     }
   };
+
+  const steps = [
+    { type: "personal_info", title: "Personal Information", icon: <User className="w-6 h-6" /> },
+    { type: "work_experience", title: "Work Experience", icon: <Briefcase className="w-6 h-6" /> },
+    { type: "education", title: "Education", icon: <GraduationCap className="w-6 h-6" /> },
+    { type: "certifications", title: "Certifications", icon: <Award className="w-6 h-6" /> },
+  ];
 
   const progressPercentage = ((currentStep + 1) / steps.length) * 100;
 

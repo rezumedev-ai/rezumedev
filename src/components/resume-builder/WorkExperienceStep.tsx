@@ -21,7 +21,7 @@ export function WorkExperienceStep({ formData, onChange, hideAiSuggestions = fal
         startDate: "",
         endDate: "",
         isCurrentJob: false,
-        responsibilities: [""]
+        responsibilities: []  // Empty array as responsibilities will be added by AI
       }
     ]);
   };
@@ -49,7 +49,7 @@ export function WorkExperienceStep({ formData, onChange, hideAiSuggestions = fal
           index={index}
           onUpdate={(field, value) => updateExperience(index, field, value)}
           onRemove={() => removeExperience(index)}
-          hideAiSuggestions={hideAiSuggestions}
+          hideResponsibilities={true}
         />
       ))}
 

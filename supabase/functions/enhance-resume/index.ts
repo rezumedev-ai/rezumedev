@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
@@ -15,11 +14,11 @@ serve(async (req) => {
   }
 
   try {
-    const { resumeData } = await req.json()
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
+    const { resumeData } = await req.json();
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
     if (!openAIApiKey) {
-      throw new Error('Missing OpenAI API key')
+      throw new Error('Missing OpenAI API key');
     }
 
     const systemPrompt = `You are an expert resume writer and career counselor. Your task is to enhance the resume by:
@@ -107,6 +106,22 @@ serve(async (req) => {
 
       if (expError) throw expError
     }
+
+    // Update the resume with enhanced content and mark as completed
+    const { error: updateError } = await supabaseClient
+      .from('resumes')
+      .update({
+        professional_summary: { 
+          title: resumeData.professional_summary.title,
+          summary: suggestions.professional_summary 
+        },
+        skills: suggestions.skills,
+        work_experience: suggestions.enhanced_work_experience,
+        completion_status: 'completed'
+      })
+      .eq('id', resumeData.id);
+
+    if (updateError) throw updateError;
 
     return new Response(
       JSON.stringify({ success: true, suggestions }),

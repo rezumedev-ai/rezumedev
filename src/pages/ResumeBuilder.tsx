@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { QuizFlow } from "@/components/resume-builder/QuizFlow";
@@ -60,10 +59,34 @@ export default function ResumeBuilder() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold mb-2">Preparing Your Resume</h2>
+          <p className="text-gray-600">Please wait while we enhance your resume with AI suggestions...</p>
+        </div>
+      </div>
+    );
   }
 
-  // If the resume is completed, show editable preview
+  if (resume?.completion_status === 'enhancing') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-lg">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-6"></div>
+          <h2 className="text-2xl font-semibold mb-3">Enhancing Your Resume</h2>
+          <p className="text-gray-600 mb-4">
+            Our AI is analyzing your experience and crafting professional descriptions...
+          </p>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="bg-primary h-2 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (resume?.completion_status === 'completed') {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -105,7 +128,6 @@ export default function ResumeBuilder() {
     );
   }
 
-  // Otherwise show the quiz flow
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">

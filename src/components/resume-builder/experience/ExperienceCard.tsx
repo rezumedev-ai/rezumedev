@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -11,10 +10,16 @@ interface ExperienceCardProps {
   index: number;
   onUpdate: (field: keyof WorkExperience, value: any) => void;
   onRemove: () => void;
-  hideAiSuggestions?: boolean;
+  hideResponsibilities?: boolean;
 }
 
-export function ExperienceCard({ experience, index, onUpdate, onRemove, hideAiSuggestions = false }: ExperienceCardProps) {
+export function ExperienceCard({ 
+  experience, 
+  index, 
+  onUpdate, 
+  onRemove,
+  hideResponsibilities = false 
+}: ExperienceCardProps) {
   return (
     <Card className="p-6 relative space-y-4 animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
       <Button
@@ -99,13 +104,6 @@ export function ExperienceCard({ experience, index, onUpdate, onRemove, hideAiSu
           </label>
         </div>
       </div>
-
-      <ResponsibilitiesSection
-        jobTitle={experience.jobTitle}
-        responsibilities={experience.responsibilities}
-        onUpdate={(responsibilities) => onUpdate("responsibilities", responsibilities)}
-        hideAiSuggestions={hideAiSuggestions}
-      />
     </Card>
   );
 }
