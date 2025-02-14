@@ -28,26 +28,20 @@ serve(async (req) => {
 
     console.log('Enhancing resume:', resumeData.id);
 
-    const systemPrompt = `You are an expert resume writer and career counselor. Your task is to enhance the resume.
-    You MUST respond with a valid JSON object containing EXACTLY these fields:
+    const systemPrompt = `You are an expert resume writer and career counselor. You must respond ONLY with a valid JSON object in this exact format:
+{
+  "professional_summary": "A compelling summary text here",
+  "skills": {
+    "hard_skills": ["skill1", "skill2"],
+    "soft_skills": ["skill1", "skill2"]
+  },
+  "enhanced_work_experience": [
     {
-      "professional_summary": "string containing the summary",
-      "skills": {
-        "hard_skills": ["array", "of", "hard", "skills"],
-        "soft_skills": ["array", "of", "soft", "skills"]
-      },
-      "enhanced_work_experience": [
-        {
-          "responsibilities": ["array", "of", "enhanced", "responsibilities"]
-        }
-      ]
+      "responsibilities": ["responsibility1", "responsibility2"]
     }
-    
-    Use the candidate's work history, education, and desired role to:
-    1. Create a compelling professional summary
-    2. Identify relevant hard and soft skills
-    3. Enhance job responsibilities to be more impactful and ATS-friendly
-    4. Ensure all content is optimized for ATS systems`;
+  ]
+}
+DO NOT include any other text or explanation outside of this JSON structure.`;
 
     console.log('Calling OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -59,85 +53,112 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { 
+            role: 'system', 
+            content: systemPrompt 
+          },
           { 
             role: 'user', 
-            content: JSON.stringify({
-              desired_role: resumeData.professional_summary.title,
+            content: `Enhance this resume data for a ${resumeData.professional_summary.title} role. Return ONLY a JSON response with no other text:\n${JSON.stringify({
               work_experience: resumeData.work_experience,
               education: resumeData.education,
               certifications: resumeData.certifications
-            })
+            })}`
           }
         ],
-        temperature: 0.5, // Lower temperature for more consistent JSON output
-        response_format: { type: "json_object" }, // Explicitly request JSON response
+        temperature: 0.3, // Even lower temperature for strict JSON output
+        response_format: { type: "json_object" },
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
       console.error('OpenAI API error response:', errorData);
-      throw new Error(`OpenAI API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Raw AI response:', data); // Log the raw response
+    console.log('Raw OpenAI response:', JSON.stringify(data));
 
     if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid AI response structure:', data);
-      throw new Error('Invalid AI response structure');
+      throw new Error('No content in AI response');
     }
 
     let suggestions;
     try {
       const content = data.choices[0].message.content;
-      console.log('AI response content:', content); // Log the content before parsing
-      suggestions = typeof content === 'string' ? JSON.parse(content) : content;
+      console.log('Content to parse:', content);
       
-      // Validate the required structure
-      if (!suggestions.professional_summary || !suggestions.skills || !suggestions.enhanced_work_experience) {
-        throw new Error('Missing required fields in AI response');
+      // Handle both string and object responses
+      if (typeof content === 'string') {
+        suggestions = JSON.parse(content.trim());
+      } else {
+        suggestions = content;
       }
-      
-      console.log('Successfully parsed AI suggestions:', suggestions);
+
+      // Validate the response structure
+      if (!suggestions.professional_summary || 
+          !suggestions.skills?.hard_skills || 
+          !suggestions.skills?.soft_skills || 
+          !Array.isArray(suggestions.enhanced_work_experience)) {
+        throw new Error('Invalid response structure');
+      }
     } catch (error) {
-      console.error('Failed to parse AI response:', error);
-      console.error('Response content:', data.choices[0].message.content);
-      throw new Error(`Invalid JSON response from AI: ${error.message}`);
+      console.error('Parse error:', error);
+      console.error('Raw content:', data.choices[0].message.content);
+      throw new Error('Failed to parse AI response');
     }
 
+    console.log('Valid suggestions:', JSON.stringify(suggestions));
+
+    // Create Supabase client with explicit types
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Prepare update data
+    const updateData = {
+      professional_summary: {
+        title: resumeData.professional_summary.title,
+        summary: suggestions.professional_summary
+      },
+      skills: {
+        hard_skills: suggestions.skills.hard_skills,
+        soft_skills: suggestions.skills.soft_skills
+      },
+      work_experience: resumeData.work_experience.map((exp: any, idx: number) => ({
+        ...exp,
+        responsibilities: suggestions.enhanced_work_experience[idx]?.responsibilities || exp.responsibilities || []
+      })),
+      completion_status: 'completed'
+    };
+
+    console.log('Updating resume with:', JSON.stringify(updateData));
+
     const { error: updateError } = await supabaseClient
       .from('resumes')
-      .update({
-        professional_summary: {
-          title: resumeData.professional_summary.title,
-          summary: suggestions.professional_summary
-        },
-        skills: suggestions.skills,
-        work_experience: resumeData.work_experience.map((exp: any, idx: number) => ({
-          ...exp,
-          responsibilities: suggestions.enhanced_work_experience[idx]?.responsibilities || exp.responsibilities || []
-        })),
-        completion_status: 'completed',
-      })
+      .update(updateData)
       .eq('id', resumeData.id);
 
     if (updateError) {
-      console.error('Update error:', updateError);
+      console.error('Supabase update error:', updateError);
       throw updateError;
     }
 
     console.log('Resume enhanced successfully:', resumeData.id);
 
     return new Response(
-      JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        success: true,
+        message: 'Resume enhanced successfully'
+      }),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json'
+        }
+      }
     )
   } catch (error) {
     console.error('Error in enhance-resume function:', error);
@@ -147,7 +168,10 @@ serve(async (req) => {
         details: error.toString()
       }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json'
+        },
         status: 500
       }
     )
