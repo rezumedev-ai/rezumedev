@@ -1,5 +1,6 @@
 
 import { Question } from "./types";
+import { resumeTemplates } from "../templates";
 
 export const questions: Question[] = [
   {
@@ -46,6 +47,21 @@ export const questions: Question[] = [
     required: false,
     placeholder: "https://johndoe.com",
     inputType: "url"
+  },
+  {
+    id: "template",
+    text: "Choose a resume template that best matches your style",
+    type: "template",
+    field: "template_id",
+    required: true,
+    placeholder: "Select a template",
+    inputType: "select",
+    options: resumeTemplates.map(template => ({
+      value: template.id,
+      label: template.name,
+      description: template.description,
+      imageUrl: template.imageUrl
+    }))
   },
   {
     id: "jobTitle",
