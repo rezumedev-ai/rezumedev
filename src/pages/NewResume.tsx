@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Json } from "@/integrations/supabase/types";
 
 export default function NewResume() {
   const navigate = useNavigate();
@@ -30,16 +31,27 @@ export default function NewResume() {
         .insert([
           {
             user_id: user.id,
+            title: "Untitled Resume",
             completion_status: 'draft',
-            personal_info: {},
-            professional_summary: {},
-            work_experience: [],
-            education: [],
-            certifications: [],
+            content: {},
+            personal_info: {
+              fullName: '',
+              email: '',
+              phone: '',
+              linkedin: '',
+              website: ''
+            } as Json,
+            professional_summary: {
+              title: '',
+              summary: ''
+            } as Json,
+            work_experience: [] as Json[],
+            education: [] as Json[],
+            certifications: [] as Json[],
             skills: {
               hard_skills: [],
-              soft_skills: [],
-            }
+              soft_skills: []
+            } as Json
           }
         ])
         .select()
