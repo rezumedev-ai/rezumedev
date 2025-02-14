@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { resumeTemplates } from "./templates";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ResumePreviewProps {
   personalInfo: {
@@ -128,164 +129,180 @@ export function ResumePreview({
   };
 
   return (
-    <div className={cn("max-w-[800px] mx-auto bg-white p-8 shadow-sm text-gray-900", template.style.contentStyle)}>
-      {/* Header Section */}
-      <div className={style.headerStyle}>
-        <h1 className={style.titleFont}>
-          <EditableText text={personalInfo.fullName} section="personalInfo" field="fullName" />
-        </h1>
-        <div className={cn(template.id === "modern-split" ? "mt-2" : "mt-4")}>
-          <h2 className={cn("text-gray-600", template.id === "modern-split" ? "text-lg uppercase tracking-wide" : "text-xl")}>
-            <EditableText text={professionalSummary.title} section="professionalSummary" field="title" />
-          </h2>
-        </div>
-        <div className={cn(
-          "text-sm text-gray-600 flex gap-2 flex-wrap mt-4",
-          template.id === "modern-split" ? "flex-col items-start" : "items-center justify-center"
-        )}>
-          {personalInfo.phone && (
-            <EditableText text={personalInfo.phone} section="personalInfo" field="phone" />
-          )}
-          {personalInfo.email && (
-            <>
-              {template.id !== "modern-split" && <span className="text-gray-400">•</span>}
-              <EditableText text={personalInfo.email} section="personalInfo" field="email" />
-            </>
-          )}
-          {personalInfo.linkedin && (
-            <>
-              {template.id !== "modern-split" && <span className="text-gray-400">•</span>}
-              <EditableText text={personalInfo.linkedin} section="personalInfo" field="linkedin" />
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Summary Section */}
-      <div className={cn("mb-8", style.contentStyle)}>
-        <h3 className={style.sectionStyle}>Professional Summary</h3>
-        <EditableTextArea text={professionalSummary.summary} section="professionalSummary" field="summary" />
-      </div>
-
-      {/* Skills Section */}
-      {skills && (skills.hard_skills.length > 0 || skills.soft_skills.length > 0) && (
-        <div className="mb-6">
-          <h3 className={style.sectionStyle}>Skills</h3>
+    <ScrollArea className="h-[calc(100vh-4rem)] w-full rounded-md">
+      <div className="max-w-[21cm] mx-auto bg-white shadow-sm text-gray-900 p-8 md:p-12">
+        {/* Header Section */}
+        <div className={cn("mb-8", style.headerStyle)}>
+          <h1 className={cn("text-3xl md:text-4xl mb-4", style.titleFont)}>
+            <EditableText text={personalInfo.fullName} section="personalInfo" field="fullName" />
+          </h1>
+          <div className="mb-4">
+            <h2 className={cn("text-xl md:text-2xl text-gray-600", template.id === "modern-split" ? "uppercase tracking-wide" : "")}>
+              <EditableText text={professionalSummary.title} section="professionalSummary" field="title" />
+            </h2>
+          </div>
           <div className={cn(
-            "text-sm text-gray-700",
-            template.id === "modern-split" ? "grid grid-cols-2 gap-4" : ""
+            "text-sm md:text-base text-gray-600 flex flex-wrap gap-2 md:gap-4",
+            template.id === "modern-split" ? "flex-col items-start" : "items-center"
           )}>
-            {skills.hard_skills.length > 0 && (
-              <div>
-                {template.id === "modern-split" && <h4 className="font-medium mb-2">Technical Skills</h4>}
-                <p>{skills.hard_skills.join(' • ')}</p>
-              </div>
+            {personalInfo.phone && (
+              <span className="inline-flex items-center">
+                <EditableText text={personalInfo.phone} section="personalInfo" field="phone" />
+              </span>
             )}
-            {skills.soft_skills.length > 0 && (
-              <div>
-                {template.id === "modern-split" && <h4 className="font-medium mb-2">Soft Skills</h4>}
-                <p>{skills.soft_skills.join(' • ')}</p>
-              </div>
+            {personalInfo.email && (
+              <span className="inline-flex items-center">
+                {template.id !== "modern-split" && <span className="hidden md:inline text-gray-400 mx-2">•</span>}
+                <EditableText text={personalInfo.email} section="personalInfo" field="email" />
+              </span>
+            )}
+            {personalInfo.linkedin && (
+              <span className="inline-flex items-center">
+                {template.id !== "modern-split" && <span className="hidden md:inline text-gray-400 mx-2">•</span>}
+                <EditableText text={personalInfo.linkedin} section="personalInfo" field="linkedin" />
+              </span>
             )}
           </div>
         </div>
-      )}
 
-      {/* Experience Section */}
-      {workExperience && workExperience.length > 0 && (
-        <div className="mb-6">
-          <h3 className={style.sectionStyle}>Professional Experience</h3>
-          <div className={cn(
-            "space-y-4",
-            template.id === "modern-split" ? "grid gap-6" : ""
-          )}>
-            {workExperience.map((experience, index) => (
-              <div key={index} className={cn(
-                template.id === "modern-split" ? "grid grid-cols-[1fr_2fr] gap-4" : ""
-              )}>
-                <div className={cn(
-                  template.id === "modern-split" ? "" : "flex justify-between items-start mb-1"
+        {/* Summary Section */}
+        <div className={cn("mb-8", style.contentStyle)}>
+          <h3 className={style.sectionStyle}>Professional Summary</h3>
+          <EditableTextArea text={professionalSummary.summary} section="professionalSummary" field="summary" />
+        </div>
+
+        {/* Skills Section */}
+        {skills && (skills.hard_skills.length > 0 || skills.soft_skills.length > 0) && (
+          <div className="mb-8">
+            <h3 className={style.sectionStyle}>Skills</h3>
+            <div className={cn(
+              "text-sm md:text-base text-gray-700",
+              template.id === "modern-split" ? "grid md:grid-cols-2 gap-4" : ""
+            )}>
+              {skills.hard_skills.length > 0 && (
+                <div className="mb-4 md:mb-0">
+                  {template.id === "modern-split" && <h4 className="font-medium mb-2">Technical Skills</h4>}
+                  <p className="flex flex-wrap gap-2">
+                    {skills.hard_skills.map((skill, index) => (
+                      <span key={index} className="bg-gray-100 px-2 py-1 rounded text-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              )}
+              {skills.soft_skills.length > 0 && (
+                <div>
+                  {template.id === "modern-split" && <h4 className="font-medium mb-2">Soft Skills</h4>}
+                  <p className="flex flex-wrap gap-2">
+                    {skills.soft_skills.map((skill, index) => (
+                      <span key={index} className="bg-gray-100 px-2 py-1 rounded text-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Experience Section */}
+        {workExperience && workExperience.length > 0 && (
+          <div className="mb-8">
+            <h3 className={style.sectionStyle}>Professional Experience</h3>
+            <div className={cn(
+              "space-y-6",
+              template.id === "modern-split" ? "grid gap-6" : ""
+            )}>
+              {workExperience.map((experience, index) => (
+                <div key={index} className={cn(
+                  "border-b border-gray-100 pb-6 last:border-0 last:pb-0",
+                  template.id === "modern-split" ? "grid md:grid-cols-[1fr_2fr] gap-4" : ""
                 )}>
-                  <div>
-                    <h4 className="font-semibold text-[#333]">{experience.companyName}</h4>
-                    <div className="text-gray-700 font-medium">{experience.jobTitle}</div>
-                  </div>
                   <div className={cn(
-                    template.id === "modern-split" ? "mt-1" : "text-right"
+                    template.id === "modern-split" ? "" : "flex flex-col md:flex-row justify-between items-start mb-2"
                   )}>
-                    <div className="text-gray-600">{experience.location}</div>
-                    <div className="text-sm text-gray-600">
-                      {formatDate(experience.startDate)} - {experience.isCurrentJob ? 'Present' : formatDate(experience.endDate)}
+                    <div>
+                      <h4 className="font-semibold text-[#333]">{experience.companyName}</h4>
+                      <div className="text-gray-700 font-medium">{experience.jobTitle}</div>
+                    </div>
+                    <div className={cn(
+                      "text-sm text-gray-600",
+                      template.id === "modern-split" ? "mt-1" : "md:text-right"
+                    )}>
+                      <div>{experience.location}</div>
+                      <div>
+                        {formatDate(experience.startDate)} - {experience.isCurrentJob ? 'Present' : formatDate(experience.endDate)}
+                      </div>
                     </div>
                   </div>
+                  <ul className={cn(
+                    "list-disc ml-4 text-sm md:text-base text-gray-700 space-y-1",
+                    template.id === "modern-split" ? "mt-0" : "mt-2"
+                  )}>
+                    {experience.responsibilities.map((resp, idx) => (
+                      <li key={idx} className="leading-relaxed">{resp}</li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className={cn(
-                  "list-disc ml-4 text-sm text-gray-700 space-y-1",
-                  template.id === "modern-split" ? "mt-0" : "mt-2"
-                )}>
-                  {experience.responsibilities.map((resp, idx) => (
-                    <li key={idx}>{resp}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Education Section */}
-      {education && education.length > 0 && (
-        <div className="mb-6">
-          <h3 className={style.sectionStyle}>Education</h3>
-          <div className={cn(
-            "space-y-4",
-            template.id === "modern-split" ? "grid gap-4" : ""
-          )}>
-            {education.map((edu, index) => (
-              <div key={index} className={cn(
-                template.id === "modern-split" ? "grid grid-cols-[1fr_2fr] gap-4" : "flex justify-between items-start"
-              )}>
-                <div>
-                  <h4 className="font-semibold text-[#333]">{edu.schoolName}</h4>
-                  <div className="text-gray-700">{edu.degreeName}</div>
-                </div>
-                <div className={template.id === "modern-split" ? "" : "text-right"}>
-                  <div className="text-sm text-gray-600">
+        {/* Education Section */}
+        {education && education.length > 0 && (
+          <div className="mb-8">
+            <h3 className={style.sectionStyle}>Education</h3>
+            <div className={cn(
+              "space-y-4",
+              template.id === "modern-split" ? "grid gap-4" : ""
+            )}>
+              {education.map((edu, index) => (
+                <div key={index} className={cn(
+                  "border-b border-gray-100 pb-4 last:border-0 last:pb-0",
+                  template.id === "modern-split" ? "grid md:grid-cols-[1fr_2fr] gap-4" : "flex flex-col md:flex-row justify-between items-start"
+                )}>
+                  <div>
+                    <h4 className="font-semibold text-[#333]">{edu.schoolName}</h4>
+                    <div className="text-gray-700">{edu.degreeName}</div>
+                  </div>
+                  <div className={cn("text-sm text-gray-600", template.id === "modern-split" ? "" : "md:text-right")}>
                     {formatDate(edu.startDate)} - {edu.isCurrentlyEnrolled ? 'Present' : formatDate(edu.endDate)}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Certifications Section */}
-      {certifications && certifications.length > 0 && (
-        <div className="mb-6">
-          <h3 className={style.sectionStyle}>Certifications</h3>
-          <div className={cn(
-            "space-y-2",
-            template.id === "modern-split" ? "grid gap-4" : ""
-          )}>
-            {certifications.map((cert, index) => (
-              <div key={index} className={cn(
-                template.id === "modern-split" ? "grid grid-cols-[1fr_2fr] gap-4" : "flex justify-between items-start"
-              )}>
-                <div>
-                  <h4 className="font-semibold text-[#333]">{cert.name}</h4>
-                  <div className="text-sm text-gray-700">{cert.organization}</div>
-                </div>
-                <div className={template.id === "modern-split" ? "" : "text-right"}>
-                  <div className="text-sm text-gray-600">
+        {/* Certifications Section */}
+        {certifications && certifications.length > 0 && (
+          <div className="mb-8">
+            <h3 className={style.sectionStyle}>Certifications</h3>
+            <div className={cn(
+              "space-y-4",
+              template.id === "modern-split" ? "grid gap-4" : ""
+            )}>
+              {certifications.map((cert, index) => (
+                <div key={index} className={cn(
+                  "border-b border-gray-100 pb-4 last:border-0 last:pb-0",
+                  template.id === "modern-split" ? "grid md:grid-cols-[1fr_2fr] gap-4" : "flex flex-col md:flex-row justify-between items-start"
+                )}>
+                  <div>
+                    <h4 className="font-semibold text-[#333]">{cert.name}</h4>
+                    <div className="text-sm text-gray-700">{cert.organization}</div>
+                  </div>
+                  <div className={cn("text-sm text-gray-600", template.id === "modern-split" ? "" : "md:text-right")}>
                     {formatDate(cert.completionDate)}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ScrollArea>
   );
 }
