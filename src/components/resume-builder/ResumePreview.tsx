@@ -130,26 +130,10 @@ export function ResumePreview({
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gray-50 p-4">
-      <div 
-        className="relative w-full bg-white shadow-lg mx-auto overflow-hidden"
-        style={{ 
-          maxWidth: '21cm',
-          height: isMobile ? '100vh' : 'calc(29.7cm * 0.75)',
-          transform: isMobile ? 'scale(0.4)' : 'scale(0.75)',
-          transformOrigin: 'top center',
-          margin: isMobile ? '-30% 0' : '0 auto'
-        }}
-      >
-        <ScrollArea 
-          className={cn("h-full", {
-            "pointer-events-none": isMobile
-          })}
-          style={{
-            height: isMobile ? '250%' : '100%'
-          }}
-        >
-          <div className="p-[2cm]">
+    <div className="w-full h-full bg-gray-50">
+      <div className="max-w-[21cm] mx-auto bg-white shadow-lg min-h-screen">
+        <ScrollArea className="h-full">
+          <div className="p-8 md:p-[2cm]">
             <div className={cn("mb-6", style.headerStyle)}>
               <h1 className={cn("text-3xl font-bold mb-3", style.titleFont)}>
                 <EditableText text={personalInfo.fullName} section="personalInfo" field="fullName" />
