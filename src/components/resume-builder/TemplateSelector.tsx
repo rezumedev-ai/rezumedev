@@ -7,7 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { QuizFlow } from "./QuizFlow";
+import { resumeTemplates } from "./templates";
+import { TemplatePreview } from "./TemplatePreview";
 
 interface TemplateSelectorProps {
   onTemplateSelect?: (templateId: string, style: string) => void;
@@ -17,30 +18,15 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string>("professional");
   const [isLoading, setIsLoading] = useState(false);
-  const [resumeId, setResumeId] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const templates = [
-    {
-      id: "modern-professional",
-      name: "Modern Professional",
-      description: "Clean and contemporary design suitable for most industries",
-      preview_image_url: "https://placehold.co/600x800/4F46E5/FFFFFF/png?text=Modern+Professional"
-    },
-    {
-      id: "creative-bold",
-      name: "Creative Bold",
-      description: "Eye-catching design for creative professionals",
-      preview_image_url: "https://placehold.co/600x800/4338CA/FFFFFF/png?text=Creative+Bold"
-    }
-  ];
-
   const styles = [
     { id: "professional", name: "Professional" },
     { id: "creative", name: "Creative" },
-    { id: "brief", name: "Brief" }
+    { id: "modern", name: "Modern" },
+    { id: "classic", name: "Classic" }
   ];
 
   const handleContinue = async () => {
@@ -61,7 +47,6 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     try {
       setIsLoading(true);
 
-      // Create a new resume
       const { data: resume, error: resumeError } = await supabase
         .from('resumes')
         .insert([
@@ -79,13 +64,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
 
       if (resumeError) throw resumeError;
 
-      setResumeId(resume.id);
-
-      // Call the onTemplateSelect prop if provided
-      if (onTemplateSelect) {
-        onTemplateSelect(selectedTemplate, selectedStyle);
-      }
-
+      navigate(`/resume-builder/${resume.id}`);
     } catch (error) {
       console.error('Error creating resume:', error);
       toast({
@@ -97,20 +76,6 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
       setIsLoading(false);
     }
   };
-
-  const handleQuizComplete = () => {
-    if (resumeId) {
-      navigate(`/resume-builder/${resumeId}`);
-      toast({
-        title: "Resume Created",
-        description: "Let's enhance your resume with AI assistance!",
-      });
-    }
-  };
-
-  if (resumeId) {
-    return <QuizFlow resumeId={resumeId} onComplete={handleQuizComplete} />;
-  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -137,27 +102,14 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {templates.map((template) => (
-          <Card
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {resumeTemplates.map((template) => (
+          <TemplatePreview
             key={template.id}
-            className={`relative cursor-pointer transition-all hover:shadow-lg ${
-              selectedTemplate === template.id ? "ring-2 ring-primary" : ""
-            }`}
-            onClick={() => setSelectedTemplate(template.id)}
-          >
-            <div className="aspect-[3/4] relative overflow-hidden rounded-t-lg">
-              <img
-                src={template.preview_image_url}
-                alt={template.name}
-                className="object-cover w-full h-full transition-transform hover:scale-105"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="font-medium">{template.name}</h3>
-              <p className="text-sm text-muted-foreground">{template.description}</p>
-            </div>
-          </Card>
+            template={template}
+            isSelected={selectedTemplate === template.id}
+            onSelect={() => setSelectedTemplate(template.id)}
+          />
         ))}
       </div>
 
