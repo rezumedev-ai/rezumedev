@@ -9,12 +9,6 @@ export interface Question {
   required: boolean;
   placeholder: string;
   inputType: string;
-  options?: {
-    value: string;
-    label: string;
-    description?: string;
-    imageUrl?: string;
-  }[];
 }
 
 export interface QuizStep {
