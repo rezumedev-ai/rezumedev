@@ -28,13 +28,26 @@ serve(async (req) => {
 
     console.log('Enhancing resume:', resumeData.id);
 
-    const systemPrompt = `You are an expert resume writer and career counselor. Your task is to enhance the resume by:
-    1. Creating a compelling professional summary
-    2. Identifying and adding relevant skills based on work experience and desired role
-    3. Improving job responsibility descriptions to be more impactful and ATS-friendly
-    4. Ensuring all content is optimized for ATS systems
-    Use the candidate's work history, education, and desired role to create highly relevant content.
-    Respond with valid JSON containing: professional_summary (string), skills (object with hard_skills and soft_skills arrays), and enhanced_work_experience (array with responsibilities array for each position).`;
+    const systemPrompt = `You are an expert resume writer and career counselor. Your task is to enhance the resume.
+    You MUST respond with a valid JSON object containing EXACTLY these fields:
+    {
+      "professional_summary": "string containing the summary",
+      "skills": {
+        "hard_skills": ["array", "of", "hard", "skills"],
+        "soft_skills": ["array", "of", "soft", "skills"]
+      },
+      "enhanced_work_experience": [
+        {
+          "responsibilities": ["array", "of", "enhanced", "responsibilities"]
+        }
+      ]
+    }
+    
+    Use the candidate's work history, education, and desired role to:
+    1. Create a compelling professional summary
+    2. Identify relevant hard and soft skills
+    3. Enhance job responsibilities to be more impactful and ATS-friendly
+    4. Ensure all content is optimized for ATS systems`;
 
     console.log('Calling OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -57,7 +70,8 @@ serve(async (req) => {
             })
           }
         ],
-        temperature: 0.7,
+        temperature: 0.5, // Lower temperature for more consistent JSON output
+        response_format: { type: "json_object" }, // Explicitly request JSON response
       }),
     });
 
@@ -68,6 +82,8 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    console.log('Raw AI response:', data); // Log the raw response
+
     if (!data.choices?.[0]?.message?.content) {
       console.error('Invalid AI response structure:', data);
       throw new Error('Invalid AI response structure');
@@ -75,14 +91,21 @@ serve(async (req) => {
 
     let suggestions;
     try {
-      suggestions = JSON.parse(data.choices[0].message.content);
-      console.log('Successfully parsed AI suggestions');
+      const content = data.choices[0].message.content;
+      console.log('AI response content:', content); // Log the content before parsing
+      suggestions = typeof content === 'string' ? JSON.parse(content) : content;
+      
+      // Validate the required structure
+      if (!suggestions.professional_summary || !suggestions.skills || !suggestions.enhanced_work_experience) {
+        throw new Error('Missing required fields in AI response');
+      }
+      
+      console.log('Successfully parsed AI suggestions:', suggestions);
     } catch (error) {
-      console.error('Failed to parse AI response:', data.choices[0].message.content);
-      throw new Error('Invalid JSON response from AI');
+      console.error('Failed to parse AI response:', error);
+      console.error('Response content:', data.choices[0].message.content);
+      throw new Error(`Invalid JSON response from AI: ${error.message}`);
     }
-
-    console.log('Generated suggestions:', suggestions);
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
