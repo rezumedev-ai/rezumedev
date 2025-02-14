@@ -8,11 +8,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WorkExperience } from "@/types/resume";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function ResumeBuilder() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const { data: resume, isLoading, error } = useQuery({
     queryKey: ['resume', id],
@@ -95,8 +97,15 @@ export default function ResumeBuilder() {
   if (resume.completion_status === 'completed') {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto py-8 px-4 flex justify-center">
-          <div className="w-full" style={{ maxWidth: '21cm' }}>
+        <div className="container mx-auto h-screen p-4 flex items-center justify-center">
+          <div 
+            className="w-full relative bg-white shadow-lg"
+            style={{ 
+              maxWidth: '21cm',
+              height: isMobile ? '100vh' : 'auto',
+              maxHeight: isMobile ? '100vh' : 'auto'
+            }}
+          >
             <ResumePreview
               personalInfo={resume.personal_info as {
                 fullName: string;

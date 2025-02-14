@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { resumeTemplates } from "./templates";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/lib/hooks";
 
 interface ResumePreviewProps {
   personalInfo: {
@@ -52,6 +53,7 @@ export function ResumePreview({
   onUpdate
 }: ResumePreviewProps) {
   const [editingField, setEditingField] = useState<string | null>(null);
+  const isMobile = useIsMobile();
   
   const template = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
   const { style } = template;
@@ -128,16 +130,23 @@ export function ResumePreview({
   };
 
   return (
-    <div className="bg-white shadow-lg">
+    <div 
+      className="relative w-full h-full"
+      style={{
+        transform: isMobile ? 'scale(0.45)' : 'none',
+        transformOrigin: 'top center',
+        height: isMobile ? '220%' : '100%'
+      }}
+    >
       <div 
-        className="w-full relative bg-white"
+        className="bg-white absolute inset-0"
         style={{ 
           width: '21cm',
           minHeight: '29.7cm',
           margin: '0 auto'
         }}
       >
-        <ScrollArea className="h-full">
+        <ScrollArea className={cn("h-full", { "pointer-events-none": isMobile })}>
           <div className="p-[2cm]">
             <div className={cn("mb-6", style.headerStyle)}>
               <h1 className={cn("text-3xl font-bold mb-3", style.titleFont)}>
