@@ -32,7 +32,7 @@ export default function ResumeBuilder() {
       return data;
     },
     enabled: !!id,
-    retry: 1, // Only retry once if there's an error
+    retry: 1
   });
 
   if (!id) {
@@ -79,7 +79,6 @@ export default function ResumeBuilder() {
     return null;
   }
 
-  // If the resume is not found or has no completion status, show the quiz flow
   if (!resume || !resume.completion_status) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -127,6 +126,7 @@ export default function ResumeBuilder() {
               organization: string;
               completionDate: string;
             }[]) || []}
+            templateId={resume.template_id || "minimal-clean"}
             isEditable={true}
             onUpdate={handleUpdate}
           />
@@ -135,7 +135,6 @@ export default function ResumeBuilder() {
     );
   }
 
-  // If completion_status is 'draft' or any other status, show the quiz flow
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
