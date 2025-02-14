@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WorkExperience } from "@/types/resume";
-import { Json } from "@/integrations/supabase/types";
 
 export default function ResumeBuilder() {
   const { id } = useParams();
@@ -95,41 +94,43 @@ export default function ResumeBuilder() {
 
   if (resume.completion_status === 'completed') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <ResumePreview
-            personalInfo={resume.personal_info as {
-              fullName: string;
-              email: string;
-              phone: string;
-              linkedin?: string;
-              website?: string;
-            }}
-            professionalSummary={resume.professional_summary as {
-              title: string;
-              summary: string;
-            }}
-            workExperience={(resume.work_experience as unknown as WorkExperience[]) || []}
-            education={(resume.education as {
-              degreeName: string;
-              schoolName: string;
-              startDate: string;
-              endDate: string;
-              isCurrentlyEnrolled?: boolean;
-            }[]) || []}
-            skills={(resume.skills as {
-              hard_skills: string[];
-              soft_skills: string[];
-            }) || { hard_skills: [], soft_skills: [] }}
-            certifications={(resume.certifications as {
-              name: string;
-              organization: string;
-              completionDate: string;
-            }[]) || []}
-            templateId={resume.template_id || "minimal-clean"}
-            isEditable={true}
-            onUpdate={handleUpdate}
-          />
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto py-8 px-4 flex justify-center">
+          <div className="w-full" style={{ maxWidth: '21cm' }}>
+            <ResumePreview
+              personalInfo={resume.personal_info as {
+                fullName: string;
+                email: string;
+                phone: string;
+                linkedin?: string;
+                website?: string;
+              }}
+              professionalSummary={resume.professional_summary as {
+                title: string;
+                summary: string;
+              }}
+              workExperience={(resume.work_experience as unknown as WorkExperience[]) || []}
+              education={(resume.education as {
+                degreeName: string;
+                schoolName: string;
+                startDate: string;
+                endDate: string;
+                isCurrentlyEnrolled?: boolean;
+              }[]) || []}
+              skills={(resume.skills as {
+                hard_skills: string[];
+                soft_skills: string[];
+              }) || { hard_skills: [], soft_skills: [] }}
+              certifications={(resume.certifications as {
+                name: string;
+                organization: string;
+                completionDate: string;
+              }[]) || []}
+              templateId={resume.template_id || "minimal-clean"}
+              isEditable={true}
+              onUpdate={handleUpdate}
+            />
+          </div>
         </div>
       </div>
     );
