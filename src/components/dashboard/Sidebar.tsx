@@ -40,7 +40,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   });
 
   const sidebarClasses = cn(
-    "fixed top-0 h-full w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 transition-all duration-300 ease-in-out z-40 shadow-lg",
+    "fixed top-0 h-full w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 transition-all duration-300 ease-in-out z-50",
     isMobile ? (isOpen ? "left-0" : "-left-64") : "left-0"
   );
 
@@ -54,7 +54,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {isMobile && isOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={onClose}
         />
       )}
@@ -75,9 +75,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-medium">
               {profile?.full_name?.[0] || user?.email?.[0] || 'U'}
             </div>
-            <div>
-              <h3 className="font-medium text-gray-900">{profile?.full_name || 'User'}</h3>
-              <p className="text-sm text-gray-500 truncate max-w-[140px]">{user?.email}</p>
+            <div className="min-w-0">
+              <h3 className="font-medium text-gray-900 truncate">{profile?.full_name || 'User'}</h3>
+              <p className="text-sm text-gray-500 truncate">{user?.email}</p>
             </div>
           </div>
 
@@ -98,8 +98,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     : "text-gray-600 hover:bg-primary/5"
                 )}
               >
-                <Icon className="w-5 h-5" />
-                <span>{label}</span>
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                <span className="truncate">{label}</span>
               </button>
             ))}
           </nav>

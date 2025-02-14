@@ -59,22 +59,22 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
 
   return (
     <div className="animate-fade-up" style={{ animationDelay: '200ms' }}>
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-bold">Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Resumes</span></h2>
-          <p className="text-gray-600">Create and manage your professional documents</p>
+          <h2 className="text-xl md:text-2xl font-bold">Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Resumes</span></h2>
+          <p className="text-sm md:text-base text-gray-600">Create and manage your professional documents</p>
         </div>
-        <Button onClick={handleCreateNew} className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-opacity">
+        <Button onClick={handleCreateNew} className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-opacity w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
           Create New
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {resumes.map((resume, index) => (
           <Card 
             key={resume.id} 
-            className="p-4 md:p-6 hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-200/50 animate-fade-up"
+            className="p-4 hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-200/50 animate-fade-up"
             style={{ animationDelay: `${(index + 3) * 100}ms` }}
           >
             <div className="space-y-4">
@@ -90,12 +90,12 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">{resume.title || 'Untitled'}</h3>
+                <h3 className="font-semibold text-gray-900 break-words">{resume.title || 'Untitled'}</h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Updated {new Date(resume.updated_at).toLocaleDateString()}
                 </p>
               </div>
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -119,15 +119,15 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
         ))}
 
         <Card 
-          className="p-4 md:p-6 border-dashed hover:border-primary/50 transition-all duration-300 cursor-pointer bg-white/50 backdrop-blur-sm animate-fade-up group"
+          className="p-4 border-dashed hover:border-primary/50 transition-all duration-300 cursor-pointer bg-white/50 backdrop-blur-sm animate-fade-up"
           onClick={handleCreateNew}
           style={{ animationDelay: `${(resumes.length + 3) * 100}ms` }}
         >
-          <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-2">
+          <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-2 p-4">
             <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Plus className="w-6 h-6 text-primary/60" />
             </div>
-            <p className="font-medium">Create New Resume</p>
+            <p className="font-medium text-center">Create New Resume</p>
             <p className="text-sm text-center">Start building your professional resume</p>
           </div>
         </Card>
