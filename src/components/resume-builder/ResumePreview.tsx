@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { resumeTemplates } from "./templates";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useIsMobile } from "@/lib/hooks";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResumePreviewProps {
   personalInfo: {
