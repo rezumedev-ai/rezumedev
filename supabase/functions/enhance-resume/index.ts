@@ -16,9 +16,13 @@ serve(async (req) => {
   try {
     const { resumeData } = await req.json();
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) throw new Error('Missing OpenAI API key');
+    if (!openAIApiKey) {
+      console.error('Missing OpenAI API key');
+      throw new Error('Missing OpenAI API key');
+    }
     
     if (!resumeData?.id || !resumeData?.professional_summary?.title) {
+      console.error('Invalid resume data:', resumeData);
       throw new Error('Invalid resume data');
     }
 
@@ -32,6 +36,7 @@ serve(async (req) => {
     Use the candidate's work history, education, and desired role to create highly relevant content.
     Respond with valid JSON containing: professional_summary (string), skills (object with hard_skills and soft_skills arrays), and enhanced_work_experience (array with responsibilities array for each position).`;
 
+    console.log('Calling OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -39,7 +44,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           { role: 'system', content: systemPrompt },
           { 
@@ -57,19 +62,21 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      console.error('OpenAI API error:', error);
-      throw new Error('Failed to get AI response');
+      const errorData = await response.json();
+      console.error('OpenAI API error response:', errorData);
+      throw new Error(`OpenAI API error: ${response.status} - ${JSON.stringify(errorData)}`);
     }
 
     const data = await response.json();
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid AI response');
+      console.error('Invalid AI response structure:', data);
+      throw new Error('Invalid AI response structure');
     }
 
     let suggestions;
     try {
       suggestions = JSON.parse(data.choices[0].message.content);
+      console.log('Successfully parsed AI suggestions');
     } catch (error) {
       console.error('Failed to parse AI response:', data.choices[0].message.content);
       throw new Error('Invalid JSON response from AI');
@@ -112,7 +119,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in enhance-resume function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString()
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
@@ -120,4 +130,3 @@ serve(async (req) => {
     )
   }
 })
-
