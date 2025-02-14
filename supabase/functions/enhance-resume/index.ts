@@ -29,7 +29,8 @@ serve(async (req) => {
     2. Identifying and adding relevant skills based on work experience and desired role
     3. Improving job responsibility descriptions to be more impactful and ATS-friendly
     4. Ensuring all content is optimized for ATS systems
-    Use the candidate's work history, education, and desired role to create highly relevant content.`;
+    Use the candidate's work history, education, and desired role to create highly relevant content.
+    Respond with valid JSON containing: professional_summary (string), skills (object with hard_skills and soft_skills arrays), and enhanced_work_experience (array with responsibilities array for each position).`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -53,23 +54,34 @@ serve(async (req) => {
         ],
         temperature: 0.7,
       }),
-    })
+    });
 
-    const data = await response.json()
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('OpenAI API error:', error);
+      throw new Error('Failed to get AI response');
+    }
+
+    const data = await response.json();
     if (!data.choices?.[0]?.message?.content) {
       throw new Error('Invalid AI response');
     }
 
-    const suggestions = JSON.parse(data.choices[0].message.content);
+    let suggestions;
+    try {
+      suggestions = JSON.parse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Failed to parse AI response:', data.choices[0].message.content);
+      throw new Error('Invalid JSON response from AI');
+    }
+
     console.log('Generated suggestions:', suggestions);
 
-    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Update resume with enhanced content
     const { error: updateError } = await supabaseClient
       .from('resumes')
       .update({
@@ -80,7 +92,7 @@ serve(async (req) => {
         skills: suggestions.skills,
         work_experience: resumeData.work_experience.map((exp: any, idx: number) => ({
           ...exp,
-          responsibilities: suggestions.enhanced_work_experience[idx]?.responsibilities || []
+          responsibilities: suggestions.enhanced_work_experience[idx]?.responsibilities || exp.responsibilities || []
         })),
         completion_status: 'completed',
       })
@@ -108,3 +120,4 @@ serve(async (req) => {
     )
   }
 })
+
