@@ -15,7 +15,7 @@ export default function ResumeBuilder() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { data: resume, isLoading } = useQuery({
+  const { data: resume, isLoading, error } = useQuery({
     queryKey: ['resume', id],
     queryFn: async () => {
       if (!id) return null;
@@ -25,10 +25,14 @@ export default function ResumeBuilder() {
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching resume:', error);
+        throw error;
+      }
       return data;
     },
-    enabled: !!id
+    enabled: !!id,
+    retry: 1, // Only retry once if there's an error
   });
 
   if (!id) {
@@ -65,11 +69,32 @@ export default function ResumeBuilder() {
     return <LoadingState status="loading" />;
   }
 
-  if (resume?.completion_status === 'enhancing') {
+  if (error) {
+    toast({
+      title: "Error",
+      description: "Failed to load resume. Redirecting to dashboard...",
+      variant: "destructive",
+    });
+    navigate("/dashboard");
+    return null;
+  }
+
+  // If the resume is not found or has no completion status, show the quiz flow
+  if (!resume || !resume.completion_status) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          <QuizFlow resumeId={id} onComplete={handleComplete} />
+        </div>
+      </div>
+    );
+  }
+
+  if (resume.completion_status === 'enhancing') {
     return <LoadingState status="enhancing" />;
   }
 
-  if (resume?.completion_status === 'completed') {
+  if (resume.completion_status === 'completed') {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-4xl mx-auto">
@@ -110,6 +135,7 @@ export default function ResumeBuilder() {
     );
   }
 
+  // If completion_status is 'draft' or any other status, show the quiz flow
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
