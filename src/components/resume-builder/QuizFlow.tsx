@@ -14,6 +14,7 @@ import { QuizProgress, quizSteps } from "./quiz/QuizProgress";
 import { questions } from "./quiz/questions";
 import { ResumeData } from "@/types/resume";
 import { Json } from "@/integrations/supabase/types";
+import { LoadingState } from "./LoadingState";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -24,6 +25,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const { toast } = useToast();
   const [formData, setFormData] = useState<ResumeData>({
     personal_info: {
@@ -92,6 +94,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const handleStepComplete = async () => {
     if (currentStep === quizSteps.length - 1) {
       try {
+        setIsEnhancing(true);
         // Cast the arrays to Json[] type to satisfy TypeScript
         const { error } = await supabase
           .from('resumes')
@@ -110,6 +113,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         setShowPreview(true);
         await enhanceResume();
       } catch (error) {
+        setIsEnhancing(false);
         toast({
           title: "Error",
           description: "Failed to save your information. Please try again.",
@@ -150,6 +154,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       onComplete();
     } catch (error) {
       console.error('Error enhancing resume:', error);
+      setIsEnhancing(false);
       toast({
         title: "Error",
         description: "Failed to enhance resume. Please try again.",
@@ -157,6 +162,10 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       });
     }
   };
+
+  if (isEnhancing) {
+    return <LoadingState status="enhancing" />;
+  }
 
   const renderStep = () => {
     switch (quizSteps[currentStep].type) {
@@ -270,3 +279,4 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     </div>
   );
 }
+
