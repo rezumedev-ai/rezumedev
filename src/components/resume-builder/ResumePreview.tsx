@@ -1,3 +1,4 @@
+
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -63,6 +64,10 @@ export function ResumePreview({
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
   const MARGIN = 40;
+
+  const toggleZoom = () => {
+    setIsZoomed(prev => !prev);
+  };
 
   useEffect(() => {
     const calculateScale = () => {
