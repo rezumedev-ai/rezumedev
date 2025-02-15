@@ -130,23 +130,21 @@ export function ResumePreview({
   };
 
   return (
-    <div className="w-full h-full bg-gray-50 overflow-auto">
-      <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
-        <div 
-          className="bg-white shadow-lg mx-auto"
-          style={{
-            width: '21cm',
-            minHeight: '29.7cm',
-            maxHeight: '29.7cm',
-            padding: '2cm',
-            transform: isMobile ? 'scale(0.45)' : 'scale(0.8)',
-            transformOrigin: 'top center',
-            marginTop: isMobile ? '-15%' : '0'
-          }}
-        >
-          <div className="p-8 md:p-[2cm]">
-            <div className={cn("mb-6", style.headerStyle)}>
-              <h1 className={cn("text-3xl font-bold mb-3", style.titleFont)}>
+    <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div 
+        className="bg-white shadow-lg relative overflow-hidden"
+        style={{
+          width: '21cm',
+          height: '29.7cm',
+          transform: isMobile ? 'scale(0.35)' : 'scale(0.75)',
+          transformOrigin: 'center',
+          margin: '0 auto'
+        }}
+      >
+        <ScrollArea className="h-full">
+          <div className="p-[2.54cm]">
+            <div className={cn("mb-8", style.headerStyle)}>
+              <h1 className={cn("text-4xl font-bold mb-3", style.titleFont)}>
                 <EditableText text={personalInfo.fullName} section="personalInfo" field="fullName" />
               </h1>
               <div className="mb-3">
@@ -155,22 +153,22 @@ export function ResumePreview({
                 </h2>
               </div>
               <div className={cn(
-                "text-sm text-gray-600 flex flex-wrap gap-2",
+                "text-sm text-gray-600 flex flex-wrap gap-3",
                 template.id === "modern-split" ? "flex-col items-start" : "items-center"
               )}>
                 {personalInfo.phone && (
-                  <span className="inline-flex items-center break-all">
+                  <span className="inline-flex items-center">
                     <EditableText text={personalInfo.phone} section="personalInfo" field="phone" />
                   </span>
                 )}
                 {personalInfo.email && (
-                  <span className="inline-flex items-center break-all">
+                  <span className="inline-flex items-center">
                     {template.id !== "modern-split" && <span className="hidden md:inline text-gray-400 mx-2">•</span>}
                     <EditableText text={personalInfo.email} section="personalInfo" field="email" />
                   </span>
                 )}
                 {personalInfo.linkedin && (
-                  <span className="inline-flex items-center break-all">
+                  <span className="inline-flex items-center">
                     {template.id !== "modern-split" && <span className="hidden md:inline text-gray-400 mx-2">•</span>}
                     <EditableText text={personalInfo.linkedin} section="personalInfo" field="linkedin" />
                   </span>
@@ -178,7 +176,7 @@ export function ResumePreview({
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className={style.contentStyle}>
                 <h3 className={style.sectionStyle}>Professional Summary</h3>
                 <EditableTextArea text={professionalSummary.summary} section="professionalSummary" field="summary" />
@@ -313,7 +311,7 @@ export function ResumePreview({
               )}
             </div>
           </div>
-        </div>
+        </ScrollArea>
       </div>
     </div>
   );
