@@ -130,9 +130,20 @@ export function ResumePreview({
   };
 
   return (
-    <div className="w-full h-full bg-gray-50">
-      <div className="max-w-[21cm] mx-auto bg-white shadow-lg min-h-screen">
-        <ScrollArea className="h-full">
+    <div className="w-full h-full bg-gray-50 overflow-auto">
+      <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
+        <div 
+          className="bg-white shadow-lg mx-auto"
+          style={{
+            width: '21cm',
+            minHeight: '29.7cm',
+            maxHeight: '29.7cm',
+            padding: '2cm',
+            transform: isMobile ? 'scale(0.45)' : 'scale(0.8)',
+            transformOrigin: 'top center',
+            marginTop: isMobile ? '-15%' : '0'
+          }}
+        >
           <div className="p-8 md:p-[2cm]">
             <div className={cn("mb-6", style.headerStyle)}>
               <h1 className={cn("text-3xl font-bold mb-3", style.titleFont)}>
@@ -302,7 +313,7 @@ export function ResumePreview({
               )}
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );
