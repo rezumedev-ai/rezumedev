@@ -90,13 +90,6 @@ export function ResumePreview({
     return () => window.removeEventListener('resize', calculateScale);
   }, [isMobile, isZoomed]);
 
-  const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
-  };
-
-  const template = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
-  const { style } = template;
-
   const handleEdit = (section: string, field: string, value: any) => {
     if (!onUpdate) return;
 
@@ -126,7 +119,7 @@ export function ResumePreview({
           onChange={(e) => handleEdit(section, field, e.target.value)}
           onBlur={() => setEditingField(null)}
           autoFocus
-          className="min-w-[200px]"
+          className="w-full max-w-[200px]"
         />
       );
     }
@@ -153,7 +146,7 @@ export function ResumePreview({
           onChange={(e) => handleEdit(section, field, e.target.value)}
           onBlur={() => setEditingField(null)}
           autoFocus
-          className="min-h-[100px]"
+          className="w-full min-h-[100px] text-sm"
         />
       );
     }
@@ -167,6 +160,8 @@ export function ResumePreview({
       </p>
     );
   };
+
+  const template = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
   return (
     <div className="relative w-full h-screen flex flex-col items-center bg-gray-100">
@@ -197,33 +192,35 @@ export function ResumePreview({
           }}
         >
           <div 
-            className="h-full"
+            className="h-full overflow-hidden"
             style={{ 
               padding: `${MARGIN}px`,
               display: 'grid',
               gridTemplateColumns: '250px 1fr',
-              gap: '40px'
+              gap: '40px',
+              maxHeight: `${A4_HEIGHT_PX}px`,
             }}
           >
-            <div className="space-y-8">
+            {/* Left Column - Fixed width */}
+            <div className="space-y-6 overflow-hidden">
               <div>
-                <h2 className="text-lg font-semibold mb-3">CONTACT</h2>
-                <div className="space-y-2 text-sm">
+                <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Contact</h2>
+                <div className="space-y-1 text-sm">
                   <div>{personalInfo.phone}</div>
-                  <div>{personalInfo.email}</div>
-                  {personalInfo.linkedin && <div>{personalInfo.linkedin}</div>}
+                  <div className="break-all">{personalInfo.email}</div>
+                  {personalInfo.linkedin && <div className="break-all">{personalInfo.linkedin}</div>}
                 </div>
               </div>
 
               {education && education.length > 0 && (
                 <div>
-                  <h2 className="text-lg font-semibold mb-3">EDUCATION</h2>
+                  <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Education</h2>
                   <div className="space-y-3">
                     {education.map((edu, index) => (
-                      <div key={index}>
+                      <div key={index} className="text-sm">
                         <div className="font-medium">{edu.schoolName}</div>
-                        <div className="text-sm text-gray-600">{edu.degreeName}</div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-gray-600">{edu.degreeName}</div>
+                        <div className="text-gray-500">
                           {formatDate(edu.startDate)} - {edu.isCurrentlyEnrolled ? 'Present' : formatDate(edu.endDate)}
                         </div>
                       </div>
@@ -234,24 +231,20 @@ export function ResumePreview({
 
               {skills && (skills.hard_skills.length > 0 || skills.soft_skills.length > 0) && (
                 <div>
-                  <h2 className="text-lg font-semibold mb-3">SKILLS</h2>
-                  <div className="space-y-3">
+                  <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Skills</h2>
+                  <div className="space-y-2">
                     {skills.hard_skills.length > 0 && (
-                      <div>
-                        <div className="text-sm space-y-1">
-                          {skills.hard_skills.map((skill, index) => (
-                            <div key={index}>{skill}</div>
-                          ))}
-                        </div>
+                      <div className="text-sm space-y-1">
+                        {skills.hard_skills.map((skill, index) => (
+                          <div key={index}>{skill}</div>
+                        ))}
                       </div>
                     )}
                     {skills.soft_skills.length > 0 && (
-                      <div>
-                        <div className="text-sm space-y-1">
-                          {skills.soft_skills.map((skill, index) => (
-                            <div key={index}>{skill}</div>
-                          ))}
-                        </div>
+                      <div className="text-sm space-y-1">
+                        {skills.soft_skills.map((skill, index) => (
+                          <div key={index}>{skill}</div>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -260,13 +253,13 @@ export function ResumePreview({
 
               {certifications && certifications.length > 0 && (
                 <div>
-                  <h2 className="text-lg font-semibold mb-3">CERTIFICATIONS</h2>
-                  <div className="space-y-3">
+                  <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Certifications</h2>
+                  <div className="space-y-2">
                     {certifications.map((cert, index) => (
-                      <div key={index}>
+                      <div key={index} className="text-sm">
                         <div className="font-medium">{cert.name}</div>
-                        <div className="text-sm text-gray-600">{cert.organization}</div>
-                        <div className="text-sm text-gray-500">{formatDate(cert.completionDate)}</div>
+                        <div className="text-gray-600">{cert.organization}</div>
+                        <div className="text-gray-500">{formatDate(cert.completionDate)}</div>
                       </div>
                     ))}
                   </div>
@@ -274,16 +267,17 @@ export function ResumePreview({
               )}
             </div>
 
-            <div className="space-y-8">
+            {/* Right Column - Flexible width */}
+            <div className="space-y-6 overflow-hidden">
               <div>
-                <h1 className="text-3xl font-bold tracking-wide mb-1">
+                <h1 className="text-2xl font-bold tracking-wide mb-1">
                   <EditableText text={personalInfo.fullName} section="personalInfo" field="fullName" />
                 </h1>
-                <h2 className="text-xl text-gray-600 mb-6">
+                <h2 className="text-lg text-gray-600 mb-4">
                   <EditableText text={professionalSummary.title} section="professionalSummary" field="title" />
                 </h2>
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">PROFILE</h3>
+                  <h3 className="text-base font-semibold mb-2 uppercase tracking-wide">Profile</h3>
                   <div className="text-sm text-gray-600 leading-relaxed">
                     <EditableTextArea text={professionalSummary.summary} section="professionalSummary" field="summary" />
                   </div>
@@ -292,12 +286,12 @@ export function ResumePreview({
 
               {workExperience && workExperience.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">WORK EXPERIENCE</h3>
+                  <h3 className="text-base font-semibold mb-2 uppercase tracking-wide">Work Experience</h3>
                   <div className="space-y-4">
                     {workExperience.map((experience, index) => (
                       <div key={index} className="pb-4 last:pb-0">
                         <div className="mb-2">
-                          <h4 className="font-medium">{experience.jobTitle}</h4>
+                          <h4 className="text-sm font-medium">{experience.jobTitle}</h4>
                           <div className="text-sm text-gray-600">{experience.companyName}</div>
                           <div className="text-sm text-gray-500">
                             {formatDate(experience.startDate)} - {experience.isCurrentJob ? 'Present' : formatDate(experience.endDate)}
@@ -305,7 +299,7 @@ export function ResumePreview({
                         </div>
                         <ul className="text-sm text-gray-600 space-y-1 list-disc ml-4">
                           {experience.responsibilities.map((resp, idx) => (
-                            <li key={idx}>{resp}</li>
+                            <li key={idx} className="leading-relaxed">{resp}</li>
                           ))}
                         </ul>
                       </div>
