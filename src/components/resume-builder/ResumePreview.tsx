@@ -66,9 +66,9 @@ export function ResumePreview({
   // Hooks
   const isMobile = useIsMobile();
 
-  // Constants
-  const A4_WIDTH_PX = 794;
-  const A4_HEIGHT_PX = 1123;
+  // Constants - Standard A4 dimensions in pixels (96 DPI)
+  const A4_WIDTH_PX = 794; // 210mm at 96 DPI
+  const A4_HEIGHT_PX = 1123; // 297mm at 96 DPI
   const MARGIN = 40;
 
   // Event handlers
@@ -100,14 +100,18 @@ export function ResumePreview({
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
         
+        // Calculate scaling factors for both dimensions
         const scaleX = (containerWidth - 48) / A4_WIDTH_PX;
         const scaleY = (containerHeight - 48) / A4_HEIGHT_PX;
         
-        let newScale = Math.min(scaleX, scaleY);
+        // Use the smaller scale to ensure the entire resume fits
+        let newScale = Math.min(scaleX, scaleY, 1); // Never scale up
         
         if (isMobile) {
-          newScale = isZoomed ? 0.95 : 0.35;
+          // Adjust mobile scaling based on zoom state
+          newScale = isZoomed ? 0.8 : 0.4; // More readable scale values for mobile
         } else {
+          // Limit desktop scale to 0.85 for better visibility
           newScale = Math.min(newScale, 0.85);
         }
         
@@ -175,7 +179,6 @@ export function ResumePreview({
     );
   };
 
-  // Main render
   return (
     <div className="relative w-full h-screen flex flex-col items-center bg-gray-100">
       {isMobile && (
@@ -195,33 +198,33 @@ export function ResumePreview({
       >
         <div 
           ref={resumeRef}
-          className="bg-white shadow-xl"
+          className="bg-white shadow-xl origin-center"
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
             transform: `scale(${scale})`,
-            transformOrigin: 'center',
             transition: 'transform 0.3s ease',
           }}
         >
           <div 
-            className="h-full overflow-hidden"
+            className="h-full w-full"
             style={{ 
               padding: `${MARGIN}px`,
               display: 'grid',
               gridTemplateColumns: '250px 1fr',
               gap: '40px',
-              maxHeight: `${A4_HEIGHT_PX}px`,
             }}
           >
-            {/* Left Column - Fixed width */}
-            <div className="space-y-6 overflow-hidden">
+            {/* Left Column */}
+            <div className="space-y-6 overflow-hidden text-sm">
               <div>
                 <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Contact</h2>
-                <div className="space-y-1 text-sm">
-                  <div>{personalInfo.phone}</div>
-                  <div className="break-all">{personalInfo.email}</div>
-                  {personalInfo.linkedin && <div className="break-all">{personalInfo.linkedin}</div>}
+                <div className="space-y-1">
+                  <div className="break-words">{personalInfo.phone}</div>
+                  <div className="break-words">{personalInfo.email}</div>
+                  {personalInfo.linkedin && (
+                    <div className="break-words">{personalInfo.linkedin}</div>
+                  )}
                 </div>
               </div>
 
@@ -230,7 +233,7 @@ export function ResumePreview({
                   <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Education</h2>
                   <div className="space-y-3">
                     {education.map((edu, index) => (
-                      <div key={index} className="text-sm">
+                      <div key={index}>
                         <div className="font-medium">{edu.schoolName}</div>
                         <div className="text-gray-600">{edu.degreeName}</div>
                         <div className="text-gray-500">
@@ -247,16 +250,16 @@ export function ResumePreview({
                   <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Skills</h2>
                   <div className="space-y-2">
                     {skills.hard_skills.length > 0 && (
-                      <div className="text-sm space-y-1">
+                      <div className="space-y-1">
                         {skills.hard_skills.map((skill, index) => (
-                          <div key={index}>{skill}</div>
+                          <div key={index} className="break-words">{skill}</div>
                         ))}
                       </div>
                     )}
                     {skills.soft_skills.length > 0 && (
-                      <div className="text-sm space-y-1">
+                      <div className="space-y-1">
                         {skills.soft_skills.map((skill, index) => (
-                          <div key={index}>{skill}</div>
+                          <div key={index} className="break-words">{skill}</div>
                         ))}
                       </div>
                     )}
@@ -269,9 +272,9 @@ export function ResumePreview({
                   <h2 className="text-base font-semibold mb-2 uppercase tracking-wide">Certifications</h2>
                   <div className="space-y-2">
                     {certifications.map((cert, index) => (
-                      <div key={index} className="text-sm">
-                        <div className="font-medium">{cert.name}</div>
-                        <div className="text-gray-600">{cert.organization}</div>
+                      <div key={index}>
+                        <div className="font-medium break-words">{cert.name}</div>
+                        <div className="text-gray-600 break-words">{cert.organization}</div>
                         <div className="text-gray-500">{formatDate(cert.completionDate)}</div>
                       </div>
                     ))}
@@ -280,7 +283,7 @@ export function ResumePreview({
               )}
             </div>
 
-            {/* Right Column - Flexible width */}
+            {/* Right Column */}
             <div className="space-y-6 overflow-hidden">
               <div>
                 <h1 className="text-2xl font-bold tracking-wide mb-1">
@@ -312,7 +315,7 @@ export function ResumePreview({
                         </div>
                         <ul className="text-sm text-gray-600 space-y-1 list-disc ml-4">
                           {experience.responsibilities.map((resp, idx) => (
-                            <li key={idx} className="leading-relaxed">{resp}</li>
+                            <li key={idx} className="leading-relaxed break-words">{resp}</li>
                           ))}
                         </ul>
                       </div>
