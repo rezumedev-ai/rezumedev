@@ -1,4 +1,3 @@
-
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -61,10 +60,9 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  // Constants for A4 dimensions in pixels (at 96 DPI)
-  const A4_WIDTH_PX = 794; // 210mm at 96 DPI
-  const A4_HEIGHT_PX = 1123; // 297mm at 96 DPI
-  const MARGIN_MM = 20; // 20mm margins
+  const A4_WIDTH_PX = 794;
+  const A4_HEIGHT_PX = 1123;
+  const MARGIN = 40;
 
   useEffect(() => {
     const calculateScale = () => {
@@ -72,18 +70,15 @@ export function ResumePreview({
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
         
-        // Calculate scales based on available space
         const scaleX = (containerWidth - 48) / A4_WIDTH_PX;
         const scaleY = (containerHeight - 48) / A4_HEIGHT_PX;
         
-        // Use the smaller scale to maintain aspect ratio
         let newScale = Math.min(scaleX, scaleY);
         
-        // Adjust scale based on device and zoom state
         if (isMobile) {
-          newScale = isZoomed ? 0.8 : 0.4;
+          newScale = isZoomed ? 0.95 : 0.35;
         } else {
-          newScale = Math.min(newScale, 0.8);
+          newScale = Math.min(newScale, 0.85);
         }
         
         setScale(newScale);
@@ -202,129 +197,33 @@ export function ResumePreview({
           }}
         >
           <div 
+            className="h-full"
             style={{ 
-              padding: `${MARGIN_MM}mm`,
-              height: '100%',
-              overflow: 'hidden'
+              padding: `${MARGIN}px`,
+              display: 'grid',
+              gridTemplateColumns: '250px 1fr',
+              gap: '40px'
             }}
-            className="relative"
           >
-            <div className={cn("mb-6", style.headerStyle)}>
-              <h1 className={cn("text-3xl font-bold mb-2", style.titleFont)}>
-                <EditableText text={personalInfo.fullName} section="personalInfo" field="fullName" />
-              </h1>
-              <div className="mb-2">
-                <h2 className={cn("text-xl text-gray-600", template.id === "modern-split" ? "uppercase tracking-wide" : "")}>
-                  <EditableText text={professionalSummary.title} section="professionalSummary" field="title" />
-                </h2>
-              </div>
-              <div className={cn(
-                "text-sm text-gray-600 flex flex-wrap gap-2",
-                template.id === "modern-split" ? "flex-col items-start" : "items-center"
-              )}>
-                {personalInfo.phone && (
-                  <span className="inline-flex items-center">
-                    <EditableText text={personalInfo.phone} section="personalInfo" field="phone" />
-                  </span>
-                )}
-                {personalInfo.email && (
-                  <span className="inline-flex items-center">
-                    {template.id !== "modern-split" && <span className="hidden md:inline text-gray-400 mx-2">•</span>}
-                    <EditableText text={personalInfo.email} section="personalInfo" field="email" />
-                  </span>
-                )}
-                {personalInfo.linkedin && (
-                  <span className="inline-flex items-center">
-                    {template.id !== "modern-split" && <span className="hidden md:inline text-gray-400 mx-2">•</span>}
-                    <EditableText text={personalInfo.linkedin} section="personalInfo" field="linkedin" />
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-5 text-sm">
-              <div className={style.contentStyle}>
-                <h3 className={cn("text-base font-semibold mb-2", style.sectionStyle)}>Professional Summary</h3>
-                <div className="text-gray-600 leading-relaxed">
-                  <EditableTextArea text={professionalSummary.summary} section="professionalSummary" field="summary" />
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-lg font-semibold mb-3">CONTACT</h2>
+                <div className="space-y-2 text-sm">
+                  <div>{personalInfo.phone}</div>
+                  <div>{personalInfo.email}</div>
+                  {personalInfo.linkedin && <div>{personalInfo.linkedin}</div>}
                 </div>
               </div>
-
-              {skills && (skills.hard_skills.length > 0 || skills.soft_skills.length > 0) && (
-                <div>
-                  <h3 className={cn("text-base font-semibold mb-2", style.sectionStyle)}>Skills</h3>
-                  <div className={cn(
-                    "text-gray-600",
-                    template.id === "modern-split" ? "grid md:grid-cols-2 gap-4" : ""
-                  )}>
-                    {skills.hard_skills.length > 0 && (
-                      <div className="mb-3">
-                        {template.id === "modern-split" && <h4 className="font-medium mb-1">Technical Skills</h4>}
-                        <p className="flex flex-wrap gap-1.5">
-                          {skills.hard_skills.map((skill, index) => (
-                            <span key={index} className="bg-gray-100 px-2 py-0.5 rounded text-sm">
-                              {skill}
-                            </span>
-                          ))}
-                        </p>
-                      </div>
-                    )}
-                    {skills.soft_skills.length > 0 && (
-                      <div>
-                        {template.id === "modern-split" && <h4 className="font-medium mb-1">Soft Skills</h4>}
-                        <p className="flex flex-wrap gap-1.5">
-                          {skills.soft_skills.map((skill, index) => (
-                            <span key={index} className="bg-gray-100 px-2 py-0.5 rounded text-sm">
-                              {skill}
-                            </span>
-                          ))}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {workExperience && workExperience.length > 0 && (
-                <div>
-                  <h3 className={cn("text-base font-semibold mb-2", style.sectionStyle)}>Professional Experience</h3>
-                  <div className="space-y-3">
-                    {workExperience.map((experience, index) => (
-                      <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                        <div className="flex justify-between items-start mb-1">
-                          <div>
-                            <h4 className="font-medium text-gray-800">{experience.companyName}</h4>
-                            <div className="text-gray-600">{experience.jobTitle}</div>
-                          </div>
-                          <div className="text-gray-500 text-xs">
-                            <div>{experience.location}</div>
-                            <div>
-                              {formatDate(experience.startDate)} - {experience.isCurrentJob ? 'Present' : formatDate(experience.endDate)}
-                            </div>
-                          </div>
-                        </div>
-                        <ul className="list-disc ml-4 text-gray-600 space-y-0.5">
-                          {experience.responsibilities.map((resp, idx) => (
-                            <li key={idx} className="leading-relaxed">{resp}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {education && education.length > 0 && (
                 <div>
-                  <h3 className={cn("text-base font-semibold mb-2", style.sectionStyle)}>Education</h3>
-                  <div className="space-y-2">
+                  <h2 className="text-lg font-semibold mb-3">EDUCATION</h2>
+                  <div className="space-y-3">
                     {education.map((edu, index) => (
-                      <div key={index} className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-800">{edu.schoolName}</h4>
-                          <div className="text-gray-600">{edu.degreeName}</div>
-                        </div>
-                        <div className="text-gray-500 text-xs">
+                      <div key={index}>
+                        <div className="font-medium">{edu.schoolName}</div>
+                        <div className="text-sm text-gray-600">{edu.degreeName}</div>
+                        <div className="text-sm text-gray-500">
                           {formatDate(edu.startDate)} - {edu.isCurrentlyEnrolled ? 'Present' : formatDate(edu.endDate)}
                         </div>
                       </div>
@@ -333,19 +232,82 @@ export function ResumePreview({
                 </div>
               )}
 
+              {skills && (skills.hard_skills.length > 0 || skills.soft_skills.length > 0) && (
+                <div>
+                  <h2 className="text-lg font-semibold mb-3">SKILLS</h2>
+                  <div className="space-y-3">
+                    {skills.hard_skills.length > 0 && (
+                      <div>
+                        <div className="text-sm space-y-1">
+                          {skills.hard_skills.map((skill, index) => (
+                            <div key={index}>{skill}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {skills.soft_skills.length > 0 && (
+                      <div>
+                        <div className="text-sm space-y-1">
+                          {skills.soft_skills.map((skill, index) => (
+                            <div key={index}>{skill}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {certifications && certifications.length > 0 && (
                 <div>
-                  <h3 className={cn("text-base font-semibold mb-2", style.sectionStyle)}>Certifications</h3>
-                  <div className="space-y-2">
+                  <h2 className="text-lg font-semibold mb-3">CERTIFICATIONS</h2>
+                  <div className="space-y-3">
                     {certifications.map((cert, index) => (
-                      <div key={index} className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-800">{cert.name}</h4>
-                          <div className="text-gray-600">{cert.organization}</div>
+                      <div key={index}>
+                        <div className="font-medium">{cert.name}</div>
+                        <div className="text-sm text-gray-600">{cert.organization}</div>
+                        <div className="text-sm text-gray-500">{formatDate(cert.completionDate)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <h1 className="text-3xl font-bold tracking-wide mb-1">
+                  <EditableText text={personalInfo.fullName} section="personalInfo" field="fullName" />
+                </h1>
+                <h2 className="text-xl text-gray-600 mb-6">
+                  <EditableText text={professionalSummary.title} section="professionalSummary" field="title" />
+                </h2>
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">PROFILE</h3>
+                  <div className="text-sm text-gray-600 leading-relaxed">
+                    <EditableTextArea text={professionalSummary.summary} section="professionalSummary" field="summary" />
+                  </div>
+                </div>
+              </div>
+
+              {workExperience && workExperience.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">WORK EXPERIENCE</h3>
+                  <div className="space-y-4">
+                    {workExperience.map((experience, index) => (
+                      <div key={index} className="pb-4 last:pb-0">
+                        <div className="mb-2">
+                          <h4 className="font-medium">{experience.jobTitle}</h4>
+                          <div className="text-sm text-gray-600">{experience.companyName}</div>
+                          <div className="text-sm text-gray-500">
+                            {formatDate(experience.startDate)} - {experience.isCurrentJob ? 'Present' : formatDate(experience.endDate)}
+                          </div>
                         </div>
-                        <div className="text-gray-500 text-xs">
-                          {formatDate(cert.completionDate)}
-                        </div>
+                        <ul className="text-sm text-gray-600 space-y-1 list-disc ml-4">
+                          {experience.responsibilities.map((resp, idx) => (
+                            <li key={idx}>{resp}</li>
+                          ))}
+                        </ul>
                       </div>
                     ))}
                   </div>
