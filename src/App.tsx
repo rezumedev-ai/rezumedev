@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import ResumeBuilder from "./pages/ResumeBuilder";
+import ResumePreview from "./pages/ResumePreview";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
@@ -89,6 +90,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ResumeBuilder />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/resume-preview/:id"
+              element={
+                <ProtectedRoute>
+                  <ResumePreview />
                 </ProtectedRoute>
               }
             />

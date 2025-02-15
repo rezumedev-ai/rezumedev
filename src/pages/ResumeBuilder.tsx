@@ -41,7 +41,7 @@ export default function ResumeBuilder() {
   }
 
   const handleComplete = () => {
-    navigate("/dashboard");
+    navigate(`/resume-preview/${id}`);
   };
 
   const handleUpdate = async (section: string, value: any) => {
@@ -95,54 +95,8 @@ export default function ResumeBuilder() {
   }
 
   if (resume.completion_status === 'completed') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto h-screen p-4 flex items-center justify-center">
-          <div 
-            className="w-full relative bg-white shadow-lg"
-            style={{ 
-              maxWidth: '21cm',
-              height: isMobile ? '100vh' : 'auto',
-              maxHeight: isMobile ? '100vh' : 'auto'
-            }}
-          >
-            <ResumePreview
-              personalInfo={resume.personal_info as {
-                fullName: string;
-                email: string;
-                phone: string;
-                linkedin?: string;
-                website?: string;
-              }}
-              professionalSummary={resume.professional_summary as {
-                title: string;
-                summary: string;
-              }}
-              workExperience={(resume.work_experience as unknown as WorkExperience[]) || []}
-              education={(resume.education as {
-                degreeName: string;
-                schoolName: string;
-                startDate: string;
-                endDate: string;
-                isCurrentlyEnrolled?: boolean;
-              }[]) || []}
-              skills={(resume.skills as {
-                hard_skills: string[];
-                soft_skills: string[];
-              }) || { hard_skills: [], soft_skills: [] }}
-              certifications={(resume.certifications as {
-                name: string;
-                organization: string;
-                completionDate: string;
-              }[]) || []}
-              templateId={resume.template_id || "minimal-clean"}
-              isEditable={true}
-              onUpdate={handleUpdate}
-            />
-          </div>
-        </div>
-      </div>
-    );
+    navigate(`/resume-preview/${id}`);
+    return null;
   }
 
   return (
