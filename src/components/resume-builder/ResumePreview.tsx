@@ -54,21 +54,46 @@ export function ResumePreview({
   isEditable = false,
   onUpdate
 }: ResumePreviewProps) {
+  // State declarations
   const [editingField, setEditingField] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
+  
+  // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
+  
+  // Hooks
   const isMobile = useIsMobile();
 
+  // Constants
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
   const MARGIN = 40;
 
+  // Event handlers
   const toggleZoom = () => {
-    setIsZoomed(prev => !prev);
+    setIsZoomed((prev) => !prev);
   };
 
+  const handleEdit = (section: string, field: string, value: any) => {
+    if (!onUpdate) return;
+
+    if (section === 'personalInfo') {
+      onUpdate('personal_info', {
+        ...personalInfo,
+        [field]: value
+      });
+    } else if (section === 'professionalSummary') {
+      onUpdate('professional_summary', {
+        ...professionalSummary,
+        [field]: value
+      });
+    }
+    setEditingField(null);
+  };
+
+  // Effects
   useEffect(() => {
     const calculateScale = () => {
       if (containerRef.current && resumeRef.current) {
@@ -95,23 +120,7 @@ export function ResumePreview({
     return () => window.removeEventListener('resize', calculateScale);
   }, [isMobile, isZoomed]);
 
-  const handleEdit = (section: string, field: string, value: any) => {
-    if (!onUpdate) return;
-
-    if (section === 'personalInfo') {
-      onUpdate('personal_info', {
-        ...personalInfo,
-        [field]: value
-      });
-    } else if (section === 'professionalSummary') {
-      onUpdate('professional_summary', {
-        ...professionalSummary,
-        [field]: value
-      });
-    }
-    setEditingField(null);
-  };
-
+  // Helper Components
   const EditableText = ({ text, section, field }: { text: string; section: string; field: string }) => {
     const isEditing = editingField === `${section}.${field}`;
     
@@ -166,8 +175,7 @@ export function ResumePreview({
     );
   };
 
-  const template = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
-
+  // Main render
   return (
     <div className="relative w-full h-screen flex flex-col items-center bg-gray-100">
       {isMobile && (
