@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -37,7 +36,6 @@ export function FinalResumePreview({
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  // A4 dimensions (96 DPI)
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
 
@@ -52,7 +50,6 @@ export function FinalResumePreview({
 
         if (error) throw error;
 
-        // Convert the response to a blob and trigger download
         const blob = await data.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -93,9 +90,13 @@ export function FinalResumePreview({
     setResumeData(newResumeData);
     
     try {
+      const updateData = {
+        [section]: newResumeData[section] as unknown as Json
+      };
+      
       const { error } = await supabase
         .from("resumes")
-        .update({ ...newResumeData })
+        .update(updateData)
         .eq("id", resumeId);
         
       if (error) throw error;
@@ -104,6 +105,10 @@ export function FinalResumePreview({
     } catch (error) {
       toast.error("Failed to save changes. Please try again.");
     }
+  };
+
+  const renderEditableField = (component: JSX.Element): JSX.Element | string => {
+    return isEditing ? component : component.props.value;
   };
 
   useEffect(() => {
@@ -127,30 +132,6 @@ export function FinalResumePreview({
     window.addEventListener('resize', calculateScale);
     return () => window.removeEventListener('resize', calculateScale);
   }, [isMobile, isZoomed]);
-
-  const renderEditableText = (text: string, section: keyof ResumeData, field: string, subsection?: string) => {
-    if (!isEditing) return text;
-
-    return (
-      <Input
-        value={text}
-        onChange={(e) => handleUpdateField(section, field, e.target.value, subsection)}
-        className="w-full"
-      />
-    );
-  };
-
-  const renderEditableTextArea = (text: string, section: keyof ResumeData, field: string, subsection?: string) => {
-    if (!isEditing) return text;
-
-    return (
-      <Textarea
-        value={text}
-        onChange={(e) => handleUpdateField(section, field, e.target.value, subsection)}
-        className="w-full min-h-[100px]"
-      />
-    );
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -186,13 +167,37 @@ export function FinalResumePreview({
             }}
           >
             <PersonalSection
-              fullName={renderEditableText(resumeData.personal_info.fullName, "personal_info", "fullName")}
-              title={renderEditableText(resumeData.professional_summary.title, "professional_summary", "title")}
-              email={renderEditableText(resumeData.personal_info.email, "personal_info", "email")}
-              phone={renderEditableText(resumeData.personal_info.phone, "personal_info", "phone")}
-              linkedin={resumeData.personal_info.linkedin ? renderEditableText(resumeData.personal_info.linkedin, "personal_info", "linkedin") : undefined}
+              fullName={renderEditableField(
+                <Input
+                  value={resumeData.personal_info.fullName}
+                  onChange={(e) => handleUpdateField("personal_info", "fullName", e.target.value)}
+                />
+              ) as string}
+              title={renderEditableField(
+                <Input
+                  value={resumeData.professional_summary.title}
+                  onChange={(e) => handleUpdateField("professional_summary", "title", e.target.value)}
+                />
+              ) as string}
+              email={renderEditableField(
+                <Input
+                  value={resumeData.personal_info.email}
+                  onChange={(e) => handleUpdateField("personal_info", "email", e.target.value)}
+                />
+              ) as string}
+              phone={renderEditableField(
+                <Input
+                  value={resumeData.personal_info.phone}
+                  onChange={(e) => handleUpdateField("personal_info", "phone", e.target.value)}
+                />
+              ) as string}
+              linkedin={resumeData.personal_info.linkedin ? renderEditableField(
+                <Input
+                  value={resumeData.personal_info.linkedin}
+                  onChange={(e) => handleUpdateField("personal_info", "linkedin", e.target.value)}
+                />
+              ) as string : undefined}
               template={selectedTemplate}
-              isEditing={isEditing}
             />
 
             <div className={`${selectedTemplate.style.contentStyle} mt-8 space-y-6`}>
@@ -201,7 +206,13 @@ export function FinalResumePreview({
                   Professional Summary
                 </h3>
                 <div className="text-gray-600 mt-2">
-                  {renderEditableTextArea(resumeData.professional_summary.summary, "professional_summary", "summary")}
+                  {renderEditableField(
+                    <Textarea
+                      value={resumeData.professional_summary.summary}
+                      onChange={(e) => handleUpdateField("professional_summary", "summary", e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                  )}
                 </div>
               </div>
 
