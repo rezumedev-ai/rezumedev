@@ -1,9 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
-import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 import { jsPDF } from "https://esm.sh/jspdf@2.5.1";
-import html2canvas from "https://esm.sh/html2canvas@1.4.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,33 +44,126 @@ serve(async (req) => {
     let fileName: string;
 
     if (format === 'pdf') {
-      // Initialize Puppeteer
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
-      
-      // Get the resume preview URL (you'll need to replace this with your actual URL)
-      const previewUrl = `${Deno.env.get('APP_URL')}/resume-preview/${resumeId}`;
-      
-      await page.goto(previewUrl, { waitUntil: 'networkidle0' });
-      
-      // Generate PDF
-      const pdf = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '0.4in', right: '0.4in', bottom: '0.4in', left: '0.4in' }
+      // Initialize PDF
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'pt',
+        format: 'a4'
       });
 
-      await browser.close();
+      // Set font
+      doc.setFont("helvetica");
+      
+      // Add content
+      const margin = 40;
+      let y = margin;
+      
+      // Header
+      doc.setFontSize(24);
+      doc.text(resume.personal_info.fullName, margin, y);
+      y += 30;
+      
+      doc.setFontSize(14);
+      doc.text(resume.professional_summary.title, margin, y);
+      y += 20;
+      
+      // Contact info
+      doc.setFontSize(10);
+      doc.text(`${resume.personal_info.email} | ${resume.personal_info.phone}`, margin, y);
+      if (resume.personal_info.linkedin) {
+        doc.text(` | ${resume.personal_info.linkedin}`, 280, y);
+      }
+      y += 30;
+      
+      // Professional Summary
+      doc.setFontSize(16);
+      doc.text("Professional Summary", margin, y);
+      y += 20;
+      
+      doc.setFontSize(10);
+      const summaryLines = doc.splitTextToSize(resume.professional_summary.summary, 530);
+      doc.text(summaryLines, margin, y);
+      y += summaryLines.length * 15 + 20;
+      
+      // Work Experience
+      if (resume.work_experience.length > 0) {
+        doc.setFontSize(16);
+        doc.text("Work Experience", margin, y);
+        y += 20;
+        
+        for (const exp of resume.work_experience) {
+          doc.setFontSize(12);
+          doc.text(exp.jobTitle, margin, y);
+          y += 15;
+          
+          doc.setFontSize(10);
+          doc.text(`${exp.companyName} | ${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`, margin, y);
+          y += 15;
+          
+          for (const resp of exp.responsibilities) {
+            const respLines = doc.splitTextToSize(`• ${resp}`, 530);
+            doc.text(respLines, margin, y);
+            y += respLines.length * 12;
+          }
+          y += 15;
+        }
+      }
+      
+      // Education
+      if (resume.education.length > 0) {
+        doc.setFontSize(16);
+        doc.text("Education", margin, y);
+        y += 20;
+        
+        for (const edu of resume.education) {
+          doc.setFontSize(12);
+          doc.text(edu.degreeName, margin, y);
+          y += 15;
+          
+          doc.setFontSize(10);
+          doc.text(`${edu.schoolName} | ${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}`, margin, y);
+          y += 20;
+        }
+      }
+      
+      // Skills
+      if (resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0) {
+        doc.setFontSize(16);
+        doc.text("Skills", margin, y);
+        y += 20;
+        
+        if (resume.skills.hard_skills.length > 0) {
+          doc.setFontSize(12);
+          doc.text("Technical Skills", margin, y);
+          y += 15;
+          
+          doc.setFontSize(10);
+          const hardSkillsText = resume.skills.hard_skills.join(", ");
+          const hardSkillsLines = doc.splitTextToSize(hardSkillsText, 530);
+          doc.text(hardSkillsLines, margin, y);
+          y += hardSkillsLines.length * 12 + 15;
+        }
+        
+        if (resume.skills.soft_skills.length > 0) {
+          doc.setFontSize(12);
+          doc.text("Soft Skills", margin, y);
+          y += 15;
+          
+          doc.setFontSize(10);
+          const softSkillsText = resume.skills.soft_skills.join(", ");
+          const softSkillsLines = doc.splitTextToSize(softSkillsText, 530);
+          doc.text(softSkillsLines, margin, y);
+          y += softSkillsLines.length * 12 + 15;
+        }
+      }
 
-      fileData = pdf;
+      // Convert to Uint8Array
+      fileData = new Uint8Array(doc.output('arraybuffer'));
       mimeType = 'application/pdf';
       fileName = `resume-${resumeId}.pdf`;
     } else if (format === 'docx') {
-      // For DOCX, we'll use a simpler approach with basic formatting
-      const docx = await generateDocx(resume); // You'll need to implement this function
-      fileData = docx;
-      mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      fileName = `resume-${resumeId}.docx`;
+      // For now, return an error for DOCX format
+      throw new Error('DOCX format is not yet supported');
     } else {
       throw new Error('Unsupported format');
     }
@@ -104,10 +195,3 @@ serve(async (req) => {
     );
   }
 });
-
-async function generateDocx(resume: any): Promise<Uint8Array> {
-  // Implement DOCX generation here
-  // You might want to use a library like docx-templates or similar
-  // For now, returning an empty array as placeholder
-  return new Uint8Array();
-}
