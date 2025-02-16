@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DownloadOptionsDialog } from "./preview/DownloadOptionsDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
