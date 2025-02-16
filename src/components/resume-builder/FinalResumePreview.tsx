@@ -67,15 +67,21 @@ export function FinalResumePreview({
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
         
-        const scaleX = (containerWidth - 64) / A4_WIDTH_PX;
-        const scaleY = (containerHeight - 64) / A4_HEIGHT_PX;
+        // Calculate the available space accounting for padding
+        const availableWidth = containerWidth - 32; // 16px padding on each side
+        const availableHeight = containerHeight - 32;
         
-        let newScale = Math.min(scaleX, scaleY, 1);
+        // Calculate scale based on available space
+        const scaleX = availableWidth / A4_WIDTH_PX;
+        const scaleY = availableHeight / A4_HEIGHT_PX;
         
+        let newScale;
         if (isMobile) {
-          newScale = isZoomed ? 0.8 : 0.4;
+          // On mobile, prioritize width scaling for better readability
+          newScale = isZoomed ? Math.min(scaleX, scaleY, 0.8) : Math.min(scaleX, 0.45);
         } else {
-          newScale = Math.min(newScale, 0.85);
+          // On desktop, maintain aspect ratio
+          newScale = Math.min(scaleX, scaleY, 0.85);
         }
         
         setScale(newScale);
@@ -140,63 +146,64 @@ export function FinalResumePreview({
       {/* Preview Area */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-hidden relative flex items-center justify-center p-8"
+        className="flex-1 overflow-auto relative flex items-center justify-center p-4 md:p-8"
       >
         <div 
           ref={resumeRef}
-          className="bg-white shadow-lg origin-center transition-transform duration-300"
+          className="bg-white shadow-lg origin-center transition-transform duration-300 w-full"
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
             transform: `scale(${scale})`,
+            transformOrigin: 'top center',
           }}
         >
           {/* Resume Content */}
           <div className="h-full overflow-hidden">
             <div 
-              className="h-full p-12"
+              className="h-full p-8 md:p-12 overflow-y-auto"
               style={{
                 fontFamily: selectedTemplate.style.titleFont.split(' ')[0].replace('font-', '')
               }}
             >
               {/* Header */}
-              <div className={selectedTemplate.style.headerStyle}>
-                <h1 className={selectedTemplate.style.titleFont}>
+              <div className={`${selectedTemplate.style.headerStyle} break-words`}>
+                <h1 className={`${selectedTemplate.style.titleFont} text-2xl md:text-3xl`}>
                   {resumeData.personal_info.fullName}
                 </h1>
-                <h2 className="text-xl text-gray-600">
+                <h2 className="text-lg md:text-xl text-gray-600">
                   {resumeData.professional_summary.title}
                 </h2>
-                <div className="flex gap-4 text-sm text-gray-500 mt-2">
-                  <span>{resumeData.personal_info.email}</span>
-                  <span>{resumeData.personal_info.phone}</span>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-gray-500 mt-2">
+                  <span className="break-words">{resumeData.personal_info.email}</span>
+                  <span className="break-words">{resumeData.personal_info.phone}</span>
                   {resumeData.personal_info.linkedin && (
-                    <span>{resumeData.personal_info.linkedin}</span>
+                    <span className="break-words">{resumeData.personal_info.linkedin}</span>
                   )}
                 </div>
               </div>
 
               {/* Main Content */}
-              <div className={selectedTemplate.style.contentStyle}>
+              <div className={`${selectedTemplate.style.contentStyle} space-y-6`}>
                 {/* Professional Summary */}
-                <div className="mb-6">
+                <div>
                   <h3 className={selectedTemplate.style.sectionStyle}>
                     Professional Summary
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed break-words">
                     {resumeData.professional_summary.summary}
                   </p>
                 </div>
 
                 {/* Work Experience */}
                 {resumeData.work_experience.length > 0 && (
-                  <div className="mb-6">
+                  <div>
                     <h3 className={selectedTemplate.style.sectionStyle}>
                       Work Experience
                     </h3>
                     <div className="space-y-4">
                       {resumeData.work_experience.map((exp, index) => (
-                        <div key={index}>
+                        <div key={index} className="break-words">
                           <h4 className="font-medium">{exp.jobTitle}</h4>
                           <div className="text-gray-600">{exp.companyName}</div>
                           <div className="text-sm text-gray-500">
@@ -204,7 +211,7 @@ export function FinalResumePreview({
                           </div>
                           <ul className="list-disc ml-4 mt-2 text-gray-600 space-y-1">
                             {exp.responsibilities.map((resp, idx) => (
-                              <li key={idx}>{resp}</li>
+                              <li key={idx} className="break-words">{resp}</li>
                             ))}
                           </ul>
                         </div>
@@ -215,13 +222,13 @@ export function FinalResumePreview({
 
                 {/* Education */}
                 {resumeData.education.length > 0 && (
-                  <div className="mb-6">
+                  <div>
                     <h3 className={selectedTemplate.style.sectionStyle}>
                       Education
                     </h3>
                     <div className="space-y-4">
                       {resumeData.education.map((edu, index) => (
-                        <div key={index}>
+                        <div key={index} className="break-words">
                           <h4 className="font-medium">{edu.degreeName}</h4>
                           <div className="text-gray-600">{edu.schoolName}</div>
                           <div className="text-sm text-gray-500">
@@ -235,15 +242,15 @@ export function FinalResumePreview({
 
                 {/* Skills */}
                 {(resumeData.skills.hard_skills.length > 0 || resumeData.skills.soft_skills.length > 0) && (
-                  <div className="mb-6">
+                  <div>
                     <h3 className={selectedTemplate.style.sectionStyle}>
                       Skills
                     </h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {resumeData.skills.hard_skills.length > 0 && (
                         <div>
                           <h4 className="font-medium mb-2">Technical Skills</h4>
-                          <div className="text-gray-600">
+                          <div className="text-gray-600 break-words">
                             {resumeData.skills.hard_skills.join(", ")}
                           </div>
                         </div>
@@ -251,7 +258,7 @@ export function FinalResumePreview({
                       {resumeData.skills.soft_skills.length > 0 && (
                         <div>
                           <h4 className="font-medium mb-2">Soft Skills</h4>
-                          <div className="text-gray-600">
+                          <div className="text-gray-600 break-words">
                             {resumeData.skills.soft_skills.join(", ")}
                           </div>
                         </div>
@@ -262,13 +269,13 @@ export function FinalResumePreview({
 
                 {/* Certifications */}
                 {resumeData.certifications.length > 0 && (
-                  <div className="mb-6">
+                  <div>
                     <h3 className={selectedTemplate.style.sectionStyle}>
                       Certifications
                     </h3>
                     <div className="space-y-4">
                       {resumeData.certifications.map((cert, index) => (
-                        <div key={index}>
+                        <div key={index} className="break-words">
                           <h4 className="font-medium">{cert.name}</h4>
                           <div className="text-gray-600">{cert.organization}</div>
                           <div className="text-sm text-gray-500">
