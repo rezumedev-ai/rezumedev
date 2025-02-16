@@ -1,14 +1,16 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Edit, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, Edit, ZoomIn, ZoomOut } from "lucide-react";
+import { DownloadOptionsDialog } from "./DownloadOptionsDialog";
 
 interface ResumeHeaderProps {
   onBack: () => void;
   onEdit: () => void;
-  onDownload: () => void;
+  onDownload: (format: "pdf" | "docx") => Promise<void>;
   onToggleZoom?: () => void;
   isZoomed?: boolean;
   isMobile: boolean;
+  isEditing?: boolean;
 }
 
 export function ResumeHeader({
@@ -17,7 +19,8 @@ export function ResumeHeader({
   onDownload,
   onToggleZoom,
   isZoomed,
-  isMobile
+  isMobile,
+  isEditing
 }: ResumeHeaderProps) {
   return (
     <div className="border-b bg-white shadow-sm">
@@ -49,20 +52,14 @@ export function ResumeHeader({
             </Button>
           )}
           <Button
-            variant="outline"
+            variant={isEditing ? "default" : "outline"}
             onClick={onEdit}
             className="gap-2"
           >
             <Edit className="h-4 w-4" />
-            <span className="hidden sm:inline">Edit</span>
+            <span className="hidden sm:inline">{isEditing ? "Save" : "Edit"}</span>
           </Button>
-          <Button
-            onClick={onDownload}
-            className="gap-2"
-          >
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Download PDF</span>
-          </Button>
+          <DownloadOptionsDialog onDownload={onDownload} />
         </div>
       </div>
     </div>

@@ -11,6 +11,10 @@ import { ExperienceSection } from "./preview/ExperienceSection";
 import { EducationSection } from "./preview/EducationSection";
 import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { DownloadOptionsDialog } from "./preview/DownloadOptionsDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -20,13 +24,14 @@ interface FinalResumePreviewProps {
 }
 
 export function FinalResumePreview({
-  resumeData,
+  resumeData: initialResumeData,
   templateId,
-  onEdit,
   resumeId
 }: FinalResumePreviewProps) {
   const [scale, setScale] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [resumeData, setResumeData] = useState(initialResumeData);
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -38,22 +43,56 @@ export function FinalResumePreview({
 
   const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
-  const handleDownload = async () => {
+  const handleDownload = async (format: "pdf" | "docx") => {
     toast.promise(
       async () => {
+        // Simulating download delay
         await new Promise(resolve => setTimeout(resolve, 1500));
+        // In a real implementation, this would call an API endpoint to generate the file
+        const fileName = `resume-${format === "pdf" ? "pdf" : "docx"}`;
+        // Trigger download with the chosen format
         return true;
       },
       {
-        loading: "Generating PDF...",
-        success: "Resume downloaded successfully!",
-        error: "Failed to generate PDF. Please try again."
+        loading: `Generating ${format.toUpperCase()}...`,
+        success: `Resume downloaded successfully as ${format.toUpperCase()}!`,
+        error: "Failed to generate file. Please try again."
       }
     );
   };
 
   const handleBack = () => {
-    navigate(`/resume-builder/${resumeId}`);
+    navigate("/dashboard");
+  };
+
+  const handleUpdateField = async (
+    section: keyof ResumeData,
+    field: string,
+    value: any,
+    subsection?: string
+  ) => {
+    const newResumeData = { ...resumeData };
+    
+    if (subsection) {
+      newResumeData[section][subsection][field] = value;
+    } else {
+      newResumeData[section][field] = value;
+    }
+    
+    setResumeData(newResumeData);
+    
+    try {
+      const { error } = await supabase
+        .from("resumes")
+        .update({ ...newResumeData })
+        .eq("id", resumeId);
+        
+      if (error) throw error;
+      
+      toast.success("Changes saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save changes. Please try again.");
+    }
   };
 
   useEffect(() => {
@@ -78,15 +117,40 @@ export function FinalResumePreview({
     return () => window.removeEventListener('resize', calculateScale);
   }, [isMobile, isZoomed]);
 
+  const renderEditableText = (text: string, section: keyof ResumeData, field: string, subsection?: string) => {
+    if (!isEditing) return text;
+
+    return (
+      <Input
+        value={text}
+        onChange={(e) => handleUpdateField(section, field, e.target.value, subsection)}
+        className="w-full"
+      />
+    );
+  };
+
+  const renderEditableTextArea = (text: string, section: keyof ResumeData, field: string, subsection?: string) => {
+    if (!isEditing) return text;
+
+    return (
+      <Textarea
+        value={text}
+        onChange={(e) => handleUpdateField(section, field, e.target.value, subsection)}
+        className="w-full min-h-[100px]"
+      />
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <ResumeHeader
         onBack={handleBack}
-        onEdit={onEdit || (() => {})}
+        onEdit={() => setIsEditing(!isEditing)}
         onDownload={handleDownload}
         onToggleZoom={() => setIsZoomed(prev => !prev)}
         isZoomed={isZoomed}
         isMobile={isMobile}
+        isEditing={isEditing}
       />
 
       <div 
@@ -111,12 +175,13 @@ export function FinalResumePreview({
             }}
           >
             <PersonalSection
-              fullName={resumeData.personal_info.fullName}
-              title={resumeData.professional_summary.title}
-              email={resumeData.personal_info.email}
-              phone={resumeData.personal_info.phone}
-              linkedin={resumeData.personal_info.linkedin}
+              fullName={renderEditableText(resumeData.personal_info.fullName, "personal_info", "fullName")}
+              title={renderEditableText(resumeData.professional_summary.title, "professional_summary", "title")}
+              email={renderEditableText(resumeData.personal_info.email, "personal_info", "email")}
+              phone={renderEditableText(resumeData.personal_info.phone, "personal_info", "phone")}
+              linkedin={resumeData.personal_info.linkedin ? renderEditableText(resumeData.personal_info.linkedin, "personal_info", "linkedin") : undefined}
               template={selectedTemplate}
+              isEditing={isEditing}
             />
 
             <div className={`${selectedTemplate.style.contentStyle} mt-8 space-y-6`}>
@@ -124,30 +189,52 @@ export function FinalResumePreview({
                 <h3 className={selectedTemplate.style.sectionStyle}>
                   Professional Summary
                 </h3>
-                <p className="text-gray-600 mt-2">
-                  {resumeData.professional_summary.summary}
-                </p>
+                <div className="text-gray-600 mt-2">
+                  {renderEditableTextArea(resumeData.professional_summary.summary, "professional_summary", "summary")}
+                </div>
               </div>
 
               <ExperienceSection
                 experiences={resumeData.work_experience}
                 template={selectedTemplate}
+                isEditing={isEditing}
+                onUpdate={(index, field, value) => {
+                  const newExperiences = [...resumeData.work_experience];
+                  newExperiences[index] = { ...newExperiences[index], [field]: value };
+                  handleUpdateField("work_experience", "", newExperiences);
+                }}
               />
 
               <EducationSection
                 education={resumeData.education}
                 template={selectedTemplate}
+                isEditing={isEditing}
+                onUpdate={(index, field, value) => {
+                  const newEducation = [...resumeData.education];
+                  newEducation[index] = { ...newEducation[index], [field]: value };
+                  handleUpdateField("education", "", newEducation);
+                }}
               />
 
               <SkillsSection
                 hardSkills={resumeData.skills.hard_skills}
                 softSkills={resumeData.skills.soft_skills}
                 template={selectedTemplate}
+                isEditing={isEditing}
+                onUpdate={(type, skills) => {
+                  handleUpdateField("skills", type === "hard" ? "hard_skills" : "soft_skills", skills);
+                }}
               />
 
               <CertificationsSection
                 certifications={resumeData.certifications}
                 template={selectedTemplate}
+                isEditing={isEditing}
+                onUpdate={(index, field, value) => {
+                  const newCertifications = [...resumeData.certifications];
+                  newCertifications[index] = { ...newCertifications[index], [field]: value };
+                  handleUpdateField("certifications", "", newCertifications);
+                }}
               />
             </div>
           </div>
