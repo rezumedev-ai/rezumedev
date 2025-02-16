@@ -46,11 +46,22 @@ export function FinalResumePreview({
   const handleDownload = async (format: "pdf" | "docx") => {
     toast.promise(
       async () => {
-        // Simulating download delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        // In a real implementation, this would call an API endpoint to generate the file
-        const fileName = `resume-${format === "pdf" ? "pdf" : "docx"}`;
-        // Trigger download with the chosen format
+        const { data, error } = await supabase.functions.invoke('generate-resume', {
+          body: { resumeId, format }
+        });
+
+        if (error) throw error;
+
+        // Convert the response to a blob and trigger download
+        const blob = await data.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `resume-${format}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
         return true;
       },
       {
