@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -32,6 +33,7 @@ export function FinalResumePreview({
   const [isZoomed, setIsZoomed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [resumeData, setResumeData] = useState(initialResumeData);
+  const [isDownloading, setIsDownloading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -43,31 +45,44 @@ export function FinalResumePreview({
   const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
   const handleDownload = async (format: "pdf" | "docx") => {
-    toast.promise(
-      async () => {
-        const { data, error } = await supabase.functions.invoke('generate-resume', {
-          body: { resumeId, format }
-        });
+    setIsDownloading(true);
+    try {
+      console.log('Starting download:', format);
+      const { data: responseData, error } = await supabase.functions.invoke('generate-resume', {
+        body: { resumeId, format }
+      });
 
-        if (error) throw error;
-
-        const blob = await data.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `resume-${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        return true;
-      },
-      {
-        loading: `Generating ${format.toUpperCase()}...`,
-        success: `Resume downloaded successfully as ${format.toUpperCase()}!`,
-        error: "Failed to generate file. Please try again."
+      if (error) {
+        console.error('Download error:', error);
+        throw error;
       }
-    );
+
+      // Convert the response data to a blob
+      const blob = new Blob([responseData], {
+        type: format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      });
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `resume-${format === 'pdf' ? 'pdf' : 'docx'}`;
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success(`Resume downloaded successfully as ${format.toUpperCase()}!`);
+    } catch (err) {
+      console.error('Download failed:', err);
+      toast.error(`Failed to generate ${format.toUpperCase()}. Please try again.`);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleBack = () => {
@@ -144,6 +159,7 @@ export function FinalResumePreview({
         isZoomed={isZoomed}
         isMobile={isMobile}
         isEditing={isEditing}
+        isDownloading={isDownloading}
       />
 
       <div 
