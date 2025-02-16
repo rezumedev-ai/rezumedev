@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -48,35 +47,36 @@ export function FinalResumePreview({
     setIsDownloading(true);
     try {
       console.log('Starting download:', format);
-      const { data: responseData, error } = await supabase.functions.invoke('generate-resume', {
-        body: { resumeId, format }
+      
+      const { data: blob } = await supabase.functions.invoke('generate-resume', {
+        body: { resumeId, format },
+        responseType: 'arrayBuffer'
       });
 
-      if (error) {
-        console.error('Download error:', error);
-        throw error;
+      if (!blob) {
+        throw new Error('Failed to generate file');
       }
 
-      // Convert the response data to a blob
-      const blob = new Blob([responseData], {
+      // Create a blob from the array buffer
+      const file = new Blob([blob], {
         type: format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       });
 
       // Create a URL for the blob
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(file);
 
-      // Create a temporary anchor element
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `resume-${format === 'pdf' ? 'pdf' : 'docx'}`;
-      document.body.appendChild(a);
-      a.click();
+      // Create a temporary link element and trigger the download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `resume.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-      // Clean up
+      // Clean up the URL
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
 
-      toast.success(`Resume downloaded successfully as ${format.toUpperCase()}!`);
+      toast.success(`Resume downloaded successfully as ${format.toUpperCase()}`);
     } catch (err) {
       console.error('Download failed:', err);
       toast.error(`Failed to generate ${format.toUpperCase()}. Please try again.`);
