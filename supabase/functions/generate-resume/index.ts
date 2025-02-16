@@ -2,7 +2,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import { jsPDF } from "https://esm.sh/jspdf@2.5.1";
-import { font } from "https://esm.sh/@canvas-fonts/helvetica-neue@1.0.4";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -53,10 +52,8 @@ serve(async (req) => {
         compress: true
       });
 
-      // Add custom font
-      doc.addFileToVFS('HelveticaNeue.ttf', font);
-      doc.addFont('HelveticaNeue.ttf', 'HelveticaNeue', 'normal');
-      doc.setFont('HelveticaNeue');
+      // Set font to Helvetica (built into jsPDF)
+      doc.setFont('helvetica');
 
       // Left column width (matches preview)
       const leftColumnWidth = 250;
@@ -95,11 +92,11 @@ serve(async (req) => {
         doc.setFontSize(10);
         for (const edu of resume.education) {
           doc.setTextColor(31, 41, 55);
-          doc.setFont('HelveticaNeue', 'bold');
+          doc.setFont('helvetica', 'bold');
           doc.text(edu.schoolName, margin, leftY);
           leftY += 15;
 
-          doc.setFont('HelveticaNeue', 'normal');
+          doc.setFont('helvetica', 'normal');
           doc.setTextColor(75, 85, 99);
           doc.text(edu.degreeName, margin, leftY);
           leftY += 15;
@@ -150,13 +147,13 @@ serve(async (req) => {
       // Header
       doc.setFontSize(24);
       doc.setTextColor(31, 41, 55);
-      doc.setFont('HelveticaNeue', 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text(resume.personal_info.fullName, rightColumnX, rightY);
       rightY += 30;
 
       doc.setFontSize(16);
       doc.setTextColor(75, 85, 99);
-      doc.setFont('HelveticaNeue', 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.text(resume.professional_summary.title, rightColumnX, rightY);
       rightY += 40;
 
@@ -181,12 +178,12 @@ serve(async (req) => {
 
         for (const exp of resume.work_experience) {
           doc.setFontSize(12);
-          doc.setFont('HelveticaNeue', 'bold');
+          doc.setFont('helvetica', 'bold');
           doc.text(exp.jobTitle, rightColumnX, rightY);
           rightY += 15;
 
           doc.setFontSize(10);
-          doc.setFont('HelveticaNeue', 'normal');
+          doc.setFont('helvetica', 'normal');
           doc.setTextColor(75, 85, 99);
           doc.text(exp.companyName, rightColumnX, rightY);
           rightY += 15;
