@@ -34,7 +34,6 @@ export function FinalResumePreview({
   // A4 dimensions (96 DPI)
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
-  const MARGIN = 48;
 
   const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
@@ -67,22 +66,14 @@ export function FinalResumePreview({
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
         
-        // Calculate the available space accounting for padding
-        const availableWidth = containerWidth - 32; // 16px padding on each side
-        const availableHeight = containerHeight - 32;
+        // Calculate scale based on container dimensions
+        const scaleX = (containerWidth - 40) / A4_WIDTH_PX;
+        const scaleY = (containerHeight - 40) / A4_HEIGHT_PX;
         
-        // Calculate scale based on available space
-        const scaleX = availableWidth / A4_WIDTH_PX;
-        const scaleY = availableHeight / A4_HEIGHT_PX;
-        
-        let newScale;
-        if (isMobile) {
-          // On mobile, prioritize width scaling for better readability
-          newScale = isZoomed ? Math.min(scaleX, scaleY, 0.8) : Math.min(scaleX, 0.45);
-        } else {
-          // On desktop, maintain aspect ratio
-          newScale = Math.min(scaleX, scaleY, 0.85);
-        }
+        // Use the smaller scale to ensure the entire resume fits
+        const newScale = isMobile 
+          ? isZoomed ? Math.min(scaleX, scaleY, 0.8) : Math.min(scaleX, 0.4)
+          : Math.min(scaleX, scaleY, 0.85);
         
         setScale(newScale);
       }
@@ -146,147 +137,146 @@ export function FinalResumePreview({
       {/* Preview Area */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-auto relative flex items-center justify-center p-4 md:p-8"
+        className="flex-1 relative flex items-center justify-center p-4 md:p-8 bg-gray-100"
       >
         <div 
           ref={resumeRef}
-          className="bg-white shadow-lg origin-center transition-transform duration-300 w-full"
+          className="bg-white shadow-lg"
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
             transform: `scale(${scale})`,
-            transformOrigin: 'top center',
+            transformOrigin: 'center',
+            position: 'absolute',
           }}
         >
           {/* Resume Content */}
-          <div className="h-full overflow-hidden">
-            <div 
-              className="h-full p-8 md:p-12 overflow-y-auto"
-              style={{
-                fontFamily: selectedTemplate.style.titleFont.split(' ')[0].replace('font-', '')
-              }}
-            >
-              {/* Header */}
-              <div className={`${selectedTemplate.style.headerStyle} break-words`}>
-                <h1 className={`${selectedTemplate.style.titleFont} text-2xl md:text-3xl`}>
-                  {resumeData.personal_info.fullName}
-                </h1>
-                <h2 className="text-lg md:text-xl text-gray-600">
-                  {resumeData.professional_summary.title}
-                </h2>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-gray-500 mt-2">
-                  <span className="break-words">{resumeData.personal_info.email}</span>
-                  <span className="break-words">{resumeData.personal_info.phone}</span>
-                  {resumeData.personal_info.linkedin && (
-                    <span className="break-words">{resumeData.personal_info.linkedin}</span>
-                  )}
-                </div>
+          <div 
+            className="w-full h-full p-[48px]"
+            style={{
+              fontFamily: selectedTemplate.style.titleFont.split(' ')[0].replace('font-', '')
+            }}
+          >
+            {/* Header */}
+            <div className={`${selectedTemplate.style.headerStyle}`}>
+              <h1 className={`${selectedTemplate.style.titleFont} text-3xl`}>
+                {resumeData.personal_info.fullName}
+              </h1>
+              <h2 className="text-xl text-gray-600">
+                {resumeData.professional_summary.title}
+              </h2>
+              <div className="flex flex-wrap gap-4 text-sm text-gray-500 mt-2">
+                <span>{resumeData.personal_info.email}</span>
+                <span>{resumeData.personal_info.phone}</span>
+                {resumeData.personal_info.linkedin && (
+                  <span>{resumeData.personal_info.linkedin}</span>
+                )}
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className={`${selectedTemplate.style.contentStyle} mt-8 space-y-6`}>
+              {/* Professional Summary */}
+              <div>
+                <h3 className={selectedTemplate.style.sectionStyle}>
+                  Professional Summary
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  {resumeData.professional_summary.summary}
+                </p>
               </div>
 
-              {/* Main Content */}
-              <div className={`${selectedTemplate.style.contentStyle} space-y-6`}>
-                {/* Professional Summary */}
+              {/* Work Experience */}
+              {resumeData.work_experience.length > 0 && (
                 <div>
                   <h3 className={selectedTemplate.style.sectionStyle}>
-                    Professional Summary
+                    Work Experience
                   </h3>
-                  <p className="text-gray-600 leading-relaxed break-words">
-                    {resumeData.professional_summary.summary}
-                  </p>
+                  <div className="space-y-4 mt-2">
+                    {resumeData.work_experience.map((exp, index) => (
+                      <div key={index}>
+                        <h4 className="font-medium">{exp.jobTitle}</h4>
+                        <div className="text-gray-600">{exp.companyName}</div>
+                        <div className="text-sm text-gray-500">
+                          {formatDate(exp.startDate)} - {exp.isCurrentJob ? 'Present' : formatDate(exp.endDate)}
+                        </div>
+                        <ul className="list-disc ml-4 mt-2 text-gray-600 space-y-1">
+                          {exp.responsibilities.map((resp, idx) => (
+                            <li key={idx}>{resp}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
 
-                {/* Work Experience */}
-                {resumeData.work_experience.length > 0 && (
-                  <div>
-                    <h3 className={selectedTemplate.style.sectionStyle}>
-                      Work Experience
-                    </h3>
-                    <div className="space-y-4">
-                      {resumeData.work_experience.map((exp, index) => (
-                        <div key={index} className="break-words">
-                          <h4 className="font-medium">{exp.jobTitle}</h4>
-                          <div className="text-gray-600">{exp.companyName}</div>
-                          <div className="text-sm text-gray-500">
-                            {formatDate(exp.startDate)} - {exp.isCurrentJob ? 'Present' : formatDate(exp.endDate)}
-                          </div>
-                          <ul className="list-disc ml-4 mt-2 text-gray-600 space-y-1">
-                            {exp.responsibilities.map((resp, idx) => (
-                              <li key={idx} className="break-words">{resp}</li>
-                            ))}
-                          </ul>
+              {/* Education */}
+              {resumeData.education.length > 0 && (
+                <div>
+                  <h3 className={selectedTemplate.style.sectionStyle}>
+                    Education
+                  </h3>
+                  <div className="space-y-4 mt-2">
+                    {resumeData.education.map((edu, index) => (
+                      <div key={index}>
+                        <h4 className="font-medium">{edu.degreeName}</h4>
+                        <div className="text-gray-600">{edu.schoolName}</div>
+                        <div className="text-sm text-gray-500">
+                          {formatDate(edu.startDate)} - {edu.isCurrentlyEnrolled ? 'Present' : formatDate(edu.endDate)}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Education */}
-                {resumeData.education.length > 0 && (
-                  <div>
-                    <h3 className={selectedTemplate.style.sectionStyle}>
-                      Education
-                    </h3>
-                    <div className="space-y-4">
-                      {resumeData.education.map((edu, index) => (
-                        <div key={index} className="break-words">
-                          <h4 className="font-medium">{edu.degreeName}</h4>
-                          <div className="text-gray-600">{edu.schoolName}</div>
-                          <div className="text-sm text-gray-500">
-                            {formatDate(edu.startDate)} - {edu.isCurrentlyEnrolled ? 'Present' : formatDate(edu.endDate)}
-                          </div>
+              {/* Skills */}
+              {(resumeData.skills.hard_skills.length > 0 || resumeData.skills.soft_skills.length > 0) && (
+                <div>
+                  <h3 className={selectedTemplate.style.sectionStyle}>
+                    Skills
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    {resumeData.skills.hard_skills.length > 0 && (
+                      <div>
+                        <h4 className="font-medium mb-2">Technical Skills</h4>
+                        <div className="text-gray-600">
+                          {resumeData.skills.hard_skills.join(", ")}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
+                    {resumeData.skills.soft_skills.length > 0 && (
+                      <div>
+                        <h4 className="font-medium mb-2">Soft Skills</h4>
+                        <div className="text-gray-600">
+                          {resumeData.skills.soft_skills.join(", ")}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Skills */}
-                {(resumeData.skills.hard_skills.length > 0 || resumeData.skills.soft_skills.length > 0) && (
-                  <div>
-                    <h3 className={selectedTemplate.style.sectionStyle}>
-                      Skills
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {resumeData.skills.hard_skills.length > 0 && (
-                        <div>
-                          <h4 className="font-medium mb-2">Technical Skills</h4>
-                          <div className="text-gray-600 break-words">
-                            {resumeData.skills.hard_skills.join(", ")}
-                          </div>
+              {/* Certifications */}
+              {resumeData.certifications.length > 0 && (
+                <div>
+                  <h3 className={selectedTemplate.style.sectionStyle}>
+                    Certifications
+                  </h3>
+                  <div className="space-y-4 mt-2">
+                    {resumeData.certifications.map((cert, index) => (
+                      <div key={index}>
+                        <h4 className="font-medium">{cert.name}</h4>
+                        <div className="text-gray-600">{cert.organization}</div>
+                        <div className="text-sm text-gray-500">
+                          {formatDate(cert.completionDate)}
                         </div>
-                      )}
-                      {resumeData.skills.soft_skills.length > 0 && (
-                        <div>
-                          <h4 className="font-medium mb-2">Soft Skills</h4>
-                          <div className="text-gray-600 break-words">
-                            {resumeData.skills.soft_skills.join(", ")}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-
-                {/* Certifications */}
-                {resumeData.certifications.length > 0 && (
-                  <div>
-                    <h3 className={selectedTemplate.style.sectionStyle}>
-                      Certifications
-                    </h3>
-                    <div className="space-y-4">
-                      {resumeData.certifications.map((cert, index) => (
-                        <div key={index} className="break-words">
-                          <h4 className="font-medium">{cert.name}</h4>
-                          <div className="text-gray-600">{cert.organization}</div>
-                          <div className="text-sm text-gray-500">
-                            {formatDate(cert.completionDate)}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
