@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import * as docx from "https://esm.sh/docx@8.2.3";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
-import * as playwright from 'https://deno.land/x/playwright@v0.3.0/mod.ts';
+import { PDFDocument, rgb, StandardFonts } from "https://esm.sh/pdf-lib@1.17.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -413,6 +413,116 @@ const generateDocx = async (resume: any) => {
   return await docx.Packer.toBuffer(doc);
 };
 
+const generatePDF = async (resume: any) => {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([595.28, 841.89]); // A4 size in points
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  const { width, height } = page.getSize();
+  const margin = 50;
+  let yOffset = height - margin;
+  const lineHeight = 14;
+
+  // Helper function to write text and update yOffset
+  const writeText = (text: string, { isBold = false, size = 12, indent = 0 }) => {
+    page.drawText(text, {
+      x: margin + indent,
+      y: yOffset,
+      size,
+      font: isBold ? boldFont : font,
+    });
+    yOffset -= lineHeight + (size - 12); // Adjust spacing based on font size
+  };
+
+  // Header
+  writeText(resume.personal_info.fullName, { isBold: true, size: 24 });
+  writeText(resume.professional_summary.title, { size: 16 });
+  
+  // Contact Info
+  yOffset -= 10;
+  const contactInfo = [
+    resume.personal_info.email,
+    resume.personal_info.phone,
+    resume.personal_info.linkedin
+  ].filter(Boolean).join(' • ');
+  writeText(contactInfo, { size: 10 });
+
+  // Professional Summary
+  yOffset -= 20;
+  writeText('Professional Summary', { isBold: true, size: 14 });
+  yOffset -= 5;
+  const words = resume.professional_summary.summary.split(' ');
+  let line = '';
+  const maxWidth = width - (2 * margin);
+  
+  for (const word of words) {
+    const testLine = line + word + ' ';
+    const lineWidth = font.widthOfTextAtSize(testLine, 12);
+    
+    if (lineWidth > maxWidth) {
+      writeText(line, { size: 11 });
+      line = word + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) writeText(line, { size: 11 });
+
+  // Work Experience
+  if (resume.work_experience.length > 0) {
+    yOffset -= 20;
+    writeText('Work Experience', { isBold: true, size: 14 });
+    
+    for (const exp of resume.work_experience) {
+      yOffset -= 15;
+      writeText(exp.jobTitle, { isBold: true, size: 12 });
+      writeText(exp.companyName, { size: 11 });
+      writeText(`${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`, { size: 10 });
+      
+      yOffset -= 5;
+      for (const resp of exp.responsibilities) {
+        writeText('• ' + resp, { size: 10, indent: 10 });
+      }
+      yOffset -= 10;
+    }
+  }
+
+  // Education
+  if (resume.education.length > 0) {
+    yOffset -= 20;
+    writeText('Education', { isBold: true, size: 14 });
+    
+    for (const edu of resume.education) {
+      yOffset -= 15;
+      writeText(edu.schoolName, { isBold: true, size: 12 });
+      writeText(edu.degreeName, { size: 11 });
+      writeText(`${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}`, { size: 10 });
+      yOffset -= 5;
+    }
+  }
+
+  // Skills
+  if (resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0) {
+    yOffset -= 20;
+    writeText('Skills', { isBold: true, size: 14 });
+    
+    if (resume.skills.hard_skills.length > 0) {
+      yOffset -= 15;
+      writeText('Technical Skills', { isBold: true, size: 12 });
+      writeText(resume.skills.hard_skills.join(' • '), { size: 10 });
+    }
+    
+    if (resume.skills.soft_skills.length > 0) {
+      yOffset -= 15;
+      writeText('Soft Skills', { isBold: true, size: 12 });
+      writeText(resume.skills.soft_skills.join(' • '), { size: 10 });
+    }
+  }
+
+  return await pdfDoc.save();
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -442,43 +552,10 @@ serve(async (req) => {
       throw new Error('Resume not found');
     }
 
-    const { data: templateData } = await supabaseClient
-      .from('resumes')
-      .select('template_id')
-      .eq('id', resumeId)
-      .single();
-
-    const templateId = templateData?.template_id || 'minimal-clean';
-
     let fileBuffer: Uint8Array;
 
     if (format === 'pdf') {
-      const htmlContent = generateExactHTML(resume, templateId);
-      
-      // Initialize Playwright
-      const browser = await playwright.chromium.launch();
-      const page = await browser.newPage();
-      
-      // Set content and wait for network idle
-      await page.setContent(htmlContent);
-      
-      // Set viewport to A4 size
-      await page.setViewport({
-        width: 794, // A4 width at 96 DPI
-        height: 1123, // A4 height at 96 DPI
-        deviceScaleFactor: 2,
-      });
-      
-      // Generate PDF
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '0', right: '0', bottom: '0', left: '0' },
-      });
-      
-      await browser.close();
-      fileBuffer = new Uint8Array(pdfBuffer);
-      
+      fileBuffer = await generatePDF(resume);
     } else if (format === 'docx') {
       fileBuffer = await generateDocx(resume);
     } else {
