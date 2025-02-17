@@ -1,54 +1,81 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FileDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 interface DownloadOptionsDialogProps {
-  onDownload: (format: "pdf" | "docx") => Promise<void>;
+  isDownloading: boolean;
+  onDownload: (format: "pdf" | "docx") => void;
 }
 
-export function DownloadOptionsDialog({ onDownload }: DownloadOptionsDialogProps) {
-  const [format, setFormat] = useState<"pdf" | "docx">("pdf");
-  const [isOpen, setIsOpen] = useState(false);
+export function DownloadOptionsDialog({
+  isDownloading,
+  onDownload
+}: DownloadOptionsDialogProps) {
+  const [open, setOpen] = useState(false);
 
-  const handleDownload = async () => {
-    try {
-      await onDownload(format);
-      setIsOpen(false);
-    } catch (error) {
-      toast.error("Failed to download resume. Please try again.");
-    }
+  const handlePrint = () => {
+    setOpen(false);
+    
+    // Add print-specific styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #resume-content, #resume-content * {
+          visibility: visible;
+        }
+        #resume-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 210mm;
+          height: 297mm;
+          margin: 0;
+          padding: 0;
+          transform: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Trigger print
+    window.print();
+
+    // Clean up
+    setTimeout(() => {
+      document.head.removeChild(style);
+    }, 1000);
+
+    toast.success("Print dialog opened. Save as PDF for best results.");
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Download className="h-4 w-4" />
-          <span className="hidden sm:inline">Download</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button 
+        variant="outline" 
+        size="sm"
+        onClick={() => setOpen(true)}
+        disabled={isDownloading}
+      >
+        <FileDown className="w-4 h-4 mr-2" />
+        Download
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Download Resume</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <RadioGroup value={format} onValueChange={(value) => setFormat(value as "pdf" | "docx")}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="pdf" id="pdf" />
-              <Label htmlFor="pdf">PDF Format</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="docx" id="docx" />
-              <Label htmlFor="docx">Word Document (DOCX)</Label>
-            </div>
-          </RadioGroup>
-          <Button onClick={handleDownload} className="w-full">
-            Download
+        <div className="space-y-4 mt-4">
+          <Button 
+            className="w-full" 
+            onClick={handlePrint}
+            disabled={isDownloading}
+          >
+            Download as PDF
           </Button>
         </div>
       </DialogContent>

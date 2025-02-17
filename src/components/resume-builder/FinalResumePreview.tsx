@@ -46,49 +46,10 @@ export function FinalResumePreview({
   const handleDownload = async (format: "pdf" | "docx") => {
     setIsDownloading(true);
     try {
-      console.log('Starting download:', format);
-      
-      const response = await supabase.functions.invoke('generate-resume', {
-        body: { 
-          resumeId,
-          format
-        }
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message || 'Failed to generate file');
-      }
-
-      if (!response.data?.data) {
-        throw new Error('No file data received');
-      }
-
-      // Decode the base64 string
-      const binaryString = atob(response.data.data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-
-      // Create a blob with the correct mime type
-      const file = new Blob([bytes], {
-        type: response.data.contentType || (format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-      });
-
-      // Create a download link
-      const url = URL.createObjectURL(file);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `resume.${format}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast.success(`Resume downloaded successfully as ${format.toUpperCase()}`);
+      toast.success("Opening print dialog...");
     } catch (err) {
       console.error('Download failed:', err);
-      toast.error(`Failed to generate ${format.toUpperCase()}. Please try again.`);
+      toast.error("Failed to generate PDF. Please try again.");
     } finally {
       setIsDownloading(false);
     }
