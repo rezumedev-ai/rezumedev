@@ -19,39 +19,61 @@ export function DownloadOptionsDialog({
   const handlePrint = () => {
     setOpen(false);
     
-    // Add print-specific styles
-    const style = document.createElement('style');
-    style.textContent = `
-      @media print {
-        body * {
-          visibility: hidden;
-        }
-        #resume-content, #resume-content * {
-          visibility: visible;
-        }
-        #resume-content {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 210mm;
-          height: 297mm;
-          margin: 0;
-          padding: 0;
-          transform: none !important;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Trigger print
-    window.print();
-
-    // Clean up
+    // Wait for dialog to close before adding print styles
     setTimeout(() => {
-      document.head.removeChild(style);
-    }, 1000);
+      // Create and add print styles
+      const style = document.createElement('style');
+      style.id = 'print-styles';
+      style.textContent = `
+        @page {
+          size: A4;
+          margin: 0;
+        }
+        @media print {
+          html, body {
+            height: 100%;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden;
+          }
+          body * {
+            visibility: hidden;
+          }
+          #resume-content, #resume-content * {
+            visibility: visible;
+          }
+          #resume-content {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+            padding: 0;
+            transform: none !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
 
-    toast.success("Print dialog opened. Save as PDF for best results.");
+      // Force browser repaint
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          // Trigger print
+          window.print();
+
+          // Remove print styles after printing
+          setTimeout(() => {
+            const printStyle = document.getElementById('print-styles');
+            if (printStyle) {
+              document.head.removeChild(printStyle);
+            }
+          }, 1000);
+        });
+      });
+    }, 100);
+
+    toast.success("Print dialog opened. Select 'Save as PDF' for best results.");
   };
 
   return (
