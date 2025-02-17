@@ -28,51 +28,63 @@ export function DownloadOptionsDialog({
         return;
       }
 
-      toast.loading("Generating PDF...");
+      // Show loading toast
+      const loadingToast = toast.loading("Generating PDF...");
 
-      // Wait for dialog to close and toast to show
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for dialog to close and any transitions to complete
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Capture the resume as a canvas
+      // Reset resume element transform for capture
+      const originalTransform = resumeElement.style.transform;
+      resumeElement.style.transform = 'none';
+
+      // Capture with optimal settings
       const canvas = await html2canvas(resumeElement, {
-        scale: 2, // Higher scale for better quality
+        scale: 2,
         useCORS: true,
-        logging: false,
+        allowTaint: true,
+        logging: true,
         backgroundColor: "#ffffff",
-        windowWidth: 794, // A4 width in pixels at 96 DPI
-        windowHeight: 1123, // A4 height in pixels at 96 DPI
+        width: 794, // A4 width
+        height: 1123, // A4 height
+        foreignObjectRendering: false,
+        removeContainer: false,
       });
 
-      // Create PDF with A4 dimensions
+      // Restore original transform
+      resumeElement.style.transform = originalTransform;
+
+      // Create PDF with correct dimensions
       const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
         format: 'a4',
-        unit: 'px'
       });
 
-      // Calculate dimensions
-      const imgWidth = 794; // A4 width in pixels at 96 DPI
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // A4 dimensions in mm
+      const pdfWidth = 210;
+      const pdfHeight = 297;
 
-      // Add the image to the PDF
+      // Add the image to PDF with full page coverage
       pdf.addImage(
         canvas.toDataURL('image/jpeg', 1.0),
         'JPEG',
         0,
         0,
-        imgWidth,
-        imgHeight,
+        pdfWidth,
+        pdfHeight,
         undefined,
         'FAST'
       );
 
-      // Save the PDF
+      // Save PDF
       pdf.save('resume.pdf');
       
-      toast.dismiss();
+      // Clear loading toast and show success
+      toast.dismiss(loadingToast);
       toast.success("PDF downloaded successfully!");
     } catch (error) {
       console.error('PDF generation error:', error);
-      toast.dismiss();
       toast.error("Failed to generate PDF. Please try again.");
     }
   };
