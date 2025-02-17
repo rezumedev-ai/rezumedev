@@ -186,36 +186,11 @@ export function FinalResumePreview({
             }}
           >
             <PersonalSection
-              fullName={renderEditableField(
-                <Input
-                  value={resumeData.personal_info.fullName}
-                  onChange={(e) => handleUpdateField("personal_info", "fullName", e.target.value)}
-                />
-              ) as string}
-              title={renderEditableField(
-                <Input
-                  value={resumeData.professional_summary.title}
-                  onChange={(e) => handleUpdateField("professional_summary", "title", e.target.value)}
-                />
-              ) as string}
-              email={renderEditableField(
-                <Input
-                  value={resumeData.personal_info.email}
-                  onChange={(e) => handleUpdateField("personal_info", "email", e.target.value)}
-                />
-              ) as string}
-              phone={renderEditableField(
-                <Input
-                  value={resumeData.personal_info.phone}
-                  onChange={(e) => handleUpdateField("personal_info", "phone", e.target.value)}
-                />
-              ) as string}
-              linkedin={resumeData.personal_info.linkedin ? renderEditableField(
-                <Input
-                  value={resumeData.personal_info.linkedin}
-                  onChange={(e) => handleUpdateField("personal_info", "linkedin", e.target.value)}
-                />
-              ) as string : undefined}
+              fullName={resumeData.personal_info.fullName}
+              title={resumeData.professional_summary.title}
+              email={resumeData.personal_info.email}
+              phone={resumeData.personal_info.phone}
+              linkedin={resumeData.personal_info.linkedin}
               template={selectedTemplate}
             />
 
@@ -225,13 +200,7 @@ export function FinalResumePreview({
                   Professional Summary
                 </h3>
                 <div className="text-gray-600 mt-2">
-                  {renderEditableField(
-                    <Textarea
-                      value={resumeData.professional_summary.summary}
-                      onChange={(e) => handleUpdateField("professional_summary", "summary", e.target.value)}
-                      className="min-h-[100px]"
-                    />
-                  )}
+                  {resumeData.professional_summary.summary}
                 </div>
               </div>
 
