@@ -1,14 +1,114 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
-import { jsPDF } from "https://esm.sh/jspdf@2.5.1";
 import * as docx from "https://esm.sh/docx@8.2.3";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
+import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const generateHTML = (resume: any, templateId: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      width: 794px;
+      height: 1123px;
+      margin: 0;
+      padding: 48px;
+      box-sizing: border-box;
+    }
+    .resume-container {
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="resume-container">
+    <!-- Personal Info Section -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2">${resume.personal_info.fullName}</h1>
+      <h2 class="text-xl text-gray-600 mb-2">${resume.professional_summary.title}</h2>
+      <div class="text-sm text-gray-500 space-x-4">
+        <span>${resume.personal_info.email}</span>
+        <span>${resume.personal_info.phone}</span>
+        ${resume.personal_info.linkedin ? `<span>${resume.personal_info.linkedin}</span>` : ''}
+      </div>
+    </div>
+
+    <!-- Professional Summary -->
+    <div class="mb-8">
+      <h3 class="text-base font-semibold mb-2 uppercase tracking-wide">Professional Summary</h3>
+      <p class="text-gray-600 text-sm">${resume.professional_summary.summary}</p>
+    </div>
+
+    <!-- Work Experience -->
+    ${resume.work_experience.length > 0 ? `
+    <div class="mb-8">
+      <h3 class="text-base font-semibold mb-2 uppercase tracking-wide">Work Experience</h3>
+      <div class="space-y-4">
+        ${resume.work_experience.map(exp => `
+          <div>
+            <h4 class="text-sm font-medium">${exp.jobTitle}</h4>
+            <div class="text-sm text-gray-600">${exp.companyName}</div>
+            <div class="text-sm text-gray-500">${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}</div>
+            <ul class="text-sm text-gray-600 space-y-1 list-disc ml-4 mt-2">
+              ${exp.responsibilities.map(resp => `<li>${resp}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- Education -->
+    ${resume.education.length > 0 ? `
+    <div class="mb-8">
+      <h3 class="text-base font-semibold mb-2 uppercase tracking-wide">Education</h3>
+      <div class="space-y-4">
+        ${resume.education.map(edu => `
+          <div>
+            <div class="font-medium text-sm">${edu.schoolName}</div>
+            <div class="text-sm text-gray-600">${edu.degreeName}</div>
+            <div class="text-sm text-gray-500">${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- Skills -->
+    ${(resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0) ? `
+    <div class="mb-8">
+      <h3 class="text-base font-semibold mb-2 uppercase tracking-wide">Skills</h3>
+      <div class="grid grid-cols-2 gap-4">
+        ${resume.skills.hard_skills.length > 0 ? `
+        <div>
+          <h4 class="font-medium text-sm mb-2">Technical Skills</h4>
+          <div class="text-sm text-gray-600">${resume.skills.hard_skills.join(' • ')}</div>
+        </div>
+        ` : ''}
+        ${resume.skills.soft_skills.length > 0 ? `
+        <div>
+          <h4 class="font-medium text-sm mb-2">Soft Skills</h4>
+          <div class="text-sm text-gray-600">${resume.skills.soft_skills.join(' • ')}</div>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+    ` : ''}
+  </div>
+</body>
+</html>
+`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -51,194 +151,41 @@ serve(async (req) => {
     let fileBuffer: Uint8Array;
 
     if (format === 'pdf') {
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'pt',
-        format: 'a4',
-        putOnlyUsedFonts: true,
-        compress: true
+      // Launch Puppeteer
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
-
-      // Constants for layout
-      const margin = 48; // Matching the preview's padding
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const usableWidth = pageWidth - (margin * 2);
-      let currentY = margin;
-
-      // Personal Section
-      doc.setFontSize(28);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'bold');
-      const fullName = resume.personal_info.fullName;
-      doc.text(fullName, margin, currentY);
-      currentY += 25;
-
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(100, 100, 100);
-      const title = resume.professional_summary.title;
-      doc.text(title, margin, currentY);
-      currentY += 20;
-
-      // Contact Info
-      doc.setFontSize(11);
-      doc.setTextColor(128, 128, 128);
-      const contactInfoParts = [
-        resume.personal_info.email,
-        resume.personal_info.phone,
-        resume.personal_info.linkedin
-      ].filter(Boolean);
       
-      doc.text(contactInfoParts.join(' • '), margin, currentY);
-      currentY += 40;
+      try {
+        const page = await browser.newPage();
+        
+        // Set viewport to A4 size
+        await page.setViewport({
+          width: 794,  // A4 width at 96 DPI
+          height: 1123, // A4 height at 96 DPI
+          deviceScaleFactor: 2, // Higher resolution
+        });
 
-      // Professional Summary
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(0, 0, 0);
-      doc.text('Professional Summary', margin, currentY);
-      currentY += 20;
+        // Generate and set HTML content
+        const html = generateHTML(resume, templateId);
+        await page.setContent(html, { waitUntil: 'networkidle0' });
 
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(96, 96, 96);
-      const summaryLines = doc.splitTextToSize(resume.professional_summary.summary, usableWidth);
-      doc.text(summaryLines, margin, currentY);
-      currentY += (summaryLines.length * 15) + 30;
-
-      // Work Experience
-      if (resume.work_experience.length > 0) {
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Work Experience', margin, currentY);
-        currentY += 20;
-
-        resume.work_experience.forEach((exp, index) => {
-          if (currentY > pageHeight - 100) {
-            doc.addPage();
-            currentY = margin;
-          }
-
-          doc.setFontSize(12);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor(0, 0, 0);
-          doc.text(exp.jobTitle, margin, currentY);
-          currentY += 15;
-
-          doc.setFontSize(11);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(96, 96, 96);
-          doc.text(exp.companyName, margin, currentY);
-          currentY += 15;
-
-          doc.setTextColor(128, 128, 128);
-          doc.text(`${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`, margin, currentY);
-          currentY += 20;
-
-          exp.responsibilities.forEach(resp => {
-            if (currentY > pageHeight - 100) {
-              doc.addPage();
-              currentY = margin;
-            }
-
-            const bulletPoint = '•';
-            const respLines = doc.splitTextToSize(resp, usableWidth - 15);
-            doc.text(bulletPoint, margin, currentY);
-            doc.text(respLines, margin + 15, currentY);
-            currentY += (respLines.length * 15);
-          });
-
-          if (index < resume.work_experience.length - 1) {
-            currentY += 25;
+        // Generate PDF
+        const pdfBuffer = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          margin: {
+            top: '0',
+            right: '0',
+            bottom: '0',
+            left: '0'
           }
         });
-        currentY += 30;
+
+        fileBuffer = new Uint8Array(pdfBuffer);
+      } finally {
+        await browser.close();
       }
-
-      // Education
-      if (resume.education.length > 0) {
-        if (currentY > pageHeight - 200) {
-          doc.addPage();
-          currentY = margin;
-        }
-
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Education', margin, currentY);
-        currentY += 20;
-
-        resume.education.forEach((edu, index) => {
-          doc.setFontSize(12);
-          doc.setFont('helvetica', 'bold');
-          doc.text(edu.schoolName, margin, currentY);
-          currentY += 15;
-
-          doc.setFontSize(11);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(96, 96, 96);
-          doc.text(edu.degreeName, margin, currentY);
-          currentY += 15;
-
-          doc.setTextColor(128, 128, 128);
-          doc.text(`${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}`, margin, currentY);
-          
-          if (index < resume.education.length - 1) {
-            currentY += 25;
-          }
-        });
-        currentY += 30;
-      }
-
-      // Skills
-      if (resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0) {
-        if (currentY > pageHeight - 200) {
-          doc.addPage();
-          currentY = margin;
-        }
-
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Skills', margin, currentY);
-        currentY += 20;
-
-        const skillsColumnWidth = (usableWidth - margin) / 2;
-
-        if (resume.skills.hard_skills.length > 0) {
-          doc.setFontSize(12);
-          doc.setFont('helvetica', 'bold');
-          doc.text('Technical Skills', margin, currentY);
-          currentY += 15;
-
-          doc.setFontSize(11);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(96, 96, 96);
-          const hardSkillsText = resume.skills.hard_skills.join(' • ');
-          const hardSkillsLines = doc.splitTextToSize(hardSkillsText, skillsColumnWidth);
-          doc.text(hardSkillsLines, margin, currentY);
-          currentY += (hardSkillsLines.length * 15) + 20;
-        }
-
-        if (resume.skills.soft_skills.length > 0) {
-          doc.setFontSize(12);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor(0, 0, 0);
-          doc.text('Soft Skills', margin, currentY);
-          currentY += 15;
-
-          doc.setFontSize(11);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(96, 96, 96);
-          const softSkillsText = resume.skills.soft_skills.join(' • ');
-          const softSkillsLines = doc.splitTextToSize(softSkillsText, skillsColumnWidth);
-          doc.text(softSkillsLines, margin, currentY);
-        }
-      }
-
-      fileBuffer = new Uint8Array(doc.output('arraybuffer'));
     } else if (format === 'docx') {
       const spacingAfterSection = 400;
       const doc = new docx.Document({
@@ -490,7 +437,7 @@ serve(async (req) => {
                       size: 22,
                       color: "666666",
                     }),
-                  ],
+                  ]),
                 }),
               ] : []),
             ] : []),
