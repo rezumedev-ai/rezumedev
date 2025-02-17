@@ -6,14 +6,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { toast } from "sonner";
-import html2pdf from "html2pdf.js";
 
 interface DownloadOptionsDialogProps {
-  onDownload?: (format: "pdf" | "docx") => Promise<void>;
   resumeId: string;
 }
 
-export function DownloadOptionsDialog({ onDownload, resumeId }: DownloadOptionsDialogProps) {
+export function DownloadOptionsDialog({ resumeId }: DownloadOptionsDialogProps) {
   const [format, setFormat] = useState<"pdf" | "docx">("pdf");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,14 +45,12 @@ export function DownloadOptionsDialog({ onDownload, resumeId }: DownloadOptionsD
           }
         };
 
-        // Generate PDF
+        // Generate PDF using html2pdf
+        const html2pdf = (await import('html2pdf.js')).default;
         await html2pdf().set(opt).from(element).save();
         toast.success("Resume downloaded successfully");
       } else {
-        // If DOCX format is selected, use the original download handler
-        if (onDownload) {
-          await onDownload(format);
-        }
+        toast.error("DOCX format is not yet supported");
       }
       setIsOpen(false);
     } catch (error) {
