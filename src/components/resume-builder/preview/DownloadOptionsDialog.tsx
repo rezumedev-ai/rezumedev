@@ -5,7 +5,7 @@ import { Download } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface DownloadOptionsDialogProps {
   resumeId: string;
