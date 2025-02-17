@@ -52,13 +52,13 @@ serve(async (req) => {
 
     console.log('Resume data fetched successfully');
 
-    // Get the preview URL for the resume
-    const frontendUrl = Deno.env.get('FRONTEND_URL');
-    if (!frontendUrl) {
-      throw new Error('Frontend URL is not configured');
+    // Get the frontend URL from the request origin
+    const origin = req.headers.get('origin');
+    if (!origin) {
+      throw new Error('Request origin not found');
     }
 
-    const previewUrl = `${frontendUrl}/resume-preview/${resumeId}`;
+    const previewUrl = `${origin}/resume-preview/${resumeId}`;
     console.log('Preview URL:', previewUrl);
 
     // Initialize browser
