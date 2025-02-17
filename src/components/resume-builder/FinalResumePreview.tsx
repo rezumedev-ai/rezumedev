@@ -124,13 +124,11 @@ export function FinalResumePreview({
       <ResumeHeader
         onBack={handleBack}
         onEdit={() => setIsEditing(!isEditing)}
-        onDownload={handleDownload}
-        onToggleZoom={() => setIsZoomed(prev => !prev)}
-        isZoomed={isZoomed}
-        isMobile={isMobile}
         isEditing={isEditing}
         isDownloading={isDownloading}
-      />
+      >
+        <DownloadOptionsDialog isDownloading={isDownloading} />
+      </ResumeHeader>
 
       <div 
         ref={containerRef}
