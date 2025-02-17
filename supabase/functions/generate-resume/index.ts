@@ -1,9 +1,8 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import * as docx from "https://esm.sh/docx@8.2.3";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
-import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
+import * as playwright from 'https://deno.land/x/playwright@v0.3.0/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -456,14 +455,12 @@ serve(async (req) => {
     if (format === 'pdf') {
       const htmlContent = generateExactHTML(resume, templateId);
       
-      // Launch Puppeteer
-      const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
-      });
+      // Initialize Playwright
+      const browser = await playwright.chromium.launch();
       const page = await browser.newPage();
       
-      // Set content and wait for network idle to ensure all resources are loaded
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      // Set content and wait for network idle
+      await page.setContent(htmlContent);
       
       // Set viewport to A4 size
       await page.setViewport({
@@ -472,12 +469,11 @@ serve(async (req) => {
         deviceScaleFactor: 2,
       });
       
-      // Generate PDF with exact A4 size
+      // Generate PDF
       const pdfBuffer = await page.pdf({
         format: 'A4',
         printBackground: true,
-        margin: { top: 0, right: 0, bottom: 0, left: 0 },
-        
+        margin: { top: '0', right: '0', bottom: '0', left: '0' },
       });
       
       await browser.close();
