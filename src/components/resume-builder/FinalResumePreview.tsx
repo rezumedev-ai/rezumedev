@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -48,17 +49,23 @@ export function FinalResumePreview({
     try {
       console.log('Starting download:', format);
       
-      const { data: blob } = await supabase.functions.invoke('generate-resume', {
-        body: { resumeId, format },
-        responseType: 'arrayBuffer'
+      const response = await supabase.functions.invoke('generate-resume', {
+        body: { resumeId, format }
       });
 
-      if (!blob) {
+      if (!response.data) {
         throw new Error('Failed to generate file');
       }
 
-      // Create a blob from the array buffer
-      const file = new Blob([blob], {
+      // Convert base64 to binary
+      const binaryStr = atob(response.data);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+
+      // Create a blob from the binary data
+      const file = new Blob([bytes], {
         type: format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       });
 
