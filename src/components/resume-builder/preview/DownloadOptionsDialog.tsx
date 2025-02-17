@@ -22,7 +22,7 @@ export function DownloadOptionsDialog({
     setOpen(false);
     
     try {
-      const resumeElement = document.querySelector('.bg-white.shadow-xl');
+      const resumeElement = document.querySelector('.bg-white.shadow-xl') as HTMLDivElement;
       if (!resumeElement) {
         toast.error("Could not find resume content");
         return;
@@ -47,15 +47,16 @@ export function DownloadOptionsDialog({
       resumeElement.style.transition = 'none';
 
       // Capture with optimal settings
-      const canvas = await html2canvas(resumeElement as HTMLElement, {
+      const canvas = await html2canvas(resumeElement, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff",
         onclone: (clonedDoc, element) => {
-          element.style.transform = 'none';
-          element.style.transformOrigin = 'top left';
+          const clonedElement = element as HTMLDivElement;
+          clonedElement.style.transform = 'none';
+          clonedElement.style.transformOrigin = 'top left';
         }
       });
 
