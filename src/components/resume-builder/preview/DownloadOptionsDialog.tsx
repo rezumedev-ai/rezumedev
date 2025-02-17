@@ -22,7 +22,7 @@ export function DownloadOptionsDialog({
     setOpen(false);
     
     try {
-      const resumeElement = document.getElementById('resume-content');
+      const resumeElement = document.querySelector('.bg-white.shadow-xl');
       if (!resumeElement) {
         toast.error("Could not find resume content");
         return;
@@ -34,45 +34,53 @@ export function DownloadOptionsDialog({
       // Wait for dialog to close and any transitions to complete
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Reset resume element transform for capture
-      const originalTransform = resumeElement.style.transform;
+      // Store original styles
+      const originalStyles = {
+        transform: resumeElement.style.transform,
+        transition: resumeElement.style.transition,
+        width: resumeElement.style.width,
+        height: resumeElement.style.height,
+      };
+
+      // Reset styles for capture
       resumeElement.style.transform = 'none';
+      resumeElement.style.transition = 'none';
 
       // Capture with optimal settings
-      const canvas = await html2canvas(resumeElement, {
+      const canvas = await html2canvas(resumeElement as HTMLElement, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        logging: true,
+        logging: false,
         backgroundColor: "#ffffff",
-        width: 794, // A4 width
-        height: 1123, // A4 height
-        foreignObjectRendering: false,
-        removeContainer: false,
+        onclone: (clonedDoc, element) => {
+          element.style.transform = 'none';
+          element.style.transformOrigin = 'top left';
+        }
       });
 
-      // Restore original transform
-      resumeElement.style.transform = originalTransform;
+      // Restore original styles
+      Object.assign(resumeElement.style, originalStyles);
 
-      // Create PDF with correct dimensions
+      // Create PDF
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       });
 
-      // A4 dimensions in mm
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-
-      // Add the image to PDF with full page coverage
+      // Calculate dimensions to maintain aspect ratio
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
       pdf.addImage(
-        canvas.toDataURL('image/jpeg', 1.0),
+        imgData,
         'JPEG',
         0,
         0,
-        pdfWidth,
-        pdfHeight,
+        pageWidth,
+        pageHeight,
         undefined,
         'FAST'
       );
