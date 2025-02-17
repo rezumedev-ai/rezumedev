@@ -20,7 +20,8 @@ export function DownloadOptionsDialog({
     setOpen(false);
     
     try {
-      const resumeElement = document.querySelector('.bg-white.shadow-xl') as HTMLDivElement;
+      // Updated selector to match the resume content div
+      const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
         toast.error("Could not find resume content");
         return;
