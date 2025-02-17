@@ -49,11 +49,18 @@ export function FinalResumePreview({
       console.log('Starting download:', format);
       
       const response = await supabase.functions.invoke('generate-resume', {
-        body: { resumeId, format }
+        body: { 
+          resumeId,
+          format
+        }
       });
 
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to generate file');
+      }
+
       if (!response.data?.data) {
-        throw new Error('Failed to generate file');
+        throw new Error('No file data received');
       }
 
       // Decode the base64 string
@@ -170,6 +177,7 @@ export function FinalResumePreview({
       >
         <div 
           ref={resumeRef}
+          id="resume-content"
           className="bg-white shadow-lg"
           style={{
             width: `${A4_WIDTH_PX}px`,

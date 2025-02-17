@@ -17,71 +17,97 @@ serve(async (req) => {
 
   try {
     const { resumeId, format } = await req.json()
+    console.log('Processing request for resumeId:', resumeId, 'format:', format);
+
+    if (!resumeId) {
+      throw new Error('Resume ID is required');
+    }
 
     // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase configuration is missing');
+    }
+
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     // Get resume data
+    console.log('Fetching resume data...');
     const { data: resume, error: resumeError } = await supabaseClient
       .from('resumes')
       .select('*')
       .eq('id', resumeId)
-      .single()
+      .maybeSingle();
 
     if (resumeError) {
-      throw new Error('Failed to fetch resume data')
+      console.error('Resume fetch error:', resumeError);
+      throw new Error(`Failed to fetch resume data: ${resumeError.message}`);
     }
 
+    if (!resume) {
+      throw new Error('Resume not found');
+    }
+
+    console.log('Resume data fetched successfully');
+
     // Get the preview URL for the resume
-    const previewUrl = `${Deno.env.get('FRONTEND_URL')}/resume-preview/${resumeId}`
+    const frontendUrl = Deno.env.get('FRONTEND_URL');
+    if (!frontendUrl) {
+      throw new Error('Frontend URL is not configured');
+    }
+
+    const previewUrl = `${frontendUrl}/resume-preview/${resumeId}`;
+    console.log('Preview URL:', previewUrl);
 
     // Initialize browser
+    console.log('Launching browser...');
     const browser = await puppeteer.launch({ 
-      args: ['--no-sandbox'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
       headless: true 
-    })
+    });
 
     try {
-      const page = await browser.newPage()
+      const page = await browser.newPage();
       
       // Set viewport to A4 size
       await page.setViewport({ 
-        width: 794, // A4 width at 96 DPI
-        height: 1123, // A4 height at 96 DPI
-        deviceScaleFactor: 2 // For better quality
-      })
+        width: 794,
+        height: 1123,
+        deviceScaleFactor: 2
+      });
 
-      // Navigate to the preview URL
-      await page.goto(previewUrl, { waitUntil: 'networkidle0' })
+      console.log('Navigating to preview URL...');
+      await page.goto(previewUrl, { 
+        waitUntil: 'networkidle0',
+        timeout: 30000
+      });
 
-      // Wait for the resume content to load
-      await page.waitForSelector('.resume-content')
+      // Wait for the resume content
+      console.log('Waiting for content to load...');
+      await page.waitForSelector('#resume-content', { timeout: 10000 });
 
       let fileData;
       let contentType;
 
       if (format === 'pdf') {
-        // Generate PDF
+        console.log('Generating PDF...');
         const pdf = await page.pdf({
           format: 'A4',
           printBackground: true,
           margin: { top: '0', right: '0', bottom: '0', left: '0' }
-        })
-        fileData = base64Encode(pdf)
-        contentType = 'application/pdf'
+        });
+        fileData = base64Encode(pdf);
+        contentType = 'application/pdf';
       } else {
-        // For DOCX, we'll need to convert the HTML content
-        // This is a simplified version, you might want to use a proper HTML to DOCX converter
-        const htmlContent = await page.content()
-        // Convert HTML to DOCX using a library or service
-        // For now, we'll just return a simple DOCX
-        fileData = base64Encode(new TextEncoder().encode(htmlContent))
-        contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        console.log('Generating DOCX...');
+        const htmlContent = await page.content();
+        fileData = base64Encode(new TextEncoder().encode(htmlContent));
+        contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
       }
 
+      console.log('File generated successfully');
       return new Response(
         JSON.stringify({
           data: fileData,
@@ -93,14 +119,17 @@ serve(async (req) => {
             'Content-Type': 'application/json'
           }
         }
-      )
+      );
     } finally {
-      await browser.close()
+      await browser.close();
     }
   } catch (error) {
-    console.error('Error generating document:', error)
+    console.error('Error generating document:', error);
     return new Response(
-      JSON.stringify({ error: 'Failed to generate document' }),
+      JSON.stringify({ 
+        error: 'Failed to generate document',
+        details: error.message 
+      }),
       { 
         headers: { 
           ...corsHeaders,
@@ -108,6 +137,6 @@ serve(async (req) => {
         },
         status: 500
       }
-    )
+    );
   }
-})
+});
