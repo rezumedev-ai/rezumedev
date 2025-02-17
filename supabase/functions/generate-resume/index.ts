@@ -204,7 +204,7 @@ serve(async (req) => {
           properties: {
             page: {
               margin: {
-                top: 1440, // 1 inch in twips
+                top: 1440,
                 right: 1440,
                 bottom: 1440,
                 left: 1440,
@@ -437,10 +437,11 @@ serve(async (req) => {
                       size: 22,
                       color: "666666",
                     }),
-                  ]),
+                  ],
+                  spacing: { after: 240 },
                 }),
-              ] : []),
-            ] : []),
+              ] : [])
+            ] : [])
           ],
         }],
       });
