@@ -1,7 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import { Puppeteer } from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 import { encode as base64Encode } from "https://deno.land/std@0.182.0/encoding/base64.ts";
 
 const corsHeaders = {
@@ -15,8 +14,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  let browser = null;
-
   try {
     const { resumeId, format } = await req.json()
     console.log('Processing request for resumeId:', resumeId, 'format:', format);
@@ -28,9 +25,10 @@ serve(async (req) => {
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const browserlessApiKey = Deno.env.get('BROWSERLESS_API_KEY');
 
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase configuration is missing');
+    if (!supabaseUrl || !supabaseKey || !browserlessApiKey) {
+      throw new Error('Required configuration is missing');
     }
 
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
@@ -63,50 +61,38 @@ serve(async (req) => {
     const previewUrl = `${origin}/resume-preview/${resumeId}`;
     console.log('Preview URL:', previewUrl);
 
-    // Launch browser
-    console.log('Launching browser...');
-    const puppeteer = new Puppeteer();
-    browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    // Generate PDF using Browserless API
+    console.log('Generating document using Browserless...');
+    const response = await fetch('https://chrome.browserless.io/pdf', {
+      method: 'POST',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/json',
+        'Authorization': browserlessApiKey,
+      },
+      body: JSON.stringify({
+        url: previewUrl,
+        options: {
+          printBackground: true,
+          format: 'A4',
+          margin: {
+            top: '0',
+            right: '0',
+            bottom: '0',
+            left: '0'
+          },
+          waitFor: '#resume-content'
+        }
+      })
     });
 
-    const page = await browser.newPage();
-    
-    // Set viewport to A4 size
-    await page.setViewport({ 
-      width: 794,
-      height: 1123,
-      deviceScaleFactor: 2
-    });
-
-    console.log('Navigating to preview URL...');
-    await page.goto(previewUrl, { 
-      waitUntil: 'networkidle0',
-      timeout: 30000
-    });
-
-    // Wait for the resume content
-    console.log('Waiting for content to load...');
-    await page.waitForSelector('#resume-content', { timeout: 10000 });
-
-    let fileData;
-    let contentType;
-
-    if (format === 'pdf') {
-      console.log('Generating PDF...');
-      const pdf = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '0', right: '0', bottom: '0', left: '0' }
-      });
-      fileData = base64Encode(pdf);
-      contentType = 'application/pdf';
-    } else {
-      console.log('Generating DOCX...');
-      const htmlContent = await page.content();
-      fileData = base64Encode(new TextEncoder().encode(htmlContent));
-      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    if (!response.ok) {
+      throw new Error(`Browserless API error: ${response.statusText}`);
     }
+
+    const pdfBuffer = await response.arrayBuffer();
+    const fileData = base64Encode(new Uint8Array(pdfBuffer));
+    const contentType = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
     console.log('File generated successfully');
     return new Response(
@@ -136,9 +122,5 @@ serve(async (req) => {
         status: 500
       }
     );
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
   }
 });
