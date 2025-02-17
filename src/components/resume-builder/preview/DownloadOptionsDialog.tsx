@@ -9,12 +9,10 @@ import jsPDF from "jspdf";
 
 interface DownloadOptionsDialogProps {
   isDownloading: boolean;
-  onDownload: (format: "pdf" | "docx") => void;
 }
 
 export function DownloadOptionsDialog({
-  isDownloading,
-  onDownload
+  isDownloading
 }: DownloadOptionsDialogProps) {
   const [open, setOpen] = useState(false);
 
@@ -75,6 +73,7 @@ export function DownloadOptionsDialog({
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
+      // Add image to PDF
       pdf.addImage(
         imgData,
         'JPEG',
@@ -86,7 +85,7 @@ export function DownloadOptionsDialog({
         'FAST'
       );
 
-      // Save PDF
+      // Save PDF directly
       pdf.save('resume.pdf');
       
       // Clear loading toast and show success
