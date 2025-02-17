@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Menu } from "lucide-react";
+import { Menu, Sparkles, Layout, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResumeList } from "@/components/dashboard/ResumeList";
 import { useNavigate } from "react-router-dom";
@@ -50,7 +50,6 @@ export default function Dashboard() {
 
       if (error) throw error;
 
-      // Transform the data to match the Resume interface
       return (data || []).map((resume: ResumeData) => ({
         ...resume,
         professional_summary: typeof resume.professional_summary === 'object' 
@@ -65,17 +64,23 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/20">
       {isMobile && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b p-4 flex justify-between items-center">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 p-4 flex justify-between items-center">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(!isSidebarOpen)}
+            className="hover:bg-primary/5"
           >
             <Menu className="h-6 w-6" />
           </Button>
-          <span className="font-semibold text-primary">Rezume.dev</span>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+              Rezume.dev
+            </span>
+          </div>
         </div>
       )}
 
@@ -85,14 +90,27 @@ export default function Dashboard() {
       />
 
       <div className={`${isMobile ? 'pt-20 px-4' : 'ml-64'} transition-all duration-300 ease-in-out`}>
-        <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 pb-8">
-          <div className="animate-fade-up">
-            <h1 className="text-2xl md:text-4xl font-bold mb-2 break-words">
-              Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">{profile?.full_name?.split(' ')[0] || 'there'}!</span>
-            </h1>
-            <p className="text-base md:text-lg text-gray-600 animate-fade-up break-words" style={{ animationDelay: '100ms' }}>
-              Create and manage your professional resumes with ease
-            </p>
+        <div className="max-w-6xl mx-auto space-y-8 md:space-y-12 pb-12">
+          <div className="space-y-4 animate-fade-up">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Layout className="w-4 h-4" />
+              <span>Dashboard</span>
+              <ChevronRight className="w-4 h-4" />
+              <span>Resumes</span>
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
+                Welcome back, {" "}
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-primary/60 animate-gradient">
+                  {profile?.full_name?.split(' ')[0] || 'there'}!
+                </span>
+              </h1>
+              <p className="text-base md:text-lg text-gray-600 animate-fade-up max-w-2xl" 
+                style={{ animationDelay: '100ms' }}>
+                Create and manage your professional resumes with our AI-powered platform. 
+                Stand out from the crowd with beautifully crafted resumes.
+              </p>
+            </div>
           </div>
 
           <ResumeList resumes={resumes || []} onCreateNew={handleCreateNew} />

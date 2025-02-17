@@ -102,50 +102,59 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
   };
 
   return (
-    <div className="animate-fade-up" style={{ animationDelay: '200ms' }}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div className="space-y-8 animate-fade-up" style={{ animationDelay: '200ms' }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h2 className="text-xl md:text-2xl font-bold">Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Resumes</span></h2>
-          <p className="text-sm md:text-base text-gray-600">Create and manage your professional documents</p>
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Resumes</span>
+          </h2>
+          <p className="text-sm md:text-base text-gray-600">Craft your professional story with our intelligent resume builder</p>
         </div>
-        <Button onClick={handleCreateNew} className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-opacity w-full sm:w-auto">
-          <Plus className="w-4 h-4 mr-2" />
-          Create New
+        <Button 
+          onClick={handleCreateNew} 
+          className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-primary/25 w-full sm:w-auto group"
+        >
+          <Plus className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
+          Create New Resume
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {resumes.map((resume, index) => (
           <Card 
             key={resume.id} 
-            className="p-4 hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-gray-200/50 animate-fade-up"
+            className="group p-6 hover:shadow-xl transition-all duration-500 bg-white/90 backdrop-blur-sm border border-gray-200/50 animate-fade-up hover:border-primary/20"
             style={{ animationDelay: `${(index + 3) * 100}ms` }}
           >
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex items-start justify-between">
-                <FileText className="w-8 h-8 text-primary/60" />
+                <div className="p-2 rounded-lg bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
+                  <FileText className="w-6 h-6 text-primary group-hover:text-primary/80 transition-colors" />
+                </div>
                 <div className={cn(
-                  "text-xs px-2 py-1 rounded-full",
+                  "text-xs px-3 py-1 rounded-full transition-colors duration-300",
                   resume.completion_status === 'completed' 
-                    ? "bg-green-100 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
+                    ? "bg-green-100 text-green-800 group-hover:bg-green-200"
+                    : "bg-amber-100 text-amber-800 group-hover:bg-amber-200"
                 )}>
                   {resume.completion_status === 'completed' ? 'Completed' : `Step ${resume.current_step} of 7`}
                 </div>
               </div>
+
               <div>
                 {editingId === resume.id ? (
                   <div className="flex gap-2 items-center">
                     <Input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="flex-1"
+                      className="flex-1 border-primary/20 focus:border-primary/40"
                       placeholder="Enter resume title"
                     />
                     <Button 
                       size="sm" 
                       variant="ghost"
                       onClick={() => saveTitle(resume.id)}
+                      className="hover:bg-green-50"
                     >
                       <Check className="w-4 h-4 text-green-600" />
                     </Button>
@@ -153,64 +162,67 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                       size="sm" 
                       variant="ghost"
                       onClick={() => setEditingId(null)}
+                      className="hover:bg-red-50"
                     >
                       <X className="w-4 h-4 text-red-600" />
                     </Button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-gray-900 break-words">
+                    <h3 className="font-semibold text-gray-900 break-words group-hover:text-primary/90 transition-colors">
                       {resume.title || resume.professional_summary?.title || "Untitled"}
                     </h3>
                     <Button 
                       variant="ghost" 
                       size="sm"
                       onClick={() => startEditingTitle(resume)}
-                      className="p-0 h-auto hover:bg-transparent"
+                      className="p-0 h-auto hover:bg-transparent opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Pencil className="w-3 h-3 text-gray-400 hover:text-gray-600" />
                     </Button>
                   </div>
                 )}
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 mt-2">
                   Updated {new Date(resume.updated_at).toLocaleDateString()}
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2">
+
+              <div className="grid grid-cols-2 gap-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleEdit(resume.id)}
-                  className="flex-1 hover:bg-primary/5"
+                  className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
                 >
-                  <Pencil className="w-4 h-4 mr-2" />
+                  <Pencil className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
                   Edit
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleView(resume.id)}
-                  className="flex-1 hover:bg-primary/5"
+                  className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
                 >
-                  <Eye className="w-4 h-4 mr-2" />
+                  <Eye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
                   View
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleDownload(resume.id)}
-                  className="flex-1 hover:bg-primary/5"
+                  className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
                   Download
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleDelete(resume.id)}
-                  className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                  className="group/btn hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                  Delete
                 </Button>
               </div>
             </div>
@@ -218,16 +230,18 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
         ))}
 
         <Card 
-          className="p-4 border-dashed hover:border-primary/50 transition-all duration-300 cursor-pointer bg-white/50 backdrop-blur-sm animate-fade-up"
+          className="group p-6 border-dashed hover:border-primary/50 transition-all duration-500 cursor-pointer bg-white/50 backdrop-blur-sm animate-fade-up hover:shadow-lg"
           onClick={handleCreateNew}
           style={{ animationDelay: `${(resumes.length + 3) * 100}ms` }}
         >
-          <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-2 p-4">
-            <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Plus className="w-6 h-6 text-primary/60" />
+          <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-4 p-6">
+            <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <Plus className="w-8 h-8 text-primary/60" />
             </div>
-            <p className="font-medium text-center">Create New Resume</p>
-            <p className="text-sm text-center">Start building your professional resume</p>
+            <div className="text-center space-y-1">
+              <p className="font-medium text-lg">Create New Resume</p>
+              <p className="text-sm text-gray-500">Start building your professional story</p>
+            </div>
           </div>
         </Card>
       </div>
