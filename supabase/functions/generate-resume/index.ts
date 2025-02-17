@@ -281,30 +281,34 @@ serve(async (req) => {
         const htmlContent = generateHTMLContent(resume, resume.template_id || 'minimal-clean');
         console.log('Generated HTML content successfully');
         
-        // Use Browserless to generate PDF with exact dimensions and styling
+        const browserlessKey = Deno.env.get('BROWSERLESS_API_KEY');
+        if (!browserlessKey) {
+          throw new Error('Browserless API key is not configured');
+        }
+        
+        // Use Browserless to generate PDF
         console.log('Calling Browserless API...');
         const response = await fetch('https://chrome.browserless.io/pdf', {
           method: 'POST',
           headers: {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/json',
-            'Authorization': `Token ${Deno.env.get('BROWSERLESS_API_KEY')}`,
+            'Authorization': `Token ${browserlessKey}`,
           },
           body: JSON.stringify({
             html: htmlContent,
             options: {
               format: 'Letter',
               printBackground: true,
-              preferCSSPageSize: true,
+              preferCSSPageSize: false,
               landscape: false,
               displayHeaderFooter: false,
               margin: {
-                top: '0',
-                right: '0',
-                bottom: '0',
-                left: '0'
-              },
-              scale: 1
+                top: '0.4in',
+                right: '0.4in',
+                bottom: '0.4in',
+                left: '0.4in'
+              }
             }
           })
         });
