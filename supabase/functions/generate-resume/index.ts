@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import * as puppeteer from 'https://deno.land/x/puppeteer@16.2.0/mod.ts'
+import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 import { encode as base64Encode } from "https://deno.land/std@0.182.0/encoding/base64.ts";
 
 const corsHeaders = {
@@ -61,11 +61,10 @@ serve(async (req) => {
     const previewUrl = `${origin}/resume-preview/${resumeId}`;
     console.log('Preview URL:', previewUrl);
 
-    // Initialize browser
+    // Initialize browser with proper import
     console.log('Launching browser...');
     const browser = await puppeteer.launch({ 
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true 
     });
 
     try {
