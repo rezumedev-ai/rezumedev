@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
@@ -272,58 +273,60 @@ serve(async (req) => {
       .single();
 
     if (resumeError || !resume) {
+      console.error('Resume fetch error:', resumeError);
       throw new Error('Resume not found');
     }
 
     if (format === 'pdf') {
       try {
-        // Generate HTML content with exact styling
         const htmlContent = generateHTMLContent(resume, resume.template_id || 'minimal-clean');
-        console.log('Generated HTML content successfully');
-        
+        console.log('HTML content generated successfully');
+
         const browserlessKey = Deno.env.get('BROWSERLESS_API_KEY');
         if (!browserlessKey) {
+          console.error('Browserless API key is missing');
           throw new Error('Browserless API key is not configured');
         }
-        
-        // Use Browserless to generate PDF
-        console.log('Calling Browserless API...');
+
+        console.log('Initiating Browserless API call...');
         const response = await fetch('https://chrome.browserless.io/pdf', {
           method: 'POST',
           headers: {
-            'Cache-Control': 'no-cache',
             'Content-Type': 'application/json',
             'Authorization': `Token ${browserlessKey}`,
           },
           body: JSON.stringify({
             html: htmlContent,
             options: {
-              format: 'Letter',
               printBackground: true,
-              preferCSSPageSize: false,
-              landscape: false,
-              displayHeaderFooter: false,
+              format: 'Letter',
               margin: {
-                top: '0.4in',
-                right: '0.4in',
-                bottom: '0.4in',
-                left: '0.4in'
+                top: '0.5in',
+                right: '0.5in',
+                bottom: '0.5in',
+                left: '0.5in'
               }
             }
           })
         });
 
+        console.log('Browserless API response status:', response.status);
+        
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Browserless API error:', errorText);
-          throw new Error(`Browserless API error: ${errorText}`);
+          console.error('Browserless API error details:', {
+            status: response.status,
+            statusText: response.statusText,
+            errorText
+          });
+          throw new Error(`Browserless API error (${response.status}): ${errorText}`);
         }
 
-        console.log('PDF generated successfully, processing response...');
+        console.log('PDF generated, processing response...');
         const pdfBuffer = await response.arrayBuffer();
         const fileBuffer = new Uint8Array(pdfBuffer);
         const base64String = base64Encode(fileBuffer);
-        console.log('PDF processed and encoded successfully');
+        console.log('PDF processing complete');
 
         return new Response(
           JSON.stringify({ 
@@ -339,14 +342,20 @@ serve(async (req) => {
           }
         );
       } catch (error) {
-        console.error('Detailed PDF generation error:', error);
-        throw new Error(`PDF Generation failed: ${error.message}`);
+        console.error('PDF generation error:', error);
+        return new Response(
+          JSON.stringify({ error: `PDF Generation failed: ${error.message}` }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
       }
     } else {
       throw new Error('Unsupported format');
     }
   } catch (error) {
-    console.error('Error generating resume:', error);
+    console.error('Error in generate-resume function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
