@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
@@ -277,59 +276,68 @@ serve(async (req) => {
     }
 
     if (format === 'pdf') {
-      // Generate HTML content with exact styling
-      const htmlContent = generateHTMLContent(resume, resume.template_id || 'minimal-clean');
-      
-      // Use Browserless to generate PDF with exact dimensions and styling
-      const response = await fetch('https://chrome.browserless.io/pdf', {
-        method: 'POST',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${Deno.env.get('BROWSERLESS_API_KEY')}`,
-        },
-        body: JSON.stringify({
-          html: htmlContent,
-          options: {
-            format: 'A4',
-            printBackground: true,
-            preferCSSPageSize: true,
-            margin: {
-              top: '0mm',
-              right: '0mm',
-              bottom: '0mm',
-              left: '0mm'
-            },
-            viewport: {
-              width: 794,
-              height: 1123
-            }
-          }
-        })
-      });
-
-      if (!response.ok) {
-        console.error('PDF generation failed:', await response.text());
-        throw new Error('Failed to generate PDF');
-      }
-
-      const pdfBuffer = await response.arrayBuffer();
-      const fileBuffer = new Uint8Array(pdfBuffer);
-      const base64String = base64Encode(fileBuffer);
-
-      return new Response(
-        JSON.stringify({ 
-          data: base64String,
-          format: 'pdf',
-          contentType: 'application/pdf'
-        }),
-        {
+      try {
+        // Generate HTML content with exact styling
+        const htmlContent = generateHTMLContent(resume, resume.template_id || 'minimal-clean');
+        console.log('Generated HTML content successfully');
+        
+        // Use Browserless to generate PDF with exact dimensions and styling
+        console.log('Calling Browserless API...');
+        const response = await fetch('https://chrome.browserless.io/pdf', {
+          method: 'POST',
           headers: {
-            ...corsHeaders,
+            'Cache-Control': 'no-cache',
             'Content-Type': 'application/json',
+            'Authorization': `Token ${Deno.env.get('BROWSERLESS_API_KEY')}`,
           },
+          body: JSON.stringify({
+            html: htmlContent,
+            options: {
+              format: 'Letter',
+              printBackground: true,
+              preferCSSPageSize: true,
+              landscape: false,
+              displayHeaderFooter: false,
+              margin: {
+                top: '0',
+                right: '0',
+                bottom: '0',
+                left: '0'
+              },
+              scale: 1
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Browserless API error:', errorText);
+          throw new Error(`Browserless API error: ${errorText}`);
         }
-      );
+
+        console.log('PDF generated successfully, processing response...');
+        const pdfBuffer = await response.arrayBuffer();
+        const fileBuffer = new Uint8Array(pdfBuffer);
+        const base64String = base64Encode(fileBuffer);
+        console.log('PDF processed and encoded successfully');
+
+        return new Response(
+          JSON.stringify({ 
+            data: base64String,
+            format: 'pdf',
+            contentType: 'application/pdf'
+          }),
+          {
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } catch (error) {
+        console.error('Detailed PDF generation error:', error);
+        throw new Error(`PDF Generation failed: ${error.message}`);
+      }
     } else {
       throw new Error('Unsupported format');
     }
