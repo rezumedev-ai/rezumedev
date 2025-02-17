@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { FileDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface DownloadOptionsDialogProps {
   isDownloading: boolean;
@@ -16,66 +18,63 @@ export function DownloadOptionsDialog({
 }: DownloadOptionsDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const handlePrint = () => {
+  const handleDownloadPDF = async () => {
     setOpen(false);
     
-    // Wait for dialog to close before adding print styles
-    setTimeout(() => {
-      // Create and add print styles
-      const style = document.createElement('style');
-      style.id = 'print-styles';
-      style.textContent = `
-        @page {
-          size: A4;
-          margin: 0;
-        }
-        @media print {
-          html, body {
-            height: 100%;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden;
-          }
-          body * {
-            visibility: hidden;
-          }
-          #resume-content {
-            position: fixed !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 210mm !important;
-            height: 297mm !important;
-            margin: 0 !important;
-            padding: 48px !important;
-            transform: none !important;
-          }
-          #resume-content * {
-            visibility: visible;
-            color-adjust: exact !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-        }
-      `;
-      document.head.appendChild(style);
+    try {
+      const resumeElement = document.getElementById('resume-content');
+      if (!resumeElement) {
+        toast.error("Could not find resume content");
+        return;
+      }
 
-      // Force browser repaint and ensure styles are applied
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.print();
-          
-          // Remove print styles after printing
-          setTimeout(() => {
-            const printStyle = document.getElementById('print-styles');
-            if (printStyle) {
-              document.head.removeChild(printStyle);
-            }
-          }, 1000);
-        });
+      toast.loading("Generating PDF...");
+
+      // Wait for dialog to close and toast to show
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Capture the resume as a canvas
+      const canvas = await html2canvas(resumeElement, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: 794, // A4 width in pixels at 96 DPI
+        windowHeight: 1123, // A4 height in pixels at 96 DPI
       });
-    }, 100);
 
-    toast.success("Print dialog opened. Select 'Save as PDF' for best results.");
+      // Create PDF with A4 dimensions
+      const pdf = new jsPDF({
+        format: 'a4',
+        unit: 'px'
+      });
+
+      // Calculate dimensions
+      const imgWidth = 794; // A4 width in pixels at 96 DPI
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Add the image to the PDF
+      pdf.addImage(
+        canvas.toDataURL('image/jpeg', 1.0),
+        'JPEG',
+        0,
+        0,
+        imgWidth,
+        imgHeight,
+        undefined,
+        'FAST'
+      );
+
+      // Save the PDF
+      pdf.save('resume.pdf');
+      
+      toast.dismiss();
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.dismiss();
+      toast.error("Failed to generate PDF. Please try again.");
+    }
   };
 
   return (
@@ -96,7 +95,7 @@ export function DownloadOptionsDialog({
         <div className="space-y-4 mt-4">
           <Button 
             className="w-full" 
-            onClick={handlePrint}
+            onClick={handleDownloadPDF}
             disabled={isDownloading}
           >
             Download as PDF
