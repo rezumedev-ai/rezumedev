@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import chromium from "https://deno.land/x/chrome_aws_lambda@1.0.1/mod.ts";
+import { Puppeteer } from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 import { encode as base64Encode } from "https://deno.land/std@0.182.0/encoding/base64.ts";
 
 const corsHeaders = {
@@ -65,11 +65,9 @@ serve(async (req) => {
 
     // Launch browser
     console.log('Launching browser...');
-    browser = await chromium.puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
-      headless: true,
+    const puppeteer = new Puppeteer();
+    browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const page = await browser.newPage();
