@@ -8,6 +8,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Define templates upfront
+const resumeTemplates = {
+  "minimal-clean": {
+    headerStyle: "text-center space-y-2 mb-8",
+    sectionStyle: "border-b border-gray-200 pb-2 mb-4 text-lg font-semibold",
+    contentStyle: "space-y-4",
+    titleFont: "font-sans text-4xl font-bold tracking-tight"
+  },
+  "modern-split": {
+    headerStyle: "text-left border-b border-gray-200 pb-6 mb-8",
+    sectionStyle: "text-lg uppercase tracking-wide font-medium mb-4",
+    contentStyle: "grid grid-cols-[1fr_2fr] gap-8",
+    titleFont: "font-sans text-5xl font-light tracking-widest uppercase"
+  },
+  "professional-grid": {
+    headerStyle: "grid grid-cols-[2fr_1fr] gap-8 mb-8",
+    sectionStyle: "font-serif text-xl font-semibold mb-4",
+    contentStyle: "space-y-6",
+    titleFont: "font-serif text-4xl font-bold"
+  },
+  "executive": {
+    headerStyle: "border-b-2 border-gray-900 pb-6 mb-8",
+    sectionStyle: "text-xl uppercase tracking-wide font-semibold mb-6",
+    contentStyle: "grid grid-cols-[1fr_3fr] gap-12",
+    titleFont: "font-serif text-5xl font-bold tracking-tight"
+  }
+};
+
 const generateHTMLContent = (resume: any, templateId: string) => {
   // Include the complete CSS from our application
   const fullCSS = `
@@ -82,9 +110,15 @@ const generateHTMLContent = (resume: any, templateId: string) => {
     .text-2xl { font-size: 1.5rem; line-height: 2rem; }
     .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
     .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+    .text-5xl { font-size: 3rem; line-height: 1; }
     .font-medium { font-weight: 500; }
     .font-semibold { font-weight: 600; }
     .font-bold { font-weight: 700; }
+    .font-light { font-weight: 300; }
+    .tracking-tight { letter-spacing: -0.025em; }
+    .tracking-wide { letter-spacing: 0.025em; }
+    .tracking-widest { letter-spacing: 0.1em; }
+    .uppercase { text-transform: uppercase; }
     
     /* Colors */
     .text-gray-500 { color: #6b7280; }
@@ -102,28 +136,19 @@ const generateHTMLContent = (resume: any, templateId: string) => {
     
     /* Borders */
     .border-b { border-bottom-width: 1px; }
+    .border-b-2 { border-bottom-width: 2px; }
     .border-gray-200 { border-color: #e5e7eb; }
     .border-gray-900 { border-color: #111827; }
+    .pb-2 { padding-bottom: 0.5rem; }
+    .pb-6 { padding-bottom: 1.5rem; }
     
     /* Template specific styles */
     .template-header { margin-bottom: 2rem; }
     .template-section { margin-bottom: 1.5rem; }
   `;
 
-  const template = {
-    minimal: {
-      headerStyle: "text-center space-y-2 mb-8",
-      sectionStyle: "border-b border-gray-200 pb-2 mb-4 text-lg font-semibold",
-      contentStyle: "space-y-4",
-      titleFont: "text-4xl font-bold tracking-tight"
-    },
-    modern: {
-      headerStyle: "border-b border-gray-900 pb-6 mb-8",
-      sectionStyle: "text-xl uppercase tracking-wide font-semibold mb-6",
-      contentStyle: "grid grid-cols-[1fr_3fr] gap-12",
-      titleFont: "text-5xl font-bold tracking-tight"
-    }
-  }[templateId] || template.minimal;
+  // Get template styles or fallback to minimal-clean
+  const templateStyle = resumeTemplates[templateId] || resumeTemplates["minimal-clean"];
 
   return `
     <!DOCTYPE html>
@@ -135,8 +160,8 @@ const generateHTMLContent = (resume: any, templateId: string) => {
     </head>
     <body>
       <div class="resume-container">
-        <div class="${template.headerStyle}">
-          <h1 class="${template.titleFont}">${resume.personal_info.fullName}</h1>
+        <div class="${templateStyle.headerStyle}">
+          <h1 class="${templateStyle.titleFont}">${resume.personal_info.fullName}</h1>
           <h2 class="text-xl text-gray-600">${resume.professional_summary.title}</h2>
           <div class="flex flex-wrap gap-4 text-sm text-gray-500 mt-2">
             <span>${resume.personal_info.email}</span>
@@ -145,16 +170,16 @@ const generateHTMLContent = (resume: any, templateId: string) => {
           </div>
         </div>
 
-        <div class="${template.contentStyle} mt-8">
+        <div class="${templateStyle.contentStyle} mt-8">
           <div class="space-y-6">
             <div>
-              <h3 class="${template.sectionStyle}">Professional Summary</h3>
+              <h3 class="${templateStyle.sectionStyle}">Professional Summary</h3>
               <div class="text-gray-600">${resume.professional_summary.summary}</div>
             </div>
 
-            ${resume.work_experience.length > 0 ? `
+            ${resume.work_experience?.length > 0 ? `
               <div>
-                <h3 class="${template.sectionStyle}">Work Experience</h3>
+                <h3 class="${templateStyle.sectionStyle}">Work Experience</h3>
                 <div class="space-y-4">
                   ${resume.work_experience.map(exp => `
                     <div>
@@ -174,9 +199,9 @@ const generateHTMLContent = (resume: any, templateId: string) => {
               </div>
             ` : ''}
 
-            ${resume.education.length > 0 ? `
+            ${resume.education?.length > 0 ? `
               <div>
-                <h3 class="${template.sectionStyle}">Education</h3>
+                <h3 class="${templateStyle.sectionStyle}">Education</h3>
                 <div class="space-y-4">
                   ${resume.education.map(edu => `
                     <div>
@@ -191,11 +216,11 @@ const generateHTMLContent = (resume: any, templateId: string) => {
               </div>
             ` : ''}
 
-            ${(resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0) ? `
+            ${(resume.skills?.hard_skills?.length > 0 || resume.skills?.soft_skills?.length > 0) ? `
               <div>
-                <h3 class="${template.sectionStyle}">Skills</h3>
+                <h3 class="${templateStyle.sectionStyle}">Skills</h3>
                 <div class="grid grid-cols-2 gap-4">
-                  ${resume.skills.hard_skills.length > 0 ? `
+                  ${resume.skills?.hard_skills?.length > 0 ? `
                     <div>
                       <h4 class="font-medium mb-2">Technical Skills</h4>
                       <div class="text-gray-600">
@@ -203,7 +228,7 @@ const generateHTMLContent = (resume: any, templateId: string) => {
                       </div>
                     </div>
                   ` : ''}
-                  ${resume.skills.soft_skills.length > 0 ? `
+                  ${resume.skills?.soft_skills?.length > 0 ? `
                     <div>
                       <h4 class="font-medium mb-2">Soft Skills</h4>
                       <div class="text-gray-600">
