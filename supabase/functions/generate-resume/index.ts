@@ -38,138 +38,203 @@ serve(async (req) => {
       throw new Error('Resume not found');
     }
 
-    let fileData: ArrayBuffer;
-    let mimeType: string;
-    let fileName: string;
+    let fileBuffer: Uint8Array;
 
     if (format === 'pdf') {
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'pt',
-        format: 'a4'
+        format: 'a4',
+        putOnlyUsedFonts: true,
+        compress: true
       });
 
+      // Add font for better text rendering
       doc.setFont('helvetica');
       
+      // Constants for layout
+      const margin = 40;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const usableWidth = pageWidth - (margin * 2);
+      let currentY = margin;
+
       // Header
       doc.setFontSize(24);
       doc.setTextColor(0, 0, 0);
-      doc.text(resume.personal_info.fullName, 40, 40);
-      
+      const name = resume.personal_info.fullName;
+      doc.text(name, margin, currentY);
+      currentY += 25;
+
+      // Title
       doc.setFontSize(16);
-      doc.text(resume.professional_summary.title, 40, 70);
-      
+      doc.setTextColor(100, 100, 100);
+      const title = resume.professional_summary.title;
+      doc.text(title, margin, currentY);
+      currentY += 30;
+
       // Contact Info
-      doc.setFontSize(12);
-      doc.text('Contact Information', 40, 100);
       doc.setFontSize(10);
-      doc.text(resume.personal_info.email, 40, 120);
-      doc.text(resume.personal_info.phone, 40, 140);
-      if (resume.personal_info.linkedin) {
-        doc.text(resume.personal_info.linkedin, 40, 160);
-      }
+      doc.setTextColor(0, 0, 0);
+      const contactInfo = [
+        resume.personal_info.email,
+        resume.personal_info.phone,
+        resume.personal_info.linkedin
+      ].filter(Boolean);
       
+      contactInfo.forEach(info => {
+        doc.text(info, margin, currentY);
+        currentY += 15;
+      });
+      currentY += 20;
+
       // Professional Summary
-      let yPos = 200;
-      doc.setFontSize(12);
-      doc.text('Professional Summary', 40, yPos);
-      yPos += 20;
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Professional Summary', margin, currentY);
+      currentY += 20;
+
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      const summaryLines = doc.splitTextToSize(resume.professional_summary.summary, 500);
-      doc.text(summaryLines, 40, yPos);
-      yPos += (summaryLines.length * 15) + 20;
+      const summaryLines = doc.splitTextToSize(resume.professional_summary.summary, usableWidth);
+      doc.text(summaryLines, margin, currentY);
+      currentY += (summaryLines.length * 15) + 25;
 
       // Work Experience
-      doc.setFontSize(12);
-      doc.text('Work Experience', 40, yPos);
-      yPos += 20;
-
-      for (const exp of resume.work_experience) {
-        doc.setFontSize(11);
+      if (resume.work_experience.length > 0) {
+        doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(exp.jobTitle, 40, yPos);
-        yPos += 15;
-        
-        doc.setFont('helvetica', 'normal');
-        doc.text(exp.companyName, 40, yPos);
-        yPos += 15;
-        
-        doc.text(`${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`, 40, yPos);
-        yPos += 20;
+        doc.text('Work Experience', margin, currentY);
+        currentY += 20;
 
-        doc.setFontSize(10);
-        for (const resp of exp.responsibilities) {
-          const respLines = doc.splitTextToSize(`• ${resp}`, 500);
-          doc.text(respLines, 40, yPos);
-          yPos += respLines.length * 15;
-        }
-        yPos += 15;
+        resume.work_experience.forEach(exp => {
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text(exp.jobTitle, margin, currentY);
+          currentY += 15;
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text(exp.companyName, margin, currentY);
+          currentY += 15;
+
+          doc.setTextColor(100, 100, 100);
+          doc.text(`${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`, margin, currentY);
+          currentY += 20;
+
+          doc.setTextColor(0, 0, 0);
+          exp.responsibilities.forEach(resp => {
+            const bulletPoint = '•';
+            const respLines = doc.splitTextToSize(resp, usableWidth - 15);
+            doc.text(bulletPoint, margin, currentY);
+            doc.text(respLines, margin + 15, currentY);
+            currentY += (respLines.length * 15);
+          });
+          currentY += 20;
+        });
       }
 
-      fileData = doc.output('arraybuffer');
-      mimeType = 'application/pdf';
-      fileName = `resume-${resumeId}.pdf`;
+      // Education
+      if (resume.education.length > 0) {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Education', margin, currentY);
+        currentY += 20;
+
+        resume.education.forEach(edu => {
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text(edu.schoolName, margin, currentY);
+          currentY += 15;
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text(edu.degreeName, margin, currentY);
+          currentY += 15;
+
+          doc.setTextColor(100, 100, 100);
+          doc.text(`${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}`, margin, currentY);
+          currentY += 25;
+        });
+      }
+
+      // Skills
+      if (resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0) {
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Skills', margin, currentY);
+        currentY += 20;
+
+        if (resume.skills.hard_skills.length > 0) {
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Technical Skills', margin, currentY);
+          currentY += 15;
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          const hardSkillsText = resume.skills.hard_skills.join(', ');
+          const hardSkillsLines = doc.splitTextToSize(hardSkillsText, usableWidth);
+          doc.text(hardSkillsLines, margin, currentY);
+          currentY += (hardSkillsLines.length * 15) + 20;
+        }
+
+        if (resume.skills.soft_skills.length > 0) {
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Soft Skills', margin, currentY);
+          currentY += 15;
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          const softSkillsText = resume.skills.soft_skills.join(', ');
+          const softSkillsLines = doc.splitTextToSize(softSkillsText, usableWidth);
+          doc.text(softSkillsLines, margin, currentY);
+        }
+      }
+
+      fileBuffer = new Uint8Array(doc.output('arraybuffer'));
     } else if (format === 'docx') {
       const doc = new docx.Document({
         sections: [{
           properties: {},
           children: [
-            // Header with name and title
+            // Header
             new docx.Paragraph({
               children: [
                 new docx.TextRun({
                   text: resume.personal_info.fullName,
                   bold: true,
-                  size: 32,
-                }),
-              ],
-              spacing: { after: 200 },
-            }),
-            new docx.Paragraph({
-              children: [
-                new docx.TextRun({
-                  text: resume.professional_summary.title,
-                  size: 24,
+                  size: 36,
                 }),
               ],
               spacing: { after: 200 },
             }),
 
-            // Contact Information
+            // Title
             new docx.Paragraph({
               children: [
                 new docx.TextRun({
-                  text: "Contact Information",
-                  bold: true,
-                  size: 24,
+                  text: resume.professional_summary.title,
+                  size: 28,
+                  color: "666666",
                 }),
               ],
               spacing: { after: 200 },
             }),
+
+            // Contact Info
             new docx.Paragraph({
               children: [
-                new docx.TextRun({
-                  text: `Email: ${resume.personal_info.email}`,
-                  size: 20,
-                }),
+                new docx.TextRun({ text: resume.personal_info.email, size: 20 }),
+                new docx.TextRun({ text: " | ", size: 20 }),
+                new docx.TextRun({ text: resume.personal_info.phone, size: 20 }),
+                ...(resume.personal_info.linkedin ? [
+                  new docx.TextRun({ text: " | ", size: 20 }),
+                  new docx.TextRun({ text: resume.personal_info.linkedin, size: 20 }),
+                ] : []),
               ],
-            }),
-            new docx.Paragraph({
-              children: [
-                new docx.TextRun({
-                  text: `Phone: ${resume.personal_info.phone}`,
-                  size: 20,
-                }),
-              ],
-            }),
-            new docx.Paragraph({
-              children: [
-                new docx.TextRun({
-                  text: `LinkedIn: ${resume.personal_info.linkedin || 'N/A'}`,
-                  size: 20,
-                }),
-              ],
-              spacing: { after: 200 },
+              spacing: { after: 400 },
             }),
 
             // Professional Summary
@@ -178,7 +243,7 @@ serve(async (req) => {
                 new docx.TextRun({
                   text: "Professional Summary",
                   bold: true,
-                  size: 24,
+                  size: 28,
                 }),
               ],
               spacing: { after: 200 },
@@ -187,87 +252,189 @@ serve(async (req) => {
               children: [
                 new docx.TextRun({
                   text: resume.professional_summary.summary,
-                  size: 20,
+                  size: 24,
                 }),
               ],
               spacing: { after: 400 },
             }),
 
             // Work Experience
-            new docx.Paragraph({
-              children: [
-                new docx.TextRun({
-                  text: "Work Experience",
-                  bold: true,
-                  size: 24,
-                }),
-              ],
-              spacing: { after: 200 },
-            }),
-            ...resume.work_experience.flatMap(exp => [
+            ...(resume.work_experience.length > 0 ? [
               new docx.Paragraph({
                 children: [
                   new docx.TextRun({
-                    text: exp.jobTitle,
+                    text: "Work Experience",
                     bold: true,
-                    size: 20,
-                  }),
-                ],
-              }),
-              new docx.Paragraph({
-                children: [
-                  new docx.TextRun({
-                    text: exp.companyName,
-                    size: 20,
-                  }),
-                ],
-              }),
-              new docx.Paragraph({
-                children: [
-                  new docx.TextRun({
-                    text: `${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`,
-                    size: 20,
+                    size: 28,
                   }),
                 ],
                 spacing: { after: 200 },
               }),
-              ...exp.responsibilities.map(resp =>
+              ...resume.work_experience.flatMap(exp => [
                 new docx.Paragraph({
-                  bullet: { level: 0 },
                   children: [
                     new docx.TextRun({
-                      text: resp,
-                      size: 20,
+                      text: exp.jobTitle,
+                      bold: true,
+                      size: 26,
                     }),
                   ],
-                })
-              ),
+                }),
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: exp.companyName,
+                      size: 24,
+                    }),
+                  ],
+                }),
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: `${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`,
+                      size: 24,
+                      color: "666666",
+                    }),
+                  ],
+                  spacing: { after: 200 },
+                }),
+                ...exp.responsibilities.map(resp =>
+                  new docx.Paragraph({
+                    bullet: { level: 0 },
+                    children: [
+                      new docx.TextRun({
+                        text: resp,
+                        size: 24,
+                      }),
+                    ],
+                    spacing: { after: 100 },
+                  })
+                ),
+                new docx.Paragraph({
+                  children: [],
+                  spacing: { after: 200 },
+                }),
+              ]),
+            ] : []),
+
+            // Education
+            ...(resume.education.length > 0 ? [
               new docx.Paragraph({
-                children: [],
+                children: [
+                  new docx.TextRun({
+                    text: "Education",
+                    bold: true,
+                    size: 28,
+                  }),
+                ],
                 spacing: { after: 200 },
               }),
-            ]),
+              ...resume.education.flatMap(edu => [
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: edu.schoolName,
+                      bold: true,
+                      size: 26,
+                    }),
+                  ],
+                }),
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: edu.degreeName,
+                      size: 24,
+                    }),
+                  ],
+                }),
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: `${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}`,
+                      size: 24,
+                      color: "666666",
+                    }),
+                  ],
+                  spacing: { after: 200 },
+                }),
+              ]),
+            ] : []),
+
+            // Skills
+            ...(resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0 ? [
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: "Skills",
+                    bold: true,
+                    size: 28,
+                  }),
+                ],
+                spacing: { after: 200 },
+              }),
+              ...(resume.skills.hard_skills.length > 0 ? [
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: "Technical Skills",
+                      bold: true,
+                      size: 26,
+                    }),
+                  ],
+                  spacing: { after: 100 },
+                }),
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: resume.skills.hard_skills.join(", "),
+                      size: 24,
+                    }),
+                  ],
+                  spacing: { after: 200 },
+                }),
+              ] : []),
+              ...(resume.skills.soft_skills.length > 0 ? [
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: "Soft Skills",
+                      bold: true,
+                      size: 26,
+                    }),
+                  ],
+                  spacing: { after: 100 },
+                }),
+                new docx.Paragraph({
+                  children: [
+                    new docx.TextRun({
+                      text: resume.skills.soft_skills.join(", "),
+                      size: 24,
+                    }),
+                  ],
+                }),
+              ] : []),
+            ] : []),
           ],
         }],
       });
 
-      fileData = await docx.Packer.toBuffer(doc);
-      mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      fileName = `resume-${resumeId}.docx`;
+      fileBuffer = await docx.Packer.toBuffer(doc);
     } else {
       throw new Error('Unsupported format');
     }
 
-    // Create the response with the binary data
-    return new Response(fileData, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': mimeType,
-        'Content-Length': fileData.byteLength.toString(),
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-      },
-    });
+    // Convert to Base64
+    const base64String = btoa(String.fromCharCode(...fileBuffer));
 
+    return new Response(
+      JSON.stringify({ data: base64String }),
+      {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error generating resume:', error);
     return new Response(
