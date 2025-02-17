@@ -39,29 +39,31 @@ export function DownloadOptionsDialog({
           body * {
             visibility: hidden;
           }
-          #resume-content, #resume-content * {
-            visibility: visible;
-          }
           #resume-content {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 210mm;
-            height: 297mm;
-            margin: 0;
-            padding: 0;
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 48px !important;
             transform: none !important;
+          }
+          #resume-content * {
+            visibility: visible;
+            color-adjust: exact !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
         }
       `;
       document.head.appendChild(style);
 
-      // Force browser repaint
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          // Trigger print
+      // Force browser repaint and ensure styles are applied
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
           window.print();
-
+          
           // Remove print styles after printing
           setTimeout(() => {
             const printStyle = document.getElementById('print-styles');
