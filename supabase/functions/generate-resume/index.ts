@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import { jsPDF } from "https://esm.sh/jspdf@2.5.1";
@@ -38,6 +39,15 @@ serve(async (req) => {
       throw new Error('Resume not found');
     }
 
+    // Also fetch the template data
+    const { data: templateData } = await supabaseClient
+      .from('resumes')
+      .select('template_id')
+      .eq('id', resumeId)
+      .single();
+
+    const templateId = templateData?.template_id || 'minimal-clean';
+
     let fileBuffer: Uint8Array;
 
     if (format === 'pdf') {
@@ -49,121 +59,153 @@ serve(async (req) => {
         compress: true
       });
 
-      // Add font for better text rendering
-      doc.setFont('helvetica');
-      
       // Constants for layout
-      const margin = 40;
+      const margin = 48; // Matching the preview's padding
       const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       const usableWidth = pageWidth - (margin * 2);
       let currentY = margin;
 
-      // Header
-      doc.setFontSize(24);
+      // Personal Section
+      doc.setFontSize(28);
       doc.setTextColor(0, 0, 0);
-      const name = resume.personal_info.fullName;
-      doc.text(name, margin, currentY);
+      doc.setFont('helvetica', 'bold');
+      const fullName = resume.personal_info.fullName;
+      doc.text(fullName, margin, currentY);
       currentY += 25;
 
-      // Title
       doc.setFontSize(16);
+      doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 100, 100);
       const title = resume.professional_summary.title;
       doc.text(title, margin, currentY);
-      currentY += 30;
+      currentY += 20;
 
       // Contact Info
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      const contactInfo = [
+      doc.setFontSize(11);
+      doc.setTextColor(128, 128, 128);
+      const contactInfoParts = [
         resume.personal_info.email,
         resume.personal_info.phone,
         resume.personal_info.linkedin
       ].filter(Boolean);
       
-      contactInfo.forEach(info => {
-        doc.text(info, margin, currentY);
-        currentY += 15;
-      });
-      currentY += 20;
+      doc.text(contactInfoParts.join(' • '), margin, currentY);
+      currentY += 40;
 
       // Professional Summary
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 0, 0);
       doc.text('Professional Summary', margin, currentY);
       currentY += 20;
 
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
+      doc.setFontSize(11);
+      doc.setTextColor(96, 96, 96);
       const summaryLines = doc.splitTextToSize(resume.professional_summary.summary, usableWidth);
       doc.text(summaryLines, margin, currentY);
-      currentY += (summaryLines.length * 15) + 25;
+      currentY += (summaryLines.length * 15) + 30;
 
       // Work Experience
       if (resume.work_experience.length > 0) {
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
         doc.text('Work Experience', margin, currentY);
         currentY += 20;
 
-        resume.work_experience.forEach(exp => {
+        resume.work_experience.forEach((exp, index) => {
+          if (currentY > pageHeight - 100) {
+            doc.addPage();
+            currentY = margin;
+          }
+
           doc.setFontSize(12);
           doc.setFont('helvetica', 'bold');
+          doc.setTextColor(0, 0, 0);
           doc.text(exp.jobTitle, margin, currentY);
           currentY += 15;
 
-          doc.setFontSize(10);
+          doc.setFontSize(11);
           doc.setFont('helvetica', 'normal');
+          doc.setTextColor(96, 96, 96);
           doc.text(exp.companyName, margin, currentY);
           currentY += 15;
 
-          doc.setTextColor(100, 100, 100);
+          doc.setTextColor(128, 128, 128);
           doc.text(`${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`, margin, currentY);
           currentY += 20;
 
-          doc.setTextColor(0, 0, 0);
           exp.responsibilities.forEach(resp => {
+            if (currentY > pageHeight - 100) {
+              doc.addPage();
+              currentY = margin;
+            }
+
             const bulletPoint = '•';
             const respLines = doc.splitTextToSize(resp, usableWidth - 15);
             doc.text(bulletPoint, margin, currentY);
             doc.text(respLines, margin + 15, currentY);
             currentY += (respLines.length * 15);
           });
-          currentY += 20;
+
+          if (index < resume.work_experience.length - 1) {
+            currentY += 25;
+          }
         });
+        currentY += 30;
       }
 
       // Education
       if (resume.education.length > 0) {
+        if (currentY > pageHeight - 200) {
+          doc.addPage();
+          currentY = margin;
+        }
+
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
         doc.text('Education', margin, currentY);
         currentY += 20;
 
-        resume.education.forEach(edu => {
+        resume.education.forEach((edu, index) => {
           doc.setFontSize(12);
           doc.setFont('helvetica', 'bold');
           doc.text(edu.schoolName, margin, currentY);
           currentY += 15;
 
-          doc.setFontSize(10);
+          doc.setFontSize(11);
           doc.setFont('helvetica', 'normal');
+          doc.setTextColor(96, 96, 96);
           doc.text(edu.degreeName, margin, currentY);
           currentY += 15;
 
-          doc.setTextColor(100, 100, 100);
+          doc.setTextColor(128, 128, 128);
           doc.text(`${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}`, margin, currentY);
-          currentY += 25;
+          
+          if (index < resume.education.length - 1) {
+            currentY += 25;
+          }
         });
+        currentY += 30;
       }
 
       // Skills
       if (resume.skills.hard_skills.length > 0 || resume.skills.soft_skills.length > 0) {
+        if (currentY > pageHeight - 200) {
+          doc.addPage();
+          currentY = margin;
+        }
+
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         doc.text('Skills', margin, currentY);
         currentY += 20;
+
+        const skillsColumnWidth = (usableWidth - margin) / 2;
 
         if (resume.skills.hard_skills.length > 0) {
           doc.setFontSize(12);
@@ -171,10 +213,11 @@ serve(async (req) => {
           doc.text('Technical Skills', margin, currentY);
           currentY += 15;
 
-          doc.setFontSize(10);
+          doc.setFontSize(11);
           doc.setFont('helvetica', 'normal');
-          const hardSkillsText = resume.skills.hard_skills.join(', ');
-          const hardSkillsLines = doc.splitTextToSize(hardSkillsText, usableWidth);
+          doc.setTextColor(96, 96, 96);
+          const hardSkillsText = resume.skills.hard_skills.join(' • ');
+          const hardSkillsLines = doc.splitTextToSize(hardSkillsText, skillsColumnWidth);
           doc.text(hardSkillsLines, margin, currentY);
           currentY += (hardSkillsLines.length * 15) + 20;
         }
@@ -182,59 +225,84 @@ serve(async (req) => {
         if (resume.skills.soft_skills.length > 0) {
           doc.setFontSize(12);
           doc.setFont('helvetica', 'bold');
+          doc.setTextColor(0, 0, 0);
           doc.text('Soft Skills', margin, currentY);
           currentY += 15;
 
-          doc.setFontSize(10);
+          doc.setFontSize(11);
           doc.setFont('helvetica', 'normal');
-          const softSkillsText = resume.skills.soft_skills.join(', ');
-          const softSkillsLines = doc.splitTextToSize(softSkillsText, usableWidth);
+          doc.setTextColor(96, 96, 96);
+          const softSkillsText = resume.skills.soft_skills.join(' • ');
+          const softSkillsLines = doc.splitTextToSize(softSkillsText, skillsColumnWidth);
           doc.text(softSkillsLines, margin, currentY);
         }
       }
 
       fileBuffer = new Uint8Array(doc.output('arraybuffer'));
     } else if (format === 'docx') {
+      const spacingAfterSection = 400;
       const doc = new docx.Document({
+        styles: {
+          default: {
+            document: {
+              run: {
+                font: "Helvetica",
+                size: 24,
+                color: "000000",
+              },
+            },
+          },
+        },
         sections: [{
-          properties: {},
+          properties: {
+            page: {
+              margin: {
+                top: 1440, // 1 inch in twips
+                right: 1440,
+                bottom: 1440,
+                left: 1440,
+              },
+            },
+          },
           children: [
-            // Header
+            // Header with Name
             new docx.Paragraph({
               children: [
                 new docx.TextRun({
                   text: resume.personal_info.fullName,
                   bold: true,
-                  size: 36,
+                  size: 48,
                 }),
               ],
-              spacing: { after: 200 },
+              spacing: { after: 240 },
             }),
 
-            // Title
+            // Job Title
             new docx.Paragraph({
               children: [
                 new docx.TextRun({
                   text: resume.professional_summary.title,
-                  size: 28,
+                  size: 32,
                   color: "666666",
                 }),
               ],
-              spacing: { after: 200 },
+              spacing: { after: 240 },
             }),
 
             // Contact Info
             new docx.Paragraph({
               children: [
-                new docx.TextRun({ text: resume.personal_info.email, size: 20 }),
-                new docx.TextRun({ text: " | ", size: 20 }),
-                new docx.TextRun({ text: resume.personal_info.phone, size: 20 }),
-                ...(resume.personal_info.linkedin ? [
-                  new docx.TextRun({ text: " | ", size: 20 }),
-                  new docx.TextRun({ text: resume.personal_info.linkedin, size: 20 }),
-                ] : []),
+                new docx.TextRun({
+                  text: [
+                    resume.personal_info.email,
+                    resume.personal_info.phone,
+                    resume.personal_info.linkedin
+                  ].filter(Boolean).join(" • "),
+                  size: 22,
+                  color: "666666",
+                }),
               ],
-              spacing: { after: 400 },
+              spacing: { after: spacingAfterSection },
             }),
 
             // Professional Summary
@@ -246,16 +314,17 @@ serve(async (req) => {
                   size: 28,
                 }),
               ],
-              spacing: { after: 200 },
+              spacing: { after: 240 },
             }),
             new docx.Paragraph({
               children: [
                 new docx.TextRun({
                   text: resume.professional_summary.summary,
-                  size: 24,
+                  size: 22,
+                  color: "666666",
                 }),
               ],
-              spacing: { after: 400 },
+              spacing: { after: spacingAfterSection },
             }),
 
             // Work Experience
@@ -268,7 +337,7 @@ serve(async (req) => {
                     size: 28,
                   }),
                 ],
-                spacing: { after: 200 },
+                spacing: { after: 240 },
               }),
               ...resume.work_experience.flatMap(exp => [
                 new docx.Paragraph({
@@ -276,43 +345,49 @@ serve(async (req) => {
                     new docx.TextRun({
                       text: exp.jobTitle,
                       bold: true,
-                      size: 26,
+                      size: 24,
                     }),
                   ],
+                  spacing: { after: 120 },
                 }),
                 new docx.Paragraph({
                   children: [
                     new docx.TextRun({
                       text: exp.companyName,
-                      size: 24,
+                      size: 22,
+                      color: "666666",
                     }),
                   ],
+                  spacing: { after: 120 },
                 }),
                 new docx.Paragraph({
                   children: [
                     new docx.TextRun({
                       text: `${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate}`,
-                      size: 24,
+                      size: 22,
                       color: "666666",
                     }),
                   ],
-                  spacing: { after: 200 },
+                  spacing: { after: 240 },
                 }),
                 ...exp.responsibilities.map(resp =>
                   new docx.Paragraph({
-                    bullet: { level: 0 },
+                    bullet: {
+                      level: 0,
+                    },
                     children: [
                       new docx.TextRun({
                         text: resp,
-                        size: 24,
+                        size: 22,
+                        color: "666666",
                       }),
                     ],
-                    spacing: { after: 100 },
+                    spacing: { after: 120 },
                   })
                 ),
                 new docx.Paragraph({
                   children: [],
-                  spacing: { after: 200 },
+                  spacing: { after: 240 },
                 }),
               ]),
             ] : []),
@@ -327,7 +402,7 @@ serve(async (req) => {
                     size: 28,
                   }),
                 ],
-                spacing: { after: 200 },
+                spacing: { after: 240 },
               }),
               ...resume.education.flatMap(edu => [
                 new docx.Paragraph({
@@ -335,27 +410,30 @@ serve(async (req) => {
                     new docx.TextRun({
                       text: edu.schoolName,
                       bold: true,
-                      size: 26,
+                      size: 24,
                     }),
                   ],
+                  spacing: { after: 120 },
                 }),
                 new docx.Paragraph({
                   children: [
                     new docx.TextRun({
                       text: edu.degreeName,
-                      size: 24,
+                      size: 22,
+                      color: "666666",
                     }),
                   ],
+                  spacing: { after: 120 },
                 }),
                 new docx.Paragraph({
                   children: [
                     new docx.TextRun({
                       text: `${edu.startDate} - ${edu.isCurrentlyEnrolled ? 'Present' : edu.endDate}`,
-                      size: 24,
+                      size: 22,
                       color: "666666",
                     }),
                   ],
-                  spacing: { after: 200 },
+                  spacing: { after: spacingAfterSection },
                 }),
               ]),
             ] : []),
@@ -370,7 +448,7 @@ serve(async (req) => {
                     size: 28,
                   }),
                 ],
-                spacing: { after: 200 },
+                spacing: { after: 240 },
               }),
               ...(resume.skills.hard_skills.length > 0 ? [
                 new docx.Paragraph({
@@ -378,19 +456,20 @@ serve(async (req) => {
                     new docx.TextRun({
                       text: "Technical Skills",
                       bold: true,
-                      size: 26,
+                      size: 24,
                     }),
                   ],
-                  spacing: { after: 100 },
+                  spacing: { after: 120 },
                 }),
                 new docx.Paragraph({
                   children: [
                     new docx.TextRun({
-                      text: resume.skills.hard_skills.join(", "),
-                      size: 24,
+                      text: resume.skills.hard_skills.join(" • "),
+                      size: 22,
+                      color: "666666",
                     }),
                   ],
-                  spacing: { after: 200 },
+                  spacing: { after: 240 },
                 }),
               ] : []),
               ...(resume.skills.soft_skills.length > 0 ? [
@@ -399,16 +478,17 @@ serve(async (req) => {
                     new docx.TextRun({
                       text: "Soft Skills",
                       bold: true,
-                      size: 26,
+                      size: 24,
                     }),
                   ],
-                  spacing: { after: 100 },
+                  spacing: { after: 120 },
                 }),
                 new docx.Paragraph({
                   children: [
                     new docx.TextRun({
-                      text: resume.skills.soft_skills.join(", "),
-                      size: 24,
+                      text: resume.skills.soft_skills.join(" • "),
+                      size: 22,
+                      color: "666666",
                     }),
                   ],
                 }),
@@ -423,7 +503,6 @@ serve(async (req) => {
       throw new Error('Unsupported format');
     }
 
-    // Convert to Base64
     const base64String = base64Encode(fileBuffer);
     console.log("File generated successfully, size:", fileBuffer.length);
 
