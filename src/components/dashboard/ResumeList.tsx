@@ -1,5 +1,5 @@
 
-import { Plus, Pencil, Trash2, FileText } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 interface Resume {
   id: string;
@@ -14,6 +16,9 @@ interface Resume {
   updated_at: string;
   completion_status: string;
   current_step: number;
+  professional_summary?: {
+    title: string;
+  };
 }
 
 interface ResumeListProps {
@@ -25,6 +30,8 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase
@@ -51,6 +58,43 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
 
   const handleEdit = (id: string) => {
     navigate(`/resume-builder/${id}`);
+  };
+
+  const handleView = (id: string) => {
+    navigate(`/resume-preview/${id}`);
+  };
+
+  const handleDownload = (id: string) => {
+    navigate(`/resume-preview/${id}`);
+  };
+
+  const startEditingTitle = (resume: Resume) => {
+    setEditingId(resume.id);
+    setEditTitle(resume.title || resume.professional_summary?.title || "Untitled");
+  };
+
+  const saveTitle = async (id: string) => {
+    const { error } = await supabase
+      .from('resumes')
+      .update({ title: editTitle })
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Could not update resume title",
+        variant: "destructive",
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Resume title updated",
+        duration: 3000,
+      });
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+    }
+    setEditingId(null);
   };
 
   const handleCreateNew = () => {
@@ -90,7 +134,44 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 break-words">{resume.title || 'Untitled'}</h3>
+                {editingId === resume.id ? (
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="flex-1"
+                      placeholder="Enter resume title"
+                    />
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      onClick={() => saveTitle(resume.id)}
+                    >
+                      <Check className="w-4 h-4 text-green-600" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      onClick={() => setEditingId(null)}
+                    >
+                      <X className="w-4 h-4 text-red-600" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-gray-900 break-words">
+                      {resume.title || resume.professional_summary?.title || "Untitled"}
+                    </h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => startEditingTitle(resume)}
+                      className="p-0 h-auto hover:bg-transparent"
+                    >
+                      <Pencil className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+                    </Button>
+                  </div>
+                )}
                 <p className="text-sm text-gray-500 mt-1">
                   Updated {new Date(resume.updated_at).toLocaleDateString()}
                 </p>
@@ -104,6 +185,24 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                 >
                   <Pencil className="w-4 h-4 mr-2" />
                   Edit
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleView(resume.id)}
+                  className="flex-1 hover:bg-primary/5"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  View
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleDownload(resume.id)}
+                  className="flex-1 hover:bg-primary/5"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
                 </Button>
                 <Button 
                   variant="outline" 
