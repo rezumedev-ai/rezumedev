@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,12 +30,19 @@ const Login = () => {
 
       if (error) throw error;
 
-      toast.success("Welcome back! You have successfully logged in");
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully logged in",
+      });
       
       // Auth state change listener will handle navigation
     } catch (error) {
       console.error('Error:', error);
-      toast.error(error instanceof Error ? error.message : "Please try again later");
+      toast({
+        variant: "destructive",
+        title: "Error signing in",
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -95,9 +103,11 @@ const Login = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
-            </Button>
+            <div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign in"}
+              </Button>
+            </div>
 
             <div className="text-center text-sm">
               <span className="text-gray-600">Don't have an account? </span>
@@ -113,3 +123,4 @@ const Login = () => {
 };
 
 export default Login;
+

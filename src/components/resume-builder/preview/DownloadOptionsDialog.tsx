@@ -5,59 +5,22 @@ import { Download } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface DownloadOptionsDialogProps {
-  resumeId: string;
+  onDownload: (format: "pdf" | "docx") => Promise<void>;
 }
 
-export function DownloadOptionsDialog({ resumeId }: DownloadOptionsDialogProps) {
+export function DownloadOptionsDialog({ onDownload }: DownloadOptionsDialogProps) {
   const [format, setFormat] = useState<"pdf" | "docx">("pdf");
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleDownload = async () => {
     try {
-      setIsLoading(true);
-      
-      if (format === "pdf") {
-        // Get the resume content element
-        const element = document.querySelector(".resume-content");
-        if (!element) {
-          throw new Error("Resume content not found");
-        }
-
-        // Configure pdf options
-        const opt = {
-          margin: [0, 0],
-          filename: 'resume.pdf',
-          image: { type: 'jpeg', quality: 1 },
-          html2canvas: { 
-            scale: 2,
-            useCORS: true,
-            logging: true,
-            letterRendering: true
-          },
-          jsPDF: { 
-            unit: 'pt', 
-            format: 'a4', 
-            orientation: 'portrait'
-          }
-        };
-
-        // Generate PDF using html2pdf
-        const html2pdf = (await import('html2pdf.js')).default;
-        await html2pdf().set(opt).from(element).save();
-        toast.success("Resume downloaded successfully");
-      } else {
-        toast.error("DOCX format is not yet supported");
-      }
+      await onDownload(format);
       setIsOpen(false);
     } catch (error) {
-      console.error("Download error:", error);
       toast.error("Failed to download resume. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -84,12 +47,8 @@ export function DownloadOptionsDialog({ resumeId }: DownloadOptionsDialogProps) 
               <Label htmlFor="docx">Word Document (DOCX)</Label>
             </div>
           </RadioGroup>
-          <Button 
-            onClick={handleDownload} 
-            className="w-full"
-            disabled={isLoading}
-          >
-            {isLoading ? "Generating..." : "Download"}
+          <Button onClick={handleDownload} className="w-full">
+            Download
           </Button>
         </div>
       </DialogContent>

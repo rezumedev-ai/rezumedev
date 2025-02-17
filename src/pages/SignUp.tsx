@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, User, Lock } from "lucide-react";
@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,12 +36,19 @@ const SignUp = () => {
 
       if (error) throw error;
 
-      toast.success("Account created successfully! Welcome to Rezume.dev");
+      toast({
+        title: "Account created successfully!",
+        description: "Welcome to Rezume.dev",
+      });
       
       // Auth state change listener will handle navigation
     } catch (error) {
       console.error('Error:', error);
-      toast.error(error instanceof Error ? error.message : "Please try again later");
+      toast({
+        variant: "destructive",
+        title: "Error creating account",
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -137,3 +145,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+
