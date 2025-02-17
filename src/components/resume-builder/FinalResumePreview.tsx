@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -53,35 +52,31 @@ export function FinalResumePreview({
         body: { resumeId, format }
       });
 
-      if (!response.data) {
+      if (!response.data?.data) {
         throw new Error('Failed to generate file');
       }
 
-      // Convert base64 to binary
-      const binaryStr = atob(response.data);
-      const bytes = new Uint8Array(binaryStr.length);
-      for (let i = 0; i < binaryStr.length; i++) {
-        bytes[i] = binaryStr.charCodeAt(i);
+      // Decode the base64 string
+      const binaryString = atob(response.data.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
 
-      // Create a blob from the binary data
+      // Create a blob with the correct mime type
       const file = new Blob([bytes], {
-        type: format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        type: response.data.contentType || (format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
       });
 
-      // Create a URL for the blob
-      const url = window.URL.createObjectURL(file);
-
-      // Create a temporary link element and trigger the download
+      // Create a download link
+      const url = URL.createObjectURL(file);
       const link = document.createElement('a');
       link.href = url;
       link.download = `resume.${format}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Clean up the URL
-      window.URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
 
       toast.success(`Resume downloaded successfully as ${format.toUpperCase()}`);
     } catch (err) {

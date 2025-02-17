@@ -1,8 +1,8 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import { jsPDF } from "https://esm.sh/jspdf@2.5.1";
 import * as docx from "https://esm.sh/docx@8.2.3";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -424,10 +424,15 @@ serve(async (req) => {
     }
 
     // Convert to Base64
-    const base64String = btoa(String.fromCharCode(...fileBuffer));
+    const base64String = base64Encode(fileBuffer);
+    console.log("File generated successfully, size:", fileBuffer.length);
 
     return new Response(
-      JSON.stringify({ data: base64String }),
+      JSON.stringify({ 
+        data: base64String,
+        format,
+        contentType: format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      }),
       {
         headers: {
           ...corsHeaders,
