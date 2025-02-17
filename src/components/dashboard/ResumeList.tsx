@@ -16,7 +16,7 @@ interface Resume {
   updated_at: string;
   completion_status: string;
   current_step: number;
-  professional_summary?: {
+  professional_summary: {
     title: string;
   };
 }

@@ -9,6 +9,16 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResumeList } from "@/components/dashboard/ResumeList";
 import { useNavigate } from "react-router-dom";
+import { Json } from "@/integrations/supabase/types";
+
+interface ResumeData {
+  id: string;
+  title: string;
+  updated_at: string;
+  completion_status: string;
+  current_step: number;
+  professional_summary: Json;
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -35,11 +45,18 @@ export default function Dashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("resumes")
-        .select("*")
+        .select("id, title, updated_at, completion_status, current_step, professional_summary")
         .eq("user_id", user?.id);
 
       if (error) throw error;
-      return data;
+
+      // Transform the data to match the Resume interface
+      return (data || []).map((resume: ResumeData) => ({
+        ...resume,
+        professional_summary: typeof resume.professional_summary === 'object' 
+          ? resume.professional_summary as { title: string }
+          : { title: '' }
+      }));
     },
   });
 
