@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function ResumePreview() {
@@ -25,10 +24,6 @@ export default function ResumePreview() {
       return data;
     }
   });
-
-  const handleEdit = () => {
-    navigate(`/resume-builder/${id}`);
-  };
 
   if (isLoading) {
     return (
@@ -52,15 +47,6 @@ export default function ResumePreview() {
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
       />
-      <div className="fixed bottom-6 right-6">
-        <Button 
-          onClick={handleEdit}
-          size="lg"
-          className="shadow-lg"
-        >
-          Edit Resume
-        </Button>
-      </div>
     </div>
   );
 }

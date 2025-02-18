@@ -67,16 +67,14 @@ export function FinalResumePreview({
         [section]: newResumeData[section] as unknown as Json
       };
       
-      const { error } = await supabase
+      await supabase
         .from("resumes")
         .update(updateData)
         .eq("id", resumeId);
-        
-      if (error) throw error;
-      
-      toast.success("Changes saved successfully!");
     } catch (error) {
       toast.error("Failed to save changes. Please try again.");
+      // Revert changes on error
+      setResumeData(prevData => ({ ...prevData }));
     }
   };
 
@@ -98,22 +96,22 @@ export function FinalResumePreview({
     handleUpdateField("work_experience", "", newExperiences);
   };
 
-  const renderEditableField = (component: JSX.Element): JSX.Element | string => {
-    return isEditing ? component : component.props.value;
-  };
-
   useEffect(() => {
     const calculateScale = () => {
       if (containerRef.current && resumeRef.current) {
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
         
-        const scaleX = (containerWidth - 40) / A4_WIDTH_PX;
-        const scaleY = (containerHeight - 40) / A4_HEIGHT_PX;
+        const scaleX = (containerWidth - 48) / A4_WIDTH_PX;
+        const scaleY = (containerHeight - 48) / A4_HEIGHT_PX;
         
-        const newScale = isMobile 
-          ? isZoomed ? Math.min(scaleX, scaleY, 0.8) : Math.min(scaleX, 0.4)
-          : Math.min(scaleX, scaleY, 0.85);
+        let newScale = Math.min(scaleX, scaleY, 1);
+        
+        if (isMobile) {
+          newScale = isZoomed ? 0.8 : 0.4;
+        } else {
+          newScale = Math.min(newScale, 0.85);
+        }
         
         setScale(newScale);
       }
@@ -126,7 +124,7 @@ export function FinalResumePreview({
 
   const renderContent = () => {
     return (
-      <div className="max-w-[700px] mx-auto">
+      <div className="max-w-[700px] mx-auto overflow-y-auto max-h-full">
         <PersonalSection
           fullName={resumeData.personal_info.fullName}
           title={resumeData.professional_summary.title}
@@ -148,7 +146,7 @@ export function FinalResumePreview({
                 value={resumeData.professional_summary.summary}
                 onChange={(e) => handleUpdateField("professional_summary", "summary", e.target.value)}
                 placeholder="Write a brief professional summary"
-                className="w-full min-h-[100px]"
+                className="w-full min-h-[100px] resize-none"
               />
             ) : (
               resumeData.professional_summary.summary
@@ -227,12 +225,12 @@ export function FinalResumePreview({
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
             transform: `scale(${scale})`,
-            transformOrigin: 'center',
+            transformOrigin: 'top center',
           }}
         >
           <div 
             ref={contentRef}
-            className="w-full h-full p-[60px] text-black"
+            className="w-full h-full p-[60px] text-black overflow-y-auto"
             style={{
               fontFamily: 'Georgia, serif'
             }}
