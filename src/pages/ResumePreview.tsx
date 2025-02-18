@@ -47,8 +47,6 @@ export default function ResumePreview() {
   return (
     <FinalResumePreview
       resumeData={resume as unknown as ResumeData}
-      templateId={resume.template_id}
-      onEdit={handleEdit}
       resumeId={id as string}
     />
   );

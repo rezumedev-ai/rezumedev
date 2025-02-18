@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -17,14 +16,11 @@ import { Json } from "@/integrations/supabase/types";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
-  templateId: string;
-  onEdit?: () => void;
   resumeId: string;
 }
 
 export function FinalResumePreview({
   resumeData: initialResumeData,
-  templateId,
   resumeId
 }: FinalResumePreviewProps) {
   const [scale, setScale] = useState(1);
@@ -39,12 +35,12 @@ export function FinalResumePreview({
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
+  const selectedTemplate = resumeTemplates[0];
+
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
   const CONTENT_MARGIN = 48;
   const CONTENT_MAX_HEIGHT = A4_HEIGHT_PX - (CONTENT_MARGIN * 2);
-
-  const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
   const handleBack = () => {
     navigate("/dashboard");
