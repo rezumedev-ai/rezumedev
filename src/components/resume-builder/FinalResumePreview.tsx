@@ -106,7 +106,7 @@ export function FinalResumePreview({
 
   const renderContent = () => {
     return (
-      <div className="space-y-6">
+      <div className="max-w-[700px] mx-auto">
         <PersonalSection
           fullName={resumeData.personal_info.fullName}
           title={resumeData.professional_summary.title}
@@ -116,11 +116,11 @@ export function FinalResumePreview({
           template={selectedTemplate}
         />
 
-        <div>
-          <h3 className="text-lg font-bold text-black mb-2">
+        <div className="mb-6">
+          <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
             Professional Summary
           </h3>
-          <div className="text-black text-sm leading-relaxed">
+          <div className="text-sm leading-relaxed">
             {resumeData.professional_summary.summary}
           </div>
         </div>
@@ -199,9 +199,9 @@ export function FinalResumePreview({
         >
           <div 
             ref={contentRef}
-            className="w-full h-full p-[48px] text-black"
+            className="w-full h-full p-[60px] text-black"
             style={{
-              fontFamily: 'Times New Roman, serif'
+              fontFamily: 'Georgia, serif'
             }}
           >
             {renderContent()}

@@ -36,23 +36,25 @@ export function EducationSection({
   };
 
   return (
-    <div>
-      <h3 className={template.style.sectionStyle}>
+    <div className="mb-6">
+      <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
         Education
       </h3>
-      <div className="space-y-4 mt-2">
+      <div className="space-y-4">
         {education.map((edu, index) => (
           <div key={index}>
-            <h4 className="font-medium">
-              {renderEditableText(edu.degreeName, index, "degreeName")}
-            </h4>
-            <div className="text-gray-600">
-              {renderEditableText(edu.schoolName, index, "schoolName")}
+            <div className="flex justify-between items-baseline mb-1">
+              <h4 className="font-bold text-sm">
+                {renderEditableText(edu.degreeName, index, "degreeName")}
+              </h4>
+              <span className="text-xs">
+                {renderEditableText(edu.startDate, index, "startDate")} - {
+                  edu.isCurrentlyEnrolled ? 'Present' : renderEditableText(edu.endDate, index, "endDate")
+                }
+              </span>
             </div>
-            <div className="text-sm text-gray-500">
-              {renderEditableText(edu.startDate, index, "startDate")} - {
-                edu.isCurrentlyEnrolled ? 'Present' : renderEditableText(edu.endDate, index, "endDate")
-              }
+            <div className="text-sm">
+              {renderEditableText(edu.schoolName, index, "schoolName")}
             </div>
           </div>
         ))}

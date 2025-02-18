@@ -37,27 +37,29 @@ export function ExperienceSection({
   };
 
   return (
-    <div>
-      <h3 className={template.style.sectionStyle}>
-        Work Experience
+    <div className="mb-6">
+      <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
+        Professional Experience
       </h3>
-      <div className="space-y-4 mt-2">
+      <div className="space-y-5">
         {experiences.map((exp, index) => (
-          <div key={index}>
-            <h4 className="font-medium">
-              {renderEditableText(exp.jobTitle, index, "jobTitle")}
-            </h4>
-            <div className="text-gray-600">
+          <div key={index} className="mb-4">
+            <div className="flex justify-between items-baseline mb-1">
+              <h4 className="font-bold text-sm uppercase">
+                {renderEditableText(exp.jobTitle, index, "jobTitle")}
+              </h4>
+              <span className="text-xs">
+                {renderEditableText(exp.startDate, index, "startDate")} - {
+                  exp.isCurrentJob ? 'Present' : renderEditableText(exp.endDate, index, "endDate")
+                }
+              </span>
+            </div>
+            <div className="text-sm font-semibold mb-2">
               {renderEditableText(exp.companyName, index, "companyName")}
             </div>
-            <div className="text-sm text-gray-500">
-              {renderEditableText(exp.startDate, index, "startDate")} - {
-                exp.isCurrentJob ? 'Present' : renderEditableText(exp.endDate, index, "endDate")
-              }
-            </div>
-            <ul className="list-disc ml-4 mt-2 text-gray-600 space-y-1">
+            <ul className="list-disc ml-4 text-sm space-y-1">
               {exp.responsibilities.map((resp, respIndex) => (
-                <li key={respIndex}>
+                <li key={respIndex} className="text-sm leading-tight">
                   {isEditing ? (
                     <Input
                       value={resp}

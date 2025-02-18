@@ -36,22 +36,25 @@ export function CertificationsSection({
   };
 
   return (
-    <div>
-      <h3 className={template.style.sectionStyle}>
-        Certifications
+    <div className="mb-6">
+      <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
+        Certifications & Licenses
       </h3>
-      <div className="space-y-4 mt-2">
+      <div className="space-y-3">
         {certifications.map((cert, index) => (
-          <div key={index}>
-            <h4 className="font-medium">
-              {renderEditableText(cert.name, index, "name")}
-            </h4>
-            <div className="text-gray-600">
-              {renderEditableText(cert.organization, index, "organization")}
+          <div key={index} className="flex justify-between items-baseline">
+            <div>
+              <span className="font-bold text-sm">
+                {renderEditableText(cert.name, index, "name")}
+              </span>
+              <span className="text-sm mx-2">|</span>
+              <span className="text-sm">
+                {renderEditableText(cert.organization, index, "organization")}
+              </span>
             </div>
-            <div className="text-sm text-gray-500">
+            <span className="text-xs">
               {renderEditableText(cert.completionDate, index, "completionDate")}
-            </div>
+            </span>
           </div>
         ))}
       </div>

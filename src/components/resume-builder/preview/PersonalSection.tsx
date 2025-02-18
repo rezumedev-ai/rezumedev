@@ -19,19 +19,23 @@ export function PersonalSection({
   linkedin
 }: PersonalSectionProps) {
   return (
-    <div className="mb-6">
-      <h1 className="text-2xl font-bold text-black mb-1">{fullName}</h1>
-      <h2 className="text-lg font-medium text-black mb-2">{title}</h2>
-      <div className="flex flex-wrap gap-4 text-sm text-black">
-        <span className="flex items-center gap-1">
-          <Mail className="w-4 h-4" /> {email}
+    <div className="mb-8 text-center border-b border-black pb-6">
+      <h1 className="text-3xl font-bold text-black mb-2 uppercase tracking-wide">
+        {fullName}
+      </h1>
+      <h2 className="text-lg font-semibold text-black mb-3 capitalize">
+        {title}
+      </h2>
+      <div className="flex flex-wrap justify-center gap-6 text-sm text-black">
+        <span className="flex items-center gap-1.5">
+          <Mail className="w-3.5 h-3.5" /> {email}
         </span>
-        <span className="flex items-center gap-1">
-          <Phone className="w-4 h-4" /> {phone}
+        <span className="flex items-center gap-1.5">
+          <Phone className="w-3.5 h-3.5" /> {phone}
         </span>
         {linkedin && (
-          <span className="flex items-center gap-1">
-            <Linkedin className="w-4 h-4" /> {linkedin}
+          <span className="flex items-center gap-1.5">
+            <Linkedin className="w-3.5 h-3.5" /> {linkedin}
           </span>
         )}
       </div>

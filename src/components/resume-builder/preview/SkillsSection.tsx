@@ -20,7 +20,7 @@ export function SkillsSection({
   if (hardSkills.length === 0 && softSkills.length === 0) return null;
 
   const renderEditableSkills = (skills: string[], type: "hard" | "soft") => {
-    if (!isEditing) return skills.join(", ");
+    if (!isEditing) return skills.join(" • ");
 
     return (
       <Input
@@ -36,23 +36,23 @@ export function SkillsSection({
   };
 
   return (
-    <div>
-      <h3 className={template.style.sectionStyle}>
-        Skills
+    <div className="mb-6">
+      <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
+        Technical Skills
       </h3>
-      <div className="grid grid-cols-2 gap-4 mt-2">
+      <div className="space-y-4">
         {hardSkills.length > 0 && (
           <div>
-            <h4 className="font-medium mb-2">Technical Skills</h4>
-            <div className="text-gray-600">
+            <h4 className="font-bold text-sm mb-2">Core Competencies</h4>
+            <div className="text-sm leading-relaxed">
               {renderEditableSkills(hardSkills, "hard")}
             </div>
           </div>
         )}
         {softSkills.length > 0 && (
           <div>
-            <h4 className="font-medium mb-2">Soft Skills</h4>
-            <div className="text-gray-600">
+            <h4 className="font-bold text-sm mb-2">Professional Skills</h4>
+            <div className="text-sm leading-relaxed">
               {renderEditableSkills(softSkills, "soft")}
             </div>
           </div>
