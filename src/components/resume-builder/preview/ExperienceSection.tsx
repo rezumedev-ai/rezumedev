@@ -23,6 +23,28 @@ export function ExperienceSection({
   onAdd,
   onRemove
 }: ExperienceSectionProps) {
+  const handleResponsibilityUpdate = (
+    expIndex: number,
+    respIndex: number,
+    value: string
+  ) => {
+    const newResponsibilities = [...experiences[expIndex].responsibilities];
+    newResponsibilities[respIndex] = value;
+    onUpdate?.(expIndex, "responsibilities", newResponsibilities);
+  };
+
+  const handleAddResponsibility = (expIndex: number) => {
+    const newResponsibilities = [...experiences[expIndex].responsibilities, ""];
+    onUpdate?.(expIndex, "responsibilities", newResponsibilities);
+  };
+
+  const handleRemoveResponsibility = (expIndex: number, respIndex: number) => {
+    const newResponsibilities = experiences[expIndex].responsibilities.filter(
+      (_, i) => i !== respIndex
+    );
+    onUpdate?.(expIndex, "responsibilities", newResponsibilities);
+  };
+
   return (
     <div className="mb-6 relative">
       <div className="flex justify-between items-center mb-4">
@@ -68,7 +90,7 @@ export function ExperienceSection({
                     <div className="text-sm font-medium">{exp.jobTitle}</div>
                   )}
                 </div>
-                <div className="flex gap-2 items-center text-xs">
+                <div className="flex gap-2 items-center text-xs whitespace-nowrap">
                   <Input
                     type="month"
                     value={exp.startDate}
@@ -116,67 +138,50 @@ export function ExperienceSection({
                   </label>
                 </div>
               )}
-              <ul className="list-disc ml-4 text-sm space-y-2">
-                {exp.responsibilities.map((resp, respIndex) => (
-                  <li key={respIndex} className="text-sm group">
-                    {isEditing ? (
-                      <div className="flex gap-2 items-start">
-                        <Textarea
-                          value={resp}
-                          onChange={(e) => {
-                            const newResp = [...exp.responsibilities];
-                            newResp[respIndex] = e.target.value;
-                            onUpdate?.(index, "responsibilities", newResp);
-                          }}
-                          placeholder="Add responsibility"
-                          className="flex-1 min-h-[40px] text-sm p-2"
-                          style={{
-                            resize: 'none',
-                            overflow: 'hidden',
-                            height: 'auto',
-                            minHeight: '40px',
-                            maxHeight: '120px'
-                          }}
-                          onInput={(e) => {
-                            const target = e.target as HTMLTextAreaElement;
-                            target.style.height = 'auto';
-                            target.style.height = `${target.scrollHeight}px`;
-                          }}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                          onClick={() => {
-                            const newResp = exp.responsibilities.filter((_, i) => i !== respIndex);
-                            onUpdate?.(index, "responsibilities", newResp);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <span className="leading-relaxed">{resp}</span>
-                    )}
-                  </li>
-                ))}
-                {isEditing && (
-                  <li>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm font-medium">Responsibilities</div>
+                  {isEditing && (
                     <Button
-                      onClick={() => {
-                        const newResp = [...exp.responsibilities, ""];
-                        onUpdate?.(index, "responsibilities", newResp);
-                      }}
+                      onClick={() => handleAddResponsibility(index)}
                       variant="ghost"
                       size="sm"
-                      className="text-xs mt-2 text-primary hover:text-primary/80 transition-colors duration-200"
+                      className="text-xs"
                     >
                       <Plus className="w-4 h-4 mr-1" />
-                      Add Responsibility
+                      Add
                     </Button>
-                  </li>
-                )}
-              </ul>
+                  )}
+                </div>
+                <ul className="list-disc ml-4 text-sm space-y-2">
+                  {exp.responsibilities.map((resp, respIndex) => (
+                    <li key={respIndex} className="text-sm group">
+                      {isEditing ? (
+                        <div className="flex gap-2 items-start">
+                          <Textarea
+                            value={resp}
+                            onChange={(e) => handleResponsibilityUpdate(index, respIndex, e.target.value)}
+                            placeholder="Add responsibility"
+                            className="flex-1 min-h-[40px] text-sm p-2"
+                          />
+                          {exp.responsibilities.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                              onClick={() => handleRemoveResponsibility(index, respIndex)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="leading-relaxed">{resp}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         ))}
