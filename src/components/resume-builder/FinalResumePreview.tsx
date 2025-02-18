@@ -52,27 +52,39 @@ export function FinalResumePreview({
     value: any,
     subsection?: string
   ) => {
-    const newResumeData = { ...resumeData };
-    
-    if (subsection) {
-      newResumeData[section][subsection][field] = value;
-    } else {
-      newResumeData[section][field] = value;
-    }
-    
-    setResumeData(newResumeData);
-    
     try {
+      const newResumeData = { ...resumeData };
+      
+      if (subsection) {
+        newResumeData[section][subsection][field] = value;
+      } else {
+        newResumeData[section][field] = value;
+      }
+      
+      // Update local state immediately for better UX
+      setResumeData(newResumeData);
+      
+      // Debounced update to Supabase
       const updateData = {
         [section]: newResumeData[section] as unknown as Json
       };
       
-      await supabase
+      const { error } = await supabase
         .from("resumes")
         .update(updateData)
         .eq("id", resumeId);
+
+      if (error) throw error;
+
+      toast.success("Changes saved", {
+        duration: 1000,
+        position: "bottom-right",
+      });
     } catch (error) {
-      toast.error("Failed to save changes. Please try again.");
+      console.error('Error updating resume:', error);
+      toast.error("Failed to save changes. Please try again.", {
+        duration: 3000,
+      });
       // Revert changes on error
       setResumeData(prevData => ({ ...prevData }));
     }
@@ -220,7 +232,9 @@ export function FinalResumePreview({
         <div 
           ref={resumeRef}
           id="resume-content"
-          className="bg-white shadow-lg mx-auto relative"
+          className={`bg-white shadow-lg mx-auto relative transition-shadow duration-200 ${
+            isEditing ? 'shadow-xl ring-1 ring-primary/10' : ''
+          }`}
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,

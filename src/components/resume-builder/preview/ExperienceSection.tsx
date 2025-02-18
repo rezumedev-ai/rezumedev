@@ -63,12 +63,12 @@ export function ExperienceSection({
       </div>
       <div className="space-y-5">
         {experiences.map((exp, index) => (
-          <div key={index} className="relative mb-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+          <div key={index} className="relative mb-4 p-4 bg-gray-50 rounded-lg border border-gray-100 transition-all duration-200 hover:shadow-md">
             {isEditing && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute -right-2 -top-2 bg-white rounded-full shadow-sm hover:bg-red-50 text-gray-400 hover:text-red-500"
+                className="absolute -right-2 -top-2 bg-white rounded-full shadow-sm hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors duration-200"
                 onClick={() => onRemove?.(index)}
               >
                 <Trash2 className="w-4 h-4" />
@@ -80,9 +80,25 @@ export function ExperienceSection({
                   {renderEditableText(exp.jobTitle, index, "jobTitle", "Job Title")}
                 </div>
                 <div className="flex gap-2 items-center text-xs">
-                  {renderEditableText(exp.startDate, index, "startDate", "Start Date")}
+                  <Input
+                    type="month"
+                    value={exp.startDate}
+                    onChange={(e) => onUpdate?.(index, "startDate", e.target.value)}
+                    className={`w-32 ${!isEditing ? 'border-none bg-transparent p-0' : ''}`}
+                    disabled={!isEditing}
+                  />
                   <span>-</span>
-                  {exp.isCurrentJob ? 'Present' : renderEditableText(exp.endDate, index, "endDate", "End Date")}
+                  {exp.isCurrentJob ? (
+                    <span className="w-32 text-center">Present</span>
+                  ) : (
+                    <Input
+                      type="month"
+                      value={exp.endDate}
+                      onChange={(e) => onUpdate?.(index, "endDate", e.target.value)}
+                      className={`w-32 ${!isEditing ? 'border-none bg-transparent p-0' : ''}`}
+                      disabled={!isEditing || exp.isCurrentJob}
+                    />
+                  )}
                 </div>
               </div>
               <div className="text-sm font-semibold">
@@ -94,7 +110,12 @@ export function ExperienceSection({
                     type="checkbox"
                     id={`current-job-${index}`}
                     checked={exp.isCurrentJob}
-                    onChange={(e) => onUpdate?.(index, "isCurrentJob", e.target.checked ? "true" : "false")}
+                    onChange={(e) => {
+                      onUpdate?.(index, "isCurrentJob", e.target.checked ? "true" : "false");
+                      if (e.target.checked) {
+                        onUpdate?.(index, "endDate", "");
+                      }
+                    }}
                     className="rounded border-gray-300"
                   />
                   <label htmlFor={`current-job-${index}`} className="text-sm text-gray-600">
@@ -104,10 +125,10 @@ export function ExperienceSection({
               )}
               <ul className="list-disc ml-4 text-sm space-y-2">
                 {exp.responsibilities.map((resp, respIndex) => (
-                  <li key={respIndex} className="text-sm">
+                  <li key={respIndex} className="text-sm group">
                     {isEditing ? (
-                      <div className="flex gap-2">
-                        <Input
+                      <div className="flex gap-2 items-start">
+                        <Textarea
                           value={resp}
                           onChange={(e) => {
                             const newResp = [...exp.responsibilities];
@@ -115,12 +136,12 @@ export function ExperienceSection({
                             onUpdate?.(index, "responsibilities", newResp);
                           }}
                           placeholder="Add responsibility"
-                          className="flex-1"
+                          className="flex-1 min-h-[60px] resize-none"
                         />
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-gray-400 hover:text-red-500"
+                          className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                           onClick={() => {
                             const newResp = exp.responsibilities.filter((_, i) => i !== respIndex);
                             onUpdate?.(index, "responsibilities", newResp);
@@ -130,23 +151,25 @@ export function ExperienceSection({
                         </Button>
                       </div>
                     ) : (
-                      resp
+                      <span className="leading-relaxed">{resp}</span>
                     )}
                   </li>
                 ))}
                 {isEditing && (
-                  <Button
-                    onClick={() => {
-                      const newResp = [...exp.responsibilities, ""];
-                      onUpdate?.(index, "responsibilities", newResp);
-                    }}
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs mt-2"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add Responsibility
-                  </Button>
+                  <li>
+                    <Button
+                      onClick={() => {
+                        const newResp = [...exp.responsibilities, ""];
+                        onUpdate?.(index, "responsibilities", newResp);
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs mt-2 text-primary hover:text-primary/80 transition-colors duration-200"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Responsibility
+                    </Button>
+                  </li>
                 )}
               </ul>
             </div>
