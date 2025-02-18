@@ -78,6 +78,24 @@ export function FinalResumePreview({
     }
   };
 
+  const handleAddExperience = () => {
+    const newExperiences = [...resumeData.work_experience, {
+      jobTitle: "",
+      companyName: "",
+      location: "",
+      startDate: "",
+      endDate: "",
+      isCurrentJob: false,
+      responsibilities: [""]
+    }];
+    handleUpdateField("work_experience", "", newExperiences);
+  };
+
+  const handleRemoveExperience = (index: number) => {
+    const newExperiences = resumeData.work_experience.filter((_, i) => i !== index);
+    handleUpdateField("work_experience", "", newExperiences);
+  };
+
   const renderEditableField = (component: JSX.Element): JSX.Element | string => {
     return isEditing ? component : component.props.value;
   };
@@ -114,6 +132,8 @@ export function FinalResumePreview({
           phone={resumeData.personal_info.phone}
           linkedin={resumeData.personal_info.linkedin}
           template={selectedTemplate}
+          isEditing={isEditing}
+          onUpdate={(field, value) => handleUpdateField("personal_info", field, value)}
         />
 
         <div className="mb-6">
@@ -121,7 +141,16 @@ export function FinalResumePreview({
             Professional Summary
           </h3>
           <div className="text-sm leading-relaxed">
-            {resumeData.professional_summary.summary}
+            {isEditing ? (
+              <Textarea
+                value={resumeData.professional_summary.summary}
+                onChange={(e) => handleUpdateField("professional_summary", "summary", e.target.value)}
+                placeholder="Write a brief professional summary"
+                className="w-full min-h-[100px]"
+              />
+            ) : (
+              resumeData.professional_summary.summary
+            )}
           </div>
         </div>
 
@@ -134,6 +163,8 @@ export function FinalResumePreview({
             newExperiences[index] = { ...newExperiences[index], [field]: value };
             handleUpdateField("work_experience", "", newExperiences);
           }}
+          onAdd={handleAddExperience}
+          onRemove={handleRemoveExperience}
         />
 
         <EducationSection

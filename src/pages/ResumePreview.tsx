@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function ResumePreview() {
   const { id } = useParams();
@@ -45,9 +47,20 @@ export default function ResumePreview() {
   }
 
   return (
-    <FinalResumePreview
-      resumeData={resume as unknown as ResumeData}
-      resumeId={id as string}
-    />
+    <div className="relative">
+      <FinalResumePreview
+        resumeData={resume as unknown as ResumeData}
+        resumeId={id as string}
+      />
+      <div className="fixed bottom-6 right-6">
+        <Button 
+          onClick={handleEdit}
+          size="lg"
+          className="shadow-lg"
+        >
+          Edit Resume
+        </Button>
+      </div>
+    </div>
   );
 }
