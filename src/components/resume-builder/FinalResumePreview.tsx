@@ -28,7 +28,6 @@ export function FinalResumePreview({
   const [isEditing, setIsEditing] = useState(false);
   const [resumeData, setResumeData] = useState(initialResumeData);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [needsSecondPage, setNeedsSecondPage] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -40,7 +39,6 @@ export function FinalResumePreview({
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
   const CONTENT_MARGIN = 48;
-  const CONTENT_MAX_HEIGHT = A4_HEIGHT_PX - (CONTENT_MARGIN * 2);
 
   const handleBack = () => {
     navigate("/dashboard");
@@ -106,56 +104,9 @@ export function FinalResumePreview({
     return () => window.removeEventListener('resize', calculateScale);
   }, [isMobile, isZoomed]);
 
-  useEffect(() => {
-    const checkContentOverflow = () => {
-      if (contentRef.current) {
-        const contentHeight = contentRef.current.scrollHeight;
-        setNeedsSecondPage(contentHeight > CONTENT_MAX_HEIGHT);
-      }
-    };
-
-    checkContentOverflow();
-  }, [resumeData]);
-
-  const renderContent = (isSecondPage: boolean = false) => {
-    if (isSecondPage) {
-      return (
-        <div className={selectedTemplate.style.contentStyle}>
-          <EducationSection
-            education={resumeData.education}
-            template={selectedTemplate}
-            isEditing={isEditing}
-            onUpdate={(index, field, value) => {
-              const newEducation = [...resumeData.education];
-              newEducation[index] = { ...newEducation[index], [field]: value };
-              handleUpdateField("education", "", newEducation);
-            }}
-          />
-          <SkillsSection
-            hardSkills={resumeData.skills.hard_skills}
-            softSkills={resumeData.skills.soft_skills}
-            template={selectedTemplate}
-            isEditing={isEditing}
-            onUpdate={(type, skills) => {
-              handleUpdateField("skills", type === "hard" ? "hard_skills" : "soft_skills", skills);
-            }}
-          />
-          <CertificationsSection
-            certifications={resumeData.certifications}
-            template={selectedTemplate}
-            isEditing={isEditing}
-            onUpdate={(index, field, value) => {
-              const newCertifications = [...resumeData.certifications];
-              newCertifications[index] = { ...newCertifications[index], [field]: value };
-              handleUpdateField("certifications", "", newCertifications);
-            }}
-          />
-        </div>
-      );
-    }
-
+  const renderContent = () => {
     return (
-      <>
+      <div className="space-y-6">
         <PersonalSection
           fullName={resumeData.personal_info.fullName}
           title={resumeData.professional_summary.title}
@@ -165,91 +116,60 @@ export function FinalResumePreview({
           template={selectedTemplate}
         />
 
-        <div className={`${selectedTemplate.style.contentStyle} mt-6`}>
-          <div className="mb-4">
-            <h3 className={selectedTemplate.style.sectionStyle}>
-              Professional Summary
-            </h3>
-            <div className="text-gray-600 mt-2">
-              {resumeData.professional_summary.summary}
-            </div>
+        <div>
+          <h3 className="text-lg font-bold text-black mb-2">
+            Professional Summary
+          </h3>
+          <div className="text-black text-sm leading-relaxed">
+            {resumeData.professional_summary.summary}
           </div>
-
-          <ExperienceSection
-            experiences={resumeData.work_experience}
-            template={selectedTemplate}
-            isEditing={isEditing}
-            onUpdate={(index, field, value) => {
-              const newExperiences = [...resumeData.work_experience];
-              newExperiences[index] = { ...newExperiences[index], [field]: value };
-              handleUpdateField("work_experience", "", newExperiences);
-            }}
-          />
-
-          {!needsSecondPage && (
-            <>
-              <EducationSection
-                education={resumeData.education}
-                template={selectedTemplate}
-                isEditing={isEditing}
-                onUpdate={(index, field, value) => {
-                  const newEducation = [...resumeData.education];
-                  newEducation[index] = { ...newEducation[index], [field]: value };
-                  handleUpdateField("education", "", newEducation);
-                }}
-              />
-              <SkillsSection
-                hardSkills={resumeData.skills.hard_skills}
-                softSkills={resumeData.skills.soft_skills}
-                template={selectedTemplate}
-                isEditing={isEditing}
-                onUpdate={(type, skills) => {
-                  handleUpdateField("skills", type === "hard" ? "hard_skills" : "soft_skills", skills);
-                }}
-              />
-              <CertificationsSection
-                certifications={resumeData.certifications}
-                template={selectedTemplate}
-                isEditing={isEditing}
-                onUpdate={(index, field, value) => {
-                  const newCertifications = [...resumeData.certifications];
-                  newCertifications[index] = { ...newCertifications[index], [field]: value };
-                  handleUpdateField("certifications", "", newCertifications);
-                }}
-              />
-            </>
-          )}
         </div>
-      </>
+
+        <ExperienceSection
+          experiences={resumeData.work_experience}
+          template={selectedTemplate}
+          isEditing={isEditing}
+          onUpdate={(index, field, value) => {
+            const newExperiences = [...resumeData.work_experience];
+            newExperiences[index] = { ...newExperiences[index], [field]: value };
+            handleUpdateField("work_experience", "", newExperiences);
+          }}
+        />
+
+        <EducationSection
+          education={resumeData.education}
+          template={selectedTemplate}
+          isEditing={isEditing}
+          onUpdate={(index, field, value) => {
+            const newEducation = [...resumeData.education];
+            newEducation[index] = { ...newEducation[index], [field]: value };
+            handleUpdateField("education", "", newEducation);
+          }}
+        />
+
+        <SkillsSection
+          hardSkills={resumeData.skills.hard_skills}
+          softSkills={resumeData.skills.soft_skills}
+          template={selectedTemplate}
+          isEditing={isEditing}
+          onUpdate={(type, skills) => {
+            handleUpdateField("skills", type === "hard" ? "hard_skills" : "soft_skills", skills);
+          }}
+        />
+
+        <CertificationsSection
+          certifications={resumeData.certifications}
+          template={selectedTemplate}
+          isEditing={isEditing}
+          onUpdate={(index, field, value) => {
+            const newCertifications = [...resumeData.certifications];
+            newCertifications[index] = { ...newCertifications[index], [field]: value };
+            handleUpdateField("certifications", "", newCertifications);
+          }}
+        />
+      </div>
     );
   };
-
-  const renderPage = (pageNumber: number) => (
-    <div 
-      key={pageNumber}
-      ref={pageNumber === 1 ? resumeRef : undefined}
-      id={pageNumber === 1 ? "resume-content" : `resume-page-${pageNumber}`}
-      className="bg-white shadow-lg mx-auto"
-      style={{
-        width: `${A4_WIDTH_PX}px`,
-        height: `${A4_HEIGHT_PX}px`,
-        transform: `scale(${scale})`,
-        transformOrigin: 'center',
-        position: 'absolute',
-        top: `${(pageNumber - 1) * (A4_HEIGHT_PX * scale + 40)}px`,
-      }}
-    >
-      <div 
-        ref={pageNumber === 1 ? contentRef : undefined}
-        className="w-full h-full p-[48px]"
-        style={{
-          fontFamily: selectedTemplate.style.titleFont.split(' ')[0].replace('font-', '')
-        }}
-      >
-        {renderContent(pageNumber === 2)}
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -265,12 +185,28 @@ export function FinalResumePreview({
       <div 
         ref={containerRef}
         className="flex-1 relative flex items-start justify-center p-4 md:p-8 bg-gray-100 overflow-auto"
-        style={{
-          minHeight: needsSecondPage ? `${2 * (A4_HEIGHT_PX * scale + 40)}px` : `${A4_HEIGHT_PX * scale + 40}px`
-        }}
       >
-        {renderPage(1)}
-        {needsSecondPage && renderPage(2)}
+        <div 
+          ref={resumeRef}
+          id="resume-content"
+          className="bg-white shadow-lg mx-auto"
+          style={{
+            width: `${A4_WIDTH_PX}px`,
+            height: `${A4_HEIGHT_PX}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: 'center',
+          }}
+        >
+          <div 
+            ref={contentRef}
+            className="w-full h-full p-[48px] text-black"
+            style={{
+              fontFamily: 'Times New Roman, serif'
+            }}
+          >
+            {renderContent()}
+          </div>
+        </div>
       </div>
     </div>
   );
