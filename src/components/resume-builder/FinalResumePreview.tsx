@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ResumeData } from "@/types/resume";
+import { ResumeData, WorkExperience } from "@/types/resume";
 import { resumeTemplates } from "./templates";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
