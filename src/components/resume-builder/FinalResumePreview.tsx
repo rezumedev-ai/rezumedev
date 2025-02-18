@@ -124,7 +124,7 @@ export function FinalResumePreview({
 
   const renderContent = () => {
     return (
-      <div className="max-w-[700px] mx-auto overflow-y-auto max-h-full">
+      <div className="max-w-[700px] mx-auto">
         <PersonalSection
           fullName={resumeData.personal_info.fullName}
           title={resumeData.professional_summary.title}
@@ -136,8 +136,8 @@ export function FinalResumePreview({
           onUpdate={(field, value) => handleUpdateField("personal_info", field, value)}
         />
 
-        <div className="mb-6">
-          <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
+        <div className="mb-4">
+          <h3 className="text-base font-bold text-black uppercase tracking-wider mb-3 border-b border-black pb-1">
             Professional Summary
           </h3>
           <div className="text-sm leading-relaxed">
@@ -146,7 +146,7 @@ export function FinalResumePreview({
                 value={resumeData.professional_summary.summary}
                 onChange={(e) => handleUpdateField("professional_summary", "summary", e.target.value)}
                 placeholder="Write a brief professional summary"
-                className="w-full min-h-[100px] resize-none"
+                className="w-full h-24 resize-none"
               />
             ) : (
               resumeData.professional_summary.summary
@@ -220,7 +220,7 @@ export function FinalResumePreview({
         <div 
           ref={resumeRef}
           id="resume-content"
-          className="bg-white shadow-lg mx-auto"
+          className="bg-white shadow-lg mx-auto relative"
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
@@ -230,7 +230,7 @@ export function FinalResumePreview({
         >
           <div 
             ref={contentRef}
-            className="w-full h-full p-[60px] text-black overflow-y-auto"
+            className="w-full h-full p-12 text-black"
             style={{
               fontFamily: 'Georgia, serif'
             }}
