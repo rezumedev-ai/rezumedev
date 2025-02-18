@@ -20,7 +20,10 @@ export default function ResumePreview() {
         .eq("id", id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        toast.error("Failed to load resume");
+        throw error;
+      }
       return data;
     }
   });
