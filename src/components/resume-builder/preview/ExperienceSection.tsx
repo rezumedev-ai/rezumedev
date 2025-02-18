@@ -4,7 +4,7 @@ import { ResumeTemplate } from "../templates";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 interface ExperienceSectionProps {
   experiences: WorkExperience[];
@@ -23,26 +23,6 @@ export function ExperienceSection({
   onAdd,
   onRemove
 }: ExperienceSectionProps) {
-  const renderEditableText = (
-    text: string, 
-    index: number, 
-    field: keyof WorkExperience,
-    placeholder: string,
-    isTextarea?: boolean
-  ) => {
-    if (!isEditing) return text;
-
-    const Component = isTextarea ? Textarea : Input;
-    return (
-      <Component
-        value={text}
-        onChange={(e) => onUpdate?.(index, field, e.target.value)}
-        placeholder={placeholder}
-        className="w-full text-sm"
-      />
-    );
-  };
-
   return (
     <div className="mb-6 relative">
       <div className="flex justify-between items-center mb-4">
@@ -77,7 +57,16 @@ export function ExperienceSection({
             <div className="space-y-3">
               <div className="flex flex-col md:flex-row md:justify-between md:items-baseline gap-2">
                 <div className="flex-1">
-                  {renderEditableText(exp.jobTitle, index, "jobTitle", "Job Title")}
+                  {isEditing ? (
+                    <Input
+                      value={exp.jobTitle}
+                      onChange={(e) => onUpdate?.(index, "jobTitle", e.target.value)}
+                      placeholder="Job Title"
+                      className="w-full text-sm font-medium"
+                    />
+                  ) : (
+                    <div className="text-sm font-medium">{exp.jobTitle}</div>
+                  )}
                 </div>
                 <div className="flex gap-2 items-center text-xs">
                   <Input
@@ -101,8 +90,17 @@ export function ExperienceSection({
                   )}
                 </div>
               </div>
-              <div className="text-sm font-semibold">
-                {renderEditableText(exp.companyName, index, "companyName", "Company Name")}
+              <div className="text-sm">
+                {isEditing ? (
+                  <Input
+                    value={exp.companyName}
+                    onChange={(e) => onUpdate?.(index, "companyName", e.target.value)}
+                    placeholder="Company Name"
+                    className="w-full text-sm font-semibold"
+                  />
+                ) : (
+                  <div className="font-semibold">{exp.companyName}</div>
+                )}
               </div>
               {isEditing && (
                 <div className="flex items-center gap-2">
@@ -110,12 +108,7 @@ export function ExperienceSection({
                     type="checkbox"
                     id={`current-job-${index}`}
                     checked={exp.isCurrentJob}
-                    onChange={(e) => {
-                      onUpdate?.(index, "isCurrentJob", e.target.checked ? "true" : "false");
-                      if (e.target.checked) {
-                        onUpdate?.(index, "endDate", "");
-                      }
-                    }}
+                    onChange={(e) => onUpdate?.(index, "isCurrentJob", e.target.checked ? "true" : "false")}
                     className="rounded border-gray-300"
                   />
                   <label htmlFor={`current-job-${index}`} className="text-sm text-gray-600">

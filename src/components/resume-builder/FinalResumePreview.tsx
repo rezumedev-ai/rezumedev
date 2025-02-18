@@ -40,7 +40,6 @@ export function FinalResumePreview({
 
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
-  const CONTENT_MARGIN = 48;
 
   const handleBack = () => {
     navigate("/dashboard");
@@ -64,7 +63,7 @@ export function FinalResumePreview({
       // Update local state immediately for better UX
       setResumeData(newResumeData);
       
-      // Debounced update to Supabase
+      // Update Supabase
       const updateData = {
         [section]: newResumeData[section] as unknown as Json
       };
@@ -85,26 +84,45 @@ export function FinalResumePreview({
       toast.error("Failed to save changes. Please try again.", {
         duration: 3000,
       });
-      // Revert changes on error
       setResumeData(prevData => ({ ...prevData }));
     }
   };
 
   const handleAddExperience = () => {
-    const newExperiences = [...resumeData.work_experience, {
-      jobTitle: "",
-      companyName: "",
-      location: "",
-      startDate: "",
-      endDate: "",
-      isCurrentJob: false,
-      responsibilities: [""]
-    }];
+    const newExperiences = [
+      ...resumeData.work_experience,
+      {
+        jobTitle: "",
+        companyName: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+        isCurrentJob: false,
+        responsibilities: [""]
+      }
+    ];
     handleUpdateField("work_experience", "", newExperiences);
   };
 
   const handleRemoveExperience = (index: number) => {
     const newExperiences = resumeData.work_experience.filter((_, i) => i !== index);
+    handleUpdateField("work_experience", "", newExperiences);
+  };
+
+  const handleUpdateExperience = (index: number, field: keyof WorkExperience, value: string | string[]) => {
+    const newExperiences = [...resumeData.work_experience];
+    if (field === "isCurrentJob") {
+      newExperiences[index] = {
+        ...newExperiences[index],
+        [field]: value === "true",
+        endDate: value === "true" ? "" : newExperiences[index].endDate
+      };
+    } else {
+      newExperiences[index] = {
+        ...newExperiences[index],
+        [field]: value
+      };
+    }
     handleUpdateField("work_experience", "", newExperiences);
   };
 
@@ -136,7 +154,7 @@ export function FinalResumePreview({
 
   const renderContent = () => {
     return (
-      <div className="max-w-[700px] mx-auto">
+      <div className="max-w-[700px] mx-auto space-y-6">
         <PersonalSection
           fullName={resumeData.personal_info.fullName}
           title={resumeData.professional_summary.title}
@@ -158,7 +176,7 @@ export function FinalResumePreview({
                 value={resumeData.professional_summary.summary}
                 onChange={(e) => handleUpdateField("professional_summary", "summary", e.target.value)}
                 placeholder="Write a brief professional summary"
-                className="w-full h-24 resize-none"
+                className="w-full min-h-[80px] max-h-[160px] resize-none"
               />
             ) : (
               resumeData.professional_summary.summary
@@ -170,11 +188,7 @@ export function FinalResumePreview({
           experiences={resumeData.work_experience}
           template={selectedTemplate}
           isEditing={isEditing}
-          onUpdate={(index, field, value) => {
-            const newExperiences = [...resumeData.work_experience];
-            newExperiences[index] = { ...newExperiences[index], [field]: value };
-            handleUpdateField("work_experience", "", newExperiences);
-          }}
+          onUpdate={handleUpdateExperience}
           onAdd={handleAddExperience}
           onRemove={handleRemoveExperience}
         />
@@ -232,7 +246,7 @@ export function FinalResumePreview({
         <div 
           ref={resumeRef}
           id="resume-content"
-          className={`bg-white shadow-lg mx-auto relative transition-shadow duration-200 ${
+          className={`bg-white shadow-lg mx-auto relative transition-all duration-200 ${
             isEditing ? 'shadow-xl ring-1 ring-primary/10' : ''
           }`}
           style={{
@@ -244,7 +258,7 @@ export function FinalResumePreview({
         >
           <div 
             ref={contentRef}
-            className="w-full h-full p-12 text-black"
+            className="w-full h-full p-12 overflow-auto text-black"
             style={{
               fontFamily: 'Georgia, serif'
             }}
