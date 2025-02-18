@@ -38,7 +38,7 @@ export function ExperienceSection({
         value={text}
         onChange={(e) => onUpdate?.(index, field, e.target.value)}
         placeholder={placeholder}
-        className="w-full"
+        className="w-full text-sm"
       />
     );
   };
@@ -74,7 +74,7 @@ export function ExperienceSection({
                 <Trash2 className="w-4 h-4" />
               </Button>
             )}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex flex-col md:flex-row md:justify-between md:items-baseline gap-2">
                 <div className="flex-1">
                   {renderEditableText(exp.jobTitle, index, "jobTitle", "Job Title")}
@@ -105,7 +105,7 @@ export function ExperienceSection({
                 {renderEditableText(exp.companyName, index, "companyName", "Company Name")}
               </div>
               {isEditing && (
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     id={`current-job-${index}`}
@@ -136,7 +136,19 @@ export function ExperienceSection({
                             onUpdate?.(index, "responsibilities", newResp);
                           }}
                           placeholder="Add responsibility"
-                          className="flex-1 min-h-[60px] resize-none"
+                          className="flex-1 min-h-[40px] text-sm p-2"
+                          style={{
+                            resize: 'none',
+                            overflow: 'hidden',
+                            height: 'auto',
+                            minHeight: '40px',
+                            maxHeight: '120px'
+                          }}
+                          onInput={(e) => {
+                            const target = e.target as HTMLTextAreaElement;
+                            target.style.height = 'auto';
+                            target.style.height = `${target.scrollHeight}px`;
+                          }}
                         />
                         <Button
                           variant="ghost"
