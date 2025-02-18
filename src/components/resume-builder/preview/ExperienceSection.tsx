@@ -4,7 +4,7 @@ import { ResumeTemplate } from "../templates";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Plus, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical } from "lucide-react";
 
 interface ExperienceSectionProps {
   experiences: WorkExperience[];
@@ -94,7 +94,7 @@ export function ExperienceSection({
                     type="checkbox"
                     id={`current-job-${index}`}
                     checked={exp.isCurrentJob}
-                    onChange={(e) => onUpdate?.(index, "isCurrentJob", e.target.checked)}
+                    onChange={(e) => onUpdate?.(index, "isCurrentJob", e.target.checked ? "true" : "false")}
                     className="rounded border-gray-300"
                   />
                   <label htmlFor={`current-job-${index}`} className="text-sm text-gray-600">

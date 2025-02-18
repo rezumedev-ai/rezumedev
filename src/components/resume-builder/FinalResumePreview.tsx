@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -11,6 +12,7 @@ import { EducationSection } from "./preview/EducationSection";
 import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
 import { DownloadOptionsDialog } from "./preview/DownloadOptionsDialog";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 
