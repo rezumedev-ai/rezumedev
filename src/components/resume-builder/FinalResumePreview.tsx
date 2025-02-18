@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ResumeData, WorkExperience } from "@/types/resume";
+import { ResumeData, WorkExperience, Education } from "@/types/resume";
 import { resumeTemplates } from "./templates";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
@@ -60,10 +60,8 @@ export function FinalResumePreview({
         newResumeData[section][field] = value;
       }
       
-      // Update local state immediately for better UX
       setResumeData(newResumeData);
       
-      // Update Supabase
       const updateData = {
         [section]: newResumeData[section] as unknown as Json
       };
@@ -124,6 +122,42 @@ export function FinalResumePreview({
       };
     }
     handleUpdateField("work_experience", "", newExperiences);
+  };
+
+  const handleAddEducation = () => {
+    const newEducation = [
+      ...resumeData.education,
+      {
+        degreeName: "",
+        schoolName: "",
+        startDate: "",
+        endDate: "",
+        isCurrentlyEnrolled: false
+      }
+    ];
+    handleUpdateField("education", "", newEducation);
+  };
+
+  const handleRemoveEducation = (index: number) => {
+    const newEducation = resumeData.education.filter((_, i) => i !== index);
+    handleUpdateField("education", "", newEducation);
+  };
+
+  const handleUpdateEducation = (index: number, field: keyof Education, value: string) => {
+    const newEducation = [...resumeData.education];
+    if (field === "isCurrentlyEnrolled") {
+      newEducation[index] = {
+        ...newEducation[index],
+        [field]: value === "true",
+        endDate: value === "true" ? "" : newEducation[index].endDate
+      };
+    } else {
+      newEducation[index] = {
+        ...newEducation[index],
+        [field]: value
+      };
+    }
+    handleUpdateField("education", "", newEducation);
   };
 
   useEffect(() => {
@@ -197,11 +231,9 @@ export function FinalResumePreview({
           education={resumeData.education}
           template={selectedTemplate}
           isEditing={isEditing}
-          onUpdate={(index, field, value) => {
-            const newEducation = [...resumeData.education];
-            newEducation[index] = { ...newEducation[index], [field]: value };
-            handleUpdateField("education", "", newEducation);
-          }}
+          onUpdate={handleUpdateEducation}
+          onAdd={handleAddEducation}
+          onRemove={handleRemoveEducation}
         />
 
         <SkillsSection
