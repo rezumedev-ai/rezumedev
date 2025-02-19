@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -15,6 +14,7 @@ import { DownloadOptionsDialog } from "./preview/DownloadOptionsDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
+import { cn } from "@/utils/cn";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -29,14 +29,13 @@ export function FinalResumePreview({
   const [isZoomed, setIsZoomed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [resumeData, setResumeData] = useState(initialResumeData);
+  const [selectedTemplateId, setSelectedTemplateId] = useState(initialResumeData.template_id || "executive-clean");
   const [isDownloading, setIsDownloading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-
-  const selectedTemplate = resumeTemplates[0];
 
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
@@ -73,7 +72,6 @@ export function FinalResumePreview({
         .eq("id", resumeId);
     } catch (error) {
       toast.error("Failed to save changes. Please try again.");
-      // Revert changes on error
       setResumeData(prevData => ({ ...prevData }));
     }
   };
@@ -94,6 +92,21 @@ export function FinalResumePreview({
   const handleRemoveExperience = (index: number) => {
     const newExperiences = resumeData.work_experience.filter((_, i) => i !== index);
     handleUpdateField("work_experience", "", newExperiences);
+  };
+
+  const handleTemplateChange = async (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    try {
+      await supabase
+        .from("resumes")
+        .update({ template_id: templateId })
+        .eq("id", resumeId);
+      
+      toast.success("Template updated successfully");
+    } catch (error) {
+      console.error('Error updating template:', error);
+      toast.error("Failed to update template");
+    }
   };
 
   useEffect(() => {
@@ -121,6 +134,8 @@ export function FinalResumePreview({
     window.addEventListener('resize', calculateScale);
     return () => window.removeEventListener('resize', calculateScale);
   }, [isMobile, isZoomed]);
+
+  const selectedTemplate = resumeTemplates.find(t => t.id === selectedTemplateId) || resumeTemplates[0];
 
   const renderContent = () => {
     return (
@@ -209,6 +224,8 @@ export function FinalResumePreview({
         onEdit={() => setIsEditing(!isEditing)}
         isEditing={isEditing}
         isDownloading={isDownloading}
+        onTemplateChange={handleTemplateChange}
+        selectedTemplate={selectedTemplateId}
       >
         <DownloadOptionsDialog isDownloading={isDownloading} />
       </ResumeHeader>
@@ -220,7 +237,10 @@ export function FinalResumePreview({
         <div 
           ref={resumeRef}
           id="resume-content"
-          className="bg-white shadow-lg mx-auto relative"
+          className={cn(
+            "bg-white shadow-lg mx-auto relative transition-all duration-200",
+            selectedTemplate.style.contentStyle
+          )}
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
@@ -230,9 +250,16 @@ export function FinalResumePreview({
         >
           <div 
             ref={contentRef}
-            className="w-full h-full p-12 text-black"
+            className={cn(
+              "w-full h-full",
+              `p-${selectedTemplate.style.spacing.contentPadding}`
+            )}
             style={{
-              fontFamily: 'Georgia, serif'
+              fontFamily: selectedTemplate.style.layout === "modern" ? 
+                'Inter, sans-serif' : 
+                selectedTemplate.style.layout === "minimal" ?
+                'Helvetica, Arial, sans-serif' :
+                'Georgia, serif'
             }}
           >
             {renderContent()}
