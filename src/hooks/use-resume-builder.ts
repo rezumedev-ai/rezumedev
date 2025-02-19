@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { ResumeData } from "@/types/resume";
+import { ResumeData, WorkExperience, Education, Certification } from "@/types/resume";
 import { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -56,32 +56,46 @@ export const useResumeBuilder = (id?: string) => {
 
   useEffect(() => {
     if (resume) {
+      const workExperience = Array.isArray(resume.work_experience) 
+        ? resume.work_experience.map((exp: any) => ({
+            jobTitle: exp.jobTitle || "",
+            companyName: exp.companyName || "",
+            location: exp.location,
+            startDate: exp.startDate || "",
+            endDate: exp.endDate || "",
+            isCurrentJob: exp.isCurrentJob || false,
+            responsibilities: Array.isArray(exp.responsibilities) ? exp.responsibilities : []
+          }))
+        : [];
+
+      const education = Array.isArray(resume.education)
+        ? resume.education.map((edu: any) => ({
+            degreeName: edu.degreeName || "",
+            schoolName: edu.schoolName || "",
+            startDate: edu.startDate || "",
+            endDate: edu.endDate || "",
+            isCurrentlyEnrolled: edu.isCurrentlyEnrolled || false
+          }))
+        : [];
+
+      const certifications = Array.isArray(resume.certifications)
+        ? resume.certifications.map((cert: any) => ({
+            name: cert.name || "",
+            organization: cert.organization || "",
+            completionDate: cert.completionDate || ""
+          }))
+        : [];
+
       setFormData({
         personal_info: resume.personal_info as ResumeData['personal_info'],
         professional_summary: resume.professional_summary as ResumeData['professional_summary'],
-        work_experience: (resume.work_experience as Json[] || []).map((exp) => ({
-          jobTitle: (exp as any).jobTitle || "",
-          companyName: (exp as any).companyName || "",
-          location: (exp as any).location,
-          startDate: (exp as any).startDate || "",
-          endDate: (exp as any).endDate || "",
-          isCurrentJob: (exp as any).isCurrentJob || false,
-          responsibilities: ((exp as any).responsibilities || []) as string[]
-        })),
-        education: (resume.education as Json[] || []).map((edu) => ({
-          degreeName: (edu as any).degreeName || "",
-          schoolName: (edu as any).schoolName || "",
-          startDate: (edu as any).startDate || "",
-          endDate: (edu as any).endDate || "",
-          isCurrentlyEnrolled: (edu as any).isCurrentlyEnrolled || false
-        })),
-        skills: (resume.skills || { hard_skills: [], soft_skills: [] }) as ResumeData['skills'],
-        certifications: (resume.certifications as Json[] || []).map((cert) => ({
-          name: (cert as any).name || "",
-          organization: (cert as any).organization || "",
-          completionDate: (cert as any).completionDate || ""
-        }))
+        work_experience: workExperience,
+        education: education,
+        skills: resume.skills || { hard_skills: [], soft_skills: [] },
+        certifications: certifications,
+        template_id: resume.template_id
       });
+      
       setCurrentStep(resume.current_step || 1);
     }
   }, [resume]);
@@ -100,7 +114,8 @@ export const useResumeBuilder = (id?: string) => {
       skills: formData.skills as Json,
       certifications: formData.certifications as unknown as Json[],
       current_step: currentStep,
-      completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft'
+      completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft',
+      template_id: formData.template_id
     };
 
     const { data, error } = await supabase
