@@ -86,12 +86,24 @@ export const useResumeBuilder = (id?: string) => {
           }))
         : [];
 
+      const defaultSkills = { hard_skills: [], soft_skills: [] };
+      const skills = resume.skills && typeof resume.skills === 'object'
+        ? {
+            hard_skills: Array.isArray((resume.skills as any).hard_skills) 
+              ? (resume.skills as any).hard_skills 
+              : [],
+            soft_skills: Array.isArray((resume.skills as any).soft_skills) 
+              ? (resume.skills as any).soft_skills 
+              : []
+          }
+        : defaultSkills;
+
       setFormData({
         personal_info: resume.personal_info as ResumeData['personal_info'],
         professional_summary: resume.professional_summary as ResumeData['professional_summary'],
         work_experience: workExperience,
         education: education,
-        skills: resume.skills || { hard_skills: [], soft_skills: [] },
+        skills,
         certifications: certifications,
         template_id: resume.template_id
       });
@@ -103,7 +115,7 @@ export const useResumeBuilder = (id?: string) => {
   const saveProgress = async () => {
     const isNew = !id;
 
-    const upsertData = {
+    const upsertData: Record<string, unknown> = {
       ...(id ? { id } : {}),
       user_id: user?.id,
       title: formData.professional_summary.title || "Untitled Resume",
@@ -111,7 +123,7 @@ export const useResumeBuilder = (id?: string) => {
       professional_summary: formData.professional_summary as Json,
       work_experience: formData.work_experience as unknown as Json[],
       education: formData.education as unknown as Json[],
-      skills: formData.skills as Json,
+      skills: formData.skills as unknown as Json,
       certifications: formData.certifications as unknown as Json[],
       current_step: currentStep,
       completion_status: currentStep === TOTAL_STEPS ? 'completed' : 'draft',
@@ -231,13 +243,17 @@ export const useResumeBuilder = (id?: string) => {
   };
 
   const handleInputChange = (section: keyof ResumeData, field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: {
+    setFormData(prev => {
+      const updatedSection = {
         ...prev[section],
         [field]: value
-      }
-    }));
+      };
+      
+      return {
+        ...prev,
+        [section]: updatedSection
+      };
+    });
   };
 
   return {
