@@ -1,6 +1,6 @@
 
 import { ResumeTemplate } from "../templates";
-import { Mail, Phone, Linkedin } from "lucide-react";
+import { Mail, Phone, Linkedin, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface PersonalSectionProps {
@@ -20,6 +20,7 @@ export function PersonalSection({
   email,
   phone,
   linkedin,
+  template,
   isEditing,
   onUpdate
 }: PersonalSectionProps) {
@@ -37,26 +38,33 @@ export function PersonalSection({
   };
 
   return (
-    <div className="mb-8 text-center border-b border-black pb-6">
-      <div className={`text-3xl font-bold text-black mb-2 uppercase tracking-wide ${isEditing ? 'space-y-2' : ''}`}>
-        {renderEditableField(fullName, "fullName", "Your Full Name")}
+    <div className={template.style.headerStyle}>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className={template.style.titleFont}>
+            {renderEditableField(fullName, "fullName", "Your Full Name")}
+          </h1>
+          <div className="text-gray-600 font-medium mt-1 text-lg">
+            {renderEditableField(title, "title", "Professional Title")}
+          </div>
+        </div>
       </div>
-      <div className={`text-lg font-semibold text-black mb-3 capitalize ${isEditing ? 'space-y-2' : ''}`}>
-        {renderEditableField(title, "title", "Professional Title")}
-      </div>
-      <div className={`flex flex-wrap justify-center gap-6 text-sm text-black ${isEditing ? 'space-y-2' : ''}`}>
-        <div className="flex items-center gap-1.5 w-full md:w-auto justify-center">
-          <Mail className="w-3.5 h-3.5 shrink-0" />
+      
+      <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
+        <div className="flex items-center gap-1.5">
+          <Mail className="w-4 h-4 text-gray-400" />
           {renderEditableField(email, "email", "Email Address")}
         </div>
-        <div className="flex items-center gap-1.5 w-full md:w-auto justify-center">
-          <Phone className="w-3.5 h-3.5 shrink-0" />
+        <div className="flex items-center gap-1.5">
+          <Phone className="w-4 h-4 text-gray-400" />
           {renderEditableField(phone, "phone", "Phone Number")}
         </div>
-        <div className="flex items-center gap-1.5 w-full md:w-auto justify-center">
-          <Linkedin className="w-3.5 h-3.5 shrink-0" />
-          {renderEditableField(linkedin || "", "linkedin", "LinkedIn Profile URL")}
-        </div>
+        {linkedin && (
+          <div className="flex items-center gap-1.5">
+            <Linkedin className="w-4 h-4 text-gray-400" />
+            {renderEditableField(linkedin, "linkedin", "LinkedIn Profile URL")}
+          </div>
+        )}
       </div>
     </div>
   );

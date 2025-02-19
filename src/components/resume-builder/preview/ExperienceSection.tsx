@@ -4,7 +4,7 @@ import { ResumeTemplate } from "../templates";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2, Briefcase } from "lucide-react";
 
 interface ExperienceSectionProps {
   experiences: WorkExperience[];
@@ -23,131 +23,85 @@ export function ExperienceSection({
   onAdd,
   onRemove
 }: ExperienceSectionProps) {
-  const renderEditableText = (
-    text: string, 
-    index: number, 
-    field: keyof WorkExperience,
-    placeholder: string,
-    isTextarea?: boolean
-  ) => {
-    if (!isEditing) return text;
-
-    const Component = isTextarea ? Textarea : Input;
-    return (
-      <Component
-        value={text}
-        onChange={(e) => onUpdate?.(index, field, e.target.value)}
-        placeholder={placeholder}
-        className="w-full"
-      />
-    );
-  };
-
   return (
-    <div className="mb-6 relative">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-base font-bold text-black uppercase tracking-wider border-b border-black pb-1">
+    <div className="mb-4">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className={template.style.sectionStyle}>
+          <Briefcase className="w-4 h-4" />
           Professional Experience
         </h3>
-        {isEditing && (
-          <Button
-            onClick={onAdd}
-            variant="outline"
-            size="sm"
-            className="text-xs"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Add Experience
+        {isEditing && onAdd && (
+          <Button onClick={onAdd} variant="ghost" size="sm" className="h-7 text-xs">
+            <Plus className="w-3.5 h-3.5 mr-1" />
+            Add
           </Button>
         )}
       </div>
-      <div className="space-y-5">
+      
+      <div className="space-y-3">
         {experiences.map((exp, index) => (
-          <div key={index} className="relative mb-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
-            {isEditing && (
+          <div key={index} className="relative pb-3">
+            {isEditing && onRemove && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute -right-2 -top-2 bg-white rounded-full shadow-sm hover:bg-red-50 text-gray-400 hover:text-red-500"
-                onClick={() => onRemove?.(index)}
+                className="absolute -right-1 -top-1 h-6 w-6 text-gray-400 hover:text-red-500"
+                onClick={() => onRemove(index)}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
             )}
-            <div className="space-y-4">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-baseline gap-2">
-                <div className="flex-1">
-                  {renderEditableText(exp.jobTitle, index, "jobTitle", "Job Title")}
+            
+            <div className="space-y-1">
+              <div className="flex justify-between items-baseline gap-4">
+                <div className="flex-1 font-medium">
+                  {isEditing ? (
+                    <Input
+                      value={exp.jobTitle}
+                      onChange={(e) => onUpdate?.(index, "jobTitle", e.target.value)}
+                      placeholder="Job Title"
+                      className="font-medium"
+                    />
+                  ) : (
+                    exp.jobTitle
+                  )}
                 </div>
-                <div className="flex gap-2 items-center text-xs">
-                  {renderEditableText(exp.startDate, index, "startDate", "Start Date")}
-                  <span>-</span>
-                  {exp.isCurrentJob ? 'Present' : renderEditableText(exp.endDate, index, "endDate", "End Date")}
+                <div className="text-xs text-gray-500 whitespace-nowrap">
+                  {exp.startDate} - {exp.isCurrentJob ? "Present" : exp.endDate}
                 </div>
               </div>
-              <div className="text-sm font-semibold">
-                {renderEditableText(exp.companyName, index, "companyName", "Company Name")}
-              </div>
-              {isEditing && (
-                <div className="flex items-center gap-2 mb-2">
-                  <input
-                    type="checkbox"
-                    id={`current-job-${index}`}
-                    checked={exp.isCurrentJob}
-                    onChange={(e) => onUpdate?.(index, "isCurrentJob", e.target.checked ? "true" : "false")}
-                    className="rounded border-gray-300"
+              
+              <div className="text-gray-600">
+                {isEditing ? (
+                  <Input
+                    value={exp.companyName}
+                    onChange={(e) => onUpdate?.(index, "companyName", e.target.value)}
+                    placeholder="Company Name"
                   />
-                  <label htmlFor={`current-job-${index}`} className="text-sm text-gray-600">
-                    I currently work here
-                  </label>
-                </div>
-              )}
-              <ul className="list-disc ml-4 text-sm space-y-2">
+                ) : (
+                  exp.companyName
+                )}
+              </div>
+              
+              <ul className="mt-2 space-y-1 text-gray-600 list-disc list-inside">
                 {exp.responsibilities.map((resp, respIndex) => (
-                  <li key={respIndex} className="text-sm">
+                  <li key={respIndex}>
                     {isEditing ? (
-                      <div className="flex gap-2">
-                        <Input
-                          value={resp}
-                          onChange={(e) => {
-                            const newResp = [...exp.responsibilities];
-                            newResp[respIndex] = e.target.value;
-                            onUpdate?.(index, "responsibilities", newResp);
-                          }}
-                          placeholder="Add responsibility"
-                          className="flex-1"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-gray-400 hover:text-red-500"
-                          onClick={() => {
-                            const newResp = exp.responsibilities.filter((_, i) => i !== respIndex);
-                            onUpdate?.(index, "responsibilities", newResp);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      <Textarea
+                        value={resp}
+                        onChange={(e) => {
+                          const newResp = [...exp.responsibilities];
+                          newResp[respIndex] = e.target.value;
+                          onUpdate?.(index, "responsibilities", newResp);
+                        }}
+                        placeholder="Add responsibility"
+                        className="min-h-[2.5rem] text-sm"
+                      />
                     ) : (
                       resp
                     )}
                   </li>
                 ))}
-                {isEditing && (
-                  <Button
-                    onClick={() => {
-                      const newResp = [...exp.responsibilities, ""];
-                      onUpdate?.(index, "responsibilities", newResp);
-                    }}
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs mt-2"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add Responsibility
-                  </Button>
-                )}
               </ul>
             </div>
           </div>
