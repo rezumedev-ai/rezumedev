@@ -20,6 +20,23 @@ export interface ResumeTemplate {
       sectionGap: string;
       itemGap: string;
       contentPadding: string;
+      headerHeight: string;
+      margins: {
+        top: string;
+        right: string;
+        bottom: string;
+        left: string;
+      };
+    };
+    dimensions: {
+      maxWidth: string;
+      minHeight: string;
+    };
+    typography: {
+      titleSize: string;
+      subtitleSize: string;
+      bodySize: string;
+      lineHeight: string;
     };
     icons: {
       sections: boolean;
@@ -51,7 +68,24 @@ export const resumeTemplates: ResumeTemplate[] = [
       spacing: {
         sectionGap: "2rem",
         itemGap: "1.5rem",
-        contentPadding: "2.5rem"
+        contentPadding: "2.5rem",
+        headerHeight: "180px",
+        margins: {
+          top: "60px",
+          right: "60px",
+          bottom: "60px",
+          left: "60px"
+        }
+      },
+      dimensions: {
+        maxWidth: "816px", // A4 width in pixels
+        minHeight: "1056px" // A4 height in pixels
+      },
+      typography: {
+        titleSize: "32px",
+        subtitleSize: "18px",
+        bodySize: "14px",
+        lineHeight: "1.5"
       },
       icons: {
         sections: true,
@@ -81,7 +115,24 @@ export const resumeTemplates: ResumeTemplate[] = [
       spacing: {
         sectionGap: "1.75rem",
         itemGap: "1.25rem",
-        contentPadding: "2rem"
+        contentPadding: "2rem",
+        headerHeight: "160px",
+        margins: {
+          top: "50px",
+          right: "50px",
+          bottom: "50px",
+          left: "50px"
+        }
+      },
+      dimensions: {
+        maxWidth: "816px",
+        minHeight: "1056px"
+      },
+      typography: {
+        titleSize: "28px",
+        subtitleSize: "16px",
+        bodySize: "13px",
+        lineHeight: "1.6"
       },
       icons: {
         sections: true,
@@ -111,7 +162,24 @@ export const resumeTemplates: ResumeTemplate[] = [
       spacing: {
         sectionGap: "2.25rem",
         itemGap: "1.5rem",
-        contentPadding: "2.25rem"
+        contentPadding: "2.25rem",
+        headerHeight: "170px",
+        margins: {
+          top: "55px",
+          right: "55px",
+          bottom: "55px",
+          left: "55px"
+        }
+      },
+      dimensions: {
+        maxWidth: "816px",
+        minHeight: "1056px"
+      },
+      typography: {
+        titleSize: "36px",
+        subtitleSize: "14px",
+        bodySize: "13px",
+        lineHeight: "1.5"
       },
       icons: {
         sections: true,
@@ -141,7 +209,24 @@ export const resumeTemplates: ResumeTemplate[] = [
       spacing: {
         sectionGap: "1.5rem",
         itemGap: "1rem",
-        contentPadding: "2rem"
+        contentPadding: "2rem",
+        headerHeight: "150px",
+        margins: {
+          top: "45px",
+          right: "45px",
+          bottom: "45px",
+          left: "45px"
+        }
+      },
+      dimensions: {
+        maxWidth: "816px",
+        minHeight: "1056px"
+      },
+      typography: {
+        titleSize: "24px",
+        subtitleSize: "16px",
+        bodySize: "13px",
+        lineHeight: "1.4"
       },
       icons: {
         sections: true,

@@ -1,8 +1,14 @@
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Edit2, Download } from "lucide-react";
-import { ResumeTemplate } from "../templates";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { resumeTemplates } from "../templates";
 
 interface ResumeHeaderProps {
   onBack: () => void;
@@ -38,18 +44,21 @@ export function ResumeHeader({
           </Button>
 
           {onTemplateChange && (
-            <Tabs
-              defaultValue={selectedTemplate}
-              className="w-[400px]"
+            <Select
+              value={selectedTemplate}
               onValueChange={onTemplateChange}
             >
-              <TabsList className="grid grid-cols-4">
-                <TabsTrigger value="executive-clean">Classic</TabsTrigger>
-                <TabsTrigger value="modern-split">Modern</TabsTrigger>
-                <TabsTrigger value="minimal-elegant">Minimal</TabsTrigger>
-                <TabsTrigger value="professional-executive">Executive</TabsTrigger>
-              </TabsList>
-            </Tabs>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select template" />
+              </SelectTrigger>
+              <SelectContent>
+                {resumeTemplates.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    {template.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
         </div>
 

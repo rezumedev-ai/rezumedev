@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -243,24 +242,28 @@ export function FinalResumePreview({
             selectedTemplate.style.contentStyle
           )}
           style={{
-            width: `${A4_WIDTH_PX}px`,
-            height: `${A4_HEIGHT_PX}px`,
+            width: selectedTemplate.style.dimensions.maxWidth,
+            minHeight: selectedTemplate.style.dimensions.minHeight,
             transform: `scale(${scale})`,
             transformOrigin: 'top center',
+            padding: selectedTemplate.style.spacing.margins.top,
+            paddingRight: selectedTemplate.style.spacing.margins.right,
+            paddingBottom: selectedTemplate.style.spacing.margins.bottom,
+            paddingLeft: selectedTemplate.style.spacing.margins.left,
           }}
         >
           <div 
             ref={contentRef}
-            className={cn(
-              "w-full h-full",
-              `p-${selectedTemplate.style.spacing.contentPadding}`
-            )}
+            className="w-full h-full"
             style={{
               fontFamily: selectedTemplate.style.layout === "modern" ? 
                 'Inter, sans-serif' : 
                 selectedTemplate.style.layout === "minimal" ?
                 'Helvetica, Arial, sans-serif' :
-                'Georgia, serif'
+                'Georgia, serif',
+              fontSize: selectedTemplate.style.typography.bodySize,
+              lineHeight: selectedTemplate.style.typography.lineHeight,
+              color: selectedTemplate.style.colors.text
             }}
           >
             {renderContent()}
