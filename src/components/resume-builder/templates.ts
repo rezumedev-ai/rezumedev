@@ -108,8 +108,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     imageUrl: "/lovable-uploads/eca7a378-81fd-4d29-9194-b292d08d283c.png",
     style: {
       titleFont: "font-serif text-[24px] font-bold tracking-normal text-gray-900",
-      headerStyle: "mb-6 pb-3 border-b-2 border
-      -gray-900",
+      headerStyle: "mb-6 pb-3 border-b-2 border-gray-900",
       sectionStyle: "text-[16px] font-bold text-gray-900 uppercase tracking-wide mb-3",
       contentStyle: "space-y-3 text-[13px] leading-snug",
       layout: "executive",
