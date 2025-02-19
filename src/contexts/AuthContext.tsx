@@ -28,23 +28,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
-    });
-
-    // Listen for changes on auth state (signed in, signed out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-
-      if (event === 'SIGNED_IN') {
-        navigate('/dashboard');
-      }
       
-      if (event === 'SIGNED_OUT') {
+      // If no session exists and we're not already on the login page,
+      // redirect to login
+      if (!session && window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
         navigate('/login');
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Listen for changes on auth state (signed in, signed out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+
+      // Handle different auth events
+      switch (event) {
+        case 'SIGNED_IN':
+          navigate('/dashboard');
+          break;
+        case 'SIGNED_OUT':
+          navigate('/login');
+          break;
+        case 'TOKEN_REFRESHED':
+          // Session has been refreshed, update the user
+          setUser(session?.user ?? null);
+          break;
+        case 'USER_UPDATED':
+          setUser(session?.user ?? null);
+          break;
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const signOut = async () => {
@@ -56,6 +73,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         title: "Signed out successfully",
         description: "Come back soon!",
       });
+
+      // Clear any persisted tokens
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Ensure user is set to null
+      setUser(null);
+      
+      // Navigate to login page
+      navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
       toast({

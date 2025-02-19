@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -12,7 +11,6 @@ import { Link } from "react-router-dom";
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,7 +33,9 @@ const Login = () => {
         description: "You have successfully logged in",
       });
       
-      // Auth state change listener will handle navigation
+      // Clear any stale tokens from localStorage
+      localStorage.removeItem('supabase.auth.token');
+      
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -123,4 +123,3 @@ const Login = () => {
 };
 
 export default Login;
-
