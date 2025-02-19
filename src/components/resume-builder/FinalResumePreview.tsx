@@ -14,6 +14,7 @@ import { CertificationsSection } from "./preview/CertificationsSection";
 import { DownloadOptionsDialog } from "./preview/DownloadOptionsDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 import { cn } from "@/utils/cn";
 
 interface FinalResumePreviewProps {

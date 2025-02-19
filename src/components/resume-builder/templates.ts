@@ -1,4 +1,3 @@
-
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -21,6 +20,11 @@ export interface ResumeTemplate {
       sectionGap: string;
       itemGap: string;
       contentPadding: string;
+    };
+    icons: {
+      sections: boolean;
+      contact: boolean;
+      bullets: "dot" | "dash" | "arrow" | "none";
     };
   };
 }
@@ -48,6 +52,11 @@ export const resumeTemplates: ResumeTemplate[] = [
         sectionGap: "2rem",
         itemGap: "1.5rem",
         contentPadding: "2.5rem"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "arrow"
       }
     }
   },
@@ -73,6 +82,11 @@ export const resumeTemplates: ResumeTemplate[] = [
         sectionGap: "1.75rem",
         itemGap: "1.25rem",
         contentPadding: "2rem"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "arrow"
       }
     }
   },
@@ -98,6 +112,11 @@ export const resumeTemplates: ResumeTemplate[] = [
         sectionGap: "2.25rem",
         itemGap: "1.5rem",
         contentPadding: "2.25rem"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "arrow"
       }
     }
   },
@@ -123,6 +142,11 @@ export const resumeTemplates: ResumeTemplate[] = [
         sectionGap: "1.5rem",
         itemGap: "1rem",
         contentPadding: "2rem"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "arrow"
       }
     }
   }

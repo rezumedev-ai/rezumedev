@@ -42,4 +42,5 @@ export interface ResumeData {
     soft_skills: string[];
   };
   certifications: Certification[];
+  template_id?: string;
 }
