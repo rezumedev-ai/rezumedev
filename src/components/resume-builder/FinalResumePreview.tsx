@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ResumeData, WorkExperience, Education } from "@/types/resume";
+import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
@@ -40,6 +40,7 @@ export function FinalResumePreview({
 
   const A4_WIDTH_PX = 794;
   const A4_HEIGHT_PX = 1123;
+  const CONTENT_MARGIN = 48;
 
   const handleBack = () => {
     navigate("/dashboard");
@@ -51,113 +52,48 @@ export function FinalResumePreview({
     value: any,
     subsection?: string
   ) => {
+    const newResumeData = { ...resumeData };
+    
+    if (subsection) {
+      newResumeData[section][subsection][field] = value;
+    } else {
+      newResumeData[section][field] = value;
+    }
+    
+    setResumeData(newResumeData);
+    
     try {
-      const newResumeData = { ...resumeData };
-      
-      if (subsection) {
-        newResumeData[section][subsection][field] = value;
-      } else {
-        newResumeData[section][field] = value;
-      }
-      
-      setResumeData(newResumeData);
-      
       const updateData = {
         [section]: newResumeData[section] as unknown as Json
       };
       
-      const { error } = await supabase
+      await supabase
         .from("resumes")
         .update(updateData)
         .eq("id", resumeId);
-
-      if (error) throw error;
-
-      toast.success("Changes saved", {
-        duration: 1000,
-        position: "bottom-right",
-      });
     } catch (error) {
-      console.error('Error updating resume:', error);
-      toast.error("Failed to save changes. Please try again.", {
-        duration: 3000,
-      });
+      toast.error("Failed to save changes. Please try again.");
+      // Revert changes on error
       setResumeData(prevData => ({ ...prevData }));
     }
   };
 
   const handleAddExperience = () => {
-    const newExperiences = [
-      ...resumeData.work_experience,
-      {
-        jobTitle: "",
-        companyName: "",
-        location: "",
-        startDate: "",
-        endDate: "",
-        isCurrentJob: false,
-        responsibilities: [""]
-      }
-    ];
+    const newExperiences = [...resumeData.work_experience, {
+      jobTitle: "",
+      companyName: "",
+      location: "",
+      startDate: "",
+      endDate: "",
+      isCurrentJob: false,
+      responsibilities: [""]
+    }];
     handleUpdateField("work_experience", "", newExperiences);
   };
 
   const handleRemoveExperience = (index: number) => {
     const newExperiences = resumeData.work_experience.filter((_, i) => i !== index);
     handleUpdateField("work_experience", "", newExperiences);
-  };
-
-  const handleUpdateExperience = (index: number, field: keyof WorkExperience, value: string | string[]) => {
-    const newExperiences = [...resumeData.work_experience];
-    if (field === "isCurrentJob") {
-      newExperiences[index] = {
-        ...newExperiences[index],
-        [field]: value === "true",
-        endDate: value === "true" ? "" : newExperiences[index].endDate
-      };
-    } else {
-      newExperiences[index] = {
-        ...newExperiences[index],
-        [field]: value
-      };
-    }
-    handleUpdateField("work_experience", "", newExperiences);
-  };
-
-  const handleAddEducation = () => {
-    const newEducation = [
-      ...resumeData.education,
-      {
-        degreeName: "",
-        schoolName: "",
-        startDate: "",
-        endDate: "",
-        isCurrentlyEnrolled: false
-      }
-    ];
-    handleUpdateField("education", "", newEducation);
-  };
-
-  const handleRemoveEducation = (index: number) => {
-    const newEducation = resumeData.education.filter((_, i) => i !== index);
-    handleUpdateField("education", "", newEducation);
-  };
-
-  const handleUpdateEducation = (index: number, field: keyof Education, value: string) => {
-    const newEducation = [...resumeData.education];
-    if (field === "isCurrentlyEnrolled") {
-      newEducation[index] = {
-        ...newEducation[index],
-        [field]: value === "true",
-        endDate: value === "true" ? "" : newEducation[index].endDate
-      };
-    } else {
-      newEducation[index] = {
-        ...newEducation[index],
-        [field]: value
-      };
-    }
-    handleUpdateField("education", "", newEducation);
   };
 
   useEffect(() => {
@@ -188,7 +124,7 @@ export function FinalResumePreview({
 
   const renderContent = () => {
     return (
-      <div className="max-w-[700px] mx-auto space-y-6">
+      <div className="max-w-[700px] mx-auto">
         <PersonalSection
           fullName={resumeData.personal_info.fullName}
           title={resumeData.professional_summary.title}
@@ -210,7 +146,7 @@ export function FinalResumePreview({
                 value={resumeData.professional_summary.summary}
                 onChange={(e) => handleUpdateField("professional_summary", "summary", e.target.value)}
                 placeholder="Write a brief professional summary"
-                className="w-full min-h-[80px] max-h-[160px] resize-none"
+                className="w-full h-24 resize-none"
               />
             ) : (
               resumeData.professional_summary.summary
@@ -222,7 +158,11 @@ export function FinalResumePreview({
           experiences={resumeData.work_experience}
           template={selectedTemplate}
           isEditing={isEditing}
-          onUpdate={handleUpdateExperience}
+          onUpdate={(index, field, value) => {
+            const newExperiences = [...resumeData.work_experience];
+            newExperiences[index] = { ...newExperiences[index], [field]: value };
+            handleUpdateField("work_experience", "", newExperiences);
+          }}
           onAdd={handleAddExperience}
           onRemove={handleRemoveExperience}
         />
@@ -231,9 +171,11 @@ export function FinalResumePreview({
           education={resumeData.education}
           template={selectedTemplate}
           isEditing={isEditing}
-          onUpdate={handleUpdateEducation}
-          onAdd={handleAddEducation}
-          onRemove={handleRemoveEducation}
+          onUpdate={(index, field, value) => {
+            const newEducation = [...resumeData.education];
+            newEducation[index] = { ...newEducation[index], [field]: value };
+            handleUpdateField("education", "", newEducation);
+          }}
         />
 
         <SkillsSection
@@ -278,9 +220,7 @@ export function FinalResumePreview({
         <div 
           ref={resumeRef}
           id="resume-content"
-          className={`bg-white shadow-lg mx-auto relative transition-all duration-200 ${
-            isEditing ? 'shadow-xl ring-1 ring-primary/10' : ''
-          }`}
+          className="bg-white shadow-lg mx-auto relative"
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,
@@ -290,7 +230,7 @@ export function FinalResumePreview({
         >
           <div 
             ref={contentRef}
-            className="w-full h-full p-12 overflow-auto text-black"
+            className="w-full h-full p-12 text-black"
             style={{
               fontFamily: 'Georgia, serif'
             }}
