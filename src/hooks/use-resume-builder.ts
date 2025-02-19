@@ -10,6 +10,21 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const TOTAL_STEPS = 7;
 
+type ResumeUpsertData = {
+  id?: string;
+  user_id: string;
+  title: string;
+  personal_info: Json;
+  professional_summary: Json;
+  work_experience: Json[];
+  education: Json[];
+  skills: Json;
+  certifications: Json[];
+  current_step: number;
+  completion_status: string;
+  template_id?: string;
+};
+
 export const useResumeBuilder = (id?: string) => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -113,11 +128,13 @@ export const useResumeBuilder = (id?: string) => {
   }, [resume]);
 
   const saveProgress = async () => {
+    if (!user?.id) return null;
+    
     const isNew = !id;
 
-    const upsertData: Record<string, unknown> = {
+    const upsertData: ResumeUpsertData = {
       ...(id ? { id } : {}),
-      user_id: user?.id,
+      user_id: user.id,
       title: formData.professional_summary.title || "Untitled Resume",
       personal_info: formData.personal_info as Json,
       professional_summary: formData.professional_summary as Json,
@@ -243,15 +260,17 @@ export const useResumeBuilder = (id?: string) => {
   };
 
   const handleInputChange = (section: keyof ResumeData, field: string, value: any) => {
-    setFormData(prev => {
-      const updatedSection = {
-        ...prev[section],
-        [field]: value
-      };
-      
+    setFormData(prevData => {
+      if (!prevData[section] || typeof prevData[section] !== 'object') {
+        return prevData;
+      }
+
       return {
-        ...prev,
-        [section]: updatedSection
+        ...prevData,
+        [section]: {
+          ...(prevData[section] as object),
+          [field]: value
+        }
       };
     });
   };
