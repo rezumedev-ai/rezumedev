@@ -61,15 +61,22 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         typeof exp.endDate === 'string' &&
         Array.isArray(exp.responsibilities)
       ) {
-        return {
+        const workExp: WorkExperience = {
           jobTitle: exp.jobTitle,
           companyName: exp.companyName,
           startDate: exp.startDate,
           endDate: exp.endDate,
-          responsibilities: exp.responsibilities.filter((r): r is string => typeof r === 'string'),
-          location: typeof exp.location === 'string' ? exp.location : undefined,
-          isCurrentJob: typeof exp.isCurrentJob === 'boolean' ? exp.isCurrentJob : false
+          responsibilities: exp.responsibilities.filter((r): r is string => typeof r === 'string')
         };
+
+        if (typeof exp.location === 'string') {
+          workExp.location = exp.location;
+        }
+        if (typeof exp.isCurrentJob === 'boolean') {
+          workExp.isCurrentJob = exp.isCurrentJob;
+        }
+
+        return workExp;
       }
       return null;
     }).filter((item): item is WorkExperience => item !== null);
@@ -86,13 +93,18 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         typeof edu.startDate === 'string' &&
         typeof edu.endDate === 'string'
       ) {
-        return {
+        const education: Education = {
           degreeName: edu.degreeName,
           schoolName: edu.schoolName,
           startDate: edu.startDate,
-          endDate: edu.endDate,
-          isCurrentlyEnrolled: typeof edu.isCurrentlyEnrolled === 'boolean' ? edu.isCurrentlyEnrolled : false
+          endDate: edu.endDate
         };
+
+        if (typeof edu.isCurrentlyEnrolled === 'boolean') {
+          education.isCurrentlyEnrolled = edu.isCurrentlyEnrolled;
+        }
+
+        return education;
       }
       return null;
     }).filter((item): item is Education => item !== null);
