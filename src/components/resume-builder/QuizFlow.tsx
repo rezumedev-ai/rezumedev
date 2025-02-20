@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft } from "lucide-react";
@@ -15,6 +14,7 @@ import { questions } from "./quiz/questions";
 import { ResumeData } from "@/types/resume";
 import { Json } from "@/integrations/supabase/types";
 import { LoadingState } from "./LoadingState";
+import { useQuery } from "@tanstack/react-query";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -48,9 +48,89 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
   });
 
+  const { data: existingData } = useQuery({
+    queryKey: ['resume-data', resumeId],
+    queryFn: async () => {
+      const [resumeResponse, quizResponse] = await Promise.all([
+        supabase.from('resumes').select('*').eq('id', resumeId).single(),
+        supabase.from('resume_quiz_responses').select('*').eq('resume_id', resumeId)
+      ]);
+
+      if (resumeResponse.error) throw resumeResponse.error;
+      
+      return {
+        resume: resumeResponse.data,
+        quizResponses: quizResponse.data || []
+      };
+    }
+  });
+
+  useEffect(() => {
+    if (existingData?.resume) {
+      const resume = existingData.resume;
+      setFormData({
+        personal_info: resume.personal_info as ResumeData['personal_info'] || formData.personal_info,
+        professional_summary: resume.professional_summary as ResumeData['professional_summary'] || formData.professional_summary,
+        work_experience: resume.work_experience as ResumeData['work_experience'] || [],
+        education: resume.education as ResumeData['education'] || [],
+        certifications: resume.certifications as ResumeData['certifications'] || [],
+        skills: resume.skills as ResumeData['skills'] || { hard_skills: [], soft_skills: [] }
+      });
+
+      const lastResponse = existingData.quizResponses
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+      
+      if (lastResponse) {
+        const questionIndex = questions.findIndex(q => q.field === lastResponse.question_key);
+        if (questionIndex !== -1) {
+          setCurrentQuestionIndex(questionIndex);
+        }
+      }
+    }
+  }, [existingData]);
+
   const currentQuestion = questions[currentQuestionIndex];
 
-  const handleInputChange = (value: string) => {
+  const saveQuizResponse = async (field: string, value: any) => {
+    try {
+      await supabase.from('resume_quiz_responses').insert({
+        resume_id: resumeId,
+        question_key: field,
+        response: value
+      });
+
+      if (currentQuestion.type === "professional_summary") {
+        await supabase
+          .from('resumes')
+          .update({
+            professional_summary: {
+              ...formData.professional_summary,
+              [field]: value
+            }
+          })
+          .eq('id', resumeId);
+      } else {
+        await supabase
+          .from('resumes')
+          .update({
+            personal_info: {
+              ...formData.personal_info,
+              [field]: value
+            }
+          })
+          .eq('id', resumeId);
+      }
+    } catch (error) {
+      console.error('Error saving quiz response:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save your response. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleInputChange = async (value: string) => {
     if (currentQuestion.type === "professional_summary") {
       setFormData(prev => ({
         ...prev,
@@ -68,6 +148,8 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         }
       }));
     }
+    
+    await saveQuizResponse(currentQuestion.field, value);
   };
 
   const handleNext = async () => {
@@ -95,8 +177,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     if (currentStep === quizSteps.length - 1) {
       try {
         setIsEnhancing(true);
-        // Cast the arrays to Json[] type to satisfy TypeScript
-        const { error } = await supabase
+        await supabase
           .from('resumes')
           .update({
             personal_info: formData.personal_info as Json,
@@ -107,10 +188,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             completion_status: 'enhancing'
           })
           .eq('id', resumeId);
-
-        if (error) throw error;
         
-        setShowPreview(true);
         await enhanceResume();
       } catch (error) {
         setIsEnhancing(false);
@@ -151,7 +229,34 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
 
       if (error) throw error;
 
-      onComplete();
+      const checkEnhancement = setInterval(async () => {
+        const { data, error } = await supabase
+          .from('resumes')
+          .select('completion_status')
+          .eq('id', resumeId)
+          .single();
+
+        if (error) {
+          clearInterval(checkEnhancement);
+          throw error;
+        }
+
+        if (data.completion_status === 'completed') {
+          clearInterval(checkEnhancement);
+          onComplete();
+        }
+      }, 2000);
+
+      setTimeout(() => {
+        clearInterval(checkEnhancement);
+        setIsEnhancing(false);
+        toast({
+          title: "Enhancement taking longer than expected",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      }, 120000);
+
     } catch (error) {
       console.error('Error enhancing resume:', error);
       setIsEnhancing(false);
@@ -279,4 +384,3 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     </div>
   );
 }
-
