@@ -148,10 +148,10 @@ export function FinalResumePreview({
         <div className="max-w-[750px] mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1 break-words">
+            <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1">
               {resumeData.personal_info.fullName}
             </h1>
-            <div className="text-[20px] font-light italic text-gray-600 break-words">
+            <div className="text-[20px] font-light italic text-gray-600">
               {resumeData.professional_summary.title}
             </div>
           </div>
@@ -254,7 +254,7 @@ export function FinalResumePreview({
                 <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
                   Profile
                 </h2>
-                <p className="text-[14px] text-gray-700 leading-relaxed max-w-none">
+                <p className="text-[14px] text-gray-700 leading-relaxed w-full">
                   {resumeData.professional_summary.summary}
                 </p>
               </div>
@@ -269,7 +269,7 @@ export function FinalResumePreview({
                     {resumeData.work_experience.map((exp, index) => (
                       <div key={index} className="pb-2">
                         <div 
-                          className="font-bold uppercase text-gray-900"
+                          className="font-bold uppercase text-gray-900 w-full"
                           style={{ fontSize: jobTitleFontSize }}
                         >
                           {exp.jobTitle}
@@ -285,7 +285,7 @@ export function FinalResumePreview({
                             <li key={idx} className="flex items-start gap-2">
                               <div className="w-1.5 h-1.5 rounded-full bg-black mt-[7px] shrink-0" />
                               <span 
-                                className="text-[14px] text-gray-700"
+                                className="text-[14px] text-gray-700 w-full"
                                 style={{ lineHeight: responsibilitiesLineHeight }}
                               >
                                 {resp}
