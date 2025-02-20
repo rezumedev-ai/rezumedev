@@ -11,7 +11,7 @@ import { ResumePreview } from "./ResumePreview";
 import { QuestionForm } from "./quiz/QuestionForm";
 import { QuizProgress, quizSteps } from "./quiz/QuizProgress";
 import { questions } from "./quiz/questions";
-import { ResumeData } from "@/types/resume";
+import { ResumeData, WorkExperience, Education, Certification } from "@/types/resume";
 import { Json } from "@/integrations/supabase/types";
 import { LoadingState } from "./LoadingState";
 import { useQuery } from "@tanstack/react-query";
@@ -48,6 +48,45 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
   });
 
+  const isWorkExperience = (item: Json): item is WorkExperience => {
+    return typeof item === 'object' && item !== null &&
+      'jobTitle' in item &&
+      'companyName' in item &&
+      'startDate' in item &&
+      'endDate' in item &&
+      'responsibilities' in item;
+  };
+
+  const isEducation = (item: Json): item is Education => {
+    return typeof item === 'object' && item !== null &&
+      'degreeName' in item &&
+      'schoolName' in item &&
+      'startDate' in item &&
+      'endDate' in item;
+  };
+
+  const isCertification = (item: Json): item is Certification => {
+    return typeof item === 'object' && item !== null &&
+      'name' in item &&
+      'organization' in item &&
+      'completionDate' in item;
+  };
+
+  const convertWorkExperience = (json: Json[] | null): WorkExperience[] => {
+    if (!Array.isArray(json)) return [];
+    return json.filter(isWorkExperience);
+  };
+
+  const convertEducation = (json: Json[] | null): Education[] => {
+    if (!Array.isArray(json)) return [];
+    return json.filter(isEducation);
+  };
+
+  const convertCertifications = (json: Json[] | null): Certification[] => {
+    if (!Array.isArray(json)) return [];
+    return json.filter(isCertification);
+  };
+
   const { data: existingData } = useQuery({
     queryKey: ['resume-data', resumeId],
     queryFn: async () => {
@@ -71,9 +110,9 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       setFormData({
         personal_info: resume.personal_info as ResumeData['personal_info'] || formData.personal_info,
         professional_summary: resume.professional_summary as ResumeData['professional_summary'] || formData.professional_summary,
-        work_experience: resume.work_experience as ResumeData['work_experience'] || [],
-        education: resume.education as ResumeData['education'] || [],
-        certifications: resume.certifications as ResumeData['certifications'] || [],
+        work_experience: convertWorkExperience(resume.work_experience),
+        education: convertEducation(resume.education),
+        certifications: convertCertifications(resume.certifications),
         skills: resume.skills as ResumeData['skills'] || { hard_skills: [], soft_skills: [] }
       });
 
