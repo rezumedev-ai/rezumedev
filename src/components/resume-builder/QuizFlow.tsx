@@ -49,62 +49,73 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
   });
 
-  const isWorkExperience = (item: unknown): item is WorkExperience => {
-    if (!item || typeof item !== 'object') return false;
-    const exp = item as Record<string, unknown>;
-    return (
-      'jobTitle' in exp &&
-      'companyName' in exp &&
-      'startDate' in exp &&
-      'endDate' in exp &&
-      'responsibilities' in exp &&
-      Array.isArray(exp.responsibilities)
-    );
-  };
-
-  const isEducation = (item: unknown): item is Education => {
-    if (!item || typeof item !== 'object') return false;
-    const edu = item as Record<string, unknown>;
-    return (
-      'degreeName' in edu &&
-      'schoolName' in edu &&
-      'startDate' in edu &&
-      'endDate' in edu
-    );
-  };
-
-  const isCertification = (item: unknown): item is Certification => {
-    if (!item || typeof item !== 'object') return false;
-    const cert = item as Record<string, unknown>;
-    return (
-      'name' in cert &&
-      'organization' in cert &&
-      'completionDate' in cert
-    );
-  };
-
   const convertWorkExperience = (json: Json[] | null): WorkExperience[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter((item): item is WorkExperience => {
-      if (!item || typeof item !== 'object') return false;
-      return isWorkExperience(item);
-    });
+    return json.map(item => {
+      if (typeof item !== 'object' || !item) return null;
+      const exp = item as Record<string, unknown>;
+      if (
+        typeof exp.jobTitle === 'string' &&
+        typeof exp.companyName === 'string' &&
+        typeof exp.startDate === 'string' &&
+        typeof exp.endDate === 'string' &&
+        Array.isArray(exp.responsibilities)
+      ) {
+        return {
+          jobTitle: exp.jobTitle,
+          companyName: exp.companyName,
+          startDate: exp.startDate,
+          endDate: exp.endDate,
+          responsibilities: exp.responsibilities.filter((r): r is string => typeof r === 'string'),
+          location: typeof exp.location === 'string' ? exp.location : undefined,
+          isCurrentJob: typeof exp.isCurrentJob === 'boolean' ? exp.isCurrentJob : false
+        };
+      }
+      return null;
+    }).filter((item): item is WorkExperience => item !== null);
   };
 
   const convertEducation = (json: Json[] | null): Education[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter((item): item is Education => {
-      if (!item || typeof item !== 'object') return false;
-      return isEducation(item);
-    });
+    return json.map(item => {
+      if (typeof item !== 'object' || !item) return null;
+      const edu = item as Record<string, unknown>;
+      if (
+        typeof edu.degreeName === 'string' &&
+        typeof edu.schoolName === 'string' &&
+        typeof edu.startDate === 'string' &&
+        typeof edu.endDate === 'string'
+      ) {
+        return {
+          degreeName: edu.degreeName,
+          schoolName: edu.schoolName,
+          startDate: edu.startDate,
+          endDate: edu.endDate,
+          isCurrentlyEnrolled: typeof edu.isCurrentlyEnrolled === 'boolean' ? edu.isCurrentlyEnrolled : false
+        };
+      }
+      return null;
+    }).filter((item): item is Education => item !== null);
   };
 
   const convertCertifications = (json: Json[] | null): Certification[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter((item): item is Certification => {
-      if (!item || typeof item !== 'object') return false;
-      return isCertification(item);
-    });
+    return json.map(item => {
+      if (typeof item !== 'object' || !item) return null;
+      const cert = item as Record<string, unknown>;
+      if (
+        typeof cert.name === 'string' &&
+        typeof cert.organization === 'string' &&
+        typeof cert.completionDate === 'string'
+      ) {
+        return {
+          name: cert.name,
+          organization: cert.organization,
+          completionDate: cert.completionDate
+        };
+      }
+      return null;
+    }).filter((item): item is Certification => item !== null);
   };
 
   // Fetch existing resume data and quiz responses
