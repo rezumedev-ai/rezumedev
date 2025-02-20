@@ -141,43 +141,48 @@ export function FinalResumePreview({
   const renderContent = () => {
     if (selectedTemplate.id === "professional-executive") {
       return (
-        <div className="max-w-[700px] mx-auto">
+        <div className="max-w-[750px] mx-auto">
           {/* Header */}
-          <div className={selectedTemplate.style.headerStyle}>
-            <h1 className={selectedTemplate.style.titleFont}>
+          <div className="mb-8">
+            <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1 whitespace-nowrap overflow-hidden text-ellipsis">
               {resumeData.personal_info.fullName}
             </h1>
-            <div className="text-[20px] font-light italic text-gray-600">
+            <div className="text-[20px] font-light italic text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">
               {resumeData.professional_summary.title}
             </div>
           </div>
 
           {/* Two Column Layout */}
-          <div className="grid grid-cols-12 gap-8">
+          <div className="grid grid-cols-[280px_1fr] gap-8 relative">
+            {/* Vertical Divider */}
+            <div className="absolute left-[280px] top-0 bottom-0 w-[1px] bg-gray-300" />
+
             {/* Left Column */}
-            <div className="col-span-4 space-y-8">
+            <div className="pr-8 space-y-7">
               {/* Contact Section */}
               <div>
-                <h2 className={selectedTemplate.style.sectionStyle}>Contact</h2>
+                <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
+                  Contact
+                </h2>
                 <div className="space-y-2 text-[14px]">
                   <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    {resumeData.personal_info.phone}
+                    <Phone className="w-4 h-4 shrink-0" />
+                    <span className="text-gray-700">{resumeData.personal_info.phone}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    {resumeData.personal_info.email}
+                    <Mail className="w-4 h-4 shrink-0" />
+                    <span className="text-gray-700">{resumeData.personal_info.email}</span>
                   </div>
                   {resumeData.personal_info.linkedin && (
                     <div className="flex items-center gap-2">
-                      <Linkedin className="w-4 h-4" />
-                      {resumeData.personal_info.linkedin}
+                      <Linkedin className="w-4 h-4 shrink-0" />
+                      <span className="text-gray-700">{resumeData.personal_info.linkedin}</span>
                     </div>
                   )}
                   {resumeData.personal_info.website && (
                     <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
-                      {resumeData.personal_info.website}
+                      <Globe className="w-4 h-4 shrink-0" />
+                      <span className="text-gray-700">{resumeData.personal_info.website}</span>
                     </div>
                   )}
                 </div>
@@ -185,13 +190,15 @@ export function FinalResumePreview({
 
               {/* Education Section */}
               <div>
-                <h2 className={selectedTemplate.style.sectionStyle}>Education</h2>
-                <div className="space-y-4">
+                <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
+                  Education
+                </h2>
+                <div className="space-y-3">
                   {resumeData.education.map((edu, index) => (
                     <div key={index}>
-                      <div className="font-semibold">{edu.schoolName}</div>
-                      <div className="text-gray-600">{edu.degreeName}</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="font-semibold text-[14px]">{edu.schoolName}</div>
+                      <div className="text-[14px] text-gray-600">{edu.degreeName}</div>
+                      <div className="text-[13px] text-gray-500">
                         {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
                       </div>
                     </div>
@@ -201,12 +208,14 @@ export function FinalResumePreview({
 
               {/* Skills Section */}
               <div>
-                <h2 className={selectedTemplate.style.sectionStyle}>Skills</h2>
-                <div className="space-y-2">
+                <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
+                  Skills
+                </h2>
+                <div className="space-y-1.5">
                   {resumeData.skills.hard_skills.map((skill, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-black" />
-                      {skill}
+                      <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                      <span className="text-[14px] text-gray-700">{skill}</span>
                     </div>
                   ))}
                 </div>
@@ -214,12 +223,14 @@ export function FinalResumePreview({
 
               {/* Certifications Section */}
               <div>
-                <h2 className={selectedTemplate.style.sectionStyle}>Awards & Certifications</h2>
-                <div className="space-y-2">
+                <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
+                  Certifications
+                </h2>
+                <div className="space-y-1.5">
                   {resumeData.certifications.map((cert, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-black mt-2" />
-                      {cert.name}
+                      <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                      <span className="text-[14px] text-gray-700">{cert.name}</span>
                     </div>
                   ))}
                 </div>
@@ -227,35 +238,39 @@ export function FinalResumePreview({
             </div>
 
             {/* Right Column */}
-            <div className="col-span-8 space-y-8">
+            <div className="pl-8 space-y-7">
               {/* Profile Section */}
               <div>
-                <h2 className={selectedTemplate.style.sectionStyle}>Profile</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
+                  Profile
+                </h2>
+                <p className="text-[14px] text-gray-700 leading-relaxed">
                   {resumeData.professional_summary.summary}
                 </p>
               </div>
 
               {/* Work Experience Section */}
               <div>
-                <h2 className={selectedTemplate.style.sectionStyle}>Work Experience</h2>
-                <div className="space-y-6">
+                <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-4">
+                  Work Experience
+                </h2>
+                <div className="space-y-5">
                   {resumeData.work_experience.map((exp, index) => (
-                    <div key={index}>
-                      <div className="font-bold text-[16px] uppercase">
+                    <div key={index} className="pb-2">
+                      <div className="font-bold text-[15px] uppercase text-gray-900">
                         {exp.jobTitle}
                       </div>
-                      <div className="text-gray-600 font-semibold">
+                      <div className="text-[14px] text-gray-700 font-semibold mb-1">
                         {exp.companyName}
                       </div>
-                      <div className="text-sm text-gray-500 mb-2">
+                      <div className="text-[13px] text-gray-500 mb-2">
                         {exp.startDate} - {exp.isCurrentJob ? "Present" : exp.endDate}
                       </div>
                       <ul className="space-y-2">
                         {exp.responsibilities.map((resp, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-black mt-2" />
-                            <span>{resp}</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-black mt-[7px] shrink-0" />
+                            <span className="text-[14px] text-gray-700 leading-relaxed">{resp}</span>
                           </li>
                         ))}
                       </ul>
