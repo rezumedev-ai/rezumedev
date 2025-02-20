@@ -85,17 +85,26 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
 
   const convertWorkExperience = (json: Json[] | null): WorkExperience[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter((item): item is WorkExperience => isWorkExperience(item));
+    return json.filter((item): item is WorkExperience => {
+      if (!item || typeof item !== 'object') return false;
+      return isWorkExperience(item);
+    });
   };
 
   const convertEducation = (json: Json[] | null): Education[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter((item): item is Education => isEducation(item));
+    return json.filter((item): item is Education => {
+      if (!item || typeof item !== 'object') return false;
+      return isEducation(item);
+    });
   };
 
   const convertCertifications = (json: Json[] | null): Certification[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter((item): item is Certification => isCertification(item));
+    return json.filter((item): item is Certification => {
+      if (!item || typeof item !== 'object') return false;
+      return isCertification(item);
+    });
   };
 
   // Fetch existing resume data and quiz responses
