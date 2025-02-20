@@ -145,7 +145,7 @@ export function FinalResumePreview({
       const responsibilitiesLineHeight = workExperienceCount <= 1 ? "1.8" : "1.6";
 
       return (
-        <div style={{ width: '21cm', minHeight: '29.7cm' }}>
+        <div className="mx-auto" style={{ width: '21cm', minHeight: '29.7cm' }}>
           <div className="p-[2.54cm]">
             {/* Header */}
             <div className="mb-8">
@@ -163,31 +163,31 @@ export function FinalResumePreview({
               <div className="absolute left-[33.33%] top-0 bottom-0 w-[1px] bg-gray-300" />
 
               {/* Left Column */}
-              <div className="pr-6 space-y-7">
+              <div className="pr-6 space-y-7 max-w-full">
                 {/* Contact Section */}
                 <div>
                   <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
                     Contact
                   </h2>
                   <div className="space-y-2 text-[14px]">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full">
                       <Phone className="w-4 h-4 shrink-0" />
-                      <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.phone}</span>
+                      <span className="text-gray-700 truncate">{resumeData.personal_info.phone}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full">
                       <Mail className="w-4 h-4 shrink-0" />
-                      <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.email}</span>
+                      <span className="text-gray-700 truncate">{resumeData.personal_info.email}</span>
                     </div>
                     {resumeData.personal_info.linkedin && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full">
                         <Linkedin className="w-4 h-4 shrink-0" />
-                        <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.linkedin}</span>
+                        <span className="text-gray-700 truncate">{resumeData.personal_info.linkedin}</span>
                       </div>
                     )}
                     {resumeData.personal_info.website && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full">
                         <Globe className="w-4 h-4 shrink-0" />
-                        <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.website}</span>
+                        <span className="text-gray-700 truncate">{resumeData.personal_info.website}</span>
                       </div>
                     )}
                   </div>
@@ -249,13 +249,13 @@ export function FinalResumePreview({
               </div>
 
               {/* Right Column */}
-              <div className="pl-6 space-y-7">
+              <div className="pl-6 space-y-7 max-w-full">
                 {/* Profile Section */}
                 <div>
                   <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
                     Profile
                   </h2>
-                  <p className="text-[14px] text-gray-700 leading-relaxed pr-2">
+                  <p className="text-[14px] text-gray-700 leading-relaxed">
                     {resumeData.professional_summary.summary}
                   </p>
                 </div>
