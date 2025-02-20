@@ -44,11 +44,7 @@ export default function ResumePreview() {
       const { error: updateError } = await supabase
         .from("resumes")
         .update({ 
-          completion_status: "enhancing",
-          // Reset these fields to ensure they're properly updated
-          professional_summary: resume.professional_summary,
-          work_experience: resume.work_experience,
-          skills: resume.skills
+          completion_status: "enhancing"
         })
         .eq("id", id);
 
@@ -62,10 +58,8 @@ export default function ResumePreview() {
       // Call the enhance-resume function
       const { data: enhanceData, error } = await supabase.functions.invoke('enhance-resume', {
         body: { 
-          resumeData: {
-            ...resume,
-            id: id
-          }
+          resumeData: resume,
+          resumeId: id
         }
       });
 
@@ -87,13 +81,14 @@ export default function ResumePreview() {
         try {
           const { data: pollData, error: pollError } = await supabase
             .from("resumes")
-            .select("completion_status, professional_summary, work_experience, skills")
+            .select("completion_status")
             .eq("id", id)
             .single();
 
           if (pollError) {
             console.error("Error polling for completion:", pollError);
             clearInterval(checkCompletion);
+            setIsRegenerating(false);
             throw pollError;
           }
 
@@ -116,11 +111,6 @@ export default function ResumePreview() {
           toast.error("Error checking regeneration status");
         }
       }, 2000);
-
-      // Cleanup on component unmount
-      return () => {
-        clearInterval(checkCompletion);
-      };
 
     } catch (error) {
       console.error("Error regenerating resume:", error);
