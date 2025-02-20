@@ -145,24 +145,24 @@ export function FinalResumePreview({
       const responsibilitiesLineHeight = workExperienceCount <= 1 ? "1.8" : "1.6";
 
       return (
-        <div className="mx-auto" style={{ width: '21cm', minHeight: '29.7cm' }}>
+        <div className="mx-auto bg-white" style={{ width: '21cm', minHeight: '29.7cm', padding: '2.54cm 2.54cm' }}>
           {/* Header */}
           <div className="mb-8">
-            <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1 inline-block">
+            <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-2 block">
               {resumeData.personal_info.fullName}
             </h1>
-            <div className="text-[20px] font-light italic text-gray-600 inline-block">
+            <div className="text-[20px] font-light italic text-gray-600 block">
               {resumeData.professional_summary.title}
             </div>
           </div>
 
           {/* Two Column Layout */}
-          <div className="grid grid-cols-[1fr_2fr] gap-8 relative">
+          <div className="grid grid-cols-[1fr_2fr] gap-6 relative">
             {/* Vertical Divider */}
             <div className="absolute left-[33.33%] top-0 bottom-0 w-[1px] bg-gray-300" />
 
             {/* Left Column */}
-            <div className="pr-8 space-y-7">
+            <div className="pr-6 space-y-7">
               {/* Contact Section */}
               <div>
                 <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
@@ -248,13 +248,13 @@ export function FinalResumePreview({
             </div>
 
             {/* Right Column */}
-            <div className="pl-8 space-y-7">
+            <div className="pl-6 space-y-7">
               {/* Profile Section */}
               <div>
                 <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
                   Profile
                 </h2>
-                <p className="text-[14px] text-gray-700 leading-relaxed" style={{ maxWidth: '100%' }}>
+                <p className="text-[14px] text-gray-700 leading-relaxed pr-2">
                   {resumeData.professional_summary.summary}
                 </p>
               </div>
@@ -269,7 +269,7 @@ export function FinalResumePreview({
                     {resumeData.work_experience.map((exp, index) => (
                       <div key={index} className="pb-2">
                         <div 
-                          className="font-bold uppercase text-gray-900 inline-block"
+                          className="font-bold uppercase text-gray-900 block"
                           style={{ fontSize: jobTitleFontSize }}
                         >
                           {exp.jobTitle}
