@@ -400,20 +400,21 @@ export function FinalResumePreview({
 
       <div 
         ref={containerRef}
-        className="flex-1 relative flex items-start justify-center p-4 md:p-8 bg-gray-100 overflow-auto"
+        className="flex-1 flex items-center justify-center p-4 md:p-8 bg-gray-100 overflow-auto"
       >
         <div 
           ref={resumeRef}
           id="resume-content"
           className={cn(
-            "bg-white shadow-lg mx-auto relative transition-all duration-200",
+            "bg-white shadow-lg relative transition-all duration-200",
             selectedTemplate.style.contentStyle
           )}
           style={{
             width: selectedTemplate.style.dimensions.maxWidth,
             minHeight: selectedTemplate.style.dimensions.minHeight,
             transform: `scale(${scale})`,
-            transformOrigin: 'top center',
+            transformOrigin: 'center center',
+            margin: '0 auto',
             padding: selectedTemplate.style.spacing.margins.top,
             paddingRight: selectedTemplate.style.spacing.margins.right,
             paddingBottom: selectedTemplate.style.spacing.margins.bottom,
