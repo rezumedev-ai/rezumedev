@@ -31,50 +31,96 @@ export default function ResumePreview() {
 
   const handleRegenerate = async () => {
     try {
+      if (!resume || !id) {
+        toast.error("Resume data not found");
+        return;
+      }
+
       setIsRegenerating(true);
+      
+      console.log("Starting regeneration for resume:", id);
       
       // First update the status
       const { error: updateError } = await supabase
         .from("resumes")
-        .update({ completion_status: "enhancing" })
+        .update({ 
+          completion_status: "enhancing",
+          // Reset these fields to ensure they're properly updated
+          professional_summary: resume.professional_summary,
+          work_experience: resume.work_experience,
+          skills: resume.skills
+        })
         .eq("id", id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error("Error updating status:", updateError);
+        throw updateError;
+      }
+
+      console.log("Status updated, calling enhance-resume function");
 
       // Call the enhance-resume function
-      const { error } = await supabase.functions.invoke('enhance-resume', {
-        body: { resumeData: resume }
+      const { data: enhanceData, error } = await supabase.functions.invoke('enhance-resume', {
+        body: { 
+          resumeData: {
+            ...resume,
+            id: id
+          }
+        }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error calling enhance-resume function:", error);
+        throw error;
+      }
+
+      console.log("Enhance-resume function called successfully:", enhanceData);
 
       // Poll for completion
+      let attempts = 0;
+      const maxAttempts = 30; // 1 minute max waiting time
+      
       const checkCompletion = setInterval(async () => {
-        const { data, error: pollError } = await supabase
-          .from("resumes")
-          .select("completion_status")
-          .eq("id", id)
-          .single();
+        attempts++;
+        console.log(`Checking completion attempt ${attempts}`);
 
-        if (pollError) {
-          clearInterval(checkCompletion);
-          throw pollError;
-        }
+        try {
+          const { data: pollData, error: pollError } = await supabase
+            .from("resumes")
+            .select("completion_status, professional_summary, work_experience, skills")
+            .eq("id", id)
+            .single();
 
-        if (data.completion_status === "completed") {
+          if (pollError) {
+            console.error("Error polling for completion:", pollError);
+            clearInterval(checkCompletion);
+            throw pollError;
+          }
+
+          console.log("Poll response:", pollData);
+
+          if (pollData.completion_status === "completed") {
+            clearInterval(checkCompletion);
+            setIsRegenerating(false);
+            await refetch();
+            toast.success("Resume has been regenerated successfully!");
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkCompletion);
+            setIsRegenerating(false);
+            toast.error("Regeneration is taking longer than expected. Please try again.");
+          }
+        } catch (pollError) {
           clearInterval(checkCompletion);
           setIsRegenerating(false);
-          refetch();
-          toast.success("Resume has been regenerated successfully!");
+          console.error("Error in polling:", pollError);
+          toast.error("Error checking regeneration status");
         }
       }, 2000);
 
-      // Timeout after 2 minutes
-      setTimeout(() => {
+      // Cleanup on component unmount
+      return () => {
         clearInterval(checkCompletion);
-        setIsRegenerating(false);
-        toast.error("Regeneration is taking longer than expected. Please try again.");
-      }, 120000);
+      };
 
     } catch (error) {
       console.error("Error regenerating resume:", error);
