@@ -140,155 +140,125 @@ export function FinalResumePreview({
 
   const renderContent = () => {
     if (selectedTemplate.id === "professional-executive") {
-      const workExperienceCount = resumeData.work_experience.length;
-      const jobTitleFontSize = workExperienceCount <= 1 ? "16px" : "15px";
-      const responsibilitiesLineHeight = workExperienceCount <= 1 ? "1.8" : "1.6";
-
       return (
-        <div className="mx-auto" style={{ width: '21cm', minHeight: '29.7cm' }}>
-          <div className="p-[2.54cm]">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-2 block">
-                {resumeData.personal_info.fullName}
-              </h1>
-              <div className="text-[20px] font-light italic text-gray-600 block">
-                {resumeData.professional_summary.title}
-              </div>
-            </div>
-
-            {/* Two Column Layout */}
-            <div className="grid grid-cols-[1fr_2fr] gap-6 relative">
-              {/* Vertical Divider */}
-              <div className="absolute left-[33.33%] top-0 bottom-0 w-[1px] bg-gray-300" />
-
-              {/* Left Column */}
-              <div className="pr-6 space-y-7 max-w-full">
-                {/* Contact Section */}
-                <div>
-                  <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
-                    Contact
-                  </h2>
-                  <div className="space-y-2 text-[14px]">
-                    <div className="flex items-center gap-2 w-full">
-                      <Phone className="w-4 h-4 shrink-0" />
-                      <span className="text-gray-700 truncate">{resumeData.personal_info.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 w-full">
-                      <Mail className="w-4 h-4 shrink-0" />
-                      <span className="text-gray-700 truncate">{resumeData.personal_info.email}</span>
-                    </div>
-                    {resumeData.personal_info.linkedin && (
-                      <div className="flex items-center gap-2 w-full">
-                        <Linkedin className="w-4 h-4 shrink-0" />
-                        <span className="text-gray-700 truncate">{resumeData.personal_info.linkedin}</span>
-                      </div>
-                    )}
-                    {resumeData.personal_info.website && (
-                      <div className="flex items-center gap-2 w-full">
-                        <Globe className="w-4 h-4 shrink-0" />
-                        <span className="text-gray-700 truncate">{resumeData.personal_info.website}</span>
-                      </div>
-                    )}
-                  </div>
+        <div className="flex justify-center items-start w-full">
+          <div className="bg-white w-[21cm] min-h-[29.7cm]">
+            <div className="px-[3.5cm] py-[2.5cm]">
+              {/* Header Section */}
+              <div className="mb-8">
+                <h1 className="font-sans text-[32px] font-black tracking-wide text-black mb-1">
+                  {resumeData.personal_info.fullName}
+                </h1>
+                <div className="text-[18px] text-gray-600 font-medium">
+                  {resumeData.professional_summary.title}
                 </div>
+              </div>
 
-                {/* Education Section */}
-                {resumeData.education.length > 0 && (
+              {/* Main Content - Two Column Layout */}
+              <div className="grid grid-cols-[1fr_1.8fr] gap-12">
+                {/* Left Column */}
+                <div className="space-y-6">
+                  {/* Contact Section */}
                   <div>
-                    <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
+                    <h2 className="text-[15px] font-bold text-black uppercase tracking-wide mb-3">
+                      Contact
+                    </h2>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-3.5 h-3.5 text-gray-600" />
+                        <span className="text-[13px] text-gray-700">
+                          {resumeData.personal_info.phone}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-3.5 h-3.5 text-gray-600" />
+                        <span className="text-[13px] text-gray-700">
+                          {resumeData.personal_info.email}
+                        </span>
+                      </div>
+                      {resumeData.personal_info.linkedin && (
+                        <div className="flex items-center gap-2">
+                          <Linkedin className="w-3.5 h-3.5 text-gray-600" />
+                          <span className="text-[13px] text-gray-700">
+                            {resumeData.personal_info.linkedin}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Education Section */}
+                  <div>
+                    <h2 className="text-[15px] font-bold text-black uppercase tracking-wide mb-3">
                       Education
                     </h2>
                     <div className="space-y-3">
                       {resumeData.education.map((edu, index) => (
                         <div key={index}>
-                          <div className="font-semibold text-[14px]">{edu.schoolName}</div>
-                          <div className="text-[14px] text-gray-600">{edu.degreeName}</div>
-                          <div className="text-[13px] text-gray-500">
+                          <div className="text-[14px] font-semibold text-gray-800">
+                            {edu.schoolName}
+                          </div>
+                          <div className="text-[13px] text-gray-700">
+                            {edu.degreeName}
+                          </div>
+                          <div className="text-[12px] text-gray-600">
                             {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                )}
 
-                {/* Skills Section */}
-                {resumeData.skills.hard_skills.length > 0 && (
+                  {/* Skills Section */}
                   <div>
-                    <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
+                    <h2 className="text-[15px] font-bold text-black uppercase tracking-wide mb-3">
                       Skills
                     </h2>
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       {resumeData.skills.hard_skills.map((skill, index) => (
                         <div key={index} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-                          <span className="text-[14px] text-gray-700">{skill}</span>
+                          <div className="w-1 h-1 rounded-full bg-gray-700" />
+                          <span className="text-[13px] text-gray-700">{skill}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                )}
-
-                {/* Certifications Section */}
-                {resumeData.certifications.length > 0 && (
-                  <div>
-                    <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
-                      Certifications
-                    </h2>
-                    <div className="space-y-1.5">
-                      {resumeData.certifications.map((cert, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-                          <span className="text-[14px] text-gray-700">{cert.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Right Column */}
-              <div className="pl-6 space-y-7 max-w-full">
-                {/* Profile Section */}
-                <div>
-                  <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
-                    Profile
-                  </h2>
-                  <p className="text-[14px] text-gray-700 leading-relaxed">
-                    {resumeData.professional_summary.summary}
-                  </p>
                 </div>
 
-                {/* Work Experience Section */}
-                {resumeData.work_experience.length > 0 && (
+                {/* Right Column */}
+                <div className="space-y-6">
+                  {/* Profile Section */}
                   <div>
-                    <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-4">
+                    <h2 className="text-[15px] font-bold text-black uppercase tracking-wide mb-3">
+                      Profile
+                    </h2>
+                    <p className="text-[13px] text-gray-700 leading-relaxed">
+                      {resumeData.professional_summary.summary}
+                    </p>
+                  </div>
+
+                  {/* Work Experience Section */}
+                  <div>
+                    <h2 className="text-[15px] font-bold text-black uppercase tracking-wide mb-4">
                       Work Experience
                     </h2>
-                    <div className="space-y-5">
+                    <div className="space-y-4">
                       {resumeData.work_experience.map((exp, index) => (
-                        <div key={index} className="pb-2">
-                          <div 
-                            className="font-bold uppercase text-gray-900 block"
-                            style={{ fontSize: jobTitleFontSize }}
-                          >
+                        <div key={index}>
+                          <div className="text-[14px] font-bold text-gray-800 uppercase">
                             {exp.jobTitle}
                           </div>
-                          <div className="text-[14px] text-gray-700 font-semibold mb-1">
+                          <div className="text-[13px] font-semibold text-gray-700 mb-1">
                             {exp.companyName}
                           </div>
-                          <div className="text-[13px] text-gray-500 mb-2">
+                          <div className="text-[12px] text-gray-600 mb-2">
                             {exp.startDate} - {exp.isCurrentJob ? "Present" : exp.endDate}
                           </div>
-                          <ul className="space-y-2">
+                          <ul className="space-y-1.5">
                             {exp.responsibilities.map((resp, idx) => (
                               <li key={idx} className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-black mt-[7px] shrink-0" />
-                                <span 
-                                  className="text-[14px] text-gray-700"
-                                  style={{ lineHeight: responsibilitiesLineHeight }}
-                                >
+                                <div className="w-1 h-1 rounded-full bg-gray-700 mt-[6px]" />
+                                <span className="text-[13px] text-gray-700 leading-normal">
                                   {resp}
                                 </span>
                               </li>
@@ -298,7 +268,7 @@ export function FinalResumePreview({
                       ))}
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
