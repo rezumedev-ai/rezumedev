@@ -145,21 +145,21 @@ export function FinalResumePreview({
       const responsibilitiesLineHeight = workExperienceCount <= 1 ? "1.8" : "1.6";
 
       return (
-        <div className="max-w-[750px] mx-auto">
+        <div className="mx-auto" style={{ width: '21cm', minHeight: '29.7cm' }}>
           {/* Header */}
           <div className="mb-8">
-            <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1">
+            <h1 className="font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1 inline-block">
               {resumeData.personal_info.fullName}
             </h1>
-            <div className="text-[20px] font-light italic text-gray-600">
+            <div className="text-[20px] font-light italic text-gray-600 inline-block">
               {resumeData.professional_summary.title}
             </div>
           </div>
 
           {/* Two Column Layout */}
-          <div className="grid grid-cols-[280px_1fr] gap-8 relative">
+          <div className="grid grid-cols-[1fr_2fr] gap-8 relative">
             {/* Vertical Divider */}
-            <div className="absolute left-[280px] top-0 bottom-0 w-[1px] bg-gray-300" />
+            <div className="absolute left-[33.33%] top-0 bottom-0 w-[1px] bg-gray-300" />
 
             {/* Left Column */}
             <div className="pr-8 space-y-7">
@@ -171,22 +171,22 @@ export function FinalResumePreview({
                 <div className="space-y-2 text-[14px]">
                   <div className="flex items-center gap-2">
                     <Phone className="w-4 h-4 shrink-0" />
-                    <span className="text-gray-700 break-all">{resumeData.personal_info.phone}</span>
+                    <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.phone}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4 shrink-0" />
-                    <span className="text-gray-700 break-all">{resumeData.personal_info.email}</span>
+                    <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.email}</span>
                   </div>
                   {resumeData.personal_info.linkedin && (
                     <div className="flex items-center gap-2">
                       <Linkedin className="w-4 h-4 shrink-0" />
-                      <span className="text-gray-700 break-all">{resumeData.personal_info.linkedin}</span>
+                      <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.linkedin}</span>
                     </div>
                   )}
                   {resumeData.personal_info.website && (
                     <div className="flex items-center gap-2">
                       <Globe className="w-4 h-4 shrink-0" />
-                      <span className="text-gray-700 break-all">{resumeData.personal_info.website}</span>
+                      <span className="text-gray-700 overflow-hidden text-ellipsis">{resumeData.personal_info.website}</span>
                     </div>
                   )}
                 </div>
@@ -254,7 +254,7 @@ export function FinalResumePreview({
                 <h2 className="text-[16px] font-bold text-black uppercase tracking-wider mb-3">
                   Profile
                 </h2>
-                <p className="text-[14px] text-gray-700 leading-relaxed w-full">
+                <p className="text-[14px] text-gray-700 leading-relaxed" style={{ maxWidth: '100%' }}>
                   {resumeData.professional_summary.summary}
                 </p>
               </div>
@@ -269,7 +269,7 @@ export function FinalResumePreview({
                     {resumeData.work_experience.map((exp, index) => (
                       <div key={index} className="pb-2">
                         <div 
-                          className="font-bold uppercase text-gray-900 w-full"
+                          className="font-bold uppercase text-gray-900 inline-block"
                           style={{ fontSize: jobTitleFontSize }}
                         >
                           {exp.jobTitle}
@@ -285,7 +285,7 @@ export function FinalResumePreview({
                             <li key={idx} className="flex items-start gap-2">
                               <div className="w-1.5 h-1.5 rounded-full bg-black mt-[7px] shrink-0" />
                               <span 
-                                className="text-[14px] text-gray-700 w-full"
+                                className="text-[14px] text-gray-700"
                                 style={{ lineHeight: responsibilitiesLineHeight }}
                               >
                                 {resp}
