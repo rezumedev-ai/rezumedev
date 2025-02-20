@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -48,45 +49,56 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
   });
 
-  const isWorkExperience = (item: Json): item is WorkExperience => {
-    return typeof item === 'object' && item !== null &&
-      'jobTitle' in item &&
-      'companyName' in item &&
-      'startDate' in item &&
-      'endDate' in item &&
-      'responsibilities' in item;
+  const isWorkExperience = (item: unknown): item is WorkExperience => {
+    if (!item || typeof item !== 'object') return false;
+    const exp = item as Record<string, unknown>;
+    return (
+      'jobTitle' in exp &&
+      'companyName' in exp &&
+      'startDate' in exp &&
+      'endDate' in exp &&
+      'responsibilities' in exp &&
+      Array.isArray(exp.responsibilities)
+    );
   };
 
-  const isEducation = (item: Json): item is Education => {
-    return typeof item === 'object' && item !== null &&
-      'degreeName' in item &&
-      'schoolName' in item &&
-      'startDate' in item &&
-      'endDate' in item;
+  const isEducation = (item: unknown): item is Education => {
+    if (!item || typeof item !== 'object') return false;
+    const edu = item as Record<string, unknown>;
+    return (
+      'degreeName' in edu &&
+      'schoolName' in edu &&
+      'startDate' in edu &&
+      'endDate' in edu
+    );
   };
 
-  const isCertification = (item: Json): item is Certification => {
-    return typeof item === 'object' && item !== null &&
-      'name' in item &&
-      'organization' in item &&
-      'completionDate' in item;
+  const isCertification = (item: unknown): item is Certification => {
+    if (!item || typeof item !== 'object') return false;
+    const cert = item as Record<string, unknown>;
+    return (
+      'name' in cert &&
+      'organization' in cert &&
+      'completionDate' in cert
+    );
   };
 
   const convertWorkExperience = (json: Json[] | null): WorkExperience[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter(isWorkExperience);
+    return json.filter((item): item is WorkExperience => isWorkExperience(item));
   };
 
   const convertEducation = (json: Json[] | null): Education[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter(isEducation);
+    return json.filter((item): item is Education => isEducation(item));
   };
 
   const convertCertifications = (json: Json[] | null): Certification[] => {
     if (!Array.isArray(json)) return [];
-    return json.filter(isCertification);
+    return json.filter((item): item is Certification => isCertification(item));
   };
 
+  // Fetch existing resume data and quiz responses
   const { data: existingData } = useQuery({
     queryKey: ['resume-data', resumeId],
     queryFn: async () => {
