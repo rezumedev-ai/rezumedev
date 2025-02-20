@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 import { cn } from "@/utils/cn";
+import { Mail, Phone, Linkedin, Globe } from "lucide-react";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -138,6 +139,136 @@ export function FinalResumePreview({
   const selectedTemplate = resumeTemplates.find(t => t.id === selectedTemplateId) || resumeTemplates[0];
 
   const renderContent = () => {
+    if (selectedTemplate.id === "professional-executive") {
+      return (
+        <div className="max-w-[700px] mx-auto">
+          {/* Header */}
+          <div className={selectedTemplate.style.headerStyle}>
+            <h1 className={selectedTemplate.style.titleFont}>
+              {resumeData.personal_info.fullName}
+            </h1>
+            <div className="text-[20px] font-light italic text-gray-600">
+              {resumeData.professional_summary.title}
+            </div>
+          </div>
+
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-12 gap-8">
+            {/* Left Column */}
+            <div className="col-span-4 space-y-8">
+              {/* Contact Section */}
+              <div>
+                <h2 className={selectedTemplate.style.sectionStyle}>Contact</h2>
+                <div className="space-y-2 text-[14px]">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    {resumeData.personal_info.phone}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    {resumeData.personal_info.email}
+                  </div>
+                  {resumeData.personal_info.linkedin && (
+                    <div className="flex items-center gap-2">
+                      <Linkedin className="w-4 h-4" />
+                      {resumeData.personal_info.linkedin}
+                    </div>
+                  )}
+                  {resumeData.personal_info.website && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      {resumeData.personal_info.website}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Education Section */}
+              <div>
+                <h2 className={selectedTemplate.style.sectionStyle}>Education</h2>
+                <div className="space-y-4">
+                  {resumeData.education.map((edu, index) => (
+                    <div key={index}>
+                      <div className="font-semibold">{edu.schoolName}</div>
+                      <div className="text-gray-600">{edu.degreeName}</div>
+                      <div className="text-sm text-gray-500">
+                        {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Skills Section */}
+              <div>
+                <h2 className={selectedTemplate.style.sectionStyle}>Skills</h2>
+                <div className="space-y-2">
+                  {resumeData.skills.hard_skills.map((skill, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-black" />
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Certifications Section */}
+              <div>
+                <h2 className={selectedTemplate.style.sectionStyle}>Awards & Certifications</h2>
+                <div className="space-y-2">
+                  {resumeData.certifications.map((cert, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-black mt-2" />
+                      {cert.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="col-span-8 space-y-8">
+              {/* Profile Section */}
+              <div>
+                <h2 className={selectedTemplate.style.sectionStyle}>Profile</h2>
+                <p className="text-gray-600 leading-relaxed">
+                  {resumeData.professional_summary.summary}
+                </p>
+              </div>
+
+              {/* Work Experience Section */}
+              <div>
+                <h2 className={selectedTemplate.style.sectionStyle}>Work Experience</h2>
+                <div className="space-y-6">
+                  {resumeData.work_experience.map((exp, index) => (
+                    <div key={index}>
+                      <div className="font-bold text-[16px] uppercase">
+                        {exp.jobTitle}
+                      </div>
+                      <div className="text-gray-600 font-semibold">
+                        {exp.companyName}
+                      </div>
+                      <div className="text-sm text-gray-500 mb-2">
+                        {exp.startDate} - {exp.isCurrentJob ? "Present" : exp.endDate}
+                      </div>
+                      <ul className="space-y-2">
+                        {exp.responsibilities.map((resp, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-black mt-2" />
+                            <span>{resp}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-[700px] mx-auto">
         <PersonalSection

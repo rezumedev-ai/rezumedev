@@ -192,31 +192,31 @@ export const resumeTemplates: ResumeTemplate[] = [
   {
     id: "professional-executive",
     name: "Professional Executive",
-    description: "Traditional format optimized for ATS systems",
+    description: "Modern two-column layout with clean typography",
     imageUrl: "/lovable-uploads/eca7a378-81fd-4d29-9194-b292d08d283c.png",
     style: {
-      titleFont: "font-serif text-[36px] font-bold tracking-normal text-gray-900",
-      headerStyle: "mb-8 pb-4 border-b-[3px] border-gray-900",
-      sectionStyle: "text-[18px] font-bold text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2",
-      contentStyle: "space-y-6",
+      titleFont: "font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1",
+      headerStyle: "mb-12",
+      sectionStyle: "text-[16px] font-bold text-black uppercase tracking-wider mb-4",
+      contentStyle: "grid grid-cols-12 gap-8",
       layout: "executive",
       colors: {
-        primary: "#111827",
-        secondary: "#4B5563",
-        text: "#1F2937",
-        border: "#D1D5DB",
+        primary: "#000000",
+        secondary: "#666666",
+        text: "#333333",
+        border: "#EEEEEE",
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "2.5rem",
-        itemGap: "1.5rem",
+        sectionGap: "2rem",
+        itemGap: "1rem",
         contentPadding: "2.5rem",
-        headerHeight: "190px",
+        headerHeight: "auto",
         margins: {
-          top: "65px",
-          right: "65px",
-          bottom: "65px",
-          left: "65px"
+          top: "60px",
+          right: "60px",
+          bottom: "60px",
+          left: "60px"
         }
       },
       dimensions: {
@@ -224,15 +224,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "1056px"
       },
       typography: {
-        titleSize: "36px",
-        subtitleSize: "18px",
+        titleSize: "42px",
+        subtitleSize: "16px",
         bodySize: "14px",
         lineHeight: "1.6"
       },
       icons: {
-        sections: true,
+        sections: false,
         contact: true,
-        bullets: "arrow"
+        bullets: "dot"
       }
     }
   }
