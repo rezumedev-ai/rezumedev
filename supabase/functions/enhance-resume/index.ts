@@ -26,19 +26,28 @@ serve(async (req) => {
       throw new Error('OpenAI API key not found');
     }
 
+    // Enhanced system prompt to compensate for the mini model
+    const systemPrompt = `You are an expert ATS resume optimizer and professional resume writer with extensive experience in creating high-impact, keyword-optimized resumes that pass ATS systems and impress hiring managers. Focus on:
+    1. Strong action verbs
+    2. Measurable achievements
+    3. Industry-specific keywords
+    4. Clear, concise language
+    5. ATS-friendly formatting`;
+
     // First, enhance the professional summary
-    const summaryPrompt = `As an expert ATS resume optimizer and professional resume writer, create a compelling and ATS-friendly professional summary for a ${resumeData.professional_summary.title} role. 
-    Use the following details:
-    Current summary: ${resumeData.professional_summary.summary}
-    Work experience: ${JSON.stringify(resumeData.work_experience)}
-    Education: ${JSON.stringify(resumeData.education)}
-    Skills: ${JSON.stringify(resumeData.skills)}
+    const summaryPrompt = `Create a powerful, ATS-optimized professional summary for a ${resumeData.professional_summary.title} position.
+    
+    Current Information:
+    - Summary: ${resumeData.professional_summary.summary}
+    - Experience: ${JSON.stringify(resumeData.work_experience)}
+    - Education: ${JSON.stringify(resumeData.education)}
+    - Skills: ${JSON.stringify(resumeData.skills)}
     
     Requirements:
-    1. Make it ATS-compliant with relevant keywords
-    2. Keep it concise (3-4 sentences)
-    3. Highlight key achievements and skills
-    4. Incorporate industry-specific terminology
+    1. Include relevant keywords for ${resumeData.professional_summary.title} role
+    2. Write 3-4 impactful sentences
+    3. Highlight key achievements
+    4. Use industry terminology
     5. Focus on value proposition
     
     Return only the enhanced summary text.`;
@@ -51,11 +60,12 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are an expert ATS resume optimizer and professional resume writer.' },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: summaryPrompt }
         ],
+        temperature: 0.7,
       }),
     });
 
@@ -64,17 +74,18 @@ serve(async (req) => {
 
     // Now enhance work experience bullet points
     const experiencePrompts = resumeData.work_experience.map(async (exp) => {
-      const expPrompt = `Enhance the following job responsibilities for a ${exp.jobTitle} position at ${exp.companyName} to be more impactful and ATS-friendly:
+      const expPrompt = `Transform these job responsibilities into powerful, ATS-optimized bullet points for a ${exp.jobTitle} role at ${exp.companyName}:
+      
       Current responsibilities: ${JSON.stringify(exp.responsibilities)}
       
       Requirements:
-      1. Start each bullet with strong action verbs
-      2. Include measurable achievements and metrics where possible
-      3. Use industry-specific keywords
+      1. Begin each with powerful action verbs
+      2. Include specific metrics and achievements
+      3. Use relevant keywords for ${exp.jobTitle}
       4. Focus on results and impact
-      5. Keep each bullet point concise
+      5. Keep each bullet clear and concise
       
-      Return only an array of enhanced bullet points, with 4-6 bullets maximum.`;
+      Format: Return exactly 4-6 bullet points, one per line.`;
 
       const expResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -83,11 +94,12 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: 'You are an expert ATS resume optimizer and professional resume writer.' },
+            { role: 'system', content: systemPrompt },
             { role: 'user', content: expPrompt }
           ],
+          temperature: 0.7,
         }),
       });
 
@@ -95,7 +107,8 @@ serve(async (req) => {
       const enhancedBullets = expData.choices[0].message.content
         .split('\n')
         .map(bullet => bullet.trim())
-        .filter(bullet => bullet.length > 0);
+        .filter(bullet => bullet.length > 0 && !bullet.startsWith('-'))
+        .slice(0, 6);
 
       return {
         ...exp,
@@ -105,19 +118,27 @@ serve(async (req) => {
 
     const enhancedExperience = await Promise.all(experiencePrompts);
 
-    // Extract and enhance skills based on job title and experience
-    const skillsPrompt = `Based on the following job title and experience, provide an optimized list of both technical and soft skills that would be most relevant for ATS systems:
-    Job Title: ${resumeData.professional_summary.title}
-    Experience: ${JSON.stringify(resumeData.work_experience)}
-    Current Skills: ${JSON.stringify(resumeData.skills)}
+    // Extract and enhance skills
+    const skillsPrompt = `Create an optimized skills section for a ${resumeData.professional_summary.title} role.
     
-    Return the response as two arrays in JSON format:
+    Current Information:
+    - Job Title: ${resumeData.professional_summary.title}
+    - Experience: ${JSON.stringify(resumeData.work_experience)}
+    - Current Skills: ${JSON.stringify(resumeData.skills)}
+    
+    Requirements:
+    1. List most relevant hard and soft skills
+    2. Include industry-specific technical skills
+    3. Focus on in-demand skills for the role
+    4. Ensure ATS-friendly formatting
+    
+    Return in JSON format:
     {
       "hard_skills": ["skill1", "skill2", ...],
       "soft_skills": ["skill1", "skill2", ...]
     }
     
-    Include 8-12 skills in each category, prioritizing the most relevant and in-demand skills for the role.`;
+    Include exactly 10 skills in each category.`;
 
     const skillsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -126,11 +147,12 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are an expert ATS resume optimizer and professional resume writer.' },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: skillsPrompt }
         ],
+        temperature: 0.7,
       }),
     });
 
