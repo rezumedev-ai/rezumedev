@@ -61,10 +61,11 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  const A4_WIDTH_PX = 794;
-  const A4_HEIGHT_PX = 1123;
-
-  const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
+  // A4 dimensions in pixels at 96 DPI
+  const A4_DIMENSIONS = {
+    width: 794, // 210mm at 96 DPI
+    height: 1123, // 297mm at 96 DPI
+  };
 
   const toggleZoom = () => {
     setIsZoomed(!isZoomed);
@@ -76,9 +77,11 @@ export function ResumePreview({
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
         
-        const scaleX = (containerWidth - 48) / A4_WIDTH_PX;
-        const scaleY = (containerHeight - 48) / A4_HEIGHT_PX;
+        // Calculate scale to fit within container while maintaining aspect ratio
+        const scaleX = (containerWidth - 48) / A4_DIMENSIONS.width;
+        const scaleY = (containerHeight - 48) / A4_DIMENSIONS.height;
         
+        // Use the smaller scale to ensure it fits both dimensions
         let newScale = Math.min(scaleX, scaleY, 1);
         
         if (isMobile) {
@@ -96,14 +99,7 @@ export function ResumePreview({
     return () => window.removeEventListener('resize', calculateScale);
   }, [isMobile, isZoomed]);
 
-  const handleEdit = (section: string, field: string, value: any) => {
-    if (!onUpdate) return;
-    onUpdate(section, {
-      ...section === 'personalInfo' ? personalInfo : professionalSummary,
-      [field]: value
-    });
-    setEditingField(null);
-  };
+  const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
   return (
     <div className="relative w-full h-screen flex flex-col items-center bg-gray-100">
@@ -120,19 +116,27 @@ export function ResumePreview({
       
       <div 
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center p-6 overflow-hidden"
+        className="w-full h-full flex items-center justify-center p-6 overflow-auto"
       >
         <div 
           ref={resumeRef}
+          id="resume-content"
           className={cn(
-            "bg-white shadow-xl origin-center",
+            "bg-white shadow-xl origin-center overflow-hidden",
             selectedTemplate.style.titleFont
           )}
           style={{
-            width: `${A4_WIDTH_PX}px`,
-            height: `${A4_HEIGHT_PX}px`,
+            width: `${A4_DIMENSIONS.width}px`,
+            height: `${A4_DIMENSIONS.height}px`,
             transform: `scale(${scale})`,
-            transition: 'transform 0.3s ease',
+            transformOrigin: 'center',
+            margin: 'auto',
+            maxHeight: `${A4_DIMENSIONS.height}px`,
+            // Ensure content doesn't overflow
+            overflowY: 'auto',
+            // Hide scrollbar while maintaining functionality
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
           }}
         >
           <div className="p-12 h-full">
