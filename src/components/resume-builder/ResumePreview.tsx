@@ -1,3 +1,4 @@
+
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -60,19 +61,12 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  // Standard US Letter size in inches
-  const PAGE_SIZE = {
-    width: 8.5,
-    height: 11
-  };
-
-  // Convert to pixels (1 inch = 96px)
-  const PIXELS_PER_INCH = 96;
-  
-  const PAGE_SIZE_PX = {
-    width: PAGE_SIZE.width * PIXELS_PER_INCH,
-    height: PAGE_SIZE.height * PIXELS_PER_INCH
-  };
+  // Fixed US Letter size constants
+  const DPI = 96; // Standard screen DPI
+  const WIDTH_INCHES = 8.5;
+  const HEIGHT_INCHES = 11;
+  const WIDTH_PX = Math.floor(WIDTH_INCHES * DPI); // 816px
+  const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI); // 1056px
 
   const toggleZoom = () => {
     setIsZoomed(!isZoomed);
@@ -80,25 +74,25 @@ export function ResumePreview({
 
   useEffect(() => {
     const calculateScale = () => {
-      if (containerRef.current && resumeRef.current) {
-        const containerWidth = containerRef.current.clientWidth;
-        const containerHeight = containerRef.current.clientHeight;
-        
-        // Calculate scale to fit within container while maintaining aspect ratio
-        const scaleX = (containerWidth - 48) / PAGE_SIZE_PX.width;
-        const scaleY = (containerHeight - 48) / PAGE_SIZE_PX.height;
-        
-        // Use the smaller scale to ensure it fits both dimensions
-        let newScale = Math.min(scaleX, scaleY, 1);
-        
-        if (isMobile) {
-          newScale = isZoomed ? 0.8 : 0.4;
-        } else {
-          newScale = Math.min(newScale, 0.85);
-        }
-        
-        setScale(newScale);
+      if (!containerRef.current || !resumeRef.current) return;
+
+      const container = containerRef.current;
+      const containerWidth = container.clientWidth - 48; // Account for padding
+      const containerHeight = container.clientHeight - 48;
+
+      // Calculate scale based on container size
+      const scaleX = containerWidth / WIDTH_PX;
+      const scaleY = containerHeight / HEIGHT_PX;
+      let newScale = Math.min(scaleX, scaleY, 1);
+
+      // Adjust scale for mobile
+      if (isMobile) {
+        newScale = isZoomed ? 0.8 : 0.4;
+      } else {
+        newScale = Math.min(newScale, 0.85);
       }
+
+      setScale(newScale);
     };
 
     calculateScale();
@@ -123,38 +117,38 @@ export function ResumePreview({
       
       <div 
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center p-6"
+        className="w-full h-full flex items-center justify-center p-6 overflow-hidden"
       >
         <div 
           ref={resumeRef}
           id="resume-content"
-          className={cn(
-            "bg-white shadow-xl",
-            selectedTemplate.style.titleFont
-          )}
+          className="bg-white shadow-xl"
           style={{
-            width: `${PAGE_SIZE_PX.width}px`,
-            height: `${PAGE_SIZE_PX.height}px`,
+            width: `${WIDTH_PX}px`,
+            height: `${HEIGHT_PX}px`,
             transform: `scale(${scale})`,
             transformOrigin: 'center',
-            // Force exact US Letter dimensions
-            minWidth: `${PAGE_SIZE_PX.width}px`,
-            maxWidth: `${PAGE_SIZE_PX.width}px`,
-            minHeight: `${PAGE_SIZE_PX.height}px`,
-            maxHeight: `${PAGE_SIZE_PX.height}px`,
-            margin: '0 auto',
+            margin: '0',
             padding: '0',
+            position: 'absolute',
+            boxSizing: 'border-box',
             overflow: 'hidden',
-            position: 'relative',
-            boxSizing: 'border-box'
+            // Force exact dimensions
+            minWidth: `${WIDTH_PX}px`,
+            maxWidth: `${WIDTH_PX}px`,
+            minHeight: `${HEIGHT_PX}px`,
+            maxHeight: `${HEIGHT_PX}px`,
           }}
         >
           <div 
-            className="absolute inset-0"
             style={{
-              padding: '1in',
+              position: 'absolute',
+              top: '1in',
+              right: '1in',
+              bottom: '1in',
+              left: '1in',
+              overflow: 'hidden',
               boxSizing: 'border-box',
-              overflow: 'hidden'
             }}
           >
             {/* Header Section */}
@@ -175,7 +169,7 @@ export function ResumePreview({
             <div 
               className={cn(selectedTemplate.style.contentStyle, "overflow-hidden")}
               style={{
-                height: 'calc(100% - 120px)'
+                height: 'calc(100% - 120px)',
               }}
             >
               {/* Professional Summary */}
