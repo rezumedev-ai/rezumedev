@@ -8,35 +8,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+async function enhanceWithAI(content: string, role: string, openAIApiKey: string) {
   try {
-    const { resumeData } = await req.json();
-    
-    if (!resumeData || !resumeData.id) {
-      throw new Error('Missing required resume data or ID');
-    }
-
-    // Get OpenAI API key from environment variables
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
-    }
-
-    console.log('Starting resume enhancement for ID:', resumeData.id);
-
-    // Initialize Supabase client
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Enhance professional summary
-    console.log('Enhancing professional summary...');
-    const summaryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    console.log(`Enhancing content for role: ${role}`);
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
@@ -47,58 +22,74 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert resume writer focused on creating ATS-friendly content.'
+            content: 'You are an expert resume writer. Enhance the content to be more professional and ATS-friendly while maintaining truthfulness.'
           },
           {
             role: 'user',
-            content: `Enhance this professional summary for a ${resumeData.professional_summary.title} position:\n${resumeData.professional_summary.summary}`
+            content: content
           }
         ],
+        temperature: 0.7,
+        max_tokens: 1000
       }),
     });
 
-    if (!summaryResponse.ok) {
-      throw new Error('OpenAI API error: ' + await summaryResponse.text());
+    const data = await response.json();
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI');
     }
 
-    const summaryData = await summaryResponse.json();
-    const enhancedSummary = summaryData.choices[0].message.content;
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error('AI enhancement error:', error);
+    throw error;
+  }
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openAIApiKey) {
+    console.error('OpenAI API key not found');
+    return new Response(
+      JSON.stringify({ error: 'OpenAI API key not configured' }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
+
+  try {
+    const { resumeData, resumeId } = await req.json();
+    console.log('Starting resume enhancement for ID:', resumeId);
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Enhance professional summary
+    console.log('Enhancing professional summary...');
+    const summaryPrompt = `Enhance this professional summary for a ${resumeData.professional_summary.title} position:\n${resumeData.professional_summary.summary}`;
+    const enhancedSummary = await enhanceWithAI(summaryPrompt, resumeData.professional_summary.title, openAIApiKey);
 
     // Enhance work experience
-    console.log('Enhancing work experience...');
+    console.log('Enhancing work experience entries...');
     const enhancedExperience = await Promise.all(
-      resumeData.work_experience.map(async (exp) => {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${openAIApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are an expert resume writer. Convert job responsibilities into achievement-focused, ATS-friendly bullet points.'
-              },
-              {
-                role: 'user',
-                content: `Enhance these responsibilities for a ${exp.jobTitle} role:\n${exp.responsibilities.join('\n')}`
-              }
-            ],
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('OpenAI API error: ' + await response.text());
-        }
-
-        const data = await response.json();
+      resumeData.work_experience.map(async (exp: any) => {
+        const responsibilitiesPrompt = `Improve these job responsibilities for a ${exp.jobTitle} position to be more impactful and achievement-focused:\n${exp.responsibilities.join('\n')}`;
+        const enhancedResponsibilities = await enhanceWithAI(responsibilitiesPrompt, exp.jobTitle, openAIApiKey);
+        
         return {
           ...exp,
-          responsibilities: data.choices[0].message.content
+          responsibilities: enhancedResponsibilities
             .split('\n')
-            .filter(line => line.trim().length > 0)
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
         };
       })
     );
@@ -115,7 +106,7 @@ serve(async (req) => {
         work_experience: enhancedExperience,
         completion_status: 'completed'
       })
-      .eq('id', resumeData.id);
+      .eq('id', resumeId);
 
     if (updateError) {
       throw updateError;
@@ -129,22 +120,19 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in enhance-resume function:', error);
-
-    // Try to update the resume status to error
+    
     try {
-      const supabase = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      );
-      
-      if (req.body) {
-        const { resumeData } = await req.json();
-        if (resumeData?.id) {
-          await supabase
-            .from('resumes')
-            .update({ completion_status: 'error' })
-            .eq('id', resumeData.id);
-        }
+      const { resumeId } = await req.json();
+      if (resumeId) {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        );
+        
+        await supabase
+          .from('resumes')
+          .update({ completion_status: 'error' })
+          .eq('id', resumeId);
       }
     } catch (updateError) {
       console.error('Failed to update error status:', updateError);
