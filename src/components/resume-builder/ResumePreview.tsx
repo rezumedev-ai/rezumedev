@@ -1,4 +1,3 @@
-
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -61,10 +60,19 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
+  // A4 dimensions in millimeters
+  const A4_MM = {
+    width: 210,
+    height: 297
+  };
+
+  // Convert mm to px (96 DPI)
+  const MM_TO_PX = 96 / 25.4;
+
   // A4 dimensions in pixels at 96 DPI
   const A4_DIMENSIONS = {
-    width: 794, // 210mm at 96 DPI
-    height: 1123, // 297mm at 96 DPI
+    width: Math.round(A4_MM.width * MM_TO_PX),  // 794px
+    height: Math.round(A4_MM.height * MM_TO_PX), // 1123px
   };
 
   const toggleZoom = () => {
@@ -116,13 +124,13 @@ export function ResumePreview({
       
       <div 
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center p-6 overflow-auto"
+        className="w-full h-full flex items-center justify-center p-6"
       >
         <div 
           ref={resumeRef}
           id="resume-content"
           className={cn(
-            "bg-white shadow-xl origin-center overflow-hidden",
+            "bg-white shadow-xl origin-center",
             selectedTemplate.style.titleFont
           )}
           style={{
@@ -131,15 +139,24 @@ export function ResumePreview({
             transform: `scale(${scale})`,
             transformOrigin: 'center',
             margin: 'auto',
+            // Strict A4 constraints
+            minWidth: `${A4_DIMENSIONS.width}px`,
+            maxWidth: `${A4_DIMENSIONS.width}px`,
+            minHeight: `${A4_DIMENSIONS.height}px`,
             maxHeight: `${A4_DIMENSIONS.height}px`,
-            // Ensure content doesn't overflow
-            overflowY: 'auto',
-            // Hide scrollbar while maintaining functionality
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none',
+            // Prevent content overflow
+            overflow: 'hidden',
+            position: 'relative',
           }}
         >
-          <div className="p-12 h-full">
+          <div 
+            className="p-12 h-full overflow-hidden"
+            style={{
+              // Ensure content stays within bounds
+              maxHeight: '100%',
+              position: 'relative',
+            }}
+          >
             {/* Header Section */}
             <div className={selectedTemplate.style.headerStyle}>
               <h1 className={selectedTemplate.style.titleFont}>
@@ -155,7 +172,12 @@ export function ResumePreview({
               </div>
             </div>
 
-            <div className={selectedTemplate.style.contentStyle}>
+            <div 
+              className={cn(selectedTemplate.style.contentStyle, "overflow-hidden")}
+              style={{
+                maxHeight: 'calc(100% - 120px)', // Account for header
+              }}
+            >
               {/* Professional Summary */}
               <div>
                 <h3 className={selectedTemplate.style.sectionStyle}>Professional Summary</h3>
