@@ -8,9 +8,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const enhanceText = async (prompt: string, openAIApiKey: string): Promise<string> => {
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const { resumeData } = await req.json();
+    
+    if (!resumeData || !resumeData.id) {
+      throw new Error('Missing required resume data or ID');
+    }
+
+    // Get OpenAI API key from environment variables
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    console.log('Starting resume enhancement for ID:', resumeData.id);
+
+    // Initialize Supabase client
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Enhance professional summary
+    console.log('Enhancing professional summary...');
+    const summaryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
@@ -19,91 +45,66 @@ const enhanceText = async (prompt: string, openAIApiKey: string): Promise<string
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are an expert ATS resume optimizer and professional writer.' },
-          { role: 'user', content: prompt }
+          {
+            role: 'system',
+            content: 'You are an expert resume writer focused on creating ATS-friendly content.'
+          },
+          {
+            role: 'user',
+            content: `Enhance this professional summary for a ${resumeData.professional_summary.title} position:\n${resumeData.professional_summary.summary}`
+          }
         ],
-        temperature: 0.7,
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+    if (!summaryResponse.ok) {
+      throw new Error('OpenAI API error: ' + await summaryResponse.text());
     }
 
-    const data = await response.json();
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error('Error in enhanceText:', error);
-    throw error;
-  }
-};
-
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  let supabase;
-  let resumeId;
-
-  try {
-    const { resumeData } = await req.json();
-    resumeId = resumeData.id;
-    
-    if (!resumeData || !resumeId) {
-      throw new Error('Missing required resume data or ID');
-    }
-
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not found');
-    }
-
-    // Initialize Supabase client
-    supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    console.log('Starting enhancement for resume:', resumeId);
-
-    // Enhance professional summary
-    let enhancedSummary;
-    try {
-      enhancedSummary = await enhanceText(
-        `Enhance this professional summary for a ${resumeData.professional_summary.title} position to be ATS-friendly: ${resumeData.professional_summary.summary}`,
-        openAIApiKey
-      );
-    } catch (error) {
-      console.error('Failed to enhance summary:', error);
-      enhancedSummary = resumeData.professional_summary.summary; // Keep original if enhancement fails
-    }
+    const summaryData = await summaryResponse.json();
+    const enhancedSummary = summaryData.choices[0].message.content;
 
     // Enhance work experience
+    console.log('Enhancing work experience...');
     const enhancedExperience = await Promise.all(
       resumeData.work_experience.map(async (exp) => {
-        try {
-          const enhancedResponsibilities = await enhanceText(
-            `Enhance these job responsibilities for a ${exp.jobTitle} role to be ATS-friendly and achievement-focused: ${exp.responsibilities.join('\n')}`,
-            openAIApiKey
-          );
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an expert resume writer. Convert job responsibilities into achievement-focused, ATS-friendly bullet points.'
+              },
+              {
+                role: 'user',
+                content: `Enhance these responsibilities for a ${exp.jobTitle} role:\n${exp.responsibilities.join('\n')}`
+              }
+            ],
+          }),
+        });
 
-          return {
-            ...exp,
-            responsibilities: enhancedResponsibilities
-              .split('\n')
-              .map(line => line.trim())
-              .filter(line => line.length > 0)
-          };
-        } catch (error) {
-          console.error('Failed to enhance experience:', error);
-          return exp; // Keep original if enhancement fails
+        if (!response.ok) {
+          throw new Error('OpenAI API error: ' + await response.text());
         }
+
+        const data = await response.json();
+        return {
+          ...exp,
+          responsibilities: data.choices[0].message.content
+            .split('\n')
+            .filter(line => line.trim().length > 0)
+        };
       })
     );
 
-    // Update the resume in the database
+    // Update resume in database
+    console.log('Updating resume with enhanced content...');
     const { error: updateError } = await supabase
       .from('resumes')
       .update({
@@ -112,47 +113,49 @@ serve(async (req) => {
           summary: enhancedSummary
         },
         work_experience: enhancedExperience,
-        completion_status: 'completed',
-        updated_at: new Date().toISOString()
+        completion_status: 'completed'
       })
-      .eq('id', resumeId);
+      .eq('id', resumeData.id);
 
     if (updateError) {
       throw updateError;
     }
 
+    console.log('Resume enhancement completed successfully');
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Resume enhanced successfully' 
-      }),
+      JSON.stringify({ success: true }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in enhance-resume function:', error);
 
-    // Try to update the resume status to error if we have the necessary info
-    if (supabase && resumeId) {
-      try {
-        await supabase
-          .from('resumes')
-          .update({ 
-            completion_status: 'error',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', resumeId);
-      } catch (updateError) {
-        console.error('Failed to update error status:', updateError);
+    // Try to update the resume status to error
+    try {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+      
+      if (req.body) {
+        const { resumeData } = await req.json();
+        if (resumeData?.id) {
+          await supabase
+            .from('resumes')
+            .update({ completion_status: 'error' })
+            .eq('id', resumeData.id);
+        }
       }
+    } catch (updateError) {
+      console.error('Failed to update error status:', updateError);
     }
 
     return new Response(
-      JSON.stringify({ 
-        error: 'Failed to enhance resume',
-        details: error.message 
+      JSON.stringify({
+        error: 'Resume enhancement failed',
+        details: error.message
       }),
-      { 
+      {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
