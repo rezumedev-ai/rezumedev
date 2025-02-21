@@ -60,19 +60,19 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  // A4 dimensions in millimeters
-  const A4_MM = {
-    width: 210,
-    height: 297
+  // US Letter dimensions in inches
+  const LETTER_SIZE = {
+    width: 8.5,
+    height: 11
   };
 
-  // Convert mm to px (96 DPI)
-  const MM_TO_PX = 96 / 25.4;
+  // Convert inches to pixels (96 DPI)
+  const INCH_TO_PX = 96;
 
-  // A4 dimensions in pixels at 96 DPI
-  const A4_DIMENSIONS = {
-    width: Math.round(A4_MM.width * MM_TO_PX),  // 794px
-    height: Math.round(A4_MM.height * MM_TO_PX), // 1123px
+  // Letter size dimensions in pixels at 96 DPI
+  const LETTER_DIMENSIONS = {
+    width: LETTER_SIZE.width * INCH_TO_PX,  // 816px
+    height: LETTER_SIZE.height * INCH_TO_PX, // 1056px
   };
 
   const toggleZoom = () => {
@@ -86,8 +86,8 @@ export function ResumePreview({
         const containerHeight = containerRef.current.clientHeight;
         
         // Calculate scale to fit within container while maintaining aspect ratio
-        const scaleX = (containerWidth - 48) / A4_DIMENSIONS.width;
-        const scaleY = (containerHeight - 48) / A4_DIMENSIONS.height;
+        const scaleX = (containerWidth - 48) / LETTER_DIMENSIONS.width;
+        const scaleY = (containerHeight - 48) / LETTER_DIMENSIONS.height;
         
         // Use the smaller scale to ensure it fits both dimensions
         let newScale = Math.min(scaleX, scaleY, 1);
@@ -134,27 +134,33 @@ export function ResumePreview({
             selectedTemplate.style.titleFont
           )}
           style={{
-            width: `${A4_DIMENSIONS.width}px`,
-            height: `${A4_DIMENSIONS.height}px`,
+            width: `${LETTER_DIMENSIONS.width}px`,
+            height: `${LETTER_DIMENSIONS.height}px`,
             transform: `scale(${scale})`,
             transformOrigin: 'center',
             margin: 'auto',
-            // Strict A4 constraints
-            minWidth: `${A4_DIMENSIONS.width}px`,
-            maxWidth: `${A4_DIMENSIONS.width}px`,
-            minHeight: `${A4_DIMENSIONS.height}px`,
-            maxHeight: `${A4_DIMENSIONS.height}px`,
+            // Strict Letter size constraints
+            minWidth: `${LETTER_DIMENSIONS.width}px`,
+            maxWidth: `${LETTER_DIMENSIONS.width}px`,
+            minHeight: `${LETTER_DIMENSIONS.height}px`,
+            maxHeight: `${LETTER_DIMENSIONS.height}px`,
             // Prevent content overflow
             overflow: 'hidden',
             position: 'relative',
+            // Ensure exact dimensions
+            boxSizing: 'border-box',
+            padding: '0',
           }}
         >
           <div 
-            className="p-12 h-full overflow-hidden"
+            className="h-full overflow-hidden"
             style={{
+              // Standard margins for US Letter
+              padding: '1in',
               // Ensure content stays within bounds
               maxHeight: '100%',
               position: 'relative',
+              boxSizing: 'border-box',
             }}
           >
             {/* Header Section */}
