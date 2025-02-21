@@ -72,15 +72,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         contentPadding: "3rem",
         headerHeight: "200px",
         margins: {
-          top: "70px",
-          right: "70px",
-          bottom: "70px",
-          left: "70px"
+          top: "1in",
+          right: "1in",
+          bottom: "1in",
+          left: "1in"
         }
       },
       dimensions: {
-        maxWidth: "816px",
-        minHeight: "1056px"
+        maxWidth: "8.5in",
+        minHeight: "11in"
       },
       typography: {
         titleSize: "40px",
@@ -237,3 +237,4 @@ export const resumeTemplates: ResumeTemplate[] = [
     }
   }
 ];
+

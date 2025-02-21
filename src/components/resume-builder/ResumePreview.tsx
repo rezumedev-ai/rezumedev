@@ -60,19 +60,18 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  // US Letter dimensions in inches
-  const LETTER_SIZE = {
+  // Standard US Letter size in inches
+  const PAGE_SIZE = {
     width: 8.5,
     height: 11
   };
 
-  // Convert inches to pixels (96 DPI)
-  const INCH_TO_PX = 96;
-
-  // Letter size dimensions in pixels at 96 DPI
-  const LETTER_DIMENSIONS = {
-    width: LETTER_SIZE.width * INCH_TO_PX,  // 816px
-    height: LETTER_SIZE.height * INCH_TO_PX, // 1056px
+  // Convert to pixels (1 inch = 96px)
+  const PIXELS_PER_INCH = 96;
+  
+  const PAGE_SIZE_PX = {
+    width: PAGE_SIZE.width * PIXELS_PER_INCH,
+    height: PAGE_SIZE.height * PIXELS_PER_INCH
   };
 
   const toggleZoom = () => {
@@ -86,8 +85,8 @@ export function ResumePreview({
         const containerHeight = containerRef.current.clientHeight;
         
         // Calculate scale to fit within container while maintaining aspect ratio
-        const scaleX = (containerWidth - 48) / LETTER_DIMENSIONS.width;
-        const scaleY = (containerHeight - 48) / LETTER_DIMENSIONS.height;
+        const scaleX = (containerWidth - 48) / PAGE_SIZE_PX.width;
+        const scaleY = (containerHeight - 48) / PAGE_SIZE_PX.height;
         
         // Use the smaller scale to ensure it fits both dimensions
         let newScale = Math.min(scaleX, scaleY, 1);
@@ -130,37 +129,32 @@ export function ResumePreview({
           ref={resumeRef}
           id="resume-content"
           className={cn(
-            "bg-white shadow-xl origin-center",
+            "bg-white shadow-xl",
             selectedTemplate.style.titleFont
           )}
           style={{
-            width: `${LETTER_DIMENSIONS.width}px`,
-            height: `${LETTER_DIMENSIONS.height}px`,
+            width: `${PAGE_SIZE_PX.width}px`,
+            height: `${PAGE_SIZE_PX.height}px`,
             transform: `scale(${scale})`,
             transformOrigin: 'center',
-            margin: 'auto',
-            // Strict Letter size constraints
-            minWidth: `${LETTER_DIMENSIONS.width}px`,
-            maxWidth: `${LETTER_DIMENSIONS.width}px`,
-            minHeight: `${LETTER_DIMENSIONS.height}px`,
-            maxHeight: `${LETTER_DIMENSIONS.height}px`,
-            // Prevent content overflow
+            // Force exact US Letter dimensions
+            minWidth: `${PAGE_SIZE_PX.width}px`,
+            maxWidth: `${PAGE_SIZE_PX.width}px`,
+            minHeight: `${PAGE_SIZE_PX.height}px`,
+            maxHeight: `${PAGE_SIZE_PX.height}px`,
+            margin: '0 auto',
+            padding: '0',
             overflow: 'hidden',
             position: 'relative',
-            // Ensure exact dimensions
-            boxSizing: 'border-box',
-            padding: '0',
+            boxSizing: 'border-box'
           }}
         >
           <div 
-            className="h-full overflow-hidden"
+            className="absolute inset-0"
             style={{
-              // Standard margins for US Letter
               padding: '1in',
-              // Ensure content stays within bounds
-              maxHeight: '100%',
-              position: 'relative',
               boxSizing: 'border-box',
+              overflow: 'hidden'
             }}
           >
             {/* Header Section */}
@@ -181,7 +175,7 @@ export function ResumePreview({
             <div 
               className={cn(selectedTemplate.style.contentStyle, "overflow-hidden")}
               style={{
-                maxHeight: 'calc(100% - 120px)', // Account for header
+                height: 'calc(100% - 120px)'
               }}
             >
               {/* Professional Summary */}
