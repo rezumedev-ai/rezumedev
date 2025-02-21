@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -130,7 +129,6 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }).filter((item): item is Certification => item !== null);
   };
 
-  // Fetch existing resume data and quiz responses
   const { data: existingData } = useQuery({
     queryKey: ['resume-data', resumeId],
     queryFn: async () => {
@@ -271,13 +269,77 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             completion_status: 'enhancing'
           })
           .eq('id', resumeId);
-        
-        await enhanceResume();
+      
+        const { data, error } = await supabase.functions.invoke('enhance-resume', {
+          body: { 
+            resumeData: formData,
+            resumeId: resumeId
+          }
+        });
+
+        if (error) {
+          console.error('Error enhancing resume:', error);
+          toast({
+            title: "Resume Generation Failed",
+            description: "We encountered an error while generating your resume. Please try again or contact support if the issue persists.",
+            variant: "destructive",
+          });
+          setIsEnhancing(false);
+          return;
+        }
+
+        let attempts = 0;
+        const maxAttempts = 30;
+        const checkCompletion = setInterval(async () => {
+          attempts++;
+          console.log(`Checking completion attempt ${attempts}`);
+
+          const { data: pollData, error: pollError } = await supabase
+            .from('resumes')
+            .select('completion_status')
+            .eq('id', resumeId)
+            .single();
+
+          if (pollError) {
+            clearInterval(checkCompletion);
+            setIsEnhancing(false);
+            toast({
+              title: "Error",
+              description: "Failed to check resume status. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          if (pollData.completion_status === 'completed') {
+            clearInterval(checkCompletion);
+            setIsEnhancing(false);
+            onComplete();
+          } else if (pollData.completion_status === 'error') {
+            clearInterval(checkCompletion);
+            setIsEnhancing(false);
+            toast({
+              title: "Resume Generation Failed",
+              description: "There was an error generating your resume. Please try again.",
+              variant: "destructive",
+            });
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkCompletion);
+            setIsEnhancing(false);
+            toast({
+              title: "Timeout",
+              description: "Resume generation is taking longer than expected. Please try again.",
+              variant: "destructive",
+            });
+          }
+        }, 2000);
+
       } catch (error) {
+        console.error('Error in handleStepComplete:', error);
         setIsEnhancing(false);
         toast({
           title: "Error",
-          description: "Failed to save your information. Please try again.",
+          description: "Failed to process your resume. Please try again.",
           variant: "destructive",
         });
       }
