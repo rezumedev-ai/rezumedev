@@ -7,6 +7,7 @@ export interface WorkExperience {
   endDate: string;
   isCurrentJob?: boolean;
   responsibilities: string[];
+  achievements?: string[]; // Adding achievements separate from responsibilities
 }
 
 export interface Education {
@@ -34,13 +35,17 @@ export interface ResumeData {
   professional_summary: {
     title: string;
     summary: string;
+    targetRole?: string; // Adding target role for better context
+    industryKeywords?: string[]; // Adding industry keywords for ATS optimization
   };
   work_experience: WorkExperience[];
   education: Education[];
   skills: {
     hard_skills: string[];
     soft_skills: string[];
+    industry_specific?: string[]; // Adding industry-specific skills
   };
   certifications: Certification[];
   template_id?: string;
+  ats_keywords?: string[]; // Track ATS keywords used throughout the resume
 }
