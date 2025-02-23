@@ -1,40 +1,122 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { createClient } from '@supabase/supabase-js';
+
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const SYSTEM_PROMPTS = {
-  summary: `You are an expert resume writer specializing in ATS optimization. Create concise, impactful summaries that:
-- Are 3-4 lines maximum
+const generateEnhancedPrompt = (resumeData: any) => `
+As an expert ATS resume optimizer for top tech companies like Google and OpenAI, enhance this resume while strictly adhering to these guidelines:
+
+1. CONTACT INFORMATION (use only provided data):
+${JSON.stringify(resumeData.personal_info, null, 2)}
+
+2. PROFESSIONAL SUMMARY:
+Create a concise, impactful summary for the role: ${resumeData.professional_summary.title}
+- Focus on actual experience and achievements
 - Include relevant industry keywords
-- Highlight key strengths and value proposition
-- Maintain professional, third-person tone
-- Focus on measurable achievements`,
+- Keep tone professional and direct
+- No assumptions or exaggerations
 
-  experience: `You are an expert resume writer. Transform job responsibilities into achievement-focused bullet points that:
-- Start with strong action verbs
-- Include metrics and specific outcomes
-- Are 1-2 lines maximum per bullet
-- Use industry-specific keywords
-- Limit to 4-5 bullet points per role
-- Focus on most impactful contributions`,
+3. WORK EXPERIENCE:
+Transform these experiences into achievement-focused bullet points:
+${JSON.stringify(resumeData.work_experience, null, 2)}
 
-  skills: `You are an expert resume writer. Generate relevant technical and soft skills that:
-- Are specific to the industry and role
-- Include both technical competencies and soft skills
-- Prioritize keywords commonly found in job descriptions
-- Are organized by category
-- Maximum 8-10 skills per category`
-};
+Guidelines for each position:
+- Convert responsibilities into measurable achievements
+- Focus on impact and results
+- Use action verbs and industry keywords
+- Maintain ATS compatibility
+- Ensure all content fits one A4 page
 
-async function enhanceWithAI(content: string, systemPrompt: string, openAIApiKey: string) {
+4. EDUCATION (keep simple and factual):
+${JSON.stringify(resumeData.education, null, 2)}
+
+${resumeData.certifications?.length > 0 ? `5. CERTIFICATIONS:
+${JSON.stringify(resumeData.certifications, null, 2)}` : ''}
+
+6. SKILLS:
+Current skills: ${JSON.stringify(resumeData.skills, null, 2)}
+- Generate relevant technical and soft skills based on experience
+- Format as clean, comma-separated list
+- No rating scales or levels
+- Focus on skills relevant to ${resumeData.professional_summary.title}
+
+FORMAT REQUIREMENTS:
+- Single A4 page layout
+- Smart spacing based on content volume
+- No fluff or filler content
+- Rich in relevant ATS keywords while maintaining readability
+- Achievement-focused bullet points
+- Clear hierarchy of information
+
+Return JSON with this exact structure:
+{
+  "personal_info": {
+    "fullName": string,
+    "email": string,
+    "phone": string,
+    "linkedin": string (optional),
+    "website": string (optional)
+  },
+  "professional_summary": {
+    "title": string,
+    "summary": string
+  },
+  "work_experience": [{
+    "jobTitle": string,
+    "companyName": string,
+    "location": string,
+    "startDate": string,
+    "endDate": string,
+    "isCurrentJob": boolean,
+    "responsibilities": string[],
+    "achievements": string[]
+  }],
+  "education": [{
+    "degreeName": string,
+    "schoolName": string,
+    "startDate": string,
+    "endDate": string,
+    "isCurrentlyEnrolled": boolean
+  }],
+  "skills": {
+    "hard_skills": string[],
+    "soft_skills": string[]
+  },
+  "certifications": [{
+    "name": string,
+    "organization": string,
+    "completionDate": string
+  }],
+  "ats_keywords": string[]
+}
+
+Use ONLY the information provided. Do not invent or assume any details.`;
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const { resumeData, resumeId } = await req.json();
+    
+    console.log('Enhancing resume:', resumeId);
+    console.log('Input data:', JSON.stringify(resumeData, null, 2));
+
+    const prompt = generateEnhancedPrompt(resumeData);
+
+    const completion = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
@@ -45,181 +127,86 @@ async function enhanceWithAI(content: string, systemPrompt: string, openAIApiKey
         messages: [
           {
             role: 'system',
-            content: systemPrompt
+            content: 'You are an expert ATS resume optimizer specializing in tech industry resumes. Generate content that is professional, achievement-focused, and keyword-optimized while strictly using only the provided information.'
           },
           {
             role: 'user',
-            content
+            content: prompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 1000
+        temperature: 0.5,
+        max_tokens: 2000,
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+    if (!completion.ok) {
+      throw new Error(`OpenAI API error: ${completion.statusText}`);
     }
 
-    const data = await response.json();
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error('AI enhancement error:', error);
-    throw error;
-  }
-}
+    const response = await completion.json();
+    console.log('OpenAI response received');
 
-async function generateSkills(jobTitle: string, experience: any[], openAIApiKey: string) {
-  const experienceContext = experience
-    .map(exp => `${exp.jobTitle} at ${exp.companyName}: ${exp.responsibilities.join('. ')}`)
-    .join('\n');
+    const enhancedResume = JSON.parse(response.choices[0].message.content);
+    console.log('Enhanced resume generated:', JSON.stringify(enhancedResume, null, 2));
 
-  const prompt = `Based on this professional background for a ${jobTitle} position:\n${experienceContext}\n\nGenerate two lists:
-1. Technical Skills (Hard Skills)
-2. Professional Skills (Soft Skills)
-
-Focus on skills that are most relevant to the role and mentioned in the experience.`;
-
-  const skillsContent = await enhanceWithAI(prompt, SYSTEM_PROMPTS.skills, openAIApiKey);
-  
-  // Parse the skills into categories
-  const hardSkills = [];
-  const softSkills = [];
-  let currentCategory = null;
-
-  skillsContent.split('\n').forEach(line => {
-    if (line.includes('Technical Skills') || line.includes('Hard Skills')) {
-      currentCategory = 'hard';
-    } else if (line.includes('Professional Skills') || line.includes('Soft Skills')) {
-      currentCategory = 'soft';
-    } else if (line.trim() && currentCategory) {
-      const skill = line.replace(/^[•\-\*]\s*/, '').trim();
-      if (skill) {
-        if (currentCategory === 'hard') {
-          hardSkills.push(skill);
-        } else {
-          softSkills.push(skill);
-        }
-      }
-    }
-  });
-
-  return {
-    hard_skills: hardSkills.slice(0, 8),
-    soft_skills: softSkills.slice(0, 6)
-  };
-}
-
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openAIApiKey) {
-    console.error('OpenAI API key not found');
-    return new Response(
-      JSON.stringify({ error: 'OpenAI API key not configured' }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
-  }
-
-  try {
-    const { resumeData, resumeId } = await req.json();
-    console.log('Starting resume enhancement for ID:', resumeId);
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Enhance professional summary
-    console.log('Enhancing professional summary...');
-    const summaryPrompt = `Create a professional summary for a ${resumeData.professional_summary.title} position with this background:\n${resumeData.professional_summary.summary}`;
-    const enhancedSummary = await enhanceWithAI(summaryPrompt, SYSTEM_PROMPTS.summary, openAIApiKey);
-
-    // Enhance work experience
-    console.log('Enhancing work experience entries...');
-    const enhancedExperience = await Promise.all(
-      resumeData.work_experience.map(async (exp: any) => {
-        const responsibilitiesPrompt = `Transform these job responsibilities for a ${exp.jobTitle} position into achievement-focused bullets:\n${exp.responsibilities.join('\n')}`;
-        const enhancedResponsibilities = await enhanceWithAI(responsibilitiesPrompt, SYSTEM_PROMPTS.experience, openAIApiKey);
-        
-        return {
-          ...exp,
-          responsibilities: enhancedResponsibilities
-            .split('\n')
-            .map(line => line.trim())
-            .filter(line => line.length > 0)
-            .slice(0, 5) // Limit to 5 bullet points per role
-        };
-      })
-    );
-
-    // Generate optimized skills
-    console.log('Generating optimized skills...');
-    const enhancedSkills = await generateSkills(
-      resumeData.professional_summary.title,
-      enhancedExperience,
-      openAIApiKey
-    );
-
-    // Update resume in database
-    console.log('Updating resume with enhanced content...');
     const { error: updateError } = await supabase
       .from('resumes')
       .update({
-        professional_summary: {
-          ...resumeData.professional_summary,
-          summary: enhancedSummary
-        },
-        work_experience: enhancedExperience,
-        skills: enhancedSkills,
+        personal_info: enhancedResume.personal_info,
+        professional_summary: enhancedResume.professional_summary,
+        work_experience: enhancedResume.work_experience,
+        education: enhancedResume.education,
+        skills: enhancedResume.skills,
+        certifications: enhancedResume.certifications,
+        ats_keywords: enhancedResume.ats_keywords,
         completion_status: 'completed'
       })
       .eq('id', resumeId);
 
     if (updateError) {
+      console.error('Error updating resume:', updateError);
       throw updateError;
     }
 
-    console.log('Resume enhancement completed successfully');
     return new Response(
-      JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        success: true, 
+        data: enhancedResume 
+      }),
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
     );
 
   } catch (error) {
     console.error('Error in enhance-resume function:', error);
     
-    try {
-      const { resumeId } = await req.json();
-      if (resumeId) {
-        const supabase = createClient(
-          Deno.env.get('SUPABASE_URL') ?? '',
-          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-        );
-        
+    // Try to update the resume status to error if possible
+    if (error.resumeId) {
+      try {
         await supabase
           .from('resumes')
           .update({ completion_status: 'error' })
-          .eq('id', resumeId);
+          .eq('id', error.resumeId);
+      } catch (updateError) {
+        console.error('Failed to update resume status:', updateError);
       }
-    } catch (updateError) {
-      console.error('Failed to update error status:', updateError);
     }
 
     return new Response(
-      JSON.stringify({
-        error: 'Resume enhancement failed',
-        details: error.message
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
       }),
-      {
+      { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     );
   }
