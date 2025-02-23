@@ -1,7 +1,53 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { ResumeData } from "../../../src/types/resume.ts";
+
+// Define types inline since we can't import from project files
+interface WorkExperience {
+  jobTitle: string;
+  companyName: string;
+  location?: string;
+  startDate: string;
+  endDate: string;
+  isCurrentJob?: boolean;
+  responsibilities: string[];
+}
+
+interface Education {
+  degreeName: string;
+  schoolName: string;
+  startDate: string;
+  endDate: string;
+  isCurrentlyEnrolled?: boolean;
+}
+
+interface Certification {
+  name: string;
+  organization: string;
+  completionDate: string;
+}
+
+interface ResumeData {
+  personal_info: {
+    fullName: string;
+    email: string;
+    phone: string;
+    linkedin?: string;
+    website?: string;
+  };
+  professional_summary: {
+    title: string;
+    summary: string;
+  };
+  work_experience: WorkExperience[];
+  education: Education[];
+  skills: {
+    hard_skills: string[];
+    soft_skills: string[];
+  };
+  certifications: Certification[];
+  template_id?: string;
+}
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -10,7 +56,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const generatePrompt = (quizData: any) => `
+const generatePrompt = (quizData: ResumeData) => `
 Generate a professional, ATS-optimized resume using ONLY the following provided information. Do not make assumptions or add information not provided:
 
 CONTACT INFORMATION:
@@ -68,11 +114,9 @@ Return a JSON object with the following structure:
   },
   "certifications": [...],
   "ats_keywords": string[]
-}
-`;
+}`;
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -106,8 +150,8 @@ serve(async (req) => {
             content: prompt
           }
         ],
-        temperature: 0.5, // Balance between creativity and consistency
-        max_tokens: 2000, // Ensure we have enough tokens for a complete resume
+        temperature: 0.5,
+        max_tokens: 2000,
       }),
     });
 
@@ -118,23 +162,6 @@ serve(async (req) => {
 
     const data = await response.json();
     const enhancedResume = JSON.parse(data.choices[0].message.content);
-
-    // Update the resume in the database
-    const { data: updateData, error: updateError } = await supabase
-      .from('resumes')
-      .update({
-        personal_info: enhancedResume.personal_info,
-        professional_summary: enhancedResume.professional_summary,
-        work_experience: enhancedResume.work_experience,
-        education: enhancedResume.education,
-        skills: enhancedResume.skills,
-        certifications: enhancedResume.certifications,
-        ats_keywords: enhancedResume.ats_keywords,
-        completion_status: 'completed'
-      })
-      .eq('id', resumeData.id);
-
-    if (updateError) throw updateError;
 
     return new Response(
       JSON.stringify({ 
