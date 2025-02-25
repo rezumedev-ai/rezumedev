@@ -1,7 +1,7 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { MoveRight } from "lucide-react";
+import { MoveRight, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { Link } from "react-router-dom";
 import { GradientHeading } from "@/components/ui/gradient-heading";
@@ -90,41 +90,44 @@ function AnimatedHero() {
   return (
     <div className="w-full">
       <div className="container mx-auto">
-        <div className="flex gap-8 py-20 lg:py-32 items-center justify-center flex-col">
-          <div className="flex gap-6 flex-col max-w-3xl">
-            <div className="space-y-6">
-              <h1 className="flex flex-col items-center text-5xl md:text-7xl tracking-tight font-regular">
-                <span className="text-primary font-medium mb-4">Create Your</span>
-                <div className="relative h-20 flex justify-center overflow-hidden my-2">
-                  {titles.map((title, index) => (
-                    <motion.span
-                      key={index}
-                      className="absolute font-semibold text-4xl md:text-6xl"
-                      initial={{ opacity: 0, y: "100%" }}
-                      transition={{ type: "spring", stiffness: 50 }}
-                      animate={
-                        titleNumber === index
-                          ? {
-                              y: 0,
-                              opacity: 1,
-                            }
-                          : {
-                              y: titleNumber > index ? "-100%" : "100%",
-                              opacity: 0,
-                            }
-                      }
-                    >
-                      {title}
-                    </motion.span>
-                  ))}
-                </div>
-                <span className="text-primary font-medium mt-4">Resume</span>
-              </h1>
+        <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
+          <div>
+            <Button variant="secondary" size="sm" className="gap-4">
+              AI-Powered Resume Builder <FileText className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex gap-4 flex-col">
+            <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
+              <span className="text-primary">Create your</span>
+              <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
+                &nbsp;
+                {titles.map((title, index) => (
+                  <motion.span
+                    key={index}
+                    className="absolute font-semibold"
+                    initial={{ opacity: 0, y: "-100" }}
+                    transition={{ type: "spring", stiffness: 50 }}
+                    animate={
+                      titleNumber === index
+                        ? {
+                            y: 0,
+                            opacity: 1,
+                          }
+                        : {
+                            y: titleNumber > index ? -150 : 150,
+                            opacity: 0,
+                          }
+                    }
+                  >
+                    {title}
+                  </motion.span>
+                ))}
+              </span>
+            </h1>
 
-              <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground text-center max-w-2xl mx-auto">
-                Land more interviews with an AI-powered resume that instantly impresses employers and beats applicant tracking systems.
-              </p>
-            </div>
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
+              Transform your career journey with our AI-powered resume builder. Create a professionally crafted, ATS-optimized resume that stands out to employers and gets you more interviews.
+            </p>
           </div>
           <div className="flex flex-col gap-8 items-center">
             <Link to="/signup">
