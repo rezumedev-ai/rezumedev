@@ -1,8 +1,7 @@
 
 import type { Config } from "tailwindcss";
-import plugin from "tailwindcss/plugin";
 
-const config = {
+export default {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -104,15 +103,7 @@ const config = {
         marquee: {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(calc(-100% - var(--gap)))' }
-        },
-        aurora: {
-          from: {
-            backgroundPosition: "50% 50%, 50% 50%",
-          },
-          to: {
-            backgroundPosition: "350% 50%, 350% 50%",
-          },
-        },
+        }
       },
       animation: {
         'fade-up': 'fade-up 0.5s ease-out',
@@ -120,35 +111,9 @@ const config = {
         'scale-up': 'scale-up 0.3s ease-out',
         'pulse-gentle': 'pulse-gentle 3s infinite',
         'rainbow': 'rainbow var(--speed, 2s) infinite linear',
-        'marquee': 'marquee var(--duration) linear infinite',
-        'aurora': 'aurora 60s linear infinite',
+        'marquee': 'marquee var(--duration) linear infinite'
       }
     }
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    plugin(({ addBase, theme }) => {
-      const colors = theme('colors', {});
-      const colorVariables = Object.fromEntries(
-        Object.entries(colors).flatMap(([key, value]) => {
-          if (typeof value === 'string') {
-            return [[`--${key}`, value]];
-          }
-          if (typeof value === 'object') {
-            return Object.entries(value).map(([nestedKey, nestedValue]) => [
-              `--${key}${nestedKey === 'DEFAULT' ? '' : `-${nestedKey}`}`,
-              nestedValue,
-            ]);
-          }
-          return [];
-        })
-      );
-
-      addBase({
-        ':root': colorVariables,
-      });
-    }),
-  ],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
-export default config;
