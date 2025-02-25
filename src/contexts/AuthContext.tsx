@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 type AuthContextType = {
@@ -17,10 +17,14 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
 });
 
+// Define public routes that don't require authentication
+const PUBLIC_ROUTES = ['/', '/login', '/signup', '/features', '/pricing', '/blog'];
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,9 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(session?.user ?? null);
       setLoading(false);
       
-      // If no session exists and we're not already on the login page,
-      // redirect to login
-      if (!session && window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+      // Only redirect to login if we're not on a public route and there's no session
+      const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
+      if (!session && !isPublicRoute) {
         navigate('/login');
       }
     });
@@ -47,7 +51,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           navigate('/dashboard');
           break;
         case 'SIGNED_OUT':
-          navigate('/login');
+          // Only redirect to login if we're not trying to access a public route
+          if (!PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login');
+          }
           break;
         case 'TOKEN_REFRESHED':
           // Session has been refreshed, update the user
@@ -62,7 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const signOut = async () => {
     try {
