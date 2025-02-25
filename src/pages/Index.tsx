@@ -1,5 +1,5 @@
 
-import { Hero } from "@/components/Hero";
+import { AnimatedHero } from "@/components/ui/animated-hero";
 import { Process } from "@/components/Process";
 import { Features } from "@/components/Features";
 import { ResumeTemplates } from "@/components/ResumeTemplates";
@@ -14,7 +14,7 @@ const Index = () => {
     <main className="min-h-screen bg-white">
       <Header />
       <div className="pt-16">
-        <Hero />
+        <AnimatedHero />
         <Process />
         <Features />
         <ResumeTemplates />
