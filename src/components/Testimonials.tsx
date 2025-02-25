@@ -1,96 +1,63 @@
 
-import { Star } from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { TestimonialsSection } from "@/components/ui/testimonials-with-marquee";
+
+const testimonials = [
+  {
+    author: {
+      name: "Sarah Miller",
+      handle: "@sarahm_tech",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "The AI-powered resume builder transformed my job search. Got callbacks from top companies within weeks. The ATS optimization really works!",
+  },
+  {
+    author: {
+      name: "Michael Chen",
+      handle: "@mchen_dev",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "Switched careers from finance to tech. The resume builder helped highlight my transferable skills perfectly. Landed my dream dev role!",
+  },
+  {
+    author: {
+      name: "Emily Rodriguez",
+      handle: "@emilycareer",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "The tailored suggestions for each job application are brilliant. It's like having a professional resume writer by your side.",
+  },
+  {
+    author: {
+      name: "James Wilson",
+      handle: "@jwilson_pro",
+      avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "Best resume builder I've used. The AI understands industry standards and automatically formats everything perfectly.",
+  },
+  {
+    author: {
+      name: "Lisa Chang",
+      handle: "@lisac_design",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "The modern templates and real-time preview helped me create a stand-out UX portfolio. Received multiple offers within a month!",
+  },
+  {
+    author: {
+      name: "David Kumar",
+      handle: "@davidk_work",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "Impressed by how the AI customizes content for different roles. Makes targeting specific positions so much easier.",
+  }
+];
 
 export const Testimonials = () => {
-  const testimonials = [
-    {
-      name: "Sarah Miller",
-      role: "Software Engineer",
-      content: "The AI-generated resume helped me land interviews at top tech companies. Highly recommended!",
-      company: "Apple Inc."
-    },
-    {
-      name: "James Wilson",
-      role: "Marketing Manager",
-      content: "This tool made updating my resume effortless. The tailored content really stands out.",
-      company: "Disney"
-    },
-    {
-      name: "Emma Thompson",
-      role: "Product Designer",
-      content: "Perfect balance of professional formatting and compelling content. Worth every penny!",
-      company: "Booking.com"
-    },
-    {
-      name: "Michael Chen",
-      role: "Data Scientist",
-      content: "The AI suggestions were spot-on for my field. Secured multiple interviews within weeks.",
-      company: "HCL Technologies"
-    },
-    {
-      name: "Laura Martinez",
-      role: "Supply Chain Manager",
-      content: "Excellent tool for highlighting key achievements. Made my experience shine!",
-      company: "DHL"
-    },
-    {
-      name: "David Kim",
-      role: "UX Researcher",
-      content: "The industry-specific templates were perfect. Landed my dream job!",
-      company: "Meta"
-    }
-  ];
-
   return (
-    <section className="py-20 bg-white sm:py-32">
-      <div className="container">
-        <h2 className="mb-16 text-3xl font-bold text-center text-secondary sm:text-4xl">
-          What Our Users Say
-        </h2>
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full max-w-5xl mx-auto"
-        >
-          <CarouselContent>
-            {testimonials.map((testimonial, index) => (
-              <CarouselItem key={testimonial.name} className="md:basis-1/2 lg:basis-1/3">
-                <div
-                  className="h-full p-6 transition-all bg-white border rounded-2xl hover:shadow-lg"
-                >
-                  <div className="flex mb-4 space-x-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-primary fill-primary" />
-                    ))}
-                  </div>
-                  <p className="mb-4 text-muted-foreground">
-                    "{testimonial.content}"
-                  </p>
-                  <div>
-                    <p className="font-semibold text-secondary">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {testimonial.role} at {testimonial.company}
-                    </p>
-                  </div>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="hidden md:flex" />
-          <CarouselNext className="hidden md:flex" />
-        </Carousel>
-      </div>
-    </section>
+    <TestimonialsSection
+      title="Trusted by job seekers worldwide"
+      description="Join thousands of professionals who've landed their dream jobs using our AI-powered resume builder"
+      testimonials={testimonials}
+    />
   );
 };

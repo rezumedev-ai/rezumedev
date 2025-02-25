@@ -52,6 +52,9 @@ export default {
         "color-4": "hsl(var(--color-4))",
         "color-5": "hsl(var(--color-5))",
       },
+      maxWidth: {
+        container: "1280px",
+      },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
@@ -96,6 +99,10 @@ export default {
         'rainbow': {
           '0%': { 'background-position': '0%' },
           '100%': { 'background-position': '200%' }
+        },
+        marquee: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(calc(-100% - var(--gap)))' }
         }
       },
       animation: {
@@ -103,7 +110,8 @@ export default {
         'fade-in': 'fade-in 0.3s ease-out',
         'scale-up': 'scale-up 0.3s ease-out',
         'pulse-gentle': 'pulse-gentle 3s infinite',
-        'rainbow': 'rainbow var(--speed, 2s) infinite linear'
+        'rainbow': 'rainbow var(--speed, 2s) infinite linear',
+        'marquee': 'marquee var(--duration) linear infinite'
       }
     }
   },
