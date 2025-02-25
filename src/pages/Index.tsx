@@ -8,21 +8,24 @@ import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { AuroraBackground } from "@/components/ui/aurora-background";
 
 const Index = () => {
   return (
     <main className="min-h-screen bg-white">
       <Header />
-      <div className="pt-16">
-        <AnimatedHero />
-        <Process />
-        <Features />
-        <ResumeTemplates />
-        <Testimonials />
-        <FAQ />
-        <CTA />
-        <Footer />
-      </div>
+      <AuroraBackground className="min-h-[calc(100vh-4rem)]">
+        <div className="pt-16 relative z-10">
+          <AnimatedHero />
+        </div>
+      </AuroraBackground>
+      <Process />
+      <Features />
+      <ResumeTemplates />
+      <Testimonials />
+      <FAQ />
+      <CTA />
+      <Footer />
     </main>
   );
 };
