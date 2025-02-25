@@ -1,5 +1,6 @@
 
 import type { Config } from "tailwindcss";
+import { flattenColors } from "./src/lib/utils";
 
 export default {
   darkMode: ["class"],
@@ -103,7 +104,15 @@ export default {
         marquee: {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(calc(-100% - var(--gap)))' }
-        }
+        },
+        aurora: {
+          from: {
+            backgroundPosition: "50% 50%, 50% 50%",
+          },
+          to: {
+            backgroundPosition: "350% 50%, 350% 50%",
+          },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.5s ease-out',
@@ -111,7 +120,8 @@ export default {
         'scale-up': 'scale-up 0.3s ease-out',
         'pulse-gentle': 'pulse-gentle 3s infinite',
         'rainbow': 'rainbow var(--speed, 2s) infinite linear',
-        'marquee': 'marquee var(--duration) linear infinite'
+        'marquee': 'marquee var(--duration) linear infinite',
+        'aurora': 'aurora 60s linear infinite',
       }
     }
   },
