@@ -45,7 +45,12 @@ export default {
         accent: {
           DEFAULT: '#EEF2FF',
           foreground: '#6366F1'
-        }
+        },
+        "color-1": "hsl(var(--color-1))",
+        "color-2": "hsl(var(--color-2))",
+        "color-3": "hsl(var(--color-3))",
+        "color-4": "hsl(var(--color-4))",
+        "color-5": "hsl(var(--color-5))",
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -87,13 +92,18 @@ export default {
           '50%': {
             transform: 'scale(1.05)'
           }
+        },
+        'rainbow': {
+          '0%': { 'background-position': '0%' },
+          '100%': { 'background-position': '200%' }
         }
       },
       animation: {
         'fade-up': 'fade-up 0.5s ease-out',
         'fade-in': 'fade-in 0.3s ease-out',
         'scale-up': 'scale-up 0.3s ease-out',
-        'pulse-gentle': 'pulse-gentle 3s infinite'
+        'pulse-gentle': 'pulse-gentle 3s infinite',
+        'rainbow': 'rainbow var(--speed, 2s) infinite linear'
       }
     }
   },

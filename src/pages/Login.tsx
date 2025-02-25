@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
@@ -104,9 +105,9 @@ const Login = () => {
             </div>
 
             <div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <RainbowButton type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
+              </RainbowButton>
             </div>
 
             <div className="text-center text-sm">
