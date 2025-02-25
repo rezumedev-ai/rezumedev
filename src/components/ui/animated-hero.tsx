@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 import { Link } from "react-router-dom";
 
 function AnimatedHero() {
@@ -67,9 +68,9 @@ function AnimatedHero() {
           </div>
           <div className="flex flex-row gap-3">
             <Link to="/signup">
-              <Button size="lg" className="gap-4">
+              <RainbowButton className="gap-4">
                 Build Your Resume Now <MoveRight className="w-4 h-4" />
-              </Button>
+              </RainbowButton>
             </Link>
           </div>
         </div>
