@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight } from "lucide-react";
@@ -92,17 +93,26 @@ function AnimatedHero() {
         <div className="flex gap-8 py-20 lg:py-32 items-center justify-center flex-col">
           <div className="flex gap-6 flex-col max-w-3xl">
             <div className="space-y-6">
-              <h1 className="flex flex-col items-center text-5xl md:text-7xl tracking-tight font-regular">
-                <div className="flex items-center gap-3">
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="flex flex-col items-center text-5xl md:text-7xl tracking-tight font-regular"
+              >
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="flex items-center gap-3"
+                >
                   <span className="text-primary font-medium">Create Your Resume</span>
-                </div>
+                </motion.div>
                 <div className="relative h-20 flex justify-center overflow-hidden my-2">
                   {titles.map((title, index) => (
                     <motion.span
                       key={index}
                       className="absolute font-semibold text-4xl md:text-6xl text-slate-900"
                       initial={{ opacity: 0, y: "100%" }}
-                      transition={{ type: "spring", stiffness: 50 }}
                       animate={
                         titleNumber === index
                           ? {
@@ -114,19 +124,30 @@ function AnimatedHero() {
                               opacity: 0,
                             }
                       }
+                      transition={{ type: "spring", stiffness: 50 }}
                     >
                       {title}
                     </motion.span>
                   ))}
                 </div>
-              </h1>
+              </motion.h1>
 
-              <p className="text-lg md:text-xl leading-relaxed tracking-tight text-slate-800 text-center max-w-2xl mx-auto">
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="text-lg md:text-xl leading-relaxed tracking-tight text-slate-800 text-center max-w-2xl mx-auto"
+              >
                 Stand out with a resume that gets you noticed. Built for impact, optimized for success.
-              </p>
+              </motion.p>
             </div>
           </div>
-          <div className="flex flex-col gap-8 items-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-col gap-8 items-center"
+          >
             <Link to="/signup">
               <RainbowButton className="gap-4">
                 Build Your Resume Now <MoveRight className="w-4 h-4" />
@@ -140,7 +161,7 @@ function AnimatedHero() {
                 <LogoCarousel columnCount={3} logos={logos} />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
