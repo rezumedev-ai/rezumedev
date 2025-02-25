@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight } from "lucide-react";
@@ -92,13 +93,13 @@ function AnimatedHero() {
         <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
           <div className="flex gap-4 flex-col">
             <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
-              <span className="text-primary block">Create Your</span>
-              <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
+              <span className="text-primary block mb-8">Create Your</span>
+              <div className="relative h-24 flex w-full justify-center overflow-hidden text-center">
                 {titles.map((title, index) => (
                   <motion.span
                     key={index}
                     className="absolute font-semibold"
-                    initial={{ opacity: 0, y: "-100" }}
+                    initial={{ opacity: 0, y: "100%" }}
                     transition={{ type: "spring", stiffness: 50 }}
                     animate={
                       titleNumber === index
@@ -107,7 +108,7 @@ function AnimatedHero() {
                             opacity: 1,
                           }
                         : {
-                            y: titleNumber > index ? -150 : 150,
+                            y: titleNumber > index ? "-100%" : "100%",
                             opacity: 0,
                           }
                     }
@@ -115,11 +116,11 @@ function AnimatedHero() {
                     {title}
                   </motion.span>
                 ))}
-              </span>
-              <span className="text-primary block mt-16">Resume</span>
+              </div>
+              <span className="text-primary block mt-8">Resume</span>
             </h1>
 
-            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center mt-4">
               Land more interviews with an AI-powered resume that instantly impresses employers and beats applicant tracking systems.
             </p>
           </div>
