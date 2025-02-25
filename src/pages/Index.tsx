@@ -8,6 +8,7 @@ import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { ScrollFeatures } from "@/components/ScrollFeatures";
 
 const Index = () => {
   return (
@@ -15,6 +16,7 @@ const Index = () => {
       <Header />
       <div className="pt-16">
         <AnimatedHero />
+        <ScrollFeatures />
         <Process />
         <Features />
         <ResumeTemplates />
