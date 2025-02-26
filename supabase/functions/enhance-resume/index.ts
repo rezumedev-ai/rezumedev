@@ -8,45 +8,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function makeOpenAIRequest(prompt: string, systemRole: string) {
+// Simplified OpenAI request function
+async function enhanceWithAI(prompt: string) {
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openAIApiKey) {
-    throw new Error('OpenAI API key not configured');
-  }
+  if (!openAIApiKey) throw new Error('OpenAI API key not configured');
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemRole },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-      }),
-    });
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { 
+          role: 'system', 
+          content: 'You are a professional resume writer who creates concise, impactful content.'
+        },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.7,
+    }),
+  });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      console.error('OpenAI API error:', error);
-      throw new Error(`OpenAI API error: ${error.error || response.statusText}`);
-    }
-
-    const data = await response.json();
-    if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid response from OpenAI API');
-    }
-
-    return data.choices[0].message.content.trim();
-  } catch (error) {
-    console.error('Error in OpenAI request:', error);
-    throw error;
-  }
+  if (!response.ok) throw new Error('Failed to get AI response');
+  
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
 }
 
 serve(async (req) => {
@@ -56,100 +45,94 @@ serve(async (req) => {
 
   try {
     const { resumeData, resumeId } = await req.json();
-    console.log('Starting resume enhancement for:', resumeId);
-    
-    // Generate professional summary
-    console.log('Generating professional summary...');
+    console.log('Enhancing resume:', resumeId);
+
+    // 1. Enhance summary
     const summaryPrompt = `
-      Write a powerful one-paragraph professional summary for a ${resumeData.professional_summary.title}.
-      Requirements:
-      - Maximum 40 words
-      - Focus on core competencies and value proposition
+      Write a powerful professional summary for a ${resumeData.professional_summary.title} in ONE short paragraph.
+      - Keep it under 50 words
+      - Focus on expertise and value
       - Use present tense
-      - No metrics or years of experience
-      - Must be ATS-friendly
-      - One short paragraph only
-      
+      - No years of experience or metrics
       Return only the summary text.
     `;
+    const enhancedSummary = await enhanceWithAI(summaryPrompt);
 
-    const enhancedSummary = await makeOpenAIRequest(
-      summaryPrompt,
-      'You are a professional resume writer specializing in concise, impactful summaries.'
-    );
-
-    // Generate responsibilities for each work experience
-    console.log('Generating work experience bullet points...');
-    const enhancedExperiences = await Promise.all(resumeData.work_experience.map(async (exp: any) => {
-      const responsibilitiesPrompt = `
-        Create 3 impactful bullet points for a ${exp.jobTitle} role that:
-        - Start with strong action verbs
-        - Are each under 100 characters
+    // 2. Enhance work experience
+    const enhancedExperiences = [];
+    for (const exp of resumeData.work_experience) {
+      const bulletPrompt = `
+        Create exactly 3 bullet points for a ${exp.jobTitle} role.
+        Requirements:
+        - Start with action verbs
+        - Each under 100 characters
         - Focus on achievements
-        - Use ATS-friendly keywords
-        - Avoid specific metrics
-        
-        Return exactly 3 lines, one point per line.
+        - No metrics
+        Return only 3 lines, one bullet point per line.
       `;
-
-      const content = await makeOpenAIRequest(
-        responsibilitiesPrompt,
-        'You are a resume expert focusing on concise achievement statements.'
-      );
-
-      return {
+      
+      const bullets = await enhanceWithAI(bulletPrompt);
+      enhancedExperiences.push({
         ...exp,
-        responsibilities: content.split('\n')
+        responsibilities: bullets.split('\n')
           .filter(line => line.trim())
           .slice(0, 3)
-          .map(line => line.replace(/^[•\-\d.]\s*/, ''))
-      };
-    }));
+          .map(line => line.replace(/^[-•*]\s*/, '').trim())
+      });
+    }
 
-    // Generate skills
-    console.log('Generating skills...');
+    // 3. Generate skills lists
     const skillsPrompt = `
-      List skills for a ${resumeData.professional_summary.title} position.
-      First list: 6 technical skills
-      Second list: 4 soft skills
-      
-      Format each skill as a single word or short phrase.
-      Number each skill.
-      
-      Example format:
-      Technical Skills:
-      1. Skill One
-      2. Skill Two
-      
-      Soft Skills:
-      1. Skill One
-      2. Skill Two
+      For a ${resumeData.professional_summary.title}, list:
+      6 technical skills and 4 soft skills.
+      Format:
+      Technical:
+      1. skill1
+      2. skill2
+      Soft:
+      1. skill1
+      2. skill2
     `;
-
-    const skillsContent = await makeOpenAIRequest(
-      skillsPrompt,
-      'You are a technical recruiter creating focused skill lists.'
-    );
-
-    // Parse skills with error handling
-    const skillLists = skillsContent.split('\n').filter(line => line.trim());
-    const hardSkills = skillLists
-      .filter(line => /^\d/.test(line)) // Lines starting with numbers
-      .slice(0, 6)
-      .map(line => line.replace(/^\d+\.\s*/, '').trim());
     
-    const softSkills = skillLists
-      .filter(line => /^\d/.test(line)) // Lines starting with numbers
-      .slice(6, 10)
-      .map(line => line.replace(/^\d+\.\s*/, '').trim());
-
-    const enhancedSkills = {
-      hard_skills: hardSkills.length ? hardSkills : ["Problem Solving", "Project Management", "Data Analysis", "System Design", "Technical Leadership", "API Development"],
-      soft_skills: softSkills.length ? softSkills : ["Leadership", "Communication", "Team Collaboration", "Strategic Thinking"]
+    const skillsResponse = await enhanceWithAI(skillsPrompt);
+    const skills = {
+      hard_skills: [
+        "Problem Solving",
+        "Project Management",
+        "Data Analysis",
+        "System Design",
+        "Technical Leadership",
+        "API Development"
+      ],
+      soft_skills: [
+        "Communication",
+        "Leadership",
+        "Team Collaboration",
+        "Strategic Thinking"
+      ]
     };
 
-    // Update resume in database
-    console.log('Updating resume in database...');
+    try {
+      const lines = skillsResponse.split('\n').map(line => line.trim());
+      const hardSkills = lines
+        .filter(line => /^\d/.test(line))
+        .slice(0, 6)
+        .map(line => line.replace(/^\d+[\s.-]*/, '').trim());
+      
+      const softSkills = lines
+        .filter(line => /^\d/.test(line))
+        .slice(6, 10)
+        .map(line => line.replace(/^\d+[\s.-]*/, '').trim());
+
+      if (hardSkills.length > 0 && softSkills.length > 0) {
+        skills.hard_skills = hardSkills;
+        skills.soft_skills = softSkills;
+      }
+    } catch (error) {
+      console.log('Using default skills due to parsing error:', error);
+    }
+
+    // 4. Update the resume in database
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -163,40 +146,30 @@ serve(async (req) => {
           summary: enhancedSummary
         },
         work_experience: enhancedExperiences,
-        skills: enhancedSkills,
+        skills: skills,
         completion_status: 'completed'
       })
       .eq('id', resumeId);
 
-    if (updateError) {
-      console.error('Database update error:', updateError);
-      throw updateError;
-    }
+    if (updateError) throw updateError;
 
-    console.log('Resume enhancement completed successfully');
+    console.log('Resume enhanced successfully:', resumeId);
+    
     return new Response(
       JSON.stringify({
         message: 'Resume enhanced successfully',
-        data: {
-          professional_summary: {
-            ...resumeData.professional_summary,
-            summary: enhancedSummary
-          },
-          work_experience: enhancedExperiences,
-          skills: enhancedSkills
-        }
+        status: 'success'
       }), 
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error in enhance-resume function:', error);
+    console.error('Enhancement error:', error);
+    
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: error.stack
+        error: 'Failed to enhance resume. Please try again.',
+        details: error.message
       }), 
       { 
         status: 500,
