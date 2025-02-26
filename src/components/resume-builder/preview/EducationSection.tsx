@@ -20,7 +20,7 @@ export function EducationSection({
   const handleContentEdit = (
     index: number,
     field: keyof Education,
-    event: React.FocusEvent<HTMLDivElement>
+    event: React.FocusEvent<HTMLElement>
   ) => {
     if (!isEditing || !onUpdate) return;
     const newValue = event.target.innerText.trim();

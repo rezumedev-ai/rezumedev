@@ -20,7 +20,7 @@ export function CertificationsSection({
   const handleContentEdit = (
     index: number,
     field: keyof Certification,
-    event: React.FocusEvent<HTMLDivElement>
+    event: React.FocusEvent<HTMLElement>
   ) => {
     if (!isEditing || !onUpdate) return;
     const newValue = event.target.innerText.trim();
