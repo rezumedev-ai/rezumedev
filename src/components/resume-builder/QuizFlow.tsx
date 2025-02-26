@@ -15,6 +15,7 @@ import { ResumeData, WorkExperience, Education, Certification } from "@/types/re
 import { Json } from "@/integrations/supabase/types";
 import { LoadingState } from "./LoadingState";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -47,6 +48,8 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       soft_skills: [],
     }
   });
+
+  const navigate = useNavigate();
 
   const convertWorkExperience = (json: Json[] | null): WorkExperience[] => {
     if (!Array.isArray(json)) return [];
@@ -413,6 +416,33 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
   };
 
+  const handleSaveAndExit = async () => {
+    try {
+      await supabase
+        .from('resumes')
+        .update({
+          personal_info: formData.personal_info,
+          professional_summary: formData.professional_summary,
+          current_step: currentQuestionIndex + 1
+        })
+        .eq('id', resumeId);
+
+      toast({
+        title: "Progress saved",
+        description: "You can continue from where you left off in the dashboard.",
+      });
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error saving progress:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save your progress. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isEnhancing) {
     return <LoadingState status="enhancing" />;
   }
@@ -499,15 +529,24 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            disabled={currentStep === 0 && currentQuestionIndex === 0}
-            className="transition-all duration-300 hover:shadow-md"
-          >
-            <ArrowLeft className="mr-2 w-4 h-4" />
-            Back
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              disabled={currentStep === 0 && currentQuestionIndex === 0}
+              className="transition-all duration-300 hover:shadow-md"
+            >
+              <ArrowLeft className="mr-2 w-4 h-4" />
+              Back
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleSaveAndExit}
+              className="transition-all duration-300 hover:shadow-md"
+            >
+              Save & Exit
+            </Button>
+          </div>
           <Button 
             onClick={currentQuestionIndex === questions.length - 1 ? handleStepComplete : handleNext}
             className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md"

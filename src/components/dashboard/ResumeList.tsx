@@ -1,5 +1,4 @@
-
-import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -101,6 +100,10 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
     navigate("/new-resume");
   };
 
+  const handleContinueQuiz = (id: string) => {
+    navigate(`/resume-builder/${id}`);
+  };
+
   return (
     <div className="space-y-8 animate-fade-up" style={{ animationDelay: '200ms' }}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -182,48 +185,67 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                     </Button>
                   </div>
                 )}
-                <p className="text-sm text-gray-500 mt-2">
-                  Updated {new Date(resume.updated_at).toLocaleDateString()}
-                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-sm text-gray-500">
+                    Updated {new Date(resume.updated_at).toLocaleDateString()}
+                  </p>
+                  {resume.completion_status === 'draft' && resume.current_step > 1 && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                      Resume Quiz in Progress
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleEdit(resume.id)}
-                  className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
-                >
-                  <Pencil className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                  Edit
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleView(resume.id)}
-                  className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
-                >
-                  <Eye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                  View
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleDownload(resume.id)}
-                  className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
-                >
-                  <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                  Download
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleDelete(resume.id)}
-                  className="group/btn hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
-                >
-                  <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-                  Delete
-                </Button>
+                {resume.completion_status === 'draft' && resume.current_step > 1 ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleContinueQuiz(resume.id)}
+                    className="col-span-2 group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                  >
+                    <ArrowRight className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                    Continue Quiz
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleEdit(resume.id)}
+                    className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                  >
+                    <Pencil className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                    Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleView(resume.id)}
+                    className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                  >
+                    <Eye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                    View
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleDownload(resume.id)}
+                    className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                  >
+                    <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                    Download
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleDelete(resume.id)}
+                    className="group/btn hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
+                  >
+                    <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                    Delete
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
