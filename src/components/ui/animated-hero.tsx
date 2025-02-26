@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight, FileText } from "lucide-react";
@@ -126,7 +127,7 @@ function AnimatedHero() {
             </h1>
 
             <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
-              Transform your career journey with our AI-powered resume builder. Create a professionally crafted, ATS-optimized resume that stands out to employers and gets you more interviews.
+              Create stunning resumes in minutes. Land your dream job faster.
             </p>
           </div>
           <div className="flex flex-col gap-8 items-center">
