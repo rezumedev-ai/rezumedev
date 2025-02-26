@@ -1,8 +1,6 @@
 
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
-import { formatDate } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 
 interface CertificationsSectionProps {
   certifications: Certification[];
@@ -19,20 +17,14 @@ export function CertificationsSection({
 }: CertificationsSectionProps) {
   if (certifications.length === 0) return null;
 
-  const renderEditableText = (
-    text: string, 
-    index: number, 
-    field: keyof Certification
+  const handleContentEdit = (
+    index: number,
+    field: keyof Certification,
+    event: React.FocusEvent<HTMLDivElement>
   ) => {
-    if (!isEditing) return text;
-
-    return (
-      <Input
-        value={text}
-        onChange={(e) => onUpdate?.(index, field, e.target.value)}
-        className="w-full"
-      />
-    );
+    if (!isEditing || !onUpdate) return;
+    const newValue = event.target.innerText.trim();
+    onUpdate(index, field, newValue);
   };
 
   return (
@@ -44,16 +36,31 @@ export function CertificationsSection({
         {certifications.map((cert, index) => (
           <div key={index} className="flex justify-between items-baseline">
             <div>
-              <span className="font-bold text-sm">
-                {renderEditableText(cert.name, index, "name")}
+              <span 
+                className="font-bold text-sm outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit(index, "name", e)}
+              >
+                {cert.name}
               </span>
               <span className="text-sm mx-2">|</span>
-              <span className="text-sm">
-                {renderEditableText(cert.organization, index, "organization")}
+              <span 
+                className="text-sm outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit(index, "organization", e)}
+              >
+                {cert.organization}
               </span>
             </div>
-            <span className="text-xs">
-              {renderEditableText(cert.completionDate, index, "completionDate")}
+            <span 
+              className="text-xs outline-none"
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit(index, "completionDate", e)}
+            >
+              {cert.completionDate}
             </span>
           </div>
         ))}

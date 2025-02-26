@@ -1,6 +1,5 @@
 
 import { ResumeTemplate } from "../templates";
-import { Input } from "@/components/ui/input";
 
 interface SkillsSectionProps {
   hardSkills: string[];
@@ -19,20 +18,13 @@ export function SkillsSection({
 }: SkillsSectionProps) {
   if (hardSkills.length === 0 && softSkills.length === 0) return null;
 
-  const renderEditableSkills = (skills: string[], type: "hard" | "soft") => {
-    if (!isEditing) return skills.join(" • ");
-
-    return (
-      <Input
-        value={skills.join(", ")}
-        onChange={(e) => {
-          const newSkills = e.target.value.split(",").map(s => s.trim()).filter(Boolean);
-          onUpdate?.(type, newSkills);
-        }}
-        className="w-full"
-        placeholder="Separate skills with commas"
-      />
-    );
+  const handleSkillsEdit = (type: "hard" | "soft", event: React.FocusEvent<HTMLDivElement>) => {
+    if (!isEditing || !onUpdate) return;
+    const newSkills = event.target.innerText
+      .split("•")
+      .map(s => s.trim())
+      .filter(Boolean);
+    onUpdate(type, newSkills);
   };
 
   return (
@@ -44,16 +36,26 @@ export function SkillsSection({
         {hardSkills.length > 0 && (
           <div>
             <h4 className="font-bold text-sm mb-2">Core Competencies</h4>
-            <div className="text-sm leading-relaxed">
-              {renderEditableSkills(hardSkills, "hard")}
+            <div 
+              className="text-sm leading-relaxed outline-none"
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleSkillsEdit("hard", e)}
+            >
+              {hardSkills.join(" • ")}
             </div>
           </div>
         )}
         {softSkills.length > 0 && (
           <div>
             <h4 className="font-bold text-sm mb-2">Professional Skills</h4>
-            <div className="text-sm leading-relaxed">
-              {renderEditableSkills(softSkills, "soft")}
+            <div 
+              className="text-sm leading-relaxed outline-none"
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleSkillsEdit("soft", e)}
+            >
+              {softSkills.join(" • ")}
             </div>
           </div>
         )}

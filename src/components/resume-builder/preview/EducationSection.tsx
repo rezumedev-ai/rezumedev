@@ -1,8 +1,6 @@
 
 import { Education } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
-import { formatDate } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 
 interface EducationSectionProps {
   education: Education[];
@@ -19,20 +17,14 @@ export function EducationSection({
 }: EducationSectionProps) {
   if (education.length === 0) return null;
 
-  const renderEditableText = (
-    text: string, 
-    index: number, 
-    field: keyof Education
+  const handleContentEdit = (
+    index: number,
+    field: keyof Education,
+    event: React.FocusEvent<HTMLDivElement>
   ) => {
-    if (!isEditing) return text;
-
-    return (
-      <Input
-        value={text}
-        onChange={(e) => onUpdate?.(index, field, e.target.value)}
-        className="w-full"
-      />
-    );
+    if (!isEditing || !onUpdate) return;
+    const newValue = event.target.innerText.trim();
+    onUpdate(index, field, newValue);
   };
 
   return (
@@ -44,17 +36,43 @@ export function EducationSection({
         {education.map((edu, index) => (
           <div key={index}>
             <div className="flex justify-between items-baseline mb-1">
-              <h4 className="font-bold text-sm">
-                {renderEditableText(edu.degreeName, index, "degreeName")}
+              <h4 
+                className="font-bold text-sm outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit(index, "degreeName", e)}
+              >
+                {edu.degreeName}
               </h4>
               <span className="text-xs">
-                {renderEditableText(edu.startDate, index, "startDate")} - {
-                  edu.isCurrentlyEnrolled ? 'Present' : renderEditableText(edu.endDate, index, "endDate")
-                }
+                <span
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit(index, "startDate", e)}
+                  className="outline-none"
+                >
+                  {edu.startDate}
+                </span>
+                {" - "}
+                {edu.isCurrentlyEnrolled ? "Present" : (
+                  <span
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit(index, "endDate", e)}
+                    className="outline-none"
+                  >
+                    {edu.endDate}
+                  </span>
+                )}
               </span>
             </div>
-            <div className="text-sm">
-              {renderEditableText(edu.schoolName, index, "schoolName")}
+            <div 
+              className="text-sm outline-none"
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit(index, "schoolName", e)}
+            >
+              {edu.schoolName}
             </div>
           </div>
         ))}
