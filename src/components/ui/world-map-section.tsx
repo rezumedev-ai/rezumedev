@@ -59,7 +59,7 @@ export function WorldMapSection() {
         </motion.div>
 
         <motion.div
-          className="mb-20"
+          className="mb-12"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -101,14 +101,6 @@ export function WorldMapSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <div className="text-center mb-12">
-            <GradientHeading size="md" weight="bold" className="mb-4">
-              Hear from Our Success Stories
-            </GradientHeading>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Real stories from professionals who landed their dream jobs
-            </p>
-          </div>
           <TestimonialsSection
             title=""
             description=""
