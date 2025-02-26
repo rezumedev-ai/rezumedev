@@ -44,6 +44,37 @@ async function makeOpenAIRequest(prompt: string, systemRole: string) {
   return data.choices[0].message.content.trim();
 }
 
+function extractSkillsFromText(content: string): { hard_skills: string[], soft_skills: string[] } {
+  const lines = content.split('\n').map(line => line.trim()).filter(Boolean);
+  const hardSkills: string[] = [];
+  const softSkills: string[] = [];
+  
+  let currentSection = '';
+  
+  for (const line of lines) {
+    if (line.toLowerCase().includes('technical') || line.toLowerCase().includes('hard skills')) {
+      currentSection = 'hard';
+      continue;
+    }
+    if (line.toLowerCase().includes('professional') || line.toLowerCase().includes('soft skills')) {
+      currentSection = 'soft';
+      continue;
+    }
+    
+    const skill = line.replace(/^[•\-\d.]\s*/, '').trim();
+    if (skill && currentSection === 'hard') {
+      hardSkills.push(skill);
+    } else if (skill && currentSection === 'soft') {
+      softSkills.push(skill);
+    }
+  }
+  
+  return {
+    hard_skills: hardSkills.slice(0, 6),
+    soft_skills: softSkills.slice(0, 4)
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -102,8 +133,8 @@ serve(async (req) => {
       const responsibilities = responsibilitiesContent
         .split('\n')
         .filter(line => line.trim())
-        .slice(0, 3) // Ensure exactly 3 points
-        .map(line => line.replace(/^[•\-\d.]\s*/, '')); // Remove any bullets or numbers
+        .slice(0, 3)
+        .map(line => line.replace(/^[•\-\d.]\s*/, ''));
 
       return {
         ...exp,
@@ -114,21 +145,23 @@ serve(async (req) => {
     // Generate relevant skills
     console.log('Generating skills...');
     const skillsPrompt = `
-      Create two concise, professional skill lists for a ${resumeData.professional_summary.title} position.
-      
-      Requirements:
-      - Technical Skills: List exactly 6 most relevant technical skills
-      - Professional Skills: List exactly 4 most relevant soft skills
-      - Skills must be single words or short phrases
-      - Order by importance
-      - Ensure all skills are highly relevant to the role
-      - Include only current, in-demand skills
-      
-      Format: Return as a JSON object with this exact structure:
-      {
-        "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
-        "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
-      }
+      Create two lists of skills for a ${resumeData.professional_summary.title} position:
+
+      Technical/Hard Skills (6 skills):
+      - List exactly 6 most relevant technical skills
+      - Include modern, in-demand skills
+      - List in order of importance
+      - One skill per line
+      - Start each line with a bullet point
+
+      Professional/Soft Skills (4 skills):
+      - List exactly 4 most relevant soft skills
+      - Focus on leadership and interpersonal abilities
+      - List in order of importance
+      - One skill per line
+      - Start each line with a bullet point
+
+      Format: Return the lists exactly as specified above, with section headers and bullet points.
     `;
 
     const skillsContent = await makeOpenAIRequest(
@@ -136,23 +169,13 @@ serve(async (req) => {
       'You are a technical recruiter who understands modern skill requirements.'
     );
 
-    let enhancedSkills;
-    try {
-      enhancedSkills = JSON.parse(skillsContent);
-      
-      // Validate skills structure
-      if (!Array.isArray(enhancedSkills.hard_skills) || !Array.isArray(enhancedSkills.soft_skills) ||
-          enhancedSkills.hard_skills.length !== 6 || enhancedSkills.soft_skills.length !== 4) {
-        throw new Error('Invalid skills format');
-      }
-    } catch (error) {
-      console.error('Error parsing skills:', error);
-      // Fallback to manual parsing if JSON fails
-      const lines = skillsContent.split('\n').filter(line => line.trim());
-      enhancedSkills = {
-        hard_skills: lines.slice(0, 6).map(s => s.replace(/^[•\-]\s*/, '')),
-        soft_skills: lines.slice(6, 10).map(s => s.replace(/^[•\-]\s*/, ''))
-      };
+    console.log('Raw skills content:', skillsContent);
+    const enhancedSkills = extractSkillsFromText(skillsContent);
+    console.log('Parsed skills:', enhancedSkills);
+
+    // Validate skills
+    if (!enhancedSkills.hard_skills.length || !enhancedSkills.soft_skills.length) {
+      throw new Error('Failed to generate valid skills');
     }
 
     // Update the resume with enhanced content
