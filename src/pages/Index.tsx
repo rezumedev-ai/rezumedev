@@ -8,6 +8,7 @@ import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { WorldMapSection } from "@/components/ui/world-map-section";
 
 const Index = () => {
   return (
@@ -17,6 +18,7 @@ const Index = () => {
         <AnimatedHero />
         <Process />
         <Features />
+        <WorldMapSection />
         <ResumeTemplates />
         <Testimonials />
         <FAQ />
