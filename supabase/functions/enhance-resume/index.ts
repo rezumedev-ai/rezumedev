@@ -41,7 +41,7 @@ async function makeOpenAIRequest(prompt: string, systemRole: string) {
     throw new Error('Invalid response from OpenAI API');
   }
 
-  return data.choices[0].message.content;
+  return data.choices[0].message.content.trim();
 }
 
 serve(async (req) => {
@@ -52,118 +52,108 @@ serve(async (req) => {
   try {
     const { resumeData, resumeId } = await req.json();
     console.log('Starting resume enhancement for:', resumeId);
-    console.log('Job Title:', resumeData.professional_summary.title);
 
     // Generate professional summary
     console.log('Generating professional summary...');
     const summaryPrompt = `
-      Create a highly professional, ATS-optimized executive summary for a ${resumeData.professional_summary.title} position.
-      The summary should:
-      - Be 3-4 sentences long
+      Create a brief, powerful professional summary for a ${resumeData.professional_summary.title} position.
+      Requirements:
+      - Maximum 2-3 concise sentences
+      - Focus on value proposition and expertise
       - Include relevant industry keywords
-      - Highlight leadership and technical expertise
-      - Be written in first person
-      - Focus on quantifiable achievements
-      - Be optimized for ATS systems
-      - Be suitable for top-tier companies
-      Do not make any assumptions about experience or specific achievements.
-      Format: Return only the summary text without any additional context or explanations.
+      - Must be ATS-optimized
+      - DO NOT mention years of experience or specific metrics
+      - Keep it under 50 words for perfect A4 fit
+      - Use present tense
+      - Be direct and impactful
+      
+      Format: Return only the polished summary text.
     `;
 
     const enhancedSummary = await makeOpenAIRequest(
       summaryPrompt,
-      'You are an expert resume writer for top technology companies.'
+      'You are a professional resume writer who creates concise, powerful content.'
     );
-    console.log('Summary generated successfully');
 
     // Generate responsibilities for each work experience
     console.log('Generating work experience bullet points...');
     const enhancedExperiences = await Promise.all(resumeData.work_experience.map(async (exp: any, index: number) => {
       console.log(`Processing experience ${index + 1}:`, exp.jobTitle);
       const responsibilitiesPrompt = `
-        Create 4-6 highly impactful, ATS-optimized bullet points for a ${exp.jobTitle} position at ${exp.companyName}.
-        Each bullet point should:
-        - Start with a strong action verb
-        - Include measurable achievements and metrics where possible
-        - Incorporate relevant technical keywords and skills
-        - Follow the STAR (Situation, Task, Action, Result) format where applicable
-        - Be optimized for applicant tracking systems
-        - Be suitable for top-tier company applications
+        Create exactly 3 powerful, ATS-optimized bullet points for a ${exp.jobTitle} position.
+        Requirements:
+        - Exactly 3 bullet points
+        - Each bullet must be under 120 characters
+        - Start each with a strong action verb
+        - Include relevant industry keywords
+        - Focus on achievements and impact
+        - Be specific but avoid mentioning exact numbers/percentages
+        - Ensure perfect formatting for A4 resume
+        - Remove any bullet points or dashes at the start
         
-        Format: Return only the bullet points, one per line, without any additional context or numbering.
+        Format: Return exactly 3 lines, one point per line.
       `;
 
       const responsibilitiesContent = await makeOpenAIRequest(
         responsibilitiesPrompt,
-        'You are an expert resume writer specializing in creating impactful bullet points for top technology companies.'
+        'You are a resume expert who creates concise, impactful bullet points.'
       );
 
       const responsibilities = responsibilitiesContent
         .split('\n')
-        .filter(line => line.trim().length > 0)
-        .map(line => line.replace(/^[•\-]\s*/, '')); // Remove any bullet points or dashes
+        .filter(line => line.trim())
+        .slice(0, 3) // Ensure exactly 3 points
+        .map(line => line.replace(/^[•\-\d.]\s*/, '')); // Remove any bullets or numbers
 
       return {
         ...exp,
         responsibilities
       };
     }));
-    console.log('Work experience bullet points generated successfully');
 
     // Generate relevant skills
     console.log('Generating skills...');
     const skillsPrompt = `
-      Generate two lists of relevant skills for a ${resumeData.professional_summary.title} position:
-      1. Technical/Hard Skills: Specific technical competencies, tools, and technologies
-      2. Professional/Soft Skills: Leadership and interpersonal abilities
+      Create two concise, professional skill lists for a ${resumeData.professional_summary.title} position.
       
       Requirements:
-      - Include 8-10 technical skills
-      - Include 5-7 professional skills
-      - Focus on high-demand skills for top-tier companies
-      - Ensure all skills are relevant to the position
-      - Include both fundamental and advanced skills
-      - List skills in order of relevance
+      - Technical Skills: List exactly 6 most relevant technical skills
+      - Professional Skills: List exactly 4 most relevant soft skills
+      - Skills must be single words or short phrases
+      - Order by importance
+      - Ensure all skills are highly relevant to the role
+      - Include only current, in-demand skills
       
-      Format: Return as a JSON object with two arrays: "hard_skills" and "soft_skills"
-      Example format:
+      Format: Return as a JSON object with this exact structure:
       {
-        "hard_skills": ["Skill 1", "Skill 2"],
-        "soft_skills": ["Skill 1", "Skill 2"]
+        "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
+        "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
       }
     `;
 
     const skillsContent = await makeOpenAIRequest(
       skillsPrompt,
-      'You are an expert in technical recruitment and skill assessment.'
+      'You are a technical recruiter who understands modern skill requirements.'
     );
 
     let enhancedSkills;
     try {
-      enhancedSkills = JSON.parse(skillsContent.trim());
-      if (!enhancedSkills.hard_skills || !enhancedSkills.soft_skills) {
+      enhancedSkills = JSON.parse(skillsContent);
+      
+      // Validate skills structure
+      if (!Array.isArray(enhancedSkills.hard_skills) || !Array.isArray(enhancedSkills.soft_skills) ||
+          enhancedSkills.hard_skills.length !== 6 || enhancedSkills.soft_skills.length !== 4) {
         throw new Error('Invalid skills format');
       }
     } catch (error) {
-      console.error('Error parsing skills JSON:', error);
-      console.log('Raw skills content:', skillsContent);
-      // Fallback to a simple split if JSON parsing fails
+      console.error('Error parsing skills:', error);
+      // Fallback to manual parsing if JSON fails
       const lines = skillsContent.split('\n').filter(line => line.trim());
-      const hardSkillsStart = lines.findIndex(line => line.includes('Technical/Hard Skills'));
-      const softSkillsStart = lines.findIndex(line => line.includes('Professional/Soft Skills'));
-      
       enhancedSkills = {
-        hard_skills: lines
-          .slice(hardSkillsStart + 1, softSkillsStart)
-          .filter(line => line.trim())
-          .map(line => line.replace(/^[•\-]\s*/, '')),
-        soft_skills: lines
-          .slice(softSkillsStart + 1)
-          .filter(line => line.trim())
-          .map(line => line.replace(/^[•\-]\s*/, ''))
+        hard_skills: lines.slice(0, 6).map(s => s.replace(/^[•\-]\s*/, '')),
+        soft_skills: lines.slice(6, 10).map(s => s.replace(/^[•\-]\s*/, ''))
       };
     }
-    console.log('Skills generated successfully');
 
     // Update the resume with enhanced content
     const enhancedResume = {
