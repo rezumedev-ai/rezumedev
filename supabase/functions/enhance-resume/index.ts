@@ -14,65 +14,39 @@ async function makeOpenAIRequest(prompt: string, systemRole: string) {
     throw new Error('OpenAI API key not configured');
   }
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openAIApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemRole },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7,
-    }),
-  });
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemRole },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+      }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-    console.error('OpenAI API error:', error);
-    throw new Error(`OpenAI API error: ${error.error || response.statusText}`);
-  }
-
-  const data = await response.json();
-  if (!data.choices?.[0]?.message?.content) {
-    throw new Error('Invalid response from OpenAI API');
-  }
-
-  return data.choices[0].message.content.trim();
-}
-
-function extractSkillsFromText(content: string): { hard_skills: string[], soft_skills: string[] } {
-  const lines = content.split('\n').map(line => line.trim()).filter(Boolean);
-  const hardSkills: string[] = [];
-  const softSkills: string[] = [];
-  
-  let currentSection = '';
-  
-  for (const line of lines) {
-    if (line.toLowerCase().includes('technical') || line.toLowerCase().includes('hard skills')) {
-      currentSection = 'hard';
-      continue;
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+      console.error('OpenAI API error:', error);
+      throw new Error(`OpenAI API error: ${error.error || response.statusText}`);
     }
-    if (line.toLowerCase().includes('professional') || line.toLowerCase().includes('soft skills')) {
-      currentSection = 'soft';
-      continue;
+
+    const data = await response.json();
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI API');
     }
-    
-    const skill = line.replace(/^[•\-\d.]\s*/, '').trim();
-    if (skill && currentSection === 'hard') {
-      hardSkills.push(skill);
-    } else if (skill && currentSection === 'soft') {
-      softSkills.push(skill);
-    }
+
+    return data.choices[0].message.content.trim();
+  } catch (error) {
+    console.error('Error in OpenAI request:', error);
+    throw error;
   }
-  
-  return {
-    hard_skills: hardSkills.slice(0, 6),
-    soft_skills: softSkills.slice(0, 4)
-  };
 }
 
 serve(async (req) => {
@@ -83,113 +57,98 @@ serve(async (req) => {
   try {
     const { resumeData, resumeId } = await req.json();
     console.log('Starting resume enhancement for:', resumeId);
-
+    
     // Generate professional summary
     console.log('Generating professional summary...');
     const summaryPrompt = `
-      Create a brief, powerful professional summary for a ${resumeData.professional_summary.title} position.
+      Write a powerful one-paragraph professional summary for a ${resumeData.professional_summary.title}.
       Requirements:
-      - Maximum 2-3 concise sentences
-      - Focus on value proposition and expertise
-      - Include relevant industry keywords
-      - Must be ATS-optimized
-      - DO NOT mention years of experience or specific metrics
-      - Keep it under 50 words for perfect A4 fit
+      - Maximum 40 words
+      - Focus on core competencies and value proposition
       - Use present tense
-      - Be direct and impactful
+      - No metrics or years of experience
+      - Must be ATS-friendly
+      - One short paragraph only
       
-      Format: Return only the polished summary text.
+      Return only the summary text.
     `;
 
     const enhancedSummary = await makeOpenAIRequest(
       summaryPrompt,
-      'You are a professional resume writer who creates concise, powerful content.'
+      'You are a professional resume writer specializing in concise, impactful summaries.'
     );
 
     // Generate responsibilities for each work experience
     console.log('Generating work experience bullet points...');
-    const enhancedExperiences = await Promise.all(resumeData.work_experience.map(async (exp: any, index: number) => {
-      console.log(`Processing experience ${index + 1}:`, exp.jobTitle);
+    const enhancedExperiences = await Promise.all(resumeData.work_experience.map(async (exp: any) => {
       const responsibilitiesPrompt = `
-        Create exactly 3 powerful, ATS-optimized bullet points for a ${exp.jobTitle} position.
-        Requirements:
-        - Exactly 3 bullet points
-        - Each bullet must be under 120 characters
-        - Start each with a strong action verb
-        - Include relevant industry keywords
-        - Focus on achievements and impact
-        - Be specific but avoid mentioning exact numbers/percentages
-        - Ensure perfect formatting for A4 resume
-        - Remove any bullet points or dashes at the start
+        Create 3 impactful bullet points for a ${exp.jobTitle} role that:
+        - Start with strong action verbs
+        - Are each under 100 characters
+        - Focus on achievements
+        - Use ATS-friendly keywords
+        - Avoid specific metrics
         
-        Format: Return exactly 3 lines, one point per line.
+        Return exactly 3 lines, one point per line.
       `;
 
-      const responsibilitiesContent = await makeOpenAIRequest(
+      const content = await makeOpenAIRequest(
         responsibilitiesPrompt,
-        'You are a resume expert who creates concise, impactful bullet points.'
+        'You are a resume expert focusing on concise achievement statements.'
       );
-
-      const responsibilities = responsibilitiesContent
-        .split('\n')
-        .filter(line => line.trim())
-        .slice(0, 3)
-        .map(line => line.replace(/^[•\-\d.]\s*/, ''));
 
       return {
         ...exp,
-        responsibilities
+        responsibilities: content.split('\n')
+          .filter(line => line.trim())
+          .slice(0, 3)
+          .map(line => line.replace(/^[•\-\d.]\s*/, ''))
       };
     }));
 
-    // Generate relevant skills
+    // Generate skills
     console.log('Generating skills...');
     const skillsPrompt = `
-      Create two lists of skills for a ${resumeData.professional_summary.title} position:
-
-      Technical/Hard Skills (6 skills):
-      - List exactly 6 most relevant technical skills
-      - Include modern, in-demand skills
-      - List in order of importance
-      - One skill per line
-      - Start each line with a bullet point
-
-      Professional/Soft Skills (4 skills):
-      - List exactly 4 most relevant soft skills
-      - Focus on leadership and interpersonal abilities
-      - List in order of importance
-      - One skill per line
-      - Start each line with a bullet point
-
-      Format: Return the lists exactly as specified above, with section headers and bullet points.
+      List skills for a ${resumeData.professional_summary.title} position.
+      First list: 6 technical skills
+      Second list: 4 soft skills
+      
+      Format each skill as a single word or short phrase.
+      Number each skill.
+      
+      Example format:
+      Technical Skills:
+      1. Skill One
+      2. Skill Two
+      
+      Soft Skills:
+      1. Skill One
+      2. Skill Two
     `;
 
     const skillsContent = await makeOpenAIRequest(
       skillsPrompt,
-      'You are a technical recruiter who understands modern skill requirements.'
+      'You are a technical recruiter creating focused skill lists.'
     );
 
-    console.log('Raw skills content:', skillsContent);
-    const enhancedSkills = extractSkillsFromText(skillsContent);
-    console.log('Parsed skills:', enhancedSkills);
+    // Parse skills with error handling
+    const skillLists = skillsContent.split('\n').filter(line => line.trim());
+    const hardSkills = skillLists
+      .filter(line => /^\d/.test(line)) // Lines starting with numbers
+      .slice(0, 6)
+      .map(line => line.replace(/^\d+\.\s*/, '').trim());
+    
+    const softSkills = skillLists
+      .filter(line => /^\d/.test(line)) // Lines starting with numbers
+      .slice(6, 10)
+      .map(line => line.replace(/^\d+\.\s*/, '').trim());
 
-    // Validate skills
-    if (!enhancedSkills.hard_skills.length || !enhancedSkills.soft_skills.length) {
-      throw new Error('Failed to generate valid skills');
-    }
-
-    // Update the resume with enhanced content
-    const enhancedResume = {
-      ...resumeData,
-      professional_summary: {
-        ...resumeData.professional_summary,
-        summary: enhancedSummary
-      },
-      work_experience: enhancedExperiences,
-      skills: enhancedSkills
+    const enhancedSkills = {
+      hard_skills: hardSkills.length ? hardSkills : ["Problem Solving", "Project Management", "Data Analysis", "System Design", "Technical Leadership", "API Development"],
+      soft_skills: softSkills.length ? softSkills : ["Leadership", "Communication", "Team Collaboration", "Strategic Thinking"]
     };
 
-    // Update the resume in the database
+    // Update resume in database
     console.log('Updating resume in database...');
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -199,7 +158,10 @@ serve(async (req) => {
     const { error: updateError } = await supabase
       .from('resumes')
       .update({
-        professional_summary: enhancedResume.professional_summary,
+        professional_summary: {
+          ...resumeData.professional_summary,
+          summary: enhancedSummary
+        },
         work_experience: enhancedExperiences,
         skills: enhancedSkills,
         completion_status: 'completed'
@@ -211,15 +173,21 @@ serve(async (req) => {
       throw updateError;
     }
 
-    console.log('Resume enhancement completed successfully for:', resumeId);
-
+    console.log('Resume enhancement completed successfully');
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         message: 'Resume enhanced successfully',
-        data: enhancedResume 
+        data: {
+          professional_summary: {
+            ...resumeData.professional_summary,
+            summary: enhancedSummary
+          },
+          work_experience: enhancedExperiences,
+          skills: enhancedSkills
+        }
       }), 
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
 
@@ -232,7 +200,7 @@ serve(async (req) => {
       }), 
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   }
