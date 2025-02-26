@@ -1,3 +1,4 @@
+
 import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -209,42 +210,44 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                     Continue Quiz
                   </Button>
                 ) : (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleEdit(resume.id)}
-                    className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
-                  >
-                    <Pencil className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                    Edit
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleView(resume.id)}
-                    className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
-                  >
-                    <Eye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                    View
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleDownload(resume.id)}
-                    className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
-                  >
-                    <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                    Download
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleDelete(resume.id)}
-                    className="group/btn hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
-                  >
-                    <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-                    Delete
-                  </Button>
+                  <>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleEdit(resume.id)}
+                      className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                    >
+                      <Pencil className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleView(resume.id)}
+                      className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                    >
+                      <Eye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                      View
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDownload(resume.id)}
+                      className="group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                    >
+                      <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                      Download
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDelete(resume.id)}
+                      className="group/btn hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
+                    >
+                      <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                      Delete
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
