@@ -45,7 +45,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'You are an expert resume writer for top technology companies.' },
           { role: 'user', content: summaryPrompt }
@@ -79,7 +79,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           messages: [
             { role: 'system', content: 'You are an expert resume writer specializing in creating impactful bullet points for top technology companies.' },
             { role: 'user', content: responsibilitiesPrompt }
@@ -123,7 +123,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'You are an expert in technical recruitment and skill assessment.' },
           { role: 'user', content: skillsPrompt }
