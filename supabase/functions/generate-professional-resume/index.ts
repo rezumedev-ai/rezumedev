@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -39,52 +40,29 @@ serve(async (req) => {
       .update({ completion_status: 'enhancing' })
       .eq('id', resumeId);
     
-    // Extract job title from resumeData
+    // Extract job title from resumeData for the overall summary
     const jobTitle = resumeData.professional_summary?.title || '';
     
-    // Construct a comprehensive prompt for the OpenAI API
-    const prompt = `
-Create a professional, ATS-friendly resume for a ${jobTitle} based on the following information:
-
-PERSONAL INFO:
+    // Generate professional summary
+    const summaryPrompt = `
+Create a powerful professional summary for a ${jobTitle} based on the following information:
 ${JSON.stringify(resumeData.personal_info, null, 2)}
+${JSON.stringify(resumeData.professional_summary, null, 2)}
 
-WORK EXPERIENCE:
-${JSON.stringify(resumeData.work_experience, null, 2)}
+Requirements:
+- Maximum 50 words
+- Highlight value and expertise without metrics or years
+- Use powerful, active language
+- Include relevant industry keywords for ATS systems
+- Focus on what makes this candidate valuable to employers
+- Make it tailored specifically for a ${jobTitle} role
 
-EDUCATION:
-${JSON.stringify(resumeData.education, null, 2)}
-
-CERTIFICATIONS:
-${JSON.stringify(resumeData.certifications, null, 2)}
-
-Please provide:
-1. A concise professional summary (maximum 50 words) highlighting value and expertise without metrics or years.
-2. For each work experience, provide exactly 3 bullet points of responsibilities that are achievement-focused and begin with strong action verbs.
-3. A list of 6 hard skills and 4 soft skills relevant to the ${jobTitle} position.
-
-Format your response as a JSON object with the following structure:
-{
-  "professional_summary": {
-    "title": "Job Title",
-    "summary": "Professional summary text here"
-  },
-  "work_experience": [
-    {
-      // Keep all original fields and just add/update responsibilities array
-      "responsibilities": ["Responsibility 1", "Responsibility 2", "Responsibility 3"]
-    }
-  ],
-  "skills": {
-    "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
-    "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
-  }
-}
+Format your response as plain text only (no JSON).
 `;
 
-    console.log('Calling OpenAI API...');
+    console.log('Calling OpenAI API for professional summary...');
     
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const summaryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
@@ -95,101 +73,178 @@ Format your response as a JSON object with the following structure:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a professional resume writer who specializes in creating ATS-friendly resumes for professionals targeting top-tier companies. You must strictly use only the information provided and never make assumptions.'
+            content: 'You are a professional resume writer specializing in ATS-optimized content. Create only the requested text with no additional commentary.'
           },
-          { 
-            role: 'user', 
-            content: prompt
-          }
+          { role: 'user', content: summaryPrompt }
         ],
         temperature: 0.7,
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+    if (!summaryResponse.ok) {
+      const errorText = await summaryResponse.text();
+      console.error('OpenAI API error for summary:', errorText);
+      throw new Error(`OpenAI API error: ${summaryResponse.status} ${summaryResponse.statusText}`);
     }
 
-    const data = await response.json();
+    const summaryData = await summaryResponse.json();
+    const enhancedSummary = summaryData.choices[0].message.content.trim();
+    console.log('Generated professional summary');
     
-    if (!data.choices || data.choices.length === 0) {
-      throw new Error('No response from OpenAI');
-    }
+    // Process each work experience entry individually to generate relevant responsibilities
+    const enhancedExperiences = [...resumeData.work_experience];
     
-    console.log('Received response from OpenAI');
-    
-    // Parse the AI-generated content
-    let enhancedContent;
-    try {
-      // Try to parse JSON from the response
-      enhancedContent = JSON.parse(data.choices[0].message.content.trim());
-    } catch (parseError) {
-      console.error('Error parsing OpenAI response:', parseError);
-      console.log('OpenAI response content:', data.choices[0].message.content);
+    for (let i = 0; i < enhancedExperiences.length; i++) {
+      const experience = enhancedExperiences[i];
+      console.log(`Processing job experience: ${experience.jobTitle} at ${experience.companyName}`);
       
-      // Fallback: Use a default structure
-      enhancedContent = {
-        professional_summary: {
-          title: resumeData.professional_summary?.title || '',
-          summary: "Skilled professional with expertise in implementing innovative solutions and driving business growth. Focused on delivering high-quality results through collaborative teamwork and strategic thinking."
+      // Craft a job-specific prompt for each role
+      const responsibilitiesPrompt = `
+Create 3-4 highly relevant, impactful bullet points for a ${experience.jobTitle} position at ${experience.companyName} that would appear on a resume.
+
+Job Details:
+- Title: ${experience.jobTitle}
+- Company: ${experience.companyName}
+- Duration: ${experience.startDate} to ${experience.isCurrentJob ? "Present" : experience.endDate}
+${experience.location ? `- Location: ${experience.location}` : ""}
+
+Requirements for each bullet point:
+1. Start with a strong action verb
+2. Be specific to the ${experience.jobTitle} role and industry
+3. Include relevant technical terms and keywords for ATS systems
+4. Focus on achievements and impact, not just duties
+5. Be between 50-100 characters each
+6. Be concrete and avoid generic statements
+7. Avoid first-person pronouns
+8. Use proper industry terminology
+
+Format your response as exactly 3-4 bullet points, one per line, with no additional text, numbering, or commentary.
+`;
+
+      const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
         },
-        work_experience: resumeData.work_experience.map(exp => ({
-          ...exp,
-          responsibilities: [
-            "Led key initiatives that improved operational efficiency and productivity.",
-            "Collaborated with cross-functional teams to implement effective solutions.",
-            "Managed resources and projects to achieve strategic business objectives."
-          ]
-        })),
-        skills: {
-          hard_skills: [
-            "Project Management",
-            "Strategic Planning",
-            "Process Optimization",
-            "Data Analysis",
-            "Technical Documentation",
-            "Performance Monitoring"
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { 
+              role: 'system', 
+              content: 'You are a professional resume writer specializing in creating job-specific bullet points that pass ATS systems and impress hiring managers. Write exactly what is requested with no additional text.'
+            },
+            { role: 'user', content: responsibilitiesPrompt }
           ],
-          soft_skills: [
-            "Communication",
-            "Leadership",
-            "Problem Solving",
-            "Team Collaboration"
-          ]
-        }
-      };
+          temperature: 0.7,
+        }),
+      });
+
+      if (!responsibilitiesResponse.ok) {
+        console.error(`Error generating responsibilities for job ${i + 1}`);
+        continue; // Continue with next job if this one fails
+      }
+
+      const respData = await responsibilitiesResponse.json();
+      const responsibilities = respData.choices[0].message.content
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => line.replace(/^[-•*]\s*/, '').trim());
+
+      if (responsibilities.length > 0) {
+        enhancedExperiences[i] = {
+          ...experience,
+          responsibilities
+        };
+        console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
+      }
     }
     
-    // Prepare the update payload
+    // Generate skills relevant to the target job
+    const skillsPrompt = `
+Generate a skills list for a ${jobTitle} resume that will pass ATS systems.
+
+Requirements:
+- Include 6 hard/technical skills specific to the ${jobTitle} role
+- Include 4 soft skills relevant for the ${jobTitle} position
+- Use industry standard terminology
+- Include important keywords that ATS systems look for
+- Skills should be specific, not generic
+- Base on current industry standards
+
+Format your response as a JSON object with this exact structure:
+{
+  "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
+  "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
+}
+`;
+
+    const skillsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are a professional resume skills expert. Generate skills that will help a candidate pass ATS systems. Return only the JSON object with no additional commentary.'
+          },
+          { role: 'user', content: skillsPrompt }
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    let skills = {
+      hard_skills: [
+        "Project Management", 
+        "Strategic Planning",
+        "Process Optimization",
+        "Data Analysis",
+        "Technical Documentation",
+        "Performance Monitoring"
+      ],
+      soft_skills: [
+        "Communication",
+        "Leadership",
+        "Problem Solving",
+        "Team Collaboration"
+      ]
+    };
+
+    if (skillsResponse.ok) {
+      try {
+        const skillsData = await skillsResponse.json();
+        const parsedSkills = JSON.parse(skillsData.choices[0].message.content);
+        if (parsedSkills && parsedSkills.hard_skills && parsedSkills.soft_skills) {
+          skills = parsedSkills;
+          console.log('Generated skills successfully');
+        }
+      } catch (e) {
+        console.error('Error parsing skills:', e);
+        // We'll use the default skills defined above
+      }
+    } else {
+      console.error('Error calling OpenAI for skills');
+      // We'll use the default skills defined above
+    }
+    
+    // Update the resume in the database
     const updatePayload = {
       professional_summary: {
         ...resumeData.professional_summary,
-        summary: enhancedContent.professional_summary.summary
+        summary: enhancedSummary
       },
-      skills: enhancedContent.skills,
+      work_experience: enhancedExperiences,
+      skills: skills,
       completion_status: 'completed'
     };
-    
-    // Handle work experience specially to ensure we preserve all original data
-    if (enhancedContent.work_experience && Array.isArray(enhancedContent.work_experience)) {
-      // Map through the original work experiences and update responsibilities
-      updatePayload.work_experience = resumeData.work_experience.map((original, index) => {
-        const enhanced = enhancedContent.work_experience[index];
-        if (enhanced && enhanced.responsibilities) {
-          return {
-            ...original,
-            responsibilities: enhanced.responsibilities
-          };
-        }
-        return original;
-      });
-    }
 
     console.log('Updating resume in database...');
     
-    // Update the resume in the database
     const { error: updateError } = await supabase
       .from('resumes')
       .update(updatePayload)
