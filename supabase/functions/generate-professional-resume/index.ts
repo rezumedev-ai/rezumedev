@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -92,7 +91,7 @@ Format your response as plain text only (no JSON).
     console.log('Generated professional summary');
     
     // Process each work experience entry individually to generate highly tailored responsibilities
-    const enhancedExperiences = [...resumeData.work_experience];
+    const enhancedExperiences = [];
     
     // First, get industry-specific keywords for the target position
     const keywordsPrompt = `
@@ -136,7 +135,24 @@ Format your response as a JSON array of strings only, with no additional comment
       try {
         const keywordsData = await keywordsResponse.json();
         const keywordsContent = keywordsData.choices[0].message.content.trim();
-        industryKeywords = JSON.parse(keywordsContent);
+        
+        try {
+          // First try parsing directly
+          industryKeywords = JSON.parse(keywordsContent);
+        } catch (e) {
+          // If direct parsing fails, try to extract JSON portion
+          const jsonMatch = keywordsContent.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            industryKeywords = JSON.parse(jsonMatch[0]);
+          } else {
+            // If that fails, fall back to line-by-line parsing
+            industryKeywords = keywordsContent
+              .split('\n')
+              .filter(line => line.trim())
+              .map(line => line.replace(/^[-•*]\s*/, '').trim());
+          }
+        }
+        
         console.log(`Generated ${industryKeywords.length} industry keywords`);
       } catch (e) {
         console.error('Error parsing industry keywords:', e);
@@ -144,30 +160,40 @@ Format your response as a JSON array of strings only, with no additional comment
       }
     }
     
-    for (let i = 0; i < enhancedExperiences.length; i++) {
-      const experience = enhancedExperiences[i];
+    // Use a cache to ensure we don't generate duplicate responsibilities
+    const responsibilitiesCache = new Map();
+    
+    // Process each work experience INDEPENDENTLY
+    for (let i = 0; i < resumeData.work_experience.length; i++) {
+      const experience = resumeData.work_experience[i];
       console.log(`Processing job experience: ${experience.jobTitle} at ${experience.companyName}`);
       
-      // Create a detailed analysis of the job role first
-      const jobAnalysisPrompt = `
-Analyze the following job position in detail:
+      // Create a more detailed and specific prompt for each job
+      // Generate job-specific terminology and keywords first
+      const jobSpecificPrompt = `
+Analyze this exact job role and company and provide job-specific terminology and keywords:
 
 Job Title: ${experience.jobTitle}
 Company: ${experience.companyName}
-Industry Keywords: ${industryKeywords.join(', ')}
+${experience.location ? `Location: ${experience.location}` : ""}
+Industry: ${experience.companyName ? `Related to ${experience.companyName}` : "Unknown"}
 
-Return a detailed analysis of:
-1. Core responsibilities typically associated with this exact role
-2. Technical skills and tools commonly used in this position
-3. Key performance metrics relevant to this role
-4. Industry-specific terminology that should be included
+Return ONLY a JSON object with:
+1. An array of 10 job-specific technical terms for this exact role
+2. An array of 10 industry-specific action verbs appropriate for this role
+3. An array of 10 metrics commonly used to measure success in this role
+4. An array of 10 tools/technologies frequently used in this role
 
-Format your response as a JSON object with these four categories.
+Format:
+{
+  "technical_terms": ["term1", "term2", ...],
+  "action_verbs": ["verb1", "verb2", ...],
+  "metrics": ["metric1", "metric2", ...],
+  "tools": ["tool1", "tool2", ...]
+}
 `;
 
-      console.log(`Analyzing job role: ${experience.jobTitle}`);
-      
-      const jobAnalysisResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      const jobSpecificResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${openAIApiKey}`,
@@ -178,71 +204,81 @@ Format your response as a JSON object with these four categories.
           messages: [
             { 
               role: 'system', 
-              content: 'You are an expert job analyst who understands the specific responsibilities and skills for different job roles across industries. Provide detailed job analysis only.'
+              content: 'You are an expert in specific job roles and industries. For each job title and company, provide terminology, verbs, metrics, and tools that are HIGHLY SPECIFIC to that exact position. DO NOT provide generic terms that could apply to any job. Your response must be in valid JSON format only.'
             },
-            { role: 'user', content: jobAnalysisPrompt }
+            { role: 'user', content: jobSpecificPrompt }
           ],
-          temperature: 0.5,
+          temperature: 0.6,
         }),
       });
       
-      let jobAnalysis = {
-        responsibilities: [],
-        skills: [],
+      let jobSpecificTerms = {
+        technical_terms: [],
+        action_verbs: [],
         metrics: [],
-        terminology: []
+        tools: []
       };
       
-      if (jobAnalysisResponse.ok) {
+      if (jobSpecificResponse.ok) {
         try {
-          const analysisData = await jobAnalysisResponse.json();
-          const analysisContent = analysisData.choices[0].message.content.trim();
-          // Extract the JSON part if there's text around it
-          const jsonMatch = analysisContent.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            jobAnalysis = JSON.parse(jsonMatch[0]);
-          } else {
-            jobAnalysis = JSON.parse(analysisContent);
+          const jobSpecificData = await jobSpecificResponse.json();
+          const jobSpecificContent = jobSpecificData.choices[0].message.content.trim();
+          
+          try {
+            // First try parsing directly
+            jobSpecificTerms = JSON.parse(jobSpecificContent);
+          } catch (e) {
+            // If direct parsing fails, try to extract JSON portion
+            const jsonMatch = jobSpecificContent.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              jobSpecificTerms = JSON.parse(jsonMatch[0]);
+            } else {
+              console.error('Failed to parse job-specific terms:', e);
+            }
           }
-          console.log(`Successfully analyzed job role: ${experience.jobTitle}`);
+          
+          console.log(`Generated job-specific terms for ${experience.jobTitle}`);
         } catch (e) {
-          console.error('Error parsing job analysis:', e);
-          // Continue with default job analysis if parsing fails
+          console.error('Error processing job-specific terms:', e);
         }
       }
       
-      // Now craft a job-specific prompt using the detailed analysis
+      // Craft very specific responsibilities prompt using job-specific terminology
       const responsibilitiesPrompt = `
-Create 4-5 highly tailored, ATS-optimized bullet points for a ${experience.jobTitle} position at ${experience.companyName}.
+Create 4-5 HIGHLY SPECIFIC and UNIQUE bullet points for the exact role of ${experience.jobTitle} at ${experience.companyName}.
 
-Core Role Information:
+Job Details:
 - Title: ${experience.jobTitle}
 - Company: ${experience.companyName}
 - Duration: ${experience.startDate} to ${experience.isCurrentJob ? "Present" : experience.endDate}
 ${experience.location ? `- Location: ${experience.location}` : ""}
 
-Job Role Analysis:
-- Core Responsibilities: ${JSON.stringify(jobAnalysis.responsibilities)}
-- Technical Skills: ${JSON.stringify(jobAnalysis.skills)}
-- Key Metrics: ${JSON.stringify(jobAnalysis.metrics)}
-- Industry Terminology: ${JSON.stringify(jobAnalysis.terminology)}
+Job-Specific Context:
+- Technical Terms: ${jobSpecificTerms.technical_terms.join(', ')}
+- Industry Action Verbs: ${jobSpecificTerms.action_verbs.join(', ')}
+- Relevant Metrics: ${jobSpecificTerms.metrics.join(', ')}
+- Tools/Technologies: ${jobSpecificTerms.tools.join(', ')}
 - Industry Keywords: ${industryKeywords.join(', ')}
 
-Requirements for each bullet point:
-1. Begin with a powerful, uncommon action verb (avoid overused words like "managed" or "developed")
-2. Incorporate at least 2-3 industry-specific keywords from the analysis above
-3. Include measurable achievements with specific metrics where possible (use percentages, numbers, dollar amounts)
-4. Demonstrate impact on business outcomes, not just tasks performed
-5. Use the STAR format (Situation, Task, Action, Result) to structure each point
-6. Each bullet point should be 1-2 lines long (no more than 100 characters)
-7. Use proper grammatical structure, present tense for current job, past tense for previous jobs
-8. Highlight leadership, innovation, or technical expertise relevant to this specific role
+Requirements:
+1. Each bullet point MUST be COMPLETELY UNIQUE to this specific role at this specific company
+2. Each bullet MUST begin with a powerful action verb from the provided list or similar
+3. Each bullet MUST include at least 2-3 technical terms or tools specific to this role
+4. Each bullet MUST include quantifiable achievements with metrics when possible
+5. Focus on impact and results, not just responsibilities
+6. NEVER use generic phrases like "Led initiatives" or "Managed projects" without specifics
+7. Length: 1-2 lines per bullet point (80-100 characters)
+8. Use industry-specific language that would impress a hiring manager in this field
 
-Format your response as a JSON array of strings, with each string being a complete bullet point. Include EXACTLY 4 bullet points.
+Format your response as a JSON array of strings ONLY. Each string should be one complete bullet point.
+Example: ["Bullet point 1", "Bullet point 2", ...]
 `;
 
-      console.log(`Generating responsibilities for: ${experience.jobTitle}`);
+      console.log(`Generating responsibilities for: ${experience.jobTitle} at ${experience.companyName}`);
 
+      // Add a unique seed to ensure different responses even for similar roles
+      const uniqueSeed = Date.now() + Math.random();
+      
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -254,17 +290,19 @@ Format your response as a JSON array of strings, with each string being a comple
           messages: [
             { 
               role: 'system', 
-              content: 'You are a professional resume writer specializing in creating highly tailored, ATS-optimized bullet points for job responsibilities. Ensure each bullet point is specific to the exact job title, incorporates relevant keywords, and highlights measurable achievements. Do not include generic responsibilities that could apply to any job.'
+              content: `You are a professional resume writer specializing in creating highly tailored, ATS-optimized bullet points for the EXACT job title: ${experience.jobTitle} at ${experience.companyName}. NEVER return generic responsibilities. Each response must be hyper-specific to this exact role and company, with specific metrics, tools, and terminology. Return ONLY the JSON array of bullet points with no other text. Seed: ${uniqueSeed}`
             },
             { role: 'user', content: responsibilitiesPrompt }
           ],
-          temperature: 0.7,
+          temperature: 0.9, // Higher temperature for more variation
         }),
       });
 
       if (!responsibilitiesResponse.ok) {
         console.error(`Error generating responsibilities for job ${i + 1}`);
-        continue; // Continue with next job if this one fails
+        // Add the original responsibilities to avoid blank entries
+        enhancedExperiences.push({...experience});
+        continue;
       }
 
       try {
@@ -290,15 +328,83 @@ Format your response as a JSON array of strings, with each string being a comple
           }
         }
         
+        // Check if these responsibilities are already in our cache (avoid duplicates)
+        const respKey = responsibilities.join('|');
+        if (responsibilitiesCache.has(respKey)) {
+          console.log(`Duplicate responsibilities detected for ${experience.jobTitle}, regenerating...`);
+          
+          // Try one more time with higher temperature
+          const retryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${openAIApiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [
+                { 
+                  role: 'system', 
+                  content: `You are a professional resume writer. Generate COMPLETELY UNIQUE bullet points for ${experience.jobTitle} at ${experience.companyName}. These MUST be different from any typical responsibilities. Use specific metrics, technical terms, and unique action verbs. Seed: ${uniqueSeed + 1}`
+                },
+                { role: 'user', content: responsibilitiesPrompt }
+              ],
+              temperature: 1.0, // Maximum temperature for highest variation
+            }),
+          });
+          
+          if (retryResponse.ok) {
+            const retryData = await retryResponse.json();
+            const retryContent = retryData.choices[0].message.content.trim();
+            
+            try {
+              responsibilities = JSON.parse(retryContent);
+            } catch (e) {
+              const jsonMatch = retryContent.match(/\[[\s\S]*\]/);
+              if (jsonMatch) {
+                responsibilities = JSON.parse(jsonMatch[0]);
+              }
+            }
+            
+            // If we still have duplicates, modify the responses slightly
+            const retryKey = responsibilities.join('|');
+            if (responsibilitiesCache.has(retryKey)) {
+              responsibilities = responsibilities.map(resp => {
+                // Add a slight variation to make it unique
+                const words = resp.split(' ');
+                if (words.length > 3) {
+                  // Replace one adjective or adverb if present
+                  for (let i = 0; i < words.length; i++) {
+                    if (words[i].endsWith('ly') || words[i].endsWith('ive')) {
+                      const variations = ['expertly', 'effectively', 'strategically', 'successfully', 'innovatively'];
+                      words[i] = variations[Math.floor(Math.random() * variations.length)];
+                      break;
+                    }
+                  }
+                }
+                return words.join(' ');
+              });
+            }
+          }
+        }
+        
+        // Add to cache to avoid future duplicates
+        responsibilitiesCache.set(responsibilities.join('|'), true);
+        
         if (responsibilities.length > 0) {
-          enhancedExperiences[i] = {
+          enhancedExperiences.push({
             ...experience,
             responsibilities
-          };
-          console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
+          });
+          console.log(`Generated ${responsibilities.length} unique responsibilities for ${experience.jobTitle}`);
+        } else {
+          // If we still failed to get responsibilities, keep the original
+          enhancedExperiences.push({...experience});
         }
       } catch (e) {
         console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
+        // Keep the original experience data if processing fails
+        enhancedExperiences.push({...experience});
       }
     }
     
