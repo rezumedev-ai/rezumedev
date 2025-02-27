@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -273,7 +274,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           })
           .eq('id', resumeId);
       
-        const { data, error } = await supabase.functions.invoke('enhance-resume', {
+        const { data, error } = await supabase.functions.invoke('generate-professional-resume', {
           body: { 
             resumeData: formData,
             resumeId: resumeId
@@ -358,61 +359,6 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       setCurrentQuestionIndex(prev => prev - 1);
     } else if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const enhanceResume = async () => {
-    try {
-      const { data: resumeData, error: resumeError } = await supabase
-        .from('resumes')
-        .select('*')
-        .eq('id', resumeId)
-        .single();
-
-      if (resumeError) throw resumeError;
-
-      const { error } = await supabase.functions.invoke('enhance-resume', {
-        body: { resumeData }
-      });
-
-      if (error) throw error;
-
-      const checkEnhancement = setInterval(async () => {
-        const { data, error } = await supabase
-          .from('resumes')
-          .select('completion_status')
-          .eq('id', resumeId)
-          .single();
-
-        if (error) {
-          clearInterval(checkEnhancement);
-          throw error;
-        }
-
-        if (data.completion_status === 'completed') {
-          clearInterval(checkEnhancement);
-          onComplete();
-        }
-      }, 2000);
-
-      setTimeout(() => {
-        clearInterval(checkEnhancement);
-        setIsEnhancing(false);
-        toast({
-          title: "Enhancement taking longer than expected",
-          description: "Please try again later.",
-          variant: "destructive",
-        });
-      }, 120000);
-
-    } catch (error) {
-      console.error('Error enhancing resume:', error);
-      setIsEnhancing(false);
-      toast({
-        title: "Error",
-        description: "Failed to enhance resume. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 

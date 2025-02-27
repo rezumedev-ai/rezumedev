@@ -53,10 +53,10 @@ export default function ResumePreview() {
         throw updateError;
       }
 
-      console.log("Status updated, calling enhance-resume function");
+      console.log("Status updated, calling generate-professional-resume function");
 
-      // Call the enhance-resume function
-      const { data: enhanceData, error } = await supabase.functions.invoke('enhance-resume', {
+      // Call the new function instead of enhance-resume
+      const { data: enhanceData, error } = await supabase.functions.invoke('generate-professional-resume', {
         body: { 
           resumeData: resume,
           resumeId: id
@@ -64,11 +64,11 @@ export default function ResumePreview() {
       });
 
       if (error) {
-        console.error("Error calling enhance-resume function:", error);
+        console.error("Error calling generate-professional-resume function:", error);
         throw error;
       }
 
-      console.log("Enhance-resume function called successfully:", enhanceData);
+      console.log("generate-professional-resume function called successfully:", enhanceData);
 
       // Poll for completion
       let attempts = 0;
