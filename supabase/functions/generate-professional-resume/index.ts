@@ -91,35 +91,157 @@ Format your response as plain text only (no JSON).
     const enhancedSummary = summaryData.choices[0].message.content.trim();
     console.log('Generated professional summary');
     
-    // Process each work experience entry individually to generate relevant responsibilities
+    // Process each work experience entry individually to generate highly tailored responsibilities
     const enhancedExperiences = [...resumeData.work_experience];
+    
+    // First, get industry-specific keywords for the target position
+    const keywordsPrompt = `
+Generate the top 15 industry-specific keywords and phrases for a ${jobTitle} position that would best optimize a resume for ATS systems.
+
+Consider:
+- Technical skills specific to this role
+- Industry terminology
+- Certifications and qualifications
+- Software and tools commonly used
+- Methodologies and frameworks relevant to ${jobTitle}
+
+Format your response as a JSON array of strings only, with no additional commentary. Example:
+["Keyword 1", "Keyword 2", "Keyword 3", ...]
+`;
+
+    console.log('Generating industry-specific keywords for target position...');
+    
+    const keywordsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are an expert in resume optimization and ATS systems. Generate only the requested list of keywords with no additional text.'
+          },
+          { role: 'user', content: keywordsPrompt }
+        ],
+        temperature: 0.5,
+      }),
+    });
+    
+    let industryKeywords = [];
+    
+    if (keywordsResponse.ok) {
+      try {
+        const keywordsData = await keywordsResponse.json();
+        const keywordsContent = keywordsData.choices[0].message.content.trim();
+        industryKeywords = JSON.parse(keywordsContent);
+        console.log(`Generated ${industryKeywords.length} industry keywords`);
+      } catch (e) {
+        console.error('Error parsing industry keywords:', e);
+        // Continue without keywords if parsing fails
+      }
+    }
     
     for (let i = 0; i < enhancedExperiences.length; i++) {
       const experience = enhancedExperiences[i];
       console.log(`Processing job experience: ${experience.jobTitle} at ${experience.companyName}`);
       
-      // Craft a job-specific prompt for each role
-      const responsibilitiesPrompt = `
-Create 3-4 highly relevant, impactful bullet points for a ${experience.jobTitle} position at ${experience.companyName} that would appear on a resume.
+      // Create a detailed analysis of the job role first
+      const jobAnalysisPrompt = `
+Analyze the following job position in detail:
 
-Job Details:
+Job Title: ${experience.jobTitle}
+Company: ${experience.companyName}
+Industry Keywords: ${industryKeywords.join(', ')}
+
+Return a detailed analysis of:
+1. Core responsibilities typically associated with this exact role
+2. Technical skills and tools commonly used in this position
+3. Key performance metrics relevant to this role
+4. Industry-specific terminology that should be included
+
+Format your response as a JSON object with these four categories.
+`;
+
+      console.log(`Analyzing job role: ${experience.jobTitle}`);
+      
+      const jobAnalysisResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { 
+              role: 'system', 
+              content: 'You are an expert job analyst who understands the specific responsibilities and skills for different job roles across industries. Provide detailed job analysis only.'
+            },
+            { role: 'user', content: jobAnalysisPrompt }
+          ],
+          temperature: 0.5,
+        }),
+      });
+      
+      let jobAnalysis = {
+        responsibilities: [],
+        skills: [],
+        metrics: [],
+        terminology: []
+      };
+      
+      if (jobAnalysisResponse.ok) {
+        try {
+          const analysisData = await jobAnalysisResponse.json();
+          const analysisContent = analysisData.choices[0].message.content.trim();
+          // Extract the JSON part if there's text around it
+          const jsonMatch = analysisContent.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            jobAnalysis = JSON.parse(jsonMatch[0]);
+          } else {
+            jobAnalysis = JSON.parse(analysisContent);
+          }
+          console.log(`Successfully analyzed job role: ${experience.jobTitle}`);
+        } catch (e) {
+          console.error('Error parsing job analysis:', e);
+          // Continue with default job analysis if parsing fails
+        }
+      }
+      
+      // Now craft a job-specific prompt using the detailed analysis
+      const responsibilitiesPrompt = `
+Create 4-5 highly tailored, ATS-optimized bullet points for a ${experience.jobTitle} position at ${experience.companyName}.
+
+Core Role Information:
 - Title: ${experience.jobTitle}
 - Company: ${experience.companyName}
 - Duration: ${experience.startDate} to ${experience.isCurrentJob ? "Present" : experience.endDate}
 ${experience.location ? `- Location: ${experience.location}` : ""}
 
-Requirements for each bullet point:
-1. Start with a strong action verb
-2. Be specific to the ${experience.jobTitle} role and industry
-3. Include relevant technical terms and keywords for ATS systems
-4. Focus on achievements and impact, not just duties
-5. Be between 50-100 characters each
-6. Be concrete and avoid generic statements
-7. Avoid first-person pronouns
-8. Use proper industry terminology
+Job Role Analysis:
+- Core Responsibilities: ${JSON.stringify(jobAnalysis.responsibilities)}
+- Technical Skills: ${JSON.stringify(jobAnalysis.skills)}
+- Key Metrics: ${JSON.stringify(jobAnalysis.metrics)}
+- Industry Terminology: ${JSON.stringify(jobAnalysis.terminology)}
+- Industry Keywords: ${industryKeywords.join(', ')}
 
-Format your response as exactly 3-4 bullet points, one per line, with no additional text, numbering, or commentary.
+Requirements for each bullet point:
+1. Begin with a powerful, uncommon action verb (avoid overused words like "managed" or "developed")
+2. Incorporate at least 2-3 industry-specific keywords from the analysis above
+3. Include measurable achievements with specific metrics where possible (use percentages, numbers, dollar amounts)
+4. Demonstrate impact on business outcomes, not just tasks performed
+5. Use the STAR format (Situation, Task, Action, Result) to structure each point
+6. Each bullet point should be 1-2 lines long (no more than 100 characters)
+7. Use proper grammatical structure, present tense for current job, past tense for previous jobs
+8. Highlight leadership, innovation, or technical expertise relevant to this specific role
+
+Format your response as a JSON array of strings, with each string being a complete bullet point. Include EXACTLY 4 bullet points.
 `;
+
+      console.log(`Generating responsibilities for: ${experience.jobTitle}`);
 
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -132,7 +254,7 @@ Format your response as exactly 3-4 bullet points, one per line, with no additio
           messages: [
             { 
               role: 'system', 
-              content: 'You are a professional resume writer specializing in creating job-specific bullet points that pass ATS systems and impress hiring managers. Write exactly what is requested with no additional text.'
+              content: 'You are a professional resume writer specializing in creating highly tailored, ATS-optimized bullet points for job responsibilities. Ensure each bullet point is specific to the exact job title, incorporates relevant keywords, and highlights measurable achievements. Do not include generic responsibilities that could apply to any job.'
             },
             { role: 'user', content: responsibilitiesPrompt }
           ],
@@ -145,36 +267,59 @@ Format your response as exactly 3-4 bullet points, one per line, with no additio
         continue; // Continue with next job if this one fails
       }
 
-      const respData = await responsibilitiesResponse.json();
-      const responsibilities = respData.choices[0].message.content
-        .split('\n')
-        .filter(line => line.trim())
-        .map(line => line.replace(/^[-•*]\s*/, '').trim());
-
-      if (responsibilities.length > 0) {
-        enhancedExperiences[i] = {
-          ...experience,
-          responsibilities
-        };
-        console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
+      try {
+        const respData = await responsibilitiesResponse.json();
+        const responseContent = respData.choices[0].message.content.trim();
+        
+        // Try to parse the response as JSON
+        let responsibilities = [];
+        try {
+          // First try parsing directly
+          responsibilities = JSON.parse(responseContent);
+        } catch (e) {
+          // If direct parsing fails, try to extract JSON portion
+          const jsonMatch = responseContent.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            responsibilities = JSON.parse(jsonMatch[0]);
+          } else {
+            // If that fails, fall back to line-by-line parsing
+            responsibilities = responseContent
+              .split('\n')
+              .filter(line => line.trim())
+              .map(line => line.replace(/^[-•*]\s*/, '').trim());
+          }
+        }
+        
+        if (responsibilities.length > 0) {
+          enhancedExperiences[i] = {
+            ...experience,
+            responsibilities
+          };
+          console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
+        }
+      } catch (e) {
+        console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
       }
     }
     
     // Generate skills relevant to the target job
     const skillsPrompt = `
-Generate a skills list for a ${jobTitle} resume that will pass ATS systems.
+Generate a comprehensive skills list for a ${jobTitle} resume that will maximize success with ATS systems.
+
+Industry Context:
+${industryKeywords.length > 0 ? `- Industry Keywords: ${industryKeywords.join(', ')}` : ''}
 
 Requirements:
-- Include 6 hard/technical skills specific to the ${jobTitle} role
-- Include 4 soft skills relevant for the ${jobTitle} position
-- Use industry standard terminology
-- Include important keywords that ATS systems look for
-- Skills should be specific, not generic
-- Base on current industry standards
+- Include 8 hard/technical skills that are HIGHLY SPECIFIC to the ${jobTitle} role
+- Include 4 soft skills most valued for the ${jobTitle} position
+- Prioritize skills that appear frequently in job postings for this role
+- Include skills that demonstrate proficiency with industry-standard tools and methodologies
+- Focus on in-demand skills that will make the candidate stand out
+- List the skills in order of relevance/importance
 
 Format your response as a JSON object with this exact structure:
 {
-  "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
+  "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6", "Skill 7", "Skill 8"],
   "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
 }
 `;
@@ -190,7 +335,7 @@ Format your response as a JSON object with this exact structure:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a professional resume skills expert. Generate skills that will help a candidate pass ATS systems. Return only the JSON object with no additional commentary.'
+            content: 'You are a professional resume skills expert. Generate skills that will help a candidate pass ATS systems and appeal to hiring managers. Return only the JSON object with no additional commentary.'
           },
           { role: 'user', content: skillsPrompt }
         ],
@@ -205,7 +350,9 @@ Format your response as a JSON object with this exact structure:
         "Process Optimization",
         "Data Analysis",
         "Technical Documentation",
-        "Performance Monitoring"
+        "Performance Monitoring",
+        "Risk Assessment",
+        "Quality Assurance"
       ],
       soft_skills: [
         "Communication",
@@ -218,13 +365,31 @@ Format your response as a JSON object with this exact structure:
     if (skillsResponse.ok) {
       try {
         const skillsData = await skillsResponse.json();
-        const parsedSkills = JSON.parse(skillsData.choices[0].message.content);
-        if (parsedSkills && parsedSkills.hard_skills && parsedSkills.soft_skills) {
-          skills = parsedSkills;
-          console.log('Generated skills successfully');
+        const skillsContent = skillsData.choices[0].message.content.trim();
+        
+        // Try to parse the JSON from the response
+        try {
+          // First try parsing directly
+          const parsedSkills = JSON.parse(skillsContent);
+          if (parsedSkills && parsedSkills.hard_skills && parsedSkills.soft_skills) {
+            skills = parsedSkills;
+            console.log('Generated skills successfully');
+          }
+        } catch (e) {
+          // If direct parsing fails, try to extract JSON portion
+          const jsonMatch = skillsContent.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const parsedSkills = JSON.parse(jsonMatch[0]);
+            if (parsedSkills && parsedSkills.hard_skills && parsedSkills.soft_skills) {
+              skills = parsedSkills;
+              console.log('Generated skills successfully (extracted from response)');
+            }
+          } else {
+            console.error('Failed to parse skills JSON:', e);
+          }
         }
       } catch (e) {
-        console.error('Error parsing skills:', e);
+        console.error('Error processing skills response:', e);
         // We'll use the default skills defined above
       }
     } else {
