@@ -55,7 +55,7 @@ export default function ResumePreview() {
 
       console.log("Status updated, calling generate-professional-resume function");
 
-      // Call the new function instead of enhance-resume
+      // Call the generate-professional-resume function with the existing resume data
       const { data: enhanceData, error } = await supabase.functions.invoke('generate-professional-resume', {
         body: { 
           resumeData: resume,
@@ -99,6 +99,10 @@ export default function ResumePreview() {
             setIsRegenerating(false);
             await refetch();
             toast.success("Resume has been regenerated successfully!");
+          } else if (pollData.completion_status === "error") {
+            clearInterval(checkCompletion);
+            setIsRegenerating(false);
+            toast.error("An error occurred while regenerating your resume. Please try again.");
           } else if (attempts >= maxAttempts) {
             clearInterval(checkCompletion);
             setIsRegenerating(false);
