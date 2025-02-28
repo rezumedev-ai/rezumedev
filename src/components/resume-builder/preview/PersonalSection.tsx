@@ -25,7 +25,8 @@ export function PersonalSection({
   isEditing,
   onUpdate
 }: PersonalSectionProps) {
-  const handleContentEdit = (field: string, event: React.FocusEvent<HTMLDivElement>) => {
+  // Updated to use HTMLElement instead of HTMLDivElement for more flexibility
+  const handleContentEdit = (field: string, event: React.FocusEvent<HTMLElement>) => {
     if (!isEditing || !onUpdate) return;
     const newValue = event.target.innerText.trim();
     onUpdate(field, newValue);
