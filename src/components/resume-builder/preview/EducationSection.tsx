@@ -27,24 +27,65 @@ export function EducationSection({
     onUpdate(index, field, newValue);
   };
 
+  // Template-specific styles
+  const styles = {
+    "executive-clean": {
+      section: "mb-6",
+      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      degree: "font-bold text-sm text-gray-800",
+      school: "text-sm text-gray-700",
+      date: "text-sm text-gray-500"
+    },
+    "modern-split": {
+      section: "mb-5",
+      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3",
+      degree: "font-medium text-xs text-gray-800",
+      school: "text-xs text-gray-600",
+      date: "text-[10px] text-gray-500"
+    },
+    "minimal-elegant": {
+      section: "mb-6",
+      title: "text-xs font-medium text-gray-400 uppercase tracking-widest mb-4 text-center",
+      degree: "font-medium text-sm text-gray-800",
+      school: "text-sm text-gray-600",
+      date: "text-xs text-gray-500"
+    },
+    "professional-executive": {
+      section: "mb-5",
+      title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
+      degree: "font-semibold text-[13px]",
+      school: "text-[13px] text-gray-600",
+      date: "text-[12px] text-gray-500"
+    }
+  };
+
+  const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+
   return (
-    <div className="mb-6">
-      <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
-        Education
+    <div className={currentStyle.section}>
+      <h3 className={currentStyle.title}>
+        {template.id === "modern-split" ? (
+          <span className="flex items-center">
+            <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
+            Education
+          </span>
+        ) : (
+          "Education"
+        )}
       </h3>
-      <div className="space-y-4">
+      <div className={template.id === "minimal-elegant" ? "space-y-4 flex flex-col items-center" : "space-y-3"}>
         {education.map((edu, index) => (
-          <div key={index}>
+          <div key={index} className={template.id === "minimal-elegant" ? "text-center" : ""}>
             <div className="flex justify-between items-baseline mb-1">
               <h4 
-                className="font-bold text-sm outline-none"
+                className={`${currentStyle.degree} outline-none`}
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit(index, "degreeName", e)}
               >
                 {edu.degreeName}
               </h4>
-              <span className="text-xs">
+              <span className={currentStyle.date}>
                 <span
                   contentEditable={isEditing}
                   suppressContentEditableWarning
@@ -67,7 +108,7 @@ export function EducationSection({
               </span>
             </div>
             <div 
-              className="text-sm outline-none"
+              className={`${currentStyle.school} outline-none`}
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit(index, "schoolName", e)}

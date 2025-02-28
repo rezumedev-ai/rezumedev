@@ -27,26 +27,73 @@ export function CertificationsSection({
     onUpdate(index, field, newValue);
   };
 
+  // Template-specific styles
+  const styles = {
+    "executive-clean": {
+      section: "mb-6",
+      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      name: "font-bold text-sm text-gray-800",
+      organization: "text-sm text-gray-700",
+      date: "text-xs text-gray-500"
+    },
+    "modern-split": {
+      section: "mb-5",
+      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3",
+      name: "font-medium text-xs text-gray-800",
+      organization: "text-xs text-gray-600",
+      date: "text-[10px] text-gray-500"
+    },
+    "minimal-elegant": {
+      section: "mb-6",
+      title: "text-xs font-medium text-gray-400 uppercase tracking-widest mb-4 text-center",
+      name: "font-medium text-sm text-gray-800",
+      organization: "text-sm text-gray-600",
+      date: "text-xs text-gray-500"
+    },
+    "professional-executive": {
+      section: "mb-5",
+      title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
+      name: "font-medium text-[13px]",
+      organization: "text-[13px] text-gray-600",
+      date: "text-[12px] text-gray-500"
+    }
+  };
+
+  const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+
   return (
-    <div className="mb-6">
-      <h3 className="text-base font-bold text-black uppercase tracking-wider mb-4 border-b border-black pb-1">
-        Certifications & Licenses
+    <div className={currentStyle.section}>
+      <h3 className={currentStyle.title}>
+        {template.id === "modern-split" ? (
+          <span className="flex items-center">
+            <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
+            Certifications
+          </span>
+        ) : template.id === "professional-executive" ? (
+          "Certifications"
+        ) : (
+          "Certifications & Licenses"
+        )}
       </h3>
-      <div className="space-y-3">
+      <div className={template.id === "minimal-elegant" ? "space-y-2 flex flex-col items-center" : "space-y-2"}>
         {certifications.map((cert, index) => (
-          <div key={index} className="flex justify-between items-baseline">
+          <div key={index} className={
+            template.id === "minimal-elegant" 
+              ? "flex justify-between items-baseline w-full max-w-lg" 
+              : "flex justify-between items-baseline"
+          }>
             <div>
               <span 
-                className="font-bold text-sm outline-none"
+                className={`${currentStyle.name} outline-none`}
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit(index, "name", e)}
               >
                 {cert.name}
               </span>
-              <span className="text-sm mx-2">|</span>
+              {template.id !== "professional-executive" && <span className="text-gray-500 mx-2">•</span>}
               <span 
-                className="text-sm outline-none"
+                className={`${currentStyle.organization} outline-none`}
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit(index, "organization", e)}
@@ -55,7 +102,7 @@ export function CertificationsSection({
               </span>
             </div>
             <span 
-              className="text-xs outline-none"
+              className={`${currentStyle.date} outline-none`}
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit(index, "completionDate", e)}
