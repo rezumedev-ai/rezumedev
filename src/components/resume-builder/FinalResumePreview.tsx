@@ -292,13 +292,20 @@ export function FinalResumePreview({
                         <h2 className={`${currentStyle.sectionTitle}`}>
                           Skills
                         </h2>
-                        <div className="space-y-1">
-                          {resumeData.skills.hard_skills.map((skill, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-                              <span className="text-[13px] text-gray-700">{skill}</span>
+                        <div className="space-y-3">
+                          {resumeData.skills.hard_skills.length > 0 && (
+                            <div>
+                              <div className="font-medium text-[13px] mb-1">Technical Skills</div>
+                              <div className="space-y-1">
+                                {resumeData.skills.hard_skills.map((skill, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                                    <span className="text-[13px] text-gray-700">{skill}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                          ))}
+                          )}
                           {resumeData.skills.soft_skills.length > 0 && (
                             <div className="mt-3 pt-1">
                               <div className="font-medium text-[13px] mb-1">Soft Skills</div>
