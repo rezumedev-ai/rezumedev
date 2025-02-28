@@ -66,6 +66,9 @@ export function SkillsSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
+  // Determine if we should use bullet points for both skill types
+  const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive";
+
   return (
     <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
@@ -87,13 +90,13 @@ export function SkillsSection({
               {template.id === "professional-executive" ? "Core Competencies" : "Technical Skills"}
             </h4>
             
-            {template.id === "modern-split" ? (
+            {usesBulletPoints ? (
               <ul className="space-y-1">
                 {hardSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="inline-block w-1 h-1 rounded-full bg-indigo-400 mt-1.5 mr-2"></span>
+                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
                     <span
-                      className="outline-none text-xs text-gray-600"
+                      className={`outline-none ${currentStyle.skillList}`}
                       contentEditable={isEditing}
                       suppressContentEditableWarning
                     >
@@ -121,13 +124,13 @@ export function SkillsSection({
               {template.id === "professional-executive" ? "Professional Skills" : "Soft Skills"}
             </h4>
             
-            {template.id === "modern-split" ? (
+            {usesBulletPoints ? (
               <ul className="space-y-1">
                 {softSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="inline-block w-1 h-1 rounded-full bg-indigo-400 mt-1.5 mr-2"></span>
+                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
                     <span
-                      className="outline-none text-xs text-gray-600"
+                      className={`outline-none ${currentStyle.skillList}`}
                       contentEditable={isEditing}
                       suppressContentEditableWarning
                     >

@@ -300,10 +300,15 @@ export function FinalResumePreview({
                             </div>
                           ))}
                           {resumeData.skills.soft_skills.length > 0 && (
-                            <div className="mt-2 pt-2 border-t border-gray-200">
+                            <div className="mt-3 pt-1">
                               <div className="font-medium text-[13px] mb-1">Soft Skills</div>
-                              <div className="text-[13px] text-gray-700">
-                                {resumeData.skills.soft_skills.join(" • ")}
+                              <div className="space-y-1">
+                                {resumeData.skills.soft_skills.map((skill, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                                    <span className="text-[13px] text-gray-700">{skill}</span>
+                                  </div>
+                                ))}
                               </div>
                             </div>
                           )}
