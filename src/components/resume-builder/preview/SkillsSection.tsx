@@ -122,7 +122,12 @@ export function SkillsSection({
             </h4>
             
             {template.id === "modern-split" ? (
-              <div className={`${currentStyle.skillList} outline-none`}>
+              <div 
+                className={`${currentStyle.skillList} outline-none`}
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleSkillsEdit("soft", e)}
+              >
                 {softSkills.join(" • ")}
               </div>
             ) : (
