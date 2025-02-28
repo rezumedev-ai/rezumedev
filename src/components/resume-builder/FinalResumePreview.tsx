@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -291,19 +292,17 @@ export function FinalResumePreview({
                         <h2 className={`${currentStyle.sectionTitle}`}>
                           Skills
                         </h2>
-                        <div className="space-y-4">
-                          {resumeData.skills.hard_skills.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-bold text-gray-700 mb-1">Technical Skills</h4>
-                              <div className={`${currentStyle.bodyText} text-gray-700`}>
-                                {resumeData.skills.hard_skills.join(" • ")}
-                              </div>
+                        <div className="space-y-1">
+                          {resumeData.skills.hard_skills.map((skill, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                              <span className="text-[13px] text-gray-700">{skill}</span>
                             </div>
-                          )}
+                          ))}
                           {resumeData.skills.soft_skills.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-bold text-gray-700 mb-1">Soft Skills</h4>
-                              <div className={`${currentStyle.bodyText} text-gray-700`}>
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <div className="font-medium text-[13px] mb-1">Soft Skills</div>
+                              <div className="text-[13px] text-gray-700">
                                 {resumeData.skills.soft_skills.join(" • ")}
                               </div>
                             </div>
@@ -318,7 +317,7 @@ export function FinalResumePreview({
                         <h2 className={`${currentStyle.sectionTitle}`}>
                           Certifications
                         </h2>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           {resumeData.certifications.map((cert, index) => (
                             <div key={index} className="flex items-center gap-2">
                               <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
@@ -421,19 +420,6 @@ export function FinalResumePreview({
                 <div className="grid grid-cols-3 gap-8 h-[calc(100%-100px)]">
                   {/* Left Sidebar */}
                   <div className="col-span-1 space-y-5 border-r border-indigo-100 pr-4">
-                    {/* Professional Summary */}
-                    <div>
-                      <h3 className={`${currentStyle.sectionTitle}`}>
-                        <span className="flex items-center">
-                          <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
-                          Summary
-                        </span>
-                      </h3>
-                      <p className={`${currentStyle.bodyText} text-gray-600 pr-2`}>
-                        {resumeData.professional_summary.summary}
-                      </p>
-                    </div>
-
                     {/* Skills */}
                     {(resumeData.skills.hard_skills.length > 0 || resumeData.skills.soft_skills.length > 0) && (
                       <div>
@@ -450,7 +436,7 @@ export function FinalResumePreview({
                               <ul className="space-y-1">
                                 {resumeData.skills.hard_skills.map((skill, index) => (
                                   <li key={index} className={`${currentStyle.bodyText} text-gray-600 flex items-start`}>
-                                    <span className="inline-block w-1 h-1 rounded-full bg-indigo-400 mt-1.5 mr-2" />
+                                    <span className="inline-block w-1 h-1 rounded-full bg-indigo-400 mt-1.5 mr-2"></span>
                                     {skill}
                                   </li>
                                 ))}
@@ -460,9 +446,14 @@ export function FinalResumePreview({
                           {resumeData.skills.soft_skills.length > 0 && (
                             <div>
                               <h4 className="text-xs font-medium text-gray-700 mb-1">Soft Skills</h4>
-                              <div className={`${currentStyle.bodyText} text-gray-600`}>
-                                {resumeData.skills.soft_skills.join(" • ")}
-                              </div>
+                              <ul className="space-y-1">
+                                {resumeData.skills.soft_skills.map((skill, index) => (
+                                  <li key={index} className={`${currentStyle.bodyText} text-gray-600 flex items-start`}>
+                                    <span className="inline-block w-1 h-1 rounded-full bg-indigo-400 mt-1.5 mr-2"></span>
+                                    {skill}
+                                  </li>
+                                ))}
+                              </ul>
                             </div>
                           )}
                         </div>
@@ -481,9 +472,9 @@ export function FinalResumePreview({
                         <div className="space-y-3">
                           {resumeData.education.map((edu, index) => (
                             <div key={index}>
-                              <div className="font-medium text-[13px] text-gray-800">{edu.degreeName}</div>
+                              <div className="font-medium text-xs text-gray-800">{edu.degreeName}</div>
                               <div className={`${currentStyle.bodyText} text-gray-600`}>{edu.schoolName}</div>
-                              <div className="text-[12px] text-gray-500">
+                              <div className="text-[10px] text-gray-500">
                                 {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
                               </div>
                             </div>
@@ -503,9 +494,10 @@ export function FinalResumePreview({
                         </h3>
                         <div className="space-y-2">
                           {resumeData.certifications.map((cert, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-                              <span className="text-[13px] text-gray-700">{cert.name}</span>
+                            <div key={index}>
+                              <div className="font-medium text-xs text-gray-800">{cert.name}</div>
+                              <div className={`${currentStyle.bodyText} text-gray-600`}>{cert.organization}</div>
+                              <div className="text-[10px] text-gray-500">{cert.completionDate}</div>
                             </div>
                           ))}
                         </div>
@@ -515,6 +507,19 @@ export function FinalResumePreview({
 
                   {/* Main Content */}
                   <div className="col-span-2 space-y-5">
+                    {/* Professional Summary */}
+                    <div>
+                      <h3 className={`${currentStyle.sectionTitle}`}>
+                        <span className="flex items-center">
+                          <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
+                          Professional Summary
+                        </span>
+                      </h3>
+                      <p className={`${currentStyle.bodyText} text-gray-600 pr-2`}>
+                        {resumeData.professional_summary.summary}
+                      </p>
+                    </div>
+                    
                     {/* Work Experience */}
                     {resumeData.work_experience.length > 0 && (
                       <div>
@@ -618,7 +623,7 @@ export function FinalResumePreview({
                             <div key={index}>
                               <div className="font-medium text-sm text-gray-800">{edu.degreeName}</div>
                               <div className={`${currentStyle.bodyText} text-gray-600`}>{edu.schoolName}</div>
-                              <div className="text-[10px] text-gray-500">
+                              <div className="text-xs text-gray-500">
                                 {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
                               </div>
                             </div>
@@ -750,8 +755,8 @@ export function FinalResumePreview({
                           <div className="space-y-3">
                             {resumeData.education.map((edu, index) => (
                               <div key={index}>
-                                <div className="font-medium text-sm text-gray-800">{edu.degreeName}</div>
-                                <div className={`${currentStyle.bodyText} text-gray-600`}>{edu.schoolName}</div>
+                                <div className="font-bold text-sm text-gray-800">{edu.degreeName}</div>
+                                <div className={`${currentStyle.bodyText} text-gray-700`}>{edu.schoolName}</div>
                                 <div className="text-sm text-gray-500">
                                   {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
                                 </div>
@@ -768,8 +773,8 @@ export function FinalResumePreview({
                           <div className="space-y-2">
                             {resumeData.certifications.map((cert, index) => (
                               <div key={index}>
-                                <div className="font-medium text-sm text-gray-800">{cert.name}</div>
-                                <div className={`${currentStyle.bodyText} text-gray-600`}>{cert.organization}</div>
+                                <div className="font-bold text-sm text-gray-800">{cert.name}</div>
+                                <div className={`${currentStyle.bodyText} text-gray-700`}>{cert.organization}</div>
                                 <div className="text-sm text-gray-500">{cert.completionDate}</div>
                               </div>
                             ))}

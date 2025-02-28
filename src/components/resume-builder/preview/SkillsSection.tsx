@@ -122,14 +122,20 @@ export function SkillsSection({
             </h4>
             
             {template.id === "modern-split" ? (
-              <div 
-                className={`${currentStyle.skillList} outline-none`}
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleSkillsEdit("soft", e)}
-              >
-                {softSkills.join(" • ")}
-              </div>
+              <ul className="space-y-1">
+                {softSkills.map((skill, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="inline-block w-1 h-1 rounded-full bg-indigo-400 mt-1.5 mr-2"></span>
+                    <span
+                      className="outline-none text-xs text-gray-600"
+                      contentEditable={isEditing}
+                      suppressContentEditableWarning
+                    >
+                      {skill}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             ) : (
               <div 
                 className={`${currentStyle.skillList} outline-none`}
