@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -49,7 +50,7 @@ ${JSON.stringify(resumeData.personal_info, null, 2)}
 ${JSON.stringify(resumeData.professional_summary, null, 2)}
 
 Requirements:
-- Maximum 50 words
+- Maximum 35 words
 - Highlight value and expertise without metrics or years
 - Use powerful, active language
 - Include relevant industry keywords for ATS systems
@@ -72,7 +73,7 @@ Format your response as plain text only (no JSON).
         messages: [
           { 
             role: 'system', 
-            content: 'You are a professional resume writer specializing in ATS-optimized content. Create only the requested text with no additional commentary.'
+            content: 'You are a professional resume writer specializing in ATS-optimized content. Create only the requested text with no additional commentary. Keep content concise and impactful.'
           },
           { role: 'user', content: summaryPrompt }
         ],
@@ -95,7 +96,7 @@ Format your response as plain text only (no JSON).
     
     // First, get industry-specific keywords for the target position
     const keywordsPrompt = `
-Generate the top 15 industry-specific keywords and phrases for a ${jobTitle} position that would best optimize a resume for ATS systems.
+Generate the top 10 industry-specific keywords and phrases for a ${jobTitle} position that would best optimize a resume for ATS systems.
 
 Consider:
 - Technical skills specific to this role
@@ -166,8 +167,9 @@ Format your response as a JSON array of strings only, with no additional comment
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
       // Create a job-specific prompt with a high temperature setting to ensure varied responses
+      // Now with strict character limits
       const jobPrompt = `
-Generate 4 HIGHLY SPECIFIC job responsibilities for a ${experience.jobTitle} position at ${experience.companyName} that would impress a hiring manager.
+Generate 3-4 CONCISE, HIGHLY SPECIFIC job responsibilities for a ${experience.jobTitle} position at ${experience.companyName} that would impress a hiring manager.
 
 Job Context:
 - Job Title: ${experience.jobTitle}
@@ -176,19 +178,23 @@ ${experience.location ? `- Location: ${experience.location}` : ''}
 - Duration: ${experience.startDate} to ${experience.isCurrentJob ? 'Present' : experience.endDate}
 
 Requirements:
-1. Each bullet point must start with a POWERFUL action verb
-2. Include specific technologies, methods, or tools relevant to this EXACT position
-3. Include quantifiable metrics and achievements where possible (%, $, numbers)
-4. Emphasize business impact and results
-5. Use industry-specific terminology for this field
-6. Each bullet must be completely different from the others
+1. Each bullet point must start with a strong action verb
+2. Each bullet point MUST be 60-80 characters maximum (strict limit for A4 page fitting)
+3. Include 1-2 industry-specific keywords in each bullet
+4. Mention specific impact/result when possible
+5. Use precise wording and eliminate unnecessary words
+6. Ensure all bullets are different from each other
 
-Mandatory: Use these industry keywords where relevant: ${industryKeywords.slice(0, 8).join(', ')}
+Format Tips:
+- Do NOT use complete sentences - use resume-style fragments
+- Avoid articles (a, an, the) when possible
+- Use present tense for current job, past tense for previous jobs
+- Focus on achievements over responsibilities when possible
 
-DO NOT RETURN ANY EXPLANATION OR INTRODUCTION. RETURN ONLY A JSON ARRAY OF 4 STRING BULLET POINTS.
+DO NOT RETURN ANY EXPLANATION OR INTRODUCTION. RETURN ONLY A JSON ARRAY OF STRING BULLET POINTS.
 Example response format: ["Bullet 1", "Bullet 2", "Bullet 3", "Bullet 4"]
 
-IMPORTANT: Generate COMPLETELY DIFFERENT content for each job. These responsibilities must be UNIQUE to this specific position.
+IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 resume.
 `;
 
       // Add a random seed to ensure varied responses
@@ -205,11 +211,11 @@ IMPORTANT: Generate COMPLETELY DIFFERENT content for each job. These responsibil
           messages: [
             { 
               role: 'system', 
-              content: `You are an expert resume writer who specializes in creating ATS-optimized, job-specific responsibilities. You must generate unique, tailored content for each job position. Never return generic responsibilities. Random seed: ${randomSeed}`
+              content: `You are an expert resume writer who specializes in creating ATS-optimized, job-specific responsibilities that fit perfectly on an A4 page. You must create CONCISE bullet points that are no more than 80 characters each. Random seed: ${randomSeed}`
             },
             { role: 'user', content: jobPrompt }
           ],
-          temperature: 0.9, // High temperature to ensure varied responses
+          temperature: 0.8,
         }),
       });
 
@@ -243,12 +249,30 @@ IMPORTANT: Generate COMPLETELY DIFFERENT content for each job. These responsibil
           }
         }
         
+        // Ensure each responsibility is within the character limit
+        responsibilities = responsibilities.map(resp => {
+          if (resp.length > 80) {
+            return resp.substring(0, 77) + '...';
+          }
+          return resp;
+        });
+        
+        // Limit to max 4 responsibilities per job to ensure everything fits on the page
+        if (responsibilities.length > 4) {
+          responsibilities = responsibilities.slice(0, 4);
+        }
+        
         if (responsibilities.length > 0) {
           enhancedExperiences.push({
             ...experience,
             responsibilities
           });
-          console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
+          
+          // Log the character count of each responsibility
+          console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}:`);
+          responsibilities.forEach((resp, idx) => {
+            console.log(`  ${idx+1}. Length: ${resp.length} chars - ${resp.substring(0, 30)}...`);
+          });
         } else {
           // If we couldn't parse any responsibilities, keep the original
           enhancedExperiences.push({...experience});
@@ -274,8 +298,9 @@ IMPORTANT: Generate COMPLETELY DIFFERENT content for each job. These responsibil
         // Try to make this set of responsibilities unique by modifying them
         enhancedExperiences[i].responsibilities = enhancedExperiences[i].responsibilities.map(resp => {
           // Add job-specific prefix to make it unique
-          return resp.replace(/^(Developed|Created|Managed|Led|Implemented|Designed|Built)/i, 
-            `${enhancedExperiences[i].jobTitle.split(' ')[0]} ${enhancedExperiences[i].companyName.split(' ')[0]} -`);
+          const prefix = `${enhancedExperiences[i].jobTitle.split(' ')[0]}: `;
+          // Ensure we don't go over character limit with our modification
+          return prefix + resp.substring(0, 80 - prefix.length);
         });
       }
       
@@ -284,22 +309,20 @@ IMPORTANT: Generate COMPLETELY DIFFERENT content for each job. These responsibil
     
     // Generate skills relevant to the target job
     const skillsPrompt = `
-Generate a comprehensive skills list for a ${jobTitle} resume that will maximize success with ATS systems.
+Generate a concise skills list for a ${jobTitle} resume that will maximize success with ATS systems.
 
 Industry Context:
 ${industryKeywords.length > 0 ? `- Industry Keywords: ${industryKeywords.join(', ')}` : ''}
 
 Requirements:
-- Include 8 hard/technical skills that are HIGHLY SPECIFIC to the ${jobTitle} role
-- Include 4 soft skills most valued for the ${jobTitle} position
+- Include 6 hard/technical skills that are SPECIFIC to the ${jobTitle} role (max 15 characters each)
+- Include 4 soft skills most valued for the ${jobTitle} position (max 15 characters each)
 - Prioritize skills that appear frequently in job postings for this role
-- Include skills that demonstrate proficiency with industry-standard tools and methodologies
-- Focus on in-demand skills that will make the candidate stand out
-- List the skills in order of relevance/importance
+- Focus on skills that will help the resume fit on a single A4 page
 
 Format your response as a JSON object with this exact structure:
 {
-  "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6", "Skill 7", "Skill 8"],
+  "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
   "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
 }
 `;
@@ -315,7 +338,7 @@ Format your response as a JSON object with this exact structure:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a professional resume skills expert. Generate skills that will help a candidate pass ATS systems and appeal to hiring managers. Return only the JSON object with no additional commentary.'
+            content: 'You are a professional resume skills expert. Generate concise skills that will help a candidate pass ATS systems and fit on a single A4 page. Return only the JSON object with no additional commentary.'
           },
           { role: 'user', content: skillsPrompt }
         ],
@@ -326,19 +349,17 @@ Format your response as a JSON object with this exact structure:
     let skills = {
       hard_skills: [
         "Project Management", 
-        "Strategic Planning",
-        "Process Optimization",
         "Data Analysis",
-        "Technical Documentation",
-        "Performance Monitoring",
-        "Risk Assessment",
-        "Quality Assurance"
+        "Process Improvement",
+        "Reporting",
+        "Budgeting",
+        "Team Leadership"
       ],
       soft_skills: [
         "Communication",
-        "Leadership",
         "Problem Solving",
-        "Team Collaboration"
+        "Teamwork",
+        "Adaptability"
       ]
     };
 
@@ -394,9 +415,10 @@ Format your response as a JSON object with this exact structure:
     console.log('Number of work experiences being updated:', enhancedExperiences.length);
     for (const exp of enhancedExperiences) {
       console.log(`${exp.jobTitle} at ${exp.companyName}: ${exp.responsibilities.length} responsibilities`);
-      // Log the first responsibility for each job to verify uniqueness
+      // Log the first responsibility for each job to verify uniqueness and length
       if (exp.responsibilities.length > 0) {
-        console.log(`First responsibility: ${exp.responsibilities[0].substring(0, 50)}...`);
+        console.log(`First responsibility: ${exp.responsibilities[0]}`);
+        console.log(`Length: ${exp.responsibilities[0].length} characters`);
       }
     }
     
