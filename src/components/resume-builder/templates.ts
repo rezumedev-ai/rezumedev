@@ -148,28 +148,28 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Clean and sophisticated design with perfect typography",
     imageUrl: "/lovable-uploads/a6ed21c1-e465-46fb-a6ff-9f66cc7b87b3.png",
     style: {
-      titleFont: "font-sans text-[44px] font-extralight tracking-tight text-gray-900",
-      headerStyle: "mb-12 text-center",
-      sectionStyle: "text-[12px] font-medium text-gray-400 uppercase tracking-[0.2em] mb-6",
-      contentStyle: "space-y-8 max-w-2xl mx-auto",
+      titleFont: "font-sans text-[28px] font-semibold tracking-tight text-gray-900",
+      headerStyle: "mb-6 border-b border-gray-300 pb-4",
+      sectionStyle: "text-base font-semibold text-gray-800 border-b border-gray-200 pb-1 mb-3",
+      contentStyle: "flex gap-6",
       layout: "minimal",
       colors: {
-        primary: "#111827",
+        primary: "#374151",
         secondary: "#6B7280",
         text: "#374151",
-        border: "#F3F4F6",
+        border: "#E5E7EB",
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "3rem",
-        itemGap: "2rem",
-        contentPadding: "3rem",
-        headerHeight: "220px",
+        sectionGap: "1.5rem",
+        itemGap: "1rem",
+        contentPadding: "2rem",
+        headerHeight: "auto",
         margins: {
-          top: "80px",
-          right: "80px",
-          bottom: "80px",
-          left: "80px"
+          top: "60px",
+          right: "60px",
+          bottom: "60px",
+          left: "60px"
         }
       },
       dimensions: {
@@ -177,15 +177,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "1056px"
       },
       typography: {
-        titleSize: "44px",
-        subtitleSize: "16px",
+        titleSize: "26px",
+        subtitleSize: "17px",
         bodySize: "14px",
-        lineHeight: "1.8"
+        lineHeight: "1.5"
       },
       icons: {
-        sections: false,
-        contact: false,
-        bullets: "none"
+        sections: true,
+        contact: true,
+        bullets: "dot"
       }
     }
   },
@@ -237,4 +237,3 @@ export const resumeTemplates: ResumeTemplate[] = [
     }
   }
 ];
-
