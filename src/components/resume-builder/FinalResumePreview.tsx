@@ -47,10 +47,14 @@ export function FinalResumePreview({ resumeData, resumeId }: FinalResumePreviewP
     setIsLoading(true);
     try {
       // Convert resume data to format expected by Supabase
+      // We need to convert our strongly typed objects to JSON compatible objects
       const supabaseData = {
         personal_info: editedResumeData.personal_info,
         professional_summary: editedResumeData.professional_summary,
-        work_experience: editedResumeData.work_experience,
+        work_experience: editedResumeData.work_experience.map(exp => ({
+          ...exp,
+          responsibilities: Array.isArray(exp.responsibilities) ? exp.responsibilities : [exp.responsibilities]
+        })),
         education: editedResumeData.education,
         skills: editedResumeData.skills,
         certifications: editedResumeData.certifications,
