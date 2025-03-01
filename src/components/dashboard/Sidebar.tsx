@@ -8,11 +8,19 @@ import {
   HelpCircle,
   LogOut,
   X,
+  FileText,
+  Home,
+  Sparkles,
+  Bell,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -24,6 +32,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -39,81 +48,250 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
   });
 
-  const sidebarClasses = cn(
-    "fixed top-0 h-full w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 transition-all duration-300 ease-in-out z-50",
-    isMobile ? (isOpen ? "left-0" : "-left-64") : "left-0"
-  );
+  const sidebarVariants = {
+    open: { 
+      x: 0,
+      transition: { 
+        type: "spring", 
+        stiffness: 300, 
+        damping: 24,
+        when: "beforeChildren",
+        staggerChildren: 0.05
+      } 
+    },
+    closed: { 
+      x: "-100%",
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24,
+        when: "afterChildren",
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
+    }
+  };
+
+  const itemVariants = {
+    open: { 
+      opacity: 1, 
+      x: 0,
+      transition: { type: "spring", stiffness: 300, damping: 24 }
+    },
+    closed: { 
+      opacity: 0, 
+      x: -20,
+      transition: { type: "spring", stiffness: 300, damping: 24 }
+    }
+  };
+
+  const overlayVariants = {
+    open: { opacity: 1 },
+    closed: { opacity: 0 }
+  };
 
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { id: 'resumes', icon: FileText, label: 'My Resumes', path: '/dashboard', badge: profile?.resumes_count || 0 },
+    { id: 'home', icon: Home, label: 'Homepage', path: '/' },
     { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
     { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
   ];
 
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const sidebarClasses = cn(
+    "fixed top-0 h-full w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 z-50",
+    isMobile ? "left-0" : "left-0"
+  );
+
   return (
     <>
-      {isMobile && isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300"
-          onClick={onClose}
-        />
-      )}
-      <div className={sidebarClasses}>
-        {isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
+      <AnimatePresence>
+        {isMobile && isOpen && (
+          <motion.div 
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={overlayVariants}
             onClick={onClose}
-            className="absolute top-4 right-4"
-          >
-            <X className="h-6 w-6" />
-          </Button>
+          />
         )}
+      </AnimatePresence>
 
-        <div className="space-y-6 animate-fade-up">
-          <div className="flex items-center space-x-3 p-2 rounded-lg bg-primary/5">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-medium">
-              {profile?.full_name?.[0] || user?.email?.[0] || 'U'}
-            </div>
-            <div className="min-w-0">
-              <h3 className="font-medium text-gray-900 truncate">{profile?.full_name || 'User'}</h3>
-              <p className="text-sm text-gray-500 truncate">{user?.email}</p>
-            </div>
-          </div>
-
-          <nav className="space-y-1">
-            {menuItems.map(({ id, icon: Icon, label, path }) => (
-              <button
-                key={id}
-                onClick={() => {
-                  navigate(path);
-                  if (isMobile && onClose) {
-                    onClose();
-                  }
-                }}
-                className={cn(
-                  "w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200",
-                  location.pathname === path
-                    ? "bg-primary text-white shadow-md hover:shadow-lg"
-                    : "text-gray-600 hover:bg-primary/5"
-                )}
+      <AnimatePresence>
+        {(!isMobile || isOpen) && (
+          <motion.div 
+            className={sidebarClasses}
+            initial={isMobile ? "closed" : "open"}
+            animate="open"
+            exit="closed"
+            variants={sidebarVariants}
+          >
+            {isMobile && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                <span className="truncate">{label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onClose}
+                  className="absolute top-4 right-4 hover:bg-red-50 hover:text-red-500 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </motion.div>
+            )}
 
-        <Button
-          variant="ghost"
-          className="absolute bottom-6 left-6 text-gray-600 hover:text-gray-900 hover:bg-red-50 hover:text-red-600 transition-colors"
-          onClick={signOut}
-        >
-          <LogOut className="w-5 h-5 mr-2" />
-          Sign out
-        </Button>
-      </div>
+            <div className="space-y-6">
+              <motion.div 
+                className="flex items-center space-x-3 p-2 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10"
+                variants={itemVariants}
+              >
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-medium shadow-lg">
+                    {profile?.full_name?.[0] || user?.email?.[0] || 'U'}
+                  </div>
+                  <motion.div 
+                    className="absolute -bottom-1 -right-1 bg-green-500 w-3 h-3 rounded-full border-2 border-white"
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      opacity: [0.7, 1, 0.7]
+                    }}
+                    transition={{ 
+                      repeat: Infinity,
+                      duration: 2
+                    }}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <motion.h3 
+                    className="font-medium text-gray-900 truncate"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    {profile?.full_name || 'User'}
+                  </motion.h3>
+                  <motion.p 
+                    className="text-sm text-gray-500 truncate"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    {user?.email}
+                  </motion.p>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                className="pt-4 space-y-1"
+                variants={itemVariants}
+              >
+                <div className="text-xs text-gray-500 uppercase tracking-wider px-4 mb-2">
+                  Main Menu
+                </div>
+                {menuItems.map(({ id, icon: Icon, label, path, badge }) => (
+                  <motion.button
+                    key={id}
+                    onClick={() => {
+                      navigate(path);
+                      if (isMobile && onClose) {
+                        onClose();
+                      }
+                    }}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200",
+                      location.pathname === path
+                        ? "bg-primary text-white shadow-md hover:shadow-lg"
+                        : "text-gray-600 hover:bg-primary/5"
+                    )}
+                    onMouseEnter={() => setHoveredItem(id)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    whileHover={{ x: 5 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center">
+                      <Icon className={cn(
+                        "w-5 h-5 flex-shrink-0 mr-3",
+                        location.pathname === path && hoveredItem === id && "animate-pulse"
+                      )} />
+                      <span className="truncate">{label}</span>
+                    </div>
+                    {typeof badge === 'number' && badge > 0 && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary text-xs">
+                        {badge}
+                      </Badge>
+                    )}
+                  </motion.button>
+                ))}
+              </motion.div>
+
+              <motion.div 
+                className="pt-4 space-y-1"
+                variants={itemVariants}
+              >
+                <div className="text-xs text-gray-500 uppercase tracking-wider px-4 mb-2">
+                  Pro Features
+                </div>
+                <motion.div
+                  className="px-4 py-3 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/10 flex justify-between items-center group cursor-pointer"
+                  whileHover={{ 
+                    scale: 1.02,
+                    backgroundColor: "rgba(99, 102, 241, 0.15)" 
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center">
+                    <Sparkles className="w-5 h-5 text-primary mr-3 animate-pulse" />
+                    <span className="text-gray-800">Premium Plan</span>
+                  </div>
+                  <Badge className="bg-gradient-to-r from-amber-500 to-amber-300 text-white border-0">
+                    PRO
+                  </Badge>
+                </motion.div>
+                <motion.button
+                  className="w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 text-gray-600 hover:bg-primary/5"
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Bell className="w-5 h-5 flex-shrink-0 mr-3" />
+                  <span className="truncate">Notifications</span>
+                </motion.button>
+                <motion.button
+                  className="w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 text-gray-600 hover:bg-primary/5"
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <ShieldCheck className="w-5 h-5 flex-shrink-0 mr-3" />
+                  <span className="truncate">Privacy</span>
+                </motion.button>
+              </motion.div>
+            </div>
+
+            <motion.div 
+              className="absolute bottom-6 left-0 w-full px-6"
+              variants={itemVariants}
+            >
+              <motion.button
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+                onClick={handleLogout}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Sign out</span>
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

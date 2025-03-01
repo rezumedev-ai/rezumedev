@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { ArrowLeftCircle, ArrowRightCircle } from 'lucide-react';
+
+import { useState, useEffect } from 'react';
+import { ArrowLeftCircle, ArrowRightCircle, Sparkles } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
+import { motion } from 'framer-motion';
 
 export const ResumeTemplates = () => {
   const [currentTemplate, setCurrentTemplate] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
 
   const resumeTemplates = [
     {
@@ -31,68 +34,131 @@ export const ResumeTemplates = () => {
     setCurrentTemplate((prev) => (prev - 1 + resumeTemplates.length) % resumeTemplates.length);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isHovering) {
+        nextTemplate();
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [isHovering]);
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        type: "spring", 
+        stiffness: 300, 
+        damping: 24 
+      }
+    },
+    hover: { 
+      scale: 1.05,
+      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
+      transition: { 
+        type: "spring", 
+        stiffness: 400, 
+        damping: 10 
+      }
+    }
+  };
+
   return (
-    <section className="py-20 bg-white sm:py-32">
+    <section className="py-20 bg-gradient-to-br from-white via-purple-50/30 to-blue-50/20 sm:py-32">
       <div className="container">
-        <GradientHeading 
-          variant="professional" 
-          weight="bold" 
-          size="lg" 
-          className="mb-4 text-center"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          Professional Resume Templates
-        </GradientHeading>
-        <p className="text-lg text-muted-foreground mb-16 max-w-2xl mx-auto text-center">
-          Each template is expertly crafted to pass ATS systems while presenting your experience in the most professional light
-        </p>
+          <GradientHeading 
+            variant="professional" 
+            weight="bold" 
+            size="lg" 
+            className="mb-4 text-center"
+          >
+            Professional Resume Templates
+          </GradientHeading>
+          <p className="text-lg text-muted-foreground mb-16 max-w-2xl mx-auto text-center">
+            Each template is expertly crafted to pass ATS systems while presenting your experience in the most professional light
+          </p>
+        </motion.div>
 
         <div className="relative max-w-4xl mx-auto overflow-hidden">
           <div className="flex items-center justify-center gap-8">
-            <button 
+            <motion.button 
               onClick={prevTemplate}
               className="absolute left-0 z-10 p-2 text-primary hover:text-primary-hover transition-colors"
               aria-label="Previous template"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
             >
               <ArrowLeftCircle className="w-10 h-10" />
-            </button>
+            </motion.button>
 
-            <div className="relative w-[300px] mx-auto">
-              <div
+            <div className="relative w-[350px] mx-auto" 
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <motion.div
                 key={resumeTemplates[currentTemplate].name}
-                className="relative bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                className="relative bg-white rounded-xl shadow-xl overflow-hidden"
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                variants={cardVariants}
+                layoutId="activeTemplate"
               >
-                <div className="relative h-[400px] w-full bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
-                  <img
+                <div className="absolute top-2 right-2 z-10">
+                  <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
+                    <Sparkles className="w-3 h-3 text-primary" />
+                    <span className="text-xs font-medium text-primary">Premium</span>
+                  </div>
+                </div>
+                <div className="relative h-[450px] w-full bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
+                  <motion.img
                     src={resumeTemplates[currentTemplate].image}
                     alt={`${resumeTemplates[currentTemplate].name} Resume Template`}
-                    className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
+                    className="object-cover w-full h-full"
+                    initial={{ scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.5 }}
                   />
                 </div>
-                <div className="p-6 text-left">
+                <motion.div className="p-6 text-left">
                   <h3 className="text-xl font-semibold text-secondary mb-2">{resumeTemplates[currentTemplate].name}</h3>
                   <p className="text-muted-foreground text-sm">{resumeTemplates[currentTemplate].description}</p>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
 
-            <button 
+            <motion.button 
               onClick={nextTemplate}
               className="absolute right-0 z-10 p-2 text-primary hover:text-primary-hover transition-colors"
               aria-label="Next template"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
             >
               <ArrowRightCircle className="w-10 h-10" />
-            </button>
+            </motion.button>
           </div>
 
           <div className="flex justify-center gap-2 mt-6">
             {resumeTemplates.map((_, index) => (
-              <button
+              <motion.button
                 key={index}
                 onClick={() => setCurrentTemplate(index)}
                 className={`w-2 h-2 rounded-full transition-all ${
                   currentTemplate === index ? 'bg-primary w-4' : 'bg-primary/30'
                 }`}
                 aria-label={`Go to template ${index + 1}`}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                initial={{ opacity: 0.7 }}
+                animate={{ opacity: currentTemplate === index ? 1 : 0.7 }}
               />
             ))}
           </div>
