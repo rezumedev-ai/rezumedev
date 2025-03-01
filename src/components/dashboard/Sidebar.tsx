@@ -9,8 +9,6 @@ import {
   LogOut,
   X,
   FileText,
-  Home,
-  Sparkles,
   Bell,
   ShieldCheck,
 } from "lucide-react";
@@ -113,7 +111,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { id: 'resumes', icon: FileText, label: 'My Resumes', path: '/dashboard', badge: resumeCount || 0 },
-    { id: 'home', icon: Home, label: 'Homepage', path: '/' },
     { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
     { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
   ];
@@ -258,24 +255,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 variants={itemVariants}
               >
                 <div className="text-xs text-gray-500 uppercase tracking-wider px-4 mb-2">
-                  Pro Features
+                  Account
                 </div>
-                <motion.div
-                  className="px-4 py-3 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/10 flex justify-between items-center group cursor-pointer"
-                  whileHover={{ 
-                    scale: 1.02,
-                    backgroundColor: "rgba(99, 102, 241, 0.15)" 
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-center">
-                    <Sparkles className="w-5 h-5 text-primary mr-3 animate-pulse" />
-                    <span className="text-gray-800">Premium Plan</span>
-                  </div>
-                  <Badge className="bg-gradient-to-r from-amber-500 to-amber-300 text-white border-0">
-                    PRO
-                  </Badge>
-                </motion.div>
                 <motion.button
                   className="w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 text-gray-600 hover:bg-primary/5"
                   whileHover={{ x: 5 }}

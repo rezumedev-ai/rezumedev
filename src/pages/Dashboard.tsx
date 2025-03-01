@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
@@ -29,7 +29,6 @@ export default function Dashboard() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [showWelcome, setShowWelcome] = useState(true);
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -63,14 +62,6 @@ export default function Dashboard() {
       }));
     },
   });
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowWelcome(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleCreateNew = () => {
     navigate("/resume-builder");
@@ -140,49 +131,6 @@ export default function Dashboard() {
 
       <div className={`${isMobile ? 'pt-20 px-4' : 'ml-64'} transition-all duration-300 ease-in-out`}>
         <div className="max-w-6xl mx-auto space-y-8 md:space-y-12 pb-12">
-          {showWelcome && (
-            <motion.div 
-              className="fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-md"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <motion.div 
-                className="text-center"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ 
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20,
-                  delay: 0.2
-                }}
-              >
-                <motion.div
-                  className="inline-block mb-6"
-                  animate={{ 
-                    rotate: [0, 10, 0, -10, 0],
-                    scale: [1, 1.2, 1, 1.2, 1] 
-                  }}
-                  transition={{ 
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatDelay: 0.5
-                  }}
-                >
-                  <Sparkles className="w-16 h-16 text-primary" />
-                </motion.div>
-                <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-primary/60">
-                  Welcome to Your Dashboard
-                </h1>
-                <p className="text-gray-600 text-xl">
-                  Let's craft your professional story
-                </p>
-              </motion.div>
-            </motion.div>
-          )}
-
           <motion.div 
             className="flex flex-col md:flex-row justify-between items-start gap-6"
             variants={container}
@@ -243,9 +191,9 @@ export default function Dashboard() {
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="grid grid-cols-1 gap-6"
           >
-            <motion.div variants={item} className="col-span-2">
+            <motion.div variants={item}>
               {isLoading ? (
                 <Card className="p-6 bg-white/80 backdrop-blur-sm">
                   <div className="h-96 flex flex-col items-center justify-center">
@@ -289,59 +237,6 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-600">Use keywords from the job description</p>
                     </li>
                   </ul>
-                </div>
-              </Card>
-              
-              <Card className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 hover:shadow-lg transition-all duration-300">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">Resume Analytics</h3>
-                    <Sparkles className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>ATS Compatibility</span>
-                        <span className="font-medium">85%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <motion.div 
-                          className="bg-primary h-2 rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: "85%" }}
-                          transition={{ duration: 1, delay: 0.5 }}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Keyword Optimization</span>
-                        <span className="font-medium">72%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <motion.div 
-                          className="bg-primary h-2 rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: "72%" }}
-                          transition={{ duration: 1, delay: 0.7 }}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Content Quality</span>
-                        <span className="font-medium">93%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <motion.div 
-                          className="bg-primary h-2 rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: "93%" }}
-                          transition={{ duration: 1, delay: 0.9 }}
-                        />
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </Card>
             </motion.div>
