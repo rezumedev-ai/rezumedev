@@ -8,7 +8,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 interface DownloadOptionsDialogProps {
-  isDownloading: boolean;
+  isDownloading?: boolean;
 }
 
 export function DownloadOptionsDialog({
@@ -99,30 +99,34 @@ export function DownloadOptionsDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
       <Button 
+        id="download-resume-button"
         variant="outline" 
         size="sm"
         onClick={() => setOpen(true)}
         disabled={isDownloading}
+        className="hidden" // Hidden button for programmatic clicks
       >
         <FileDown className="w-4 h-4 mr-2" />
         Download
       </Button>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Download Resume</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 mt-4">
-          <Button 
-            className="w-full" 
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-          >
-            Download as PDF
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Download Resume</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <Button 
+              className="w-full" 
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+            >
+              Download as PDF
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
