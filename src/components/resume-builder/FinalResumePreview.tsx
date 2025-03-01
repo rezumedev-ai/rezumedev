@@ -33,7 +33,7 @@ export function FinalResumePreview({ resumeData, resumeId }: FinalResumePreviewP
   const isMobile = useIsMobile();
 
   // Find the selected template
-  const template = resumeTemplates.find(t => t.id === resumeData.template) || resumeTemplates[0];
+  const template = resumeTemplates.find(t => t.id === resumeData.template_id) || resumeTemplates[0];
 
   // Prepare template-specific styles
   const DPI = 96; // Standard screen DPI
@@ -46,9 +46,20 @@ export function FinalResumePreview({ resumeData, resumeId }: FinalResumePreviewP
   const updateResumeData = async () => {
     setIsLoading(true);
     try {
+      // Convert resume data to format expected by Supabase
+      const supabaseData = {
+        personal_info: editedResumeData.personal_info,
+        professional_summary: editedResumeData.professional_summary,
+        work_experience: editedResumeData.work_experience,
+        education: editedResumeData.education,
+        skills: editedResumeData.skills,
+        certifications: editedResumeData.certifications,
+        template_id: editedResumeData.template_id
+      };
+
       const { error } = await supabase
         .from("resumes")
-        .update(editedResumeData)
+        .update(supabaseData)
         .eq("id", resumeId);
 
       if (error) throw error;
@@ -89,9 +100,11 @@ export function FinalResumePreview({ resumeData, resumeId }: FinalResumePreviewP
     setEditedResumeData(prev => {
       const updatedExperiences = [...prev.work_experience];
       if (field === "responsibilities") {
+        // Ensure responsibilities is always an array
+        const responsibilities = Array.isArray(value) ? value : [value];
         updatedExperiences[index] = {
           ...updatedExperiences[index],
-          [field]: value
+          [field]: responsibilities
         };
       } else {
         updatedExperiences[index] = {
