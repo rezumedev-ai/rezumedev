@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -16,16 +15,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 import { cn } from "@/utils/cn";
-import { Mail, Phone, Linkedin, Globe, MapPin, Briefcase, GraduationCap, Award, User } from "lucide-react";
+import { Mail, Phone, Linkedin, Globe, MapPin, Briefcase, GraduationCap, Award, User, ArrowLeft, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
   resumeId: string;
+  onRegenerateClick?: () => void;
+  isRegenerating?: boolean;
 }
 
 export function FinalResumePreview({
   resumeData: initialResumeData,
-  resumeId
+  resumeId,
+  onRegenerateClick,
+  isRegenerating = false
 }: FinalResumePreviewProps) {
   const [scale, setScale] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -33,6 +38,8 @@ export function FinalResumePreview({
   const [resumeData, setResumeData] = useState(initialResumeData);
   const [selectedTemplateId, setSelectedTemplateId] = useState(initialResumeData.template_id || "executive-clean");
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showTools, setShowTools] = useState(false);
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -170,20 +177,72 @@ export function FinalResumePreview({
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <ResumeHeader
-        onBack={handleBack}
-        onEdit={() => setIsEditing(!isEditing)}
-        isEditing={isEditing}
-        isDownloading={isDownloading}
-        onTemplateChange={handleTemplateChange}
-        selectedTemplate={selectedTemplateId}
+      {/* Floating Action Bar - appears on hover/scroll */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ 
+          opacity: showTools ? 1 : 0, 
+          y: showTools ? 0 : -20,
+          pointerEvents: showTools ? 'auto' : 'none' 
+        }}
+        transition={{ duration: 0.2 }}
+        className="fixed top-4 left-0 right-0 mx-auto z-50 flex justify-between items-center max-w-5xl bg-white/90 backdrop-blur-sm shadow-md rounded-lg border border-gray-200 p-2"
+        style={{ width: 'calc(100% - 2rem)' }}
       >
-        <DownloadOptionsDialog isDownloading={isDownloading} />
-      </ResumeHeader>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1.5"
+          onClick={handleBack}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Back to Dashboard</span>
+          <span className="sm:hidden">Back</span>
+        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            {isEditing ? "View Mode" : "Edit Mode"}
+          </Button>
+          
+          <select
+            className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            value={selectedTemplateId}
+            onChange={(e) => handleTemplateChange(e.target.value)}
+          >
+            {resumeTemplates.map((template) => (
+              <option key={template.id} value={template.id}>
+                {template.name}
+              </option>
+            ))}
+          </select>
+          
+          <DownloadOptionsDialog setIsDownloading={setIsDownloading} />
+          
+          {onRegenerateClick && (
+            <Button
+              size="sm"
+              onClick={onRegenerateClick}
+              disabled={isRegenerating}
+              className="flex items-center gap-1.5"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
+              {isRegenerating ? 'Regenerating...' : 'Regenerate'}
+            </Button>
+          )}
+        </div>
+      </motion.div>
 
       <div 
         ref={containerRef}
         className="flex-1 flex items-center justify-center p-4 md:p-8 bg-gray-100 overflow-hidden"
+        onMouseEnter={() => setShowTools(true)}
+        onMouseLeave={() => setShowTools(false)}
+        onTouchStart={() => setShowTools(true)}
       >
         <div 
           ref={resumeRef}
@@ -866,6 +925,20 @@ export function FinalResumePreview({
           </div>
         </div>
       </div>
+
+      {/* Mobile zoom controls */}
+      {isMobile && (
+        <div className="fixed bottom-4 right-4 flex gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-10 w-10 rounded-full p-0 shadow-lg"
+            onClick={() => setIsZoomed(!isZoomed)}
+          >
+            {isZoomed ? "−" : "+"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
