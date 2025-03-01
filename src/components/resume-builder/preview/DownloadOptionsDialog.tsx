@@ -2,24 +2,17 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FileDown } from "lucide-react";
-import { useState, MutableRefObject } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { ResumeData } from "@/types/resume";
 
 interface DownloadOptionsDialogProps {
-  isDownloading?: boolean;
-  resumeData?: ResumeData;
-  resumeRef?: MutableRefObject<HTMLDivElement | null>;
-  templateId?: string;
+  isDownloading: boolean;
 }
 
 export function DownloadOptionsDialog({
-  isDownloading,
-  resumeData,
-  resumeRef,
-  templateId
+  isDownloading
 }: DownloadOptionsDialogProps) {
   const [open, setOpen] = useState(false);
 
@@ -106,34 +99,30 @@ export function DownloadOptionsDialog({
   };
 
   return (
-    <>
+    <Dialog open={open} onOpenChange={setOpen}>
       <Button 
-        id="download-resume-button"
         variant="outline" 
         size="sm"
         onClick={() => setOpen(true)}
         disabled={isDownloading}
-        className="hidden" // Hidden button for programmatic clicks
       >
         <FileDown className="w-4 h-4 mr-2" />
         Download
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Download Resume</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <Button 
-              className="w-full" 
-              onClick={handleDownloadPDF}
-              disabled={isDownloading}
-            >
-              Download as PDF
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Download Resume</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 mt-4">
+          <Button 
+            className="w-full" 
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+          >
+            Download as PDF
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
