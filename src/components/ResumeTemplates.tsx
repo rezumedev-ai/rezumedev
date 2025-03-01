@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ArrowLeftCircle, ArrowRightCircle } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
@@ -11,11 +10,6 @@ export const ResumeTemplates = () => {
       name: "Executive Clean",
       image: "/lovable-uploads/489267dd-1129-466d-b30b-dd43b3cbe0e8.png",
       description: "Commanding resume design for C-suite executives and senior leaders, highlighting strategic achievements and board experience"
-    },
-    {
-      name: "Modern Split",
-      image: "/lovable-uploads/50a6d61f-0b70-4d4b-8fd8-e293d40c5ae1.png",
-      description: "Professional two-column design that maximizes content, ideal for technical roles and experienced professionals"
     },
     {
       name: "Minimal Elegant",
