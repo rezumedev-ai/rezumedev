@@ -1,4 +1,3 @@
-
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -100,20 +99,7 @@ export function ResumePreview({
   const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
   const getMargins = () => {
-    if (templateId === "modern-split") {
-      return {
-        top: '0.5in',
-        right: '0.5in',
-        bottom: '0.5in',
-        left: '0.5in',
-      };
-    }
-    return {
-      top: '1in',
-      right: '1in',
-      bottom: '1in',
-      left: '1in',
-    };
+    return selectedTemplate.style.margins;
   };
 
   const margins = getMargins();
@@ -170,11 +156,11 @@ export function ResumePreview({
               <h1 className={selectedTemplate.style.titleFont}>
                 {personalInfo.fullName}
               </h1>
-              <h2 className={templateId === "modern-split" ? "text-base text-gray-600 mt-1" : "text-xl text-gray-600 mt-2"}>
+              <h2 className={templateId === "modern-split" ? "text-base text-gray-700 mt-1 font-medium" : "text-xl text-gray-600 mt-2"}>
                 {professionalSummary.title}
               </h2>
               <div className={templateId === "modern-split" ? 
-                "flex flex-wrap gap-3 text-sm text-gray-500 mt-1" : 
+                "flex flex-wrap gap-3 text-xs text-gray-600 mt-1" : 
                 "flex flex-wrap gap-4 text-sm text-gray-500 mt-2"}>
                 <span>{personalInfo.email}</span>
                 <span>{personalInfo.phone}</span>
@@ -185,12 +171,23 @@ export function ResumePreview({
             <div 
               className={cn(selectedTemplate.style.contentStyle, "overflow-hidden")}
               style={{
-                height: templateId === "modern-split" ? 'calc(100% - 110px)' : 'calc(100% - 120px)',
+                height: 'calc(100% - 80px)',
               }}
             >
               <div>
-                <h3 className={selectedTemplate.style.sectionStyle}>Professional Summary</h3>
-                <p className={templateId === "modern-split" ? "text-xs text-gray-700 mt-1" : "text-gray-700 mt-2"}>{professionalSummary.summary}</p>
+                <h3 className={selectedTemplate.style.sectionStyle}>
+                  {templateId === "modern-split" ? (
+                    <span className="flex items-center">
+                      <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
+                      Professional Summary
+                    </span>
+                  ) : (
+                    "Professional Summary"
+                  )}
+                </h3>
+                <p className={templateId === "modern-split" ? "text-[11px] text-gray-700 mt-1 leading-tight" : "text-gray-700 mt-2"}>
+                  {professionalSummary.summary}
+                </p>
               </div>
 
               {workExperience.length > 0 && (

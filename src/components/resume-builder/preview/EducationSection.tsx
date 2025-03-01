@@ -37,10 +37,10 @@ export function EducationSection({
       date: "text-sm text-gray-500"
     },
     "modern-split": {
-      section: "mb-5",
-      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3",
-      degree: "font-medium text-xs text-gray-800",
-      school: "text-xs text-gray-600",
+      section: "mb-4",
+      title: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2",
+      degree: "font-semibold text-[12px] text-gray-800",
+      school: "text-[11px] text-gray-600",
       date: "text-[10px] text-gray-500"
     },
     "minimal-elegant": {
@@ -66,14 +66,14 @@ export function EducationSection({
       <h3 className={currentStyle.title}>
         {template.id === "modern-split" ? (
           <span className="flex items-center">
-            <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
+            <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
             Education
           </span>
         ) : (
           "Education"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-6 flex flex-col items-center" : "space-y-3"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-6 flex flex-col items-center" : template.id === "modern-split" ? "space-y-2" : "space-y-3"}>
         {education.map((edu, index) => (
           <div key={index} className={template.id === "minimal-elegant" ? "text-center w-full max-w-md" : ""}>
             {template.id === "minimal-elegant" ? (
@@ -118,7 +118,7 @@ export function EducationSection({
               </>
             ) : (
               <>
-                <div className="flex justify-between items-baseline mb-1">
+                <div className="flex justify-between items-baseline mb-0.5">
                   <h4 
                     className={`${currentStyle.degree} outline-none`}
                     contentEditable={isEditing}

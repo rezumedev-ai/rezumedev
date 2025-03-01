@@ -43,8 +43,8 @@ export function CertificationsSection({
       orgFontSize = "text-xs";
       dateFontSize = "text-[10px]";
     } else if (totalItems <= 2) {
-      nameFontSize = "text-base";
-      orgFontSize = "text-sm";
+      nameFontSize = "text-sm";
+      orgFontSize = "text-xs";
       dateFontSize = "text-xs";
     }
     
@@ -57,7 +57,7 @@ export function CertificationsSection({
     }
     
     if (hasLongOrgs) {
-      orgFontSize = totalItems > 3 ? "text-xs" : "text-sm";
+      orgFontSize = totalItems > 3 ? "text-xs" : "text-xs";
     }
     
     return { nameFontSize, orgFontSize, dateFontSize };
@@ -73,11 +73,11 @@ export function CertificationsSection({
       date: `${dynamicFontSizes.dateFontSize} text-gray-500`
     },
     "modern-split": {
-      section: "mb-6",
-      title: "text-[13px] font-semibold text-indigo-600 uppercase tracking-wider mb-3 flex items-center",
-      name: `font-medium ${dynamicFontSizes.nameFontSize} text-gray-800`,
-      organization: `${dynamicFontSizes.orgFontSize} text-gray-600`,
-      date: `${dynamicFontSizes.dateFontSize} text-gray-500`
+      section: "mb-4",
+      title: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center",
+      name: `font-semibold text-[12px] text-gray-800`,
+      organization: `text-[11px] text-gray-600`,
+      date: `text-[10px] text-gray-500`
     },
     "minimal-elegant": {
       section: "mb-8",
@@ -102,7 +102,7 @@ export function CertificationsSection({
       <h3 className={currentStyle.title}>
         {template.id === "modern-split" ? (
           <span className="flex items-center">
-            <span className="inline-block w-4 h-0.5 bg-indigo-500 mr-2"></span>
+            <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
             Certifications
           </span>
         ) : template.id === "professional-executive" ? (
@@ -113,7 +113,7 @@ export function CertificationsSection({
           "Certifications & Licenses"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-2" : "space-y-1.5"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-1.5" : "space-y-1.5"}>
         {certifications.map((cert, index) => (
           template.id === "minimal-elegant" ? (
             <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
@@ -145,13 +145,7 @@ export function CertificationsSection({
               </span>
             </div>
           ) : (
-            <div key={index} className={
-              template.id === "minimal-elegant" 
-                ? "flex justify-between items-baseline w-full max-w-lg" 
-                : template.id === "modern-split"
-                ? "flex justify-between items-baseline w-full"
-                : "flex justify-between items-baseline"
-            }>
+            <div key={index} className="flex justify-between items-baseline gap-2">
               <div>
                 <span 
                   className={`${currentStyle.name} outline-none`}
@@ -161,18 +155,20 @@ export function CertificationsSection({
                 >
                   {cert.name}
                 </span>
-                {template.id !== "professional-executive" && <span className="text-gray-500 mx-1">•</span>}
-                <span 
-                  className={`${currentStyle.organization} outline-none`}
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit(index, "organization", e)}
-                >
-                  {cert.organization}
-                </span>
+                {template.id !== "professional-executive" && template.id !== "modern-split" && <span className="text-gray-500 mx-1">•</span>}
+                {template.id !== "modern-split" && (
+                  <span 
+                    className={`${currentStyle.organization} outline-none`}
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit(index, "organization", e)}
+                  >
+                    {cert.organization}
+                  </span>
+                )}
               </div>
               <span 
-                className={`${currentStyle.date} outline-none`}
+                className={`${currentStyle.date} outline-none whitespace-nowrap`}
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit(index, "completionDate", e)}

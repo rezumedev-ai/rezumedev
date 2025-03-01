@@ -56,13 +56,13 @@ export function ExperienceSection({
       responsibility: "text-sm text-gray-700"
     },
     "modern-split": {
-      section: "mb-5",
-      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3",
-      jobTitle: "font-medium text-sm text-gray-800",
-      company: "text-gray-600 text-xs",
+      section: "mb-4",
+      title: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2",
+      jobTitle: "font-semibold text-[13px] text-gray-800",
+      company: "text-gray-600 text-xs font-medium",
       date: "text-[10px] text-gray-500 whitespace-nowrap",
-      responsibilities: "mt-1.5 space-y-1",
-      responsibility: "text-xs text-gray-600 flex items-start"
+      responsibilities: "mt-1 space-y-1",
+      responsibility: "text-[11px] text-gray-700 flex items-start gap-1 leading-tight"
     },
     "minimal-elegant": {
       section: "mb-6",
@@ -88,11 +88,11 @@ export function ExperienceSection({
 
   return (
     <div className={currentStyle.section}>
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-center mb-2">
         <h3 className={currentStyle.title}>
           {template.id === "modern-split" ? (
             <span className="flex items-center">
-              <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
+              <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
               Professional Experience
             </span>
           ) : template.id === "minimal-elegant" ? (
@@ -103,28 +103,30 @@ export function ExperienceSection({
         </h3>
       </div>
       
-      <div className={template.id === "modern-split" ? "space-y-4" : "space-y-5"}>
+      <div className={template.id === "modern-split" ? "space-y-2.5" : "space-y-5"}>
         {experiences.map((exp, index) => (
           <div 
             key={index} 
             className={
               template.id === "modern-split" 
-                ? "relative pl-4 border-l border-indigo-100" 
+                ? "relative pl-3 border-l border-gray-200"
                 : template.id === "minimal-elegant"
                 ? "border-b border-gray-100 pb-4 last:border-0 last:pb-0"
                 : "pb-3"
             }
           >
             {template.id === "modern-split" && (
-              <div className="absolute top-0 left-[-4px] w-2 h-2 rounded-full bg-indigo-500"></div>
+              <div className="absolute top-1 left-[-2px] w-1 h-1 rounded-full bg-gray-400"></div>
             )}
             
             <div className={
               template.id === "minimal-elegant" 
                 ? "flex flex-col items-center space-y-1"
+                : template.id === "modern-split"
+                ? "space-y-0.5"
                 : "space-y-1"
             }>
-              <div className="flex justify-between items-baseline gap-4">
+              <div className="flex justify-between items-baseline gap-2">
                 <div 
                   className={`${currentStyle.jobTitle} outline-none`}
                   contentEditable={isEditing}
@@ -167,7 +169,7 @@ export function ExperienceSection({
                 {exp.responsibilities.map((resp, respIndex) => (
                   <li key={respIndex} className={currentStyle.responsibility}>
                     {template.id === "modern-split" && (
-                      <span className="inline-block w-1 h-1 rounded-full bg-indigo-400 mt-1.5 mr-2"></span>
+                      <span className="inline-block w-1 h-1 rounded-full bg-gray-400 mt-1.5 mr-1 shrink-0"></span>
                     )}
                     {template.id === "professional-executive" && (
                       <div className="w-1.5 h-1.5 rounded-full bg-black mt-[6px] shrink-0"></div>

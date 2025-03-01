@@ -101,28 +101,28 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Contemporary two-column design for creative professionals",
     imageUrl: "/lovable-uploads/50a6d61f-0b70-4d4b-8fd8-e293d40c5ae1.png",
     style: {
-      titleFont: "font-sans text-[24px] font-semibold tracking-wide text-indigo-700",
-      headerStyle: "mb-4 pb-3 border-b border-gray-200",
-      sectionStyle: "text-[13px] font-semibold text-indigo-600 uppercase tracking-wider mb-3",
-      contentStyle: "grid grid-cols-12 gap-6",
+      titleFont: "font-sans text-[28px] font-bold tracking-tight text-gray-900",
+      headerStyle: "mb-4 pb-2 border-b border-gray-300",
+      sectionStyle: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center",
+      contentStyle: "grid grid-cols-12 gap-4",
       layout: "modern",
       colors: {
-        primary: "#4F46E5",
-        secondary: "#6B7280",
-        text: "#374151",
-        border: "#E5E7EB",
+        primary: "#333333",
+        secondary: "#555555",
+        text: "#333333",
+        border: "#CCCCCC",
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "1.5rem",
-        itemGap: "1rem",
-        contentPadding: "1.5rem",
-        headerHeight: "110px",
+        sectionGap: "1rem",
+        itemGap: "0.75rem",
+        contentPadding: "0",
+        headerHeight: "auto",
         margins: {
-          top: "40px",
-          right: "40px",
-          bottom: "40px",
-          left: "40px"
+          top: "0.4in",
+          right: "0.4in",
+          bottom: "0.4in",
+          left: "0.4in"
         }
       },
       dimensions: {
@@ -130,10 +130,10 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "1056px"
       },
       typography: {
-        titleSize: "24px",
-        subtitleSize: "14px",
-        bodySize: "13px",
-        lineHeight: "1.4"
+        titleSize: "28px",
+        subtitleSize: "16px",
+        bodySize: "12px",
+        lineHeight: "1.3"
       },
       icons: {
         sections: true,
