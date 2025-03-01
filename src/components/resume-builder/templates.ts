@@ -101,10 +101,10 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Contemporary two-column design for creative professionals",
     imageUrl: "/lovable-uploads/50a6d61f-0b70-4d4b-8fd8-e293d40c5ae1.png",
     style: {
-      titleFont: "font-sans text-[28px] font-light tracking-wide text-gray-800",
-      headerStyle: "mb-2 pb-1",
-      sectionStyle: "text-[13px] font-semibold text-indigo-600 uppercase tracking-widest mb-1.5",
-      contentStyle: "grid grid-cols-12 gap-4",
+      titleFont: "font-sans text-[24px] font-light tracking-wide text-gray-800",
+      headerStyle: "mb-1 pb-0",
+      sectionStyle: "text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-1",
+      contentStyle: "grid grid-cols-12 gap-3",
       layout: "modern",
       colors: {
         primary: "#4F46E5",
@@ -114,15 +114,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "0.75rem",
-        itemGap: "0.5rem",
-        contentPadding: "1rem",
-        headerHeight: "100px",
+        sectionGap: "0.5rem",
+        itemGap: "0.25rem",
+        contentPadding: "0.5rem",
+        headerHeight: "80px",
         margins: {
-          top: "20px",
-          right: "20px",
-          bottom: "20px",
-          left: "20px"
+          top: "10px",
+          right: "10px",
+          bottom: "10px",
+          left: "10px"
         }
       },
       dimensions: {
@@ -130,10 +130,10 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "1056px"
       },
       typography: {
-        titleSize: "28px",
-        subtitleSize: "14px",
-        bodySize: "12px",
-        lineHeight: "1.3"
+        titleSize: "24px",
+        subtitleSize: "13px",
+        bodySize: "11px",
+        lineHeight: "1.2"
       },
       icons: {
         sections: true,

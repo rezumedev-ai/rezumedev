@@ -1,4 +1,3 @@
-
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -61,7 +60,6 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  // Fixed US Letter size constants
   const DPI = 96; // Standard screen DPI
   const WIDTH_INCHES = 8.5;
   const HEIGHT_INCHES = 11;
@@ -80,12 +78,10 @@ export function ResumePreview({
       const containerWidth = container.clientWidth - 48; // Account for padding
       const containerHeight = container.clientHeight - 48;
 
-      // Calculate scale based on container size
       const scaleX = containerWidth / WIDTH_PX;
       const scaleY = containerHeight / HEIGHT_PX;
       let newScale = Math.min(scaleX, scaleY, 1);
 
-      // Adjust scale for mobile
       if (isMobile) {
         newScale = isZoomed ? 0.8 : 0.4;
       } else {
@@ -101,6 +97,25 @@ export function ResumePreview({
   }, [isMobile, isZoomed]);
 
   const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
+
+  const getMargins = () => {
+    if (templateId === "modern-split") {
+      return {
+        top: '0.25in',
+        right: '0.25in',
+        bottom: '0.25in',
+        left: '0.25in',
+      };
+    }
+    return {
+      top: '1in',
+      right: '1in',
+      bottom: '1in',
+      left: '1in',
+    };
+  };
+
+  const margins = getMargins();
 
   return (
     <div className="relative w-full h-screen flex flex-col items-center bg-gray-100">
@@ -133,7 +148,6 @@ export function ResumePreview({
             position: 'absolute',
             boxSizing: 'border-box',
             overflow: 'hidden',
-            // Force exact dimensions
             minWidth: `${WIDTH_PX}px`,
             maxWidth: `${WIDTH_PX}px`,
             minHeight: `${HEIGHT_PX}px`,
@@ -143,23 +157,24 @@ export function ResumePreview({
           <div 
             style={{
               position: 'absolute',
-              top: '1in',
-              right: '1in',
-              bottom: '1in',
-              left: '1in',
+              top: margins.top,
+              right: margins.right,
+              bottom: margins.bottom,
+              left: margins.left,
               overflow: 'hidden',
               boxSizing: 'border-box',
             }}
           >
-            {/* Header Section */}
             <div className={selectedTemplate.style.headerStyle}>
               <h1 className={selectedTemplate.style.titleFont}>
                 {personalInfo.fullName}
               </h1>
-              <h2 className="text-xl text-gray-600 mt-2">
+              <h2 className={templateId === "modern-split" ? "text-base text-gray-600 mt-1" : "text-xl text-gray-600 mt-2"}>
                 {professionalSummary.title}
               </h2>
-              <div className="flex flex-wrap gap-4 text-sm text-gray-500 mt-2">
+              <div className={templateId === "modern-split" ? 
+                "flex flex-wrap gap-2 text-xs text-gray-500 mt-1" : 
+                "flex flex-wrap gap-4 text-sm text-gray-500 mt-2"}>
                 <span>{personalInfo.email}</span>
                 <span>{personalInfo.phone}</span>
                 {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
@@ -169,16 +184,14 @@ export function ResumePreview({
             <div 
               className={cn(selectedTemplate.style.contentStyle, "overflow-hidden")}
               style={{
-                height: 'calc(100% - 120px)',
+                height: templateId === "modern-split" ? 'calc(100% - 80px)' : 'calc(100% - 120px)',
               }}
             >
-              {/* Professional Summary */}
               <div>
                 <h3 className={selectedTemplate.style.sectionStyle}>Professional Summary</h3>
-                <p className="text-gray-700 mt-2">{professionalSummary.summary}</p>
+                <p className={templateId === "modern-split" ? "text-xs text-gray-700 mt-1" : "text-gray-700 mt-2"}>{professionalSummary.summary}</p>
               </div>
 
-              {/* Work Experience */}
               {workExperience.length > 0 && (
                 <div className="mt-6">
                   <h3 className={selectedTemplate.style.sectionStyle}>Work Experience</h3>
@@ -201,7 +214,6 @@ export function ResumePreview({
                 </div>
               )}
 
-              {/* Education */}
               {education.length > 0 && (
                 <div className="mt-6">
                   <h3 className={selectedTemplate.style.sectionStyle}>Education</h3>
@@ -219,7 +231,6 @@ export function ResumePreview({
                 </div>
               )}
 
-              {/* Skills */}
               {(skills.hard_skills.length > 0 || skills.soft_skills.length > 0) && (
                 <div className="mt-6">
                   <h3 className={selectedTemplate.style.sectionStyle}>Skills</h3>
@@ -244,7 +255,6 @@ export function ResumePreview({
                 </div>
               )}
 
-              {/* Certifications */}
               {certifications.length > 0 && (
                 <div className="mt-6">
                   <h3 className={selectedTemplate.style.sectionStyle}>Certifications</h3>

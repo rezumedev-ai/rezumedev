@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 
 interface SkillsSectionProps {
@@ -23,10 +22,8 @@ export function SkillsSection({
     let newSkills: string[] = [];
     
     if (template.id === "modern-split") {
-      // If using bullet points in modern-split template
       newSkills = Array.from(event.target.querySelectorAll('li')).map(li => li.textContent?.trim() || '');
     } else {
-      // For templates using dot separators
       newSkills = event.target.innerText
         .split("•")
         .map(s => s.trim())
@@ -36,7 +33,6 @@ export function SkillsSection({
     onUpdate(type, newSkills);
   };
 
-  // Template-specific styles
   const styles = {
     "executive-clean": {
       section: "mb-6",
@@ -45,10 +41,10 @@ export function SkillsSection({
       skillList: "text-sm text-gray-700"
     },
     "modern-split": {
-      section: "mb-4",
-      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-2",
-      skillType: "text-xs font-medium text-gray-700 mb-1",
-      skillList: "text-xs text-gray-600"
+      section: "mb-2",
+      title: "text-[11px] font-semibold text-indigo-600 uppercase tracking-widest mb-1",
+      skillType: "text-[10px] font-medium text-gray-700 mb-0.5",
+      skillList: "text-[10px] text-gray-600"
     },
     "minimal-elegant": {
       section: "mb-10",
@@ -66,7 +62,6 @@ export function SkillsSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  // Determine if we should use bullet points for both skill types
   const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive";
 
   return (
@@ -74,7 +69,7 @@ export function SkillsSection({
       <h3 className={currentStyle.title}>
         {template.id === "modern-split" ? (
           <span className="flex items-center">
-            <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
+            <span className="inline-block w-3 h-[1px] bg-indigo-500 mr-1"></span>
             Skills
           </span>
         ) : template.id === "professional-executive" ? (
@@ -85,7 +80,7 @@ export function SkillsSection({
           "Skills"
         )}
       </h3>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {hardSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
@@ -94,10 +89,10 @@ export function SkillsSection({
             </h4>
             
             {usesBulletPoints ? (
-              <ul className={template.id === "modern-split" ? "space-y-0.5" : "space-y-1"}>
+              <ul className={template.id === "modern-split" ? "space-y-0" : "space-y-1"}>
                 {hardSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
-                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
+                    <span className={`inline-block w-1 h-1 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[5px] mr-1 shrink-0`}></span>
                     <span
                       className={`outline-none ${currentStyle.skillList}`}
                       contentEditable={isEditing}
