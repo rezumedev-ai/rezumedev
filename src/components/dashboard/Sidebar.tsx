@@ -34,6 +34,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
+  // Additional query to get resume count
+  const { data: resumeCount } = useQuery({
+    queryKey: ["resumeCount"],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      
+      const { count, error } = await supabase
+        .from("resumes")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Error fetching resume count:", error);
+        return 0;
+      }
+      
+      return count || 0;
+    },
+  });
+
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
@@ -92,7 +112,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { id: 'resumes', icon: FileText, label: 'My Resumes', path: '/dashboard', badge: profile?.resumes_count || 0 },
+    { id: 'resumes', icon: FileText, label: 'My Resumes', path: '/dashboard', badge: resumeCount || 0 },
     { id: 'home', icon: Home, label: 'Homepage', path: '/' },
     { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
     { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
