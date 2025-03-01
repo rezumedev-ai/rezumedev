@@ -1,3 +1,4 @@
+
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -99,7 +100,7 @@ export function ResumePreview({
   const selectedTemplate = resumeTemplates.find(t => t.id === templateId) || resumeTemplates[0];
 
   const getMargins = () => {
-    return selectedTemplate.style.margins;
+    return selectedTemplate.style.spacing.margins;
   };
 
   const margins = getMargins();
