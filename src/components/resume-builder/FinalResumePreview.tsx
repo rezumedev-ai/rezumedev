@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
@@ -38,7 +39,6 @@ export function FinalResumePreview({
   const [resumeData, setResumeData] = useState(initialResumeData);
   const [selectedTemplateId, setSelectedTemplateId] = useState(initialResumeData.template_id || "executive-clean");
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showTools, setShowTools] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
@@ -177,72 +177,9 @@ export function FinalResumePreview({
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Floating Action Bar - appears on hover/scroll */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ 
-          opacity: showTools ? 1 : 0, 
-          y: showTools ? 0 : -20,
-          pointerEvents: showTools ? 'auto' : 'none' 
-        }}
-        transition={{ duration: 0.2 }}
-        className="fixed top-4 left-0 right-0 mx-auto z-50 flex justify-between items-center max-w-5xl bg-white/90 backdrop-blur-sm shadow-md rounded-lg border border-gray-200 p-2"
-        style={{ width: 'calc(100% - 2rem)' }}
-      >
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1.5"
-          onClick={handleBack}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Back to Dashboard</span>
-          <span className="sm:hidden">Back</span>
-        </Button>
-
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? "View Mode" : "Edit Mode"}
-          </Button>
-          
-          <select
-            className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            value={selectedTemplateId}
-            onChange={(e) => handleTemplateChange(e.target.value)}
-          >
-            {resumeTemplates.map((template) => (
-              <option key={template.id} value={template.id}>
-                {template.name}
-              </option>
-            ))}
-          </select>
-          
-          <DownloadOptionsDialog setIsDownloading={setIsDownloading} />
-          
-          {onRegenerateClick && (
-            <Button
-              size="sm"
-              onClick={onRegenerateClick}
-              disabled={isRegenerating}
-              className="flex items-center gap-1.5"
-            >
-              <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
-              {isRegenerating ? 'Regenerating...' : 'Regenerate'}
-            </Button>
-          )}
-        </div>
-      </motion.div>
-
       <div 
         ref={containerRef}
         className="flex-1 flex items-center justify-center p-4 md:p-8 bg-gray-100 overflow-hidden"
-        onMouseEnter={() => setShowTools(true)}
-        onMouseLeave={() => setShowTools(false)}
-        onTouchStart={() => setShowTools(true)}
       >
         <div 
           ref={resumeRef}
@@ -804,141 +741,4 @@ export function FinalResumePreview({
                   <div className="flex flex-wrap gap-6 mt-2 text-gray-600">
                     <div className="flex items-center gap-1.5">
                       <Mail className="w-4 h-4 text-gray-500" />
-                      <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info.email}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Phone className="w-4 h-4 text-gray-500" />
-                      <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info.phone}</span>
-                    </div>
-                    {resumeData.personal_info.linkedin && (
-                      <div className="flex items-center gap-1.5">
-                        <Linkedin className="w-4 h-4 text-gray-500" />
-                        <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info.linkedin}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Main Content */}
-                <div className="mt-6 space-y-6">
-                  {/* Professional Summary */}
-                  <div>
-                    <h3 className={`${currentStyle.sectionTitle}`}>Professional Summary</h3>
-                    <p className={`${currentStyle.bodyText} text-gray-700`}>
-                      {resumeData.professional_summary.summary}
-                    </p>
-                  </div>
-
-                  {/* Work Experience */}
-                  {resumeData.work_experience.length > 0 && (
-                    <div>
-                      <h3 className={`${currentStyle.sectionTitle}`}>Professional Experience</h3>
-                      <div className="space-y-5">
-                        {resumeData.work_experience.map((exp, index) => (
-                          <div key={index}>
-                            <div className="flex justify-between items-baseline mb-1">
-                              <h4 className="font-bold text-base text-gray-800">{exp.jobTitle}</h4>
-                              <span className="text-sm text-gray-500">
-                                {exp.startDate} - {exp.isCurrentJob ? "Present" : exp.endDate}
-                              </span>
-                            </div>
-                            <div className={`${currentStyle.bodyText} font-semibold text-gray-700 mb-2`}>{exp.companyName}</div>
-                            <ul className="space-y-1.5 list-disc list-inside">
-                              {exp.responsibilities.map((resp, respIndex) => (
-                                <li key={respIndex} className={`${currentStyle.bodyText} text-gray-700 pl-1`}>
-                                  <span className="pl-1">{resp}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Skills and Education Side-by-Side */}
-                  <div className="grid grid-cols-2 gap-6">
-                    {/* Education */}
-                    <div>
-                      {resumeData.education.length > 0 && (
-                        <div>
-                          <h3 className={`${currentStyle.sectionTitle}`}>Education</h3>
-                          <div className="space-y-3">
-                            {resumeData.education.map((edu, index) => (
-                              <div key={index}>
-                                <div className="font-bold text-sm text-gray-800">{edu.degreeName}</div>
-                                <div className={`${currentStyle.bodyText} text-gray-700`}>{edu.schoolName}</div>
-                                <div className="text-sm text-gray-500">
-                                  {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Certifications */}
-                      {resumeData.certifications.length > 0 && (
-                        <div className="mt-5">
-                          <h3 className={`${currentStyle.sectionTitle}`}>Certifications</h3>
-                          <div className="space-y-2">
-                            {resumeData.certifications.map((cert, index) => (
-                              <div key={index}>
-                                <div className="font-bold text-sm text-gray-800">{cert.name}</div>
-                                <div className={`${currentStyle.bodyText} text-gray-700`}>{cert.organization}</div>
-                                <div className="text-sm text-gray-500">{cert.completionDate}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Skills */}
-                    {(resumeData.skills.hard_skills.length > 0 || resumeData.skills.soft_skills.length > 0) && (
-                      <div>
-                        <h3 className={`${currentStyle.sectionTitle}`}>Skills</h3>
-                        <div className="space-y-4">
-                          {resumeData.skills.hard_skills.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-bold text-gray-700 mb-1">Technical Skills</h4>
-                              <div className={`${currentStyle.bodyText} text-gray-700`}>
-                                {resumeData.skills.hard_skills.join(" • ")}
-                              </div>
-                            </div>
-                          )}
-                          {resumeData.skills.soft_skills.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-bold text-gray-700 mb-1">Soft Skills</h4>
-                              <div className={`${currentStyle.bodyText} text-gray-700`}>
-                                {resumeData.skills.soft_skills.join(" • ")}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile zoom controls */}
-      {isMobile && (
-        <div className="fixed bottom-4 right-4 flex gap-2">
-          <Button
-            size="sm"
-            variant="secondary"
-            className="h-10 w-10 rounded-full p-0 shadow-lg"
-            onClick={() => setIsZoomed(!isZoomed)}
-          >
-            {isZoomed ? "−" : "+"}
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
+                      <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info
