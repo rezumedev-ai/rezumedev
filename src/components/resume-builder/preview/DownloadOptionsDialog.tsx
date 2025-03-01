@@ -2,17 +2,24 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FileDown } from "lucide-react";
-import { useState } from "react";
+import { useState, MutableRefObject } from "react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { ResumeData } from "@/types/resume";
 
 interface DownloadOptionsDialogProps {
   isDownloading?: boolean;
+  resumeData?: ResumeData;
+  resumeRef?: MutableRefObject<HTMLDivElement | null>;
+  templateId?: string;
 }
 
 export function DownloadOptionsDialog({
-  isDownloading
+  isDownloading,
+  resumeData,
+  resumeRef,
+  templateId
 }: DownloadOptionsDialogProps) {
   const [open, setOpen] = useState(false);
 

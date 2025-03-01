@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,14 +6,13 @@ import { ResumeData } from "@/types/resume";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Edit2, FileDown, RefreshCw } from "lucide-react";
+import { ChevronLeft, Edit2, FileDown } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { resumeTemplates } from "@/components/resume-builder/templates";
 
 export default function ResumePreview() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isRegenerating, setIsRegenerating] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -38,100 +36,6 @@ export default function ResumePreview() {
     }
   });
 
-  const handleRegenerate = async () => {
-    try {
-      if (!resume || !id) {
-        toast.error("Resume data not found");
-        return;
-      }
-
-      setIsRegenerating(true);
-      
-      console.log("Starting regeneration for resume:", id);
-      
-      // First update the status
-      const { error: updateError } = await supabase
-        .from("resumes")
-        .update({ 
-          completion_status: "enhancing"
-        })
-        .eq("id", id);
-
-      if (updateError) {
-        console.error("Error updating status:", updateError);
-        throw updateError;
-      }
-
-      console.log("Status updated, calling generate-professional-resume function");
-
-      // Call the generate-professional-resume function with the existing resume data
-      const { data: enhanceData, error } = await supabase.functions.invoke('generate-professional-resume', {
-        body: { 
-          resumeData: resume,
-          resumeId: id
-        }
-      });
-
-      if (error) {
-        console.error("Error calling generate-professional-resume function:", error);
-        throw error;
-      }
-
-      console.log("generate-professional-resume function called successfully:", enhanceData);
-
-      // Poll for completion
-      let attempts = 0;
-      const maxAttempts = 30; // 1 minute max waiting time
-      
-      const checkCompletion = setInterval(async () => {
-        attempts++;
-        console.log(`Checking completion attempt ${attempts}`);
-
-        try {
-          const { data: pollData, error: pollError } = await supabase
-            .from("resumes")
-            .select("completion_status")
-            .eq("id", id)
-            .single();
-
-          if (pollError) {
-            console.error("Error polling for completion:", pollError);
-            clearInterval(checkCompletion);
-            setIsRegenerating(false);
-            throw pollError;
-          }
-
-          console.log("Poll response:", pollData);
-
-          if (pollData.completion_status === "completed") {
-            clearInterval(checkCompletion);
-            setIsRegenerating(false);
-            await refetch();
-            toast.success("Resume has been regenerated successfully!");
-          } else if (pollData.completion_status === "error") {
-            clearInterval(checkCompletion);
-            setIsRegenerating(false);
-            toast.error("An error occurred while regenerating your resume. Please try again.");
-          } else if (attempts >= maxAttempts) {
-            clearInterval(checkCompletion);
-            setIsRegenerating(false);
-            toast.error("Regeneration is taking longer than expected. Please try again.");
-          }
-        } catch (pollError) {
-          clearInterval(checkCompletion);
-          setIsRegenerating(false);
-          console.error("Error in polling:", pollError);
-          toast.error("Error checking regeneration status");
-        }
-      }, 2000);
-
-    } catch (error) {
-      console.error("Error regenerating resume:", error);
-      setIsRegenerating(false);
-      toast.error("Failed to regenerate resume. Please try again.");
-    }
-  };
-
   const handleTemplateChange = async (templateId: string) => {
     if (!id || templateId === selectedTemplate) return;
     
@@ -145,6 +49,7 @@ export default function ResumePreview() {
         
       if (error) throw error;
       await refetch();
+      toast.success("Template updated successfully");
     } catch (error) {
       console.error("Error updating template:", error);
       toast.error("Failed to update template. Please try again.");
@@ -152,9 +57,8 @@ export default function ResumePreview() {
   };
 
   const handleEditClick = () => {
-    if (id) {
-      navigate(`/resume-builder/${id}`);
-    }
+    setIsEditing(!isEditing);
+    toast.success(isEditing ? "Edit mode disabled" : "Edit mode enabled - click on any text to edit");
   };
 
   const handleBackToDashboard = () => {
@@ -207,12 +111,12 @@ export default function ResumePreview() {
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant={isEditing ? "default" : "outline"}
               size="sm"
               onClick={handleEditClick}
             >
               <Edit2 className="w-4 h-4 mr-1" />
-              Edit
+              {isEditing ? "Editing..." : "Edit"}
             </Button>
             
             <Button 
@@ -227,16 +131,6 @@ export default function ResumePreview() {
               <FileDown className="w-4 h-4 mr-1" />
               Download
             </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRegenerate}
-              disabled={isRegenerating}
-            >
-              <RefreshCw className={`w-4 h-4 mr-1 ${isRegenerating ? 'animate-spin' : ''}`} />
-              {isRegenerating ? 'Regenerating...' : 'Regenerate with AI'}
-            </Button>
           </div>
         </div>
       </div>
@@ -245,8 +139,7 @@ export default function ResumePreview() {
         <FinalResumePreview
           resumeData={resume as unknown as ResumeData}
           resumeId={id as string}
-          onRegenerateClick={handleRegenerate}
-          isRegenerating={isRegenerating}
+          isEditing={isEditing}
         />
       </div>
     </div>
