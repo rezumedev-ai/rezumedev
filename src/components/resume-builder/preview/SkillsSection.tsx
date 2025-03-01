@@ -45,8 +45,8 @@ export function SkillsSection({
       skillList: "text-sm text-gray-700"
     },
     "modern-split": {
-      section: "mb-5",
-      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3",
+      section: "mb-4",
+      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-2",
       skillType: "text-xs font-medium text-gray-700 mb-1",
       skillList: "text-xs text-gray-600"
     },
@@ -85,7 +85,7 @@ export function SkillsSection({
           "Skills"
         )}
       </h3>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {hardSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
@@ -94,7 +94,7 @@ export function SkillsSection({
             </h4>
             
             {usesBulletPoints ? (
-              <ul className="space-y-1">
+              <ul className={template.id === "modern-split" ? "space-y-0.5" : "space-y-1"}>
                 {hardSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
                     <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
@@ -142,7 +142,7 @@ export function SkillsSection({
             </h4>
             
             {usesBulletPoints ? (
-              <ul className="space-y-1">
+              <ul className={template.id === "modern-split" ? "space-y-0.5" : "space-y-1"}>
                 {softSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
                     <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>

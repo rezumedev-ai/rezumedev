@@ -37,8 +37,8 @@ export function CertificationsSection({
       date: "text-xs text-gray-500"
     },
     "modern-split": {
-      section: "mb-5",
-      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3",
+      section: "mb-4",
+      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-2",
       name: "font-medium text-xs text-gray-800",
       organization: "text-xs text-gray-600",
       date: "text-[10px] text-gray-500"
@@ -77,7 +77,7 @@ export function CertificationsSection({
           "Certifications & Licenses"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-3" : "space-y-2"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-3" : "space-y-1.5"}>
         {certifications.map((cert, index) => (
           template.id === "minimal-elegant" ? (
             <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
@@ -125,7 +125,7 @@ export function CertificationsSection({
                 >
                   {cert.name}
                 </span>
-                {template.id !== "professional-executive" && <span className="text-gray-500 mx-2">•</span>}
+                {template.id !== "professional-executive" && <span className="text-gray-500 mx-1.5">•</span>}
                 <span 
                   className={`${currentStyle.organization} outline-none`}
                   contentEditable={isEditing}
