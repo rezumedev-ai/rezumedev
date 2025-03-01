@@ -1,6 +1,5 @@
-<lov-code>
+
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 import { cn } from "@/utils/cn";
-import { Mail, Phone, Linkedin, Globe, MapPin, Briefcase, GraduationCap, Award, User, ArrowLeft, RefreshCw } from "lucide-react";
+import { Mail, Phone, Linkedin, Globe, MapPin, Briefcase, GraduationCap, Award, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -44,7 +43,6 @@ export function FinalResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
 
   // Fixed US Letter size constants
   const DPI = 96; // Standard screen DPI
@@ -52,10 +50,6 @@ export function FinalResumePreview({
   const HEIGHT_INCHES = 11;
   const WIDTH_PX = Math.floor(WIDTH_INCHES * DPI); // 816px
   const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI); // 1056px
-
-  const handleBack = () => {
-    navigate("/dashboard");
-  };
 
   const handleUpdateField = async (
     section: keyof ResumeData,
@@ -229,7 +223,7 @@ export function FinalResumePreview({
                 {/* Two Column Layout */}
                 <div className="grid grid-cols-[1fr_2fr] gap-6 relative">
                   {/* Vertical Divider */}
-                  <div className="absolute left-[33.33%] top-0 bottom-0 w-[1px] bg-gray-300" />
+                  <div className="absolute left-[33.33%] top-0 bottom-0 w-[1px] bg-gray-300"></div>
 
                   {/* Left Column */}
                   <div className="pr-6 space-y-5 max-w-full">
@@ -295,7 +289,7 @@ export function FinalResumePreview({
                               <div className="space-y-1">
                                 {resumeData.skills.hard_skills.map((skill, index) => (
                                   <div key={index} className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0"></div>
                                     <span className="text-[13px] text-gray-700">{skill}</span>
                                   </div>
                                 ))}
@@ -308,7 +302,7 @@ export function FinalResumePreview({
                               <div className="space-y-1">
                                 {resumeData.skills.soft_skills.map((skill, index) => (
                                   <div key={index} className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0"></div>
                                     <span className="text-[13px] text-gray-700">{skill}</span>
                                   </div>
                                 ))}
@@ -328,7 +322,7 @@ export function FinalResumePreview({
                         <div className="space-y-1.5">
                           {resumeData.certifications.map((cert, index) => (
                             <div key={index} className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                              <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0"></div>
                               <span className="text-[13px] text-gray-700">{cert.name}</span>
                             </div>
                           ))}
@@ -372,7 +366,7 @@ export function FinalResumePreview({
                               <ul className="space-y-1.5">
                                 {exp.responsibilities.map((resp, idx) => (
                                   <li key={idx} className="flex items-start gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-black mt-[6px] shrink-0" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-black mt-[6px] shrink-0"></div>
                                     <span 
                                       className="text-[13px] text-gray-700 leading-snug"
                                     >
@@ -741,4 +735,162 @@ export function FinalResumePreview({
                   <div className="flex flex-wrap gap-6 mt-2 text-gray-600">
                     <div className="flex items-center gap-1.5">
                       <Mail className="w-4 h-4 text-gray-500" />
-                      <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info
+                      <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info.email}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Phone className="w-4 h-4 text-gray-500" />
+                      <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info.phone}</span>
+                    </div>
+                    {resumeData.personal_info.linkedin && (
+                      <div className="flex items-center gap-1.5">
+                        <Linkedin className="w-4 h-4 text-gray-500" />
+                        <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info.linkedin}</span>
+                      </div>
+                    )}
+                    {resumeData.personal_info.website && (
+                      <div className="flex items-center gap-1.5">
+                        <Globe className="w-4 h-4 text-gray-500" />
+                        <span className={`${currentStyle.contactFont}`}>{resumeData.personal_info.website}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Professional Summary */}
+                <div className={`${currentStyle.sectionSpacing}`}>
+                  <h2 className={`${currentStyle.sectionTitle}`}>
+                    Professional Summary
+                  </h2>
+                  <p className={`${currentStyle.bodyText} text-gray-700`}>
+                    {resumeData.professional_summary.summary}
+                  </p>
+                </div>
+
+                {/* Work Experience */}
+                {resumeData.work_experience.length > 0 && (
+                  <div className={`${currentStyle.sectionSpacing}`}>
+                    <h2 className={`${currentStyle.sectionTitle}`}>
+                      Work Experience
+                    </h2>
+                    <div className="space-y-5">
+                      {resumeData.work_experience.map((exp, index) => (
+                        <div key={index}>
+                          <div className="flex justify-between mb-1">
+                            <h3 className="font-bold text-gray-800 text-lg">{exp.jobTitle}</h3>
+                            <span className="text-sm text-gray-600">
+                              {exp.startDate} - {exp.isCurrentJob ? "Present" : exp.endDate}
+                            </span>
+                          </div>
+                          <div className="text-base text-gray-700 mb-2">{exp.companyName}</div>
+                          <ul className="space-y-2">
+                            {exp.responsibilities.map((resp, respIndex) => (
+                              <li key={respIndex} className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-gray-600 mt-[8px] shrink-0"></div>
+                                <span className="text-sm text-gray-700">{resp}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Education */}
+                {resumeData.education.length > 0 && (
+                  <div className={`${currentStyle.sectionSpacing}`}>
+                    <h2 className={`${currentStyle.sectionTitle}`}>
+                      Education
+                    </h2>
+                    <div className="space-y-4">
+                      {resumeData.education.map((edu, index) => (
+                        <div key={index}>
+                          <div className="flex justify-between mb-1">
+                            <h3 className="font-semibold text-gray-800">{edu.degreeName}</h3>
+                            <span className="text-sm text-gray-600">
+                              {edu.startDate} - {edu.isCurrentlyEnrolled ? "Present" : edu.endDate}
+                            </span>
+                          </div>
+                          <div className="text-base text-gray-700">{edu.schoolName}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Skills */}
+                {(resumeData.skills.hard_skills.length > 0 || resumeData.skills.soft_skills.length > 0) && (
+                  <div className={`${currentStyle.sectionSpacing}`}>
+                    <h2 className={`${currentStyle.sectionTitle}`}>
+                      Skills
+                    </h2>
+                    <div className="grid grid-cols-2 gap-6">
+                      {resumeData.skills.hard_skills.length > 0 && (
+                        <div>
+                          <h3 className="font-semibold mb-2 text-gray-800">Technical</h3>
+                          <ul className="space-y-1">
+                            {resumeData.skills.hard_skills.map((skill, index) => (
+                              <li key={index} className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                                <span className="text-sm text-gray-700">{skill}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {resumeData.skills.soft_skills.length > 0 && (
+                        <div>
+                          <h3 className="font-semibold mb-2 text-gray-800">Professional</h3>
+                          <ul className="space-y-1">
+                            {resumeData.skills.soft_skills.map((skill, index) => (
+                              <li key={index} className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                                <span className="text-sm text-gray-700">{skill}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Certifications */}
+                {resumeData.certifications.length > 0 && (
+                  <div>
+                    <h2 className={`${currentStyle.sectionTitle}`}>
+                      Certifications
+                    </h2>
+                    <ul className="space-y-2">
+                      {resumeData.certifications.map((cert, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                          <div>
+                            <span className="font-medium text-gray-800">{cert.name}</span>
+                            {cert.organization && (
+                              <span className="text-sm text-gray-600"> - {cert.organization}</span>
+                            )}
+                            {cert.completionDate && (
+                              <span className="text-sm text-gray-500"> ({cert.completionDate})</span>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <DownloadOptionsDialog
+        isOpen={isDownloading}
+        setIsOpen={setIsDownloading}
+        resumeData={resumeData}
+        resumeRef={resumeRef}
+        templateId={selectedTemplateId}
+      />
+    </div>
+  );
+}
