@@ -44,11 +44,11 @@ export function CertificationsSection({
       date: "text-[10px] text-gray-500"
     },
     "minimal-elegant": {
-      section: "mb-10",
-      title: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-6 font-medium text-center",
-      name: "font-medium text-sm text-gray-800",
-      organization: "text-[13px] text-gray-500",
-      date: "text-xs text-gray-400"
+      section: "mb-8",
+      title: "text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-4 font-medium flex items-center gap-1.5 after:content-[''] after:h-px after:flex-grow after:bg-gray-200",
+      name: "font-normal text-sm text-gray-700",
+      organization: "text-xs text-gray-500 italic",
+      date: "text-[11px] text-gray-400"
     },
     "professional-executive": {
       section: "mb-5",
@@ -72,38 +72,40 @@ export function CertificationsSection({
         ) : template.id === "professional-executive" ? (
           "Certifications"
         ) : template.id === "minimal-elegant" ? (
-          "Certifications"
+          <span>Certifications</span>
         ) : (
           "Certifications & Licenses"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-4 flex flex-col items-center" : "space-y-2"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-3" : "space-y-2"}>
         {certifications.map((cert, index) => (
           template.id === "minimal-elegant" ? (
-            <div key={index} className="text-center w-full max-w-md">
+            <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+              <div className="flex justify-between items-baseline">
+                <span 
+                  className={`${currentStyle.name} outline-none`}
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit(index, "name", e)}
+                >
+                  {cert.name}
+                </span>
+                <span 
+                  className={`${currentStyle.date} outline-none`}
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit(index, "completionDate", e)}
+                >
+                  {cert.completionDate}
+                </span>
+              </div>
               <span 
-                className={`${currentStyle.name} outline-none block mb-1`}
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit(index, "name", e)}
-              >
-                {cert.name}
-              </span>
-              <span 
-                className={`${currentStyle.organization} outline-none block mb-1`}
+                className={`${currentStyle.organization} outline-none block mt-0.5`}
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit(index, "organization", e)}
               >
                 {cert.organization}
-              </span>
-              <span 
-                className={`${currentStyle.date} outline-none`}
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit(index, "completionDate", e)}
-              >
-                {cert.completionDate}
               </span>
             </div>
           ) : (
