@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
-import { Menu, Save, User, Bell, Shield, Lock, CreditCard, Palette, EyeOff, FileText, Sparkles } from "lucide-react";
+import { Menu, Save, User, Bell, Shield, Lock, EyeOff, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -200,7 +200,7 @@ export default function Settings() {
                 onValueChange={setActiveTab}
                 className="w-full"
               >
-                <TabsList className="grid w-full grid-cols-4 lg:w-[600px] p-1 bg-gray-100/50 backdrop-blur-sm">
+                <TabsList className="grid w-full grid-cols-3 lg:w-[450px] p-1 bg-gray-100/50 backdrop-blur-sm">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <TabsTrigger 
                       value="profile" 
@@ -226,15 +226,6 @@ export default function Settings() {
                     >
                       <Shield className="h-4 w-4" />
                       <span className="hidden sm:inline">Security</span>
-                    </TabsTrigger>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <TabsTrigger 
-                      value="appearance" 
-                      className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                    >
-                      <Palette className="h-4 w-4" />
-                      <span className="hidden sm:inline">Appearance</span>
                     </TabsTrigger>
                   </motion.div>
                 </TabsList>
@@ -279,32 +270,6 @@ export default function Settings() {
                                 />
                                 <p className="text-sm text-gray-500">Your email address is managed through your account settings.</p>
                               </div>
-                            </div>
-                          </div>
-                        </Card>
-                        
-                        <Card className="p-6 bg-gradient-to-br from-primary/5 to-purple-500/5 border border-primary/10 hover:shadow-lg transition-all duration-300">
-                          <div className="space-y-4">
-                            <div className="flex items-center">
-                              <Sparkles className="w-5 h-5 text-primary mr-2 animate-pulse" />
-                              <h3 className="text-lg font-medium">Premium Features</h3>
-                            </div>
-                            <div className="rounded-lg border border-primary/20 p-4 bg-white/50 backdrop-blur-sm">
-                              <div className="flex justify-between items-center mb-3">
-                                <div className="flex items-center">
-                                  <CreditCard className="w-5 h-5 text-primary mr-2" />
-                                  <h4 className="font-medium">Current Plan</h4>
-                                </div>
-                                <Badge className="bg-gradient-to-r from-amber-500 to-amber-300 text-white border-0">
-                                  FREE
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-4">Upgrade to Premium for unlimited resumes, AI-powered suggestions, and priority support.</p>
-                              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90">
-                                  Upgrade to Premium
-                                </Button>
-                              </motion.div>
                             </div>
                           </div>
                         </Card>
@@ -441,102 +406,6 @@ export default function Settings() {
                             >
                               Delete Account
                             </Button>
-                          </div>
-                        </Card>
-                      </motion.div>
-                    </TabsContent>
-
-                    <TabsContent value="appearance">
-                      <motion.div 
-                        variants={tabContent}
-                        className="space-y-4"
-                      >
-                        <Card className="space-y-4 bg-white/80 backdrop-blur-sm rounded-lg p-6 border border-gray-200/50 hover:shadow-lg transition-all duration-300">
-                          <div className="flex items-center">
-                            <Palette className="w-5 h-5 text-primary mr-2" />
-                            <h3 className="text-lg font-medium">Appearance Settings</h3>
-                          </div>
-                          <div className="space-y-6">
-                            <div className="space-y-2">
-                              <Label>Theme</Label>
-                              <div className="grid grid-cols-3 gap-3 mt-2">
-                                <div className="relative">
-                                  <input type="radio" id="light" name="theme" value="light" className="peer sr-only" defaultChecked />
-                                  <label htmlFor="light" className="flex flex-col items-center justify-center p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 transition-all">
-                                    <div className="w-full h-12 bg-white border border-gray-200 rounded-md mb-2"></div>
-                                    <span className="text-sm font-medium">Light</span>
-                                  </label>
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary hidden peer-checked:block" />
-                                </div>
-                                <div className="relative">
-                                  <input type="radio" id="dark" name="theme" value="dark" className="peer sr-only" />
-                                  <label htmlFor="dark" className="flex flex-col items-center justify-center p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 transition-all">
-                                    <div className="w-full h-12 bg-gray-900 border border-gray-700 rounded-md mb-2"></div>
-                                    <span className="text-sm font-medium">Dark</span>
-                                  </label>
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary hidden peer-checked:block" />
-                                </div>
-                                <div className="relative">
-                                  <input type="radio" id="system" name="theme" value="system" className="peer sr-only" />
-                                  <label htmlFor="system" className="flex flex-col items-center justify-center p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 transition-all">
-                                    <div className="w-full h-12 bg-gradient-to-r from-white to-gray-900 border border-gray-200 rounded-md mb-2"></div>
-                                    <span className="text-sm font-medium">System</span>
-                                  </label>
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary hidden peer-checked:block" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Color Schemes</Label>
-                              <div className="grid grid-cols-4 gap-3 mt-2">
-                                <div className="relative">
-                                  <input type="radio" id="indigo" name="color" value="indigo" className="peer sr-only" defaultChecked />
-                                  <label htmlFor="indigo" className="flex items-center justify-center h-10 bg-[#6366F1] rounded-lg cursor-pointer peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-[#6366F1] transition-all" />
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-white hidden peer-checked:block" />
-                                </div>
-                                <div className="relative">
-                                  <input type="radio" id="teal" name="color" value="teal" className="peer sr-only" />
-                                  <label htmlFor="teal" className="flex items-center justify-center h-10 bg-teal-500 rounded-lg cursor-pointer peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-teal-500 transition-all" />
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-white hidden peer-checked:block" />
-                                </div>
-                                <div className="relative">
-                                  <input type="radio" id="blue" name="color" value="blue" className="peer sr-only" />
-                                  <label htmlFor="blue" className="flex items-center justify-center h-10 bg-blue-500 rounded-lg cursor-pointer peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-blue-500 transition-all" />
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-white hidden peer-checked:block" />
-                                </div>
-                                <div className="relative">
-                                  <input type="radio" id="purple" name="color" value="purple" className="peer sr-only" />
-                                  <label htmlFor="purple" className="flex items-center justify-center h-10 bg-purple-500 rounded-lg cursor-pointer peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-purple-500 transition-all" />
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-white hidden peer-checked:block" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Font Size</Label>
-                              <div className="grid grid-cols-3 gap-3 mt-2">
-                                <div className="relative">
-                                  <input type="radio" id="sm" name="fontSize" value="sm" className="peer sr-only" />
-                                  <label htmlFor="sm" className="flex items-center justify-center p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 transition-all">
-                                    <span className="text-sm">Small</span>
-                                  </label>
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary hidden peer-checked:block" />
-                                </div>
-                                <div className="relative">
-                                  <input type="radio" id="md" name="fontSize" value="md" className="peer sr-only" defaultChecked />
-                                  <label htmlFor="md" className="flex items-center justify-center p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 transition-all">
-                                    <span className="text-base">Medium</span>
-                                  </label>
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary hidden peer-checked:block" />
-                                </div>
-                                <div className="relative">
-                                  <input type="radio" id="lg" name="fontSize" value="lg" className="peer sr-only" />
-                                  <label htmlFor="lg" className="flex items-center justify-center p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 transition-all">
-                                    <span className="text-lg">Large</span>
-                                  </label>
-                                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary hidden peer-checked:block" />
-                                </div>
-                              </div>
-                            </div>
                           </div>
                         </Card>
                       </motion.div>

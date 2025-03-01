@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +5,7 @@ import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
-import { Menu, Sparkles, Layout, ChevronRight, Bell, Search, Star } from "lucide-react";
+import { Menu, Sparkles, Layout, ChevronRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResumeList } from "@/components/dashboard/ResumeList";
 import { useNavigate } from "react-router-dom";
@@ -157,33 +156,6 @@ export default function Dashboard() {
                   Stand out from the crowd with beautifully crafted resumes.
                 </p>
               </div>
-            </motion.div>
-
-            <motion.div 
-              className="flex gap-2 w-full md:w-auto"
-              variants={item}
-            >
-              <Button 
-                variant="outline" 
-                size="icon"
-                className="relative group"
-                onClick={() => toast({
-                  title: "Notifications",
-                  description: "You have no new notifications."
-                })}
-              >
-                <Bell className="h-5 w-5 group-hover:text-primary transition-colors" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="icon"
-                className="group"
-                onClick={() => navigate("/search")}
-              >
-                <Search className="h-5 w-5 group-hover:text-primary transition-colors" />
-              </Button>
             </motion.div>
           </motion.div>
 

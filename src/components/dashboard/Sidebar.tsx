@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,8 +8,6 @@ import {
   LogOut,
   X,
   FileText,
-  Bell,
-  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -32,7 +29,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
-  // Additional query to get resume count
   const { data: resumeCount } = useQuery({
     queryKey: ["resumeCount"],
     queryFn: async () => {
@@ -248,31 +244,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     )}
                   </motion.button>
                 ))}
-              </motion.div>
-
-              <motion.div 
-                className="pt-4 space-y-1"
-                variants={itemVariants}
-              >
-                <div className="text-xs text-gray-500 uppercase tracking-wider px-4 mb-2">
-                  Account
-                </div>
-                <motion.button
-                  className="w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 text-gray-600 hover:bg-primary/5"
-                  whileHover={{ x: 5 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Bell className="w-5 h-5 flex-shrink-0 mr-3" />
-                  <span className="truncate">Notifications</span>
-                </motion.button>
-                <motion.button
-                  className="w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 text-gray-600 hover:bg-primary/5"
-                  whileHover={{ x: 5 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <ShieldCheck className="w-5 h-5 flex-shrink-0 mr-3" />
-                  <span className="truncate">Privacy</span>
-                </motion.button>
               </motion.div>
             </div>
 
