@@ -37,11 +37,11 @@ export function CertificationsSection({
       date: "text-xs text-gray-500"
     },
     "modern-split": {
-      section: "mb-2",
-      title: "text-[11px] font-semibold text-indigo-600 uppercase tracking-widest mb-1",
-      name: "font-medium text-[10px] text-gray-800",
-      organization: "text-[10px] text-gray-600",
-      date: "text-[9px] text-gray-500"
+      section: "mb-6",
+      title: "text-[13px] font-semibold text-indigo-600 uppercase tracking-wider mb-3 flex items-center",
+      name: "font-medium text-[13px] text-gray-800",
+      organization: "text-[13px] text-gray-600",
+      date: "text-[12px] text-gray-500"
     },
     "minimal-elegant": {
       section: "mb-8",
@@ -66,7 +66,7 @@ export function CertificationsSection({
       <h3 className={currentStyle.title}>
         {template.id === "modern-split" ? (
           <span className="flex items-center">
-            <span className="inline-block w-3 h-[1px] bg-indigo-500 mr-1"></span>
+            <span className="inline-block w-4 h-0.5 bg-indigo-500 mr-2"></span>
             Certifications
           </span>
         ) : template.id === "professional-executive" ? (
@@ -77,7 +77,7 @@ export function CertificationsSection({
           "Certifications & Licenses"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-0.5" : "space-y-1.5"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-2" : "space-y-1.5"}>
         {certifications.map((cert, index) => (
           template.id === "minimal-elegant" ? (
             <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">

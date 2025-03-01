@@ -1,3 +1,4 @@
+
 import { ResumeTemplate } from "../templates";
 
 interface SkillsSectionProps {
@@ -41,10 +42,10 @@ export function SkillsSection({
       skillList: "text-sm text-gray-700"
     },
     "modern-split": {
-      section: "mb-2",
-      title: "text-[11px] font-semibold text-indigo-600 uppercase tracking-widest mb-1",
-      skillType: "text-[10px] font-medium text-gray-700 mb-0.5",
-      skillList: "text-[10px] text-gray-600"
+      section: "mb-6",
+      title: "text-[13px] font-semibold text-indigo-600 uppercase tracking-wider mb-3 flex items-center",
+      skillType: "text-[13px] font-medium text-gray-700 mb-2",
+      skillList: "text-[13px] text-gray-600"
     },
     "minimal-elegant": {
       section: "mb-10",
@@ -69,7 +70,7 @@ export function SkillsSection({
       <h3 className={currentStyle.title}>
         {template.id === "modern-split" ? (
           <span className="flex items-center">
-            <span className="inline-block w-3 h-[1px] bg-indigo-500 mr-1"></span>
+            <span className="inline-block w-4 h-0.5 bg-indigo-500 mr-2"></span>
             Skills
           </span>
         ) : template.id === "professional-executive" ? (
@@ -80,19 +81,19 @@ export function SkillsSection({
           "Skills"
         )}
       </h3>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {hardSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
               {template.id === "professional-executive" ? "Core Competencies" : 
-               template.id === "minimal-elegant" ? "Technical Skills" : "Technical Skills"}
+               template.id === "minimal-elegant" ? "Technical Skills" : "Technical"}
             </h4>
             
             {usesBulletPoints ? (
-              <ul className={template.id === "modern-split" ? "space-y-0" : "space-y-1"}>
+              <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
                 {hardSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
-                    <span className={`inline-block w-1 h-1 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[5px] mr-1 shrink-0`}></span>
+                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
                     <span
                       className={`outline-none ${currentStyle.skillList}`}
                       contentEditable={isEditing}
@@ -137,7 +138,7 @@ export function SkillsSection({
             </h4>
             
             {usesBulletPoints ? (
-              <ul className={template.id === "modern-split" ? "space-y-0.5" : "space-y-1"}>
+              <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
                 {softSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
                     <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>

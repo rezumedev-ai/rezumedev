@@ -1,3 +1,4 @@
+
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -101,10 +102,10 @@ export function ResumePreview({
   const getMargins = () => {
     if (templateId === "modern-split") {
       return {
-        top: '0.25in',
-        right: '0.25in',
-        bottom: '0.25in',
-        left: '0.25in',
+        top: '0.5in',
+        right: '0.5in',
+        bottom: '0.5in',
+        left: '0.5in',
       };
     }
     return {
@@ -173,7 +174,7 @@ export function ResumePreview({
                 {professionalSummary.title}
               </h2>
               <div className={templateId === "modern-split" ? 
-                "flex flex-wrap gap-2 text-xs text-gray-500 mt-1" : 
+                "flex flex-wrap gap-3 text-sm text-gray-500 mt-1" : 
                 "flex flex-wrap gap-4 text-sm text-gray-500 mt-2"}>
                 <span>{personalInfo.email}</span>
                 <span>{personalInfo.phone}</span>
@@ -184,7 +185,7 @@ export function ResumePreview({
             <div 
               className={cn(selectedTemplate.style.contentStyle, "overflow-hidden")}
               style={{
-                height: templateId === "modern-split" ? 'calc(100% - 80px)' : 'calc(100% - 120px)',
+                height: templateId === "modern-split" ? 'calc(100% - 110px)' : 'calc(100% - 120px)',
               }}
             >
               <div>
