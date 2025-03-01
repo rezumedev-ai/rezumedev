@@ -44,11 +44,11 @@ export function EducationSection({
       date: "text-[10px] text-gray-500"
     },
     "minimal-elegant": {
-      section: "mb-6",
-      title: "text-xs font-medium text-gray-400 uppercase tracking-widest mb-4 text-center",
+      section: "mb-10",
+      title: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-6 font-medium text-center",
       degree: "font-medium text-sm text-gray-800",
-      school: "text-sm text-gray-600",
-      date: "text-xs text-gray-500"
+      school: "text-[13px] text-gray-500",
+      date: "text-xs text-gray-400"
     },
     "professional-executive": {
       section: "mb-5",
@@ -73,48 +73,92 @@ export function EducationSection({
           "Education"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-4 flex flex-col items-center" : "space-y-3"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-6 flex flex-col items-center" : "space-y-3"}>
         {education.map((edu, index) => (
-          <div key={index} className={template.id === "minimal-elegant" ? "text-center" : ""}>
-            <div className="flex justify-between items-baseline mb-1">
-              <h4 
-                className={`${currentStyle.degree} outline-none`}
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit(index, "degreeName", e)}
-              >
-                {edu.degreeName}
-              </h4>
-              <span className={currentStyle.date}>
-                <span
+          <div key={index} className={template.id === "minimal-elegant" ? "text-center w-full max-w-md" : ""}>
+            {template.id === "minimal-elegant" ? (
+              <>
+                <h4 
+                  className={`${currentStyle.degree} outline-none mb-1`}
                   contentEditable={isEditing}
                   suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit(index, "startDate", e)}
-                  className="outline-none"
+                  onBlur={(e) => handleContentEdit(index, "degreeName", e)}
                 >
-                  {edu.startDate}
-                </span>
-                {" - "}
-                {edu.isCurrentlyEnrolled ? "Present" : (
+                  {edu.degreeName}
+                </h4>
+                <div 
+                  className={`${currentStyle.school} outline-none mb-1`}
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit(index, "schoolName", e)}
+                >
+                  {edu.schoolName}
+                </div>
+                <div className={currentStyle.date}>
                   <span
                     contentEditable={isEditing}
                     suppressContentEditableWarning
-                    onBlur={(e) => handleContentEdit(index, "endDate", e)}
+                    onBlur={(e) => handleContentEdit(index, "startDate", e)}
                     className="outline-none"
                   >
-                    {edu.endDate}
+                    {edu.startDate}
                   </span>
-                )}
-              </span>
-            </div>
-            <div 
-              className={`${currentStyle.school} outline-none`}
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit(index, "schoolName", e)}
-            >
-              {edu.schoolName}
-            </div>
+                  {" — "}
+                  {edu.isCurrentlyEnrolled ? "Present" : (
+                    <span
+                      contentEditable={isEditing}
+                      suppressContentEditableWarning
+                      onBlur={(e) => handleContentEdit(index, "endDate", e)}
+                      className="outline-none"
+                    >
+                      {edu.endDate}
+                    </span>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-between items-baseline mb-1">
+                  <h4 
+                    className={`${currentStyle.degree} outline-none`}
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit(index, "degreeName", e)}
+                  >
+                    {edu.degreeName}
+                  </h4>
+                  <span className={currentStyle.date}>
+                    <span
+                      contentEditable={isEditing}
+                      suppressContentEditableWarning
+                      onBlur={(e) => handleContentEdit(index, "startDate", e)}
+                      className="outline-none"
+                    >
+                      {edu.startDate}
+                    </span>
+                    {" - "}
+                    {edu.isCurrentlyEnrolled ? "Present" : (
+                      <span
+                        contentEditable={isEditing}
+                        suppressContentEditableWarning
+                        onBlur={(e) => handleContentEdit(index, "endDate", e)}
+                        className="outline-none"
+                      >
+                        {edu.endDate}
+                      </span>
+                    )}
+                  </span>
+                </div>
+                <div 
+                  className={`${currentStyle.school} outline-none`}
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit(index, "schoolName", e)}
+                >
+                  {edu.schoolName}
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>

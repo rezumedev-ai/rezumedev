@@ -51,10 +51,10 @@ export function SkillsSection({
       skillList: "text-xs text-gray-600"
     },
     "minimal-elegant": {
-      section: "mb-6 text-center",
-      title: "text-xs font-medium text-gray-400 uppercase tracking-widest mb-4 text-center",
-      skillType: "text-xs font-medium text-gray-600 mb-1",
-      skillList: "text-sm text-gray-600"
+      section: "mb-10",
+      title: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-6 font-medium text-center",
+      skillType: "text-xs font-medium text-gray-500 mb-3",
+      skillList: "text-[13px] text-gray-600"
     },
     "professional-executive": {
       section: "mb-5",
@@ -79,6 +79,8 @@ export function SkillsSection({
           </span>
         ) : template.id === "professional-executive" ? (
           "Technical Skills"
+        ) : template.id === "minimal-elegant" ? (
+          "Skills"
         ) : (
           "Skills"
         )}
@@ -87,7 +89,8 @@ export function SkillsSection({
         {hardSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Core Competencies" : "Technical Skills"}
+              {template.id === "professional-executive" ? "Core Competencies" : 
+               template.id === "minimal-elegant" ? "Technical Skills" : "Technical Skills"}
             </h4>
             
             {usesBulletPoints ? (
@@ -105,6 +108,19 @@ export function SkillsSection({
                   </li>
                 ))}
               </ul>
+            ) : template.id === "minimal-elegant" ? (
+              <div className="flex flex-wrap justify-center gap-2 mt-1">
+                {hardSkills.map((skill, index) => (
+                  <span 
+                    key={index}
+                    className={`text-[13px] px-3 py-1 bg-gray-50 rounded-full outline-none`}
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
             ) : (
               <div 
                 className={`${currentStyle.skillList} outline-none`}
@@ -121,7 +137,8 @@ export function SkillsSection({
         {softSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Professional Skills" : "Soft Skills"}
+              {template.id === "professional-executive" ? "Professional Skills" : 
+               template.id === "minimal-elegant" ? "Professional Skills" : "Soft Skills"}
             </h4>
             
             {usesBulletPoints ? (
@@ -139,6 +156,19 @@ export function SkillsSection({
                   </li>
                 ))}
               </ul>
+            ) : template.id === "minimal-elegant" ? (
+              <div className="flex flex-wrap justify-center gap-2 mt-1">
+                {softSkills.map((skill, index) => (
+                  <span 
+                    key={index}
+                    className={`text-[13px] px-3 py-1 bg-gray-50 rounded-full outline-none`}
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
             ) : (
               <div 
                 className={`${currentStyle.skillList} outline-none`}

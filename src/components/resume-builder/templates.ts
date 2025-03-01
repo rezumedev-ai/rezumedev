@@ -148,28 +148,28 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Clean and sophisticated design with perfect typography",
     imageUrl: "/lovable-uploads/a6ed21c1-e465-46fb-a6ff-9f66cc7b87b3.png",
     style: {
-      titleFont: "font-sans text-[28px] font-semibold tracking-tight text-gray-900",
-      headerStyle: "mb-6 border-b border-gray-300 pb-4",
-      sectionStyle: "text-base font-semibold text-gray-800 border-b border-gray-200 pb-1 mb-3",
-      contentStyle: "flex gap-6",
+      titleFont: "font-sans text-[26px] font-light tracking-wide text-gray-800",
+      headerStyle: "mb-10 pb-0 flex flex-col items-center relative",
+      sectionStyle: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-4 font-medium relative",
+      contentStyle: "space-y-8 max-w-2xl mx-auto",
       layout: "minimal",
       colors: {
-        primary: "#374151",
-        secondary: "#6B7280",
+        primary: "#9CA3AF",
+        secondary: "#D1D5DB",
         text: "#374151",
-        border: "#E5E7EB",
+        border: "#F3F4F6",
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "1.5rem",
-        itemGap: "1rem",
+        sectionGap: "2.5rem",
+        itemGap: "1.25rem",
         contentPadding: "2rem",
         headerHeight: "auto",
         margins: {
-          top: "60px",
-          right: "60px",
-          bottom: "60px",
-          left: "60px"
+          top: "80px",
+          right: "80px",
+          bottom: "80px",
+          left: "80px"
         }
       },
       dimensions: {
@@ -178,14 +178,14 @@ export const resumeTemplates: ResumeTemplate[] = [
       },
       typography: {
         titleSize: "26px",
-        subtitleSize: "17px",
-        bodySize: "14px",
-        lineHeight: "1.5"
+        subtitleSize: "14px",
+        bodySize: "13px",
+        lineHeight: "1.6"
       },
       icons: {
-        sections: true,
-        contact: true,
-        bullets: "dot"
+        sections: false,
+        contact: false,
+        bullets: "none"
       }
     }
   },
