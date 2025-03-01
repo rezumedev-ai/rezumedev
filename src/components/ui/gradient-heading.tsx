@@ -15,6 +15,7 @@ const headingVariants = cva(
         light: "bg-gradient-to-t from-neutral-200 to-neutral-300",
         secondary:
           "bg-gradient-to-t from-neutral-500 to-neutral-600 dark:from-stone-200 dark:to-neutral-200",
+        resume: "bg-gradient-to-t from-indigo-700 to-indigo-500 dark:from-indigo-300 dark:to-indigo-100",
       },
       size: {
         default: "text-2xl sm:text-3xl lg:text-4xl",
@@ -27,6 +28,10 @@ const headingVariants = cva(
         xll: "text-5xl sm:text-6xl lg:text-[5.4rem]  lg:leading-[0.5rem] ",
         xxl: "text-5xl sm:text-6xl lg:text-[6rem]",
         xxxl: "text-5xl sm:text-6xl lg:text-[8rem]",
+        // New dynamic sizes for resumes
+        dynamic: "text-[clamp(1rem,5vw,2rem)]",
+        dynamicLg: "text-[clamp(1.2rem,6vw,2.5rem)]",
+        dynamicSm: "text-[clamp(0.8rem,4vw,1.5rem)]",
       },
       weight: {
         default: "font-bold",
@@ -66,8 +71,8 @@ const GradientHeading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
 
 GradientHeading.displayName = "GradientHeading"
 
-export type Variant = "default" | "pink" | "light" | "secondary"
-export type Size = "default" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" | "xxxl"
+export type Variant = "default" | "pink" | "light" | "secondary" | "resume"
+export type Size = "default" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" | "xxxl" | "dynamic" | "dynamicLg" | "dynamicSm"
 export type Weight = "default" | "thin" | "base" | "semi" | "bold" | "black"
 
 export { GradientHeading, headingVariants }

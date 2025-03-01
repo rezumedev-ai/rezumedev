@@ -1,5 +1,6 @@
 
 import { ResumeTemplate } from "../templates";
+import { useMemo } from "react";
 
 interface SkillsSectionProps {
   hardSkills: string[];
@@ -34,30 +35,61 @@ export function SkillsSection({
     onUpdate(type, newSkills);
   };
 
+  // Calculate dynamic font sizes based on content length
+  const dynamicFontSizes = useMemo(() => {
+    const totalHardSkills = hardSkills.length;
+    const totalSoftSkills = softSkills.length;
+    const totalSkills = totalHardSkills + totalSoftSkills;
+    
+    // Base font size
+    let skillsFontSize = "text-sm";
+    let titleFontSize = "text-sm";
+    
+    // Adjust based on total skills count
+    if (totalSkills > 12) {
+      skillsFontSize = "text-xs";
+      titleFontSize = "text-xs";
+    } else if (totalSkills > 8) {
+      skillsFontSize = "text-[13px]";
+      titleFontSize = "text-[13px]";
+    } else if (totalSkills <= 4) {
+      skillsFontSize = "text-sm";
+      titleFontSize = "text-sm";
+    }
+    
+    // Check for long skill names
+    const hasLongSkillNames = [...hardSkills, ...softSkills].some(skill => skill.length > 25);
+    if (hasLongSkillNames) {
+      skillsFontSize = totalSkills > 8 ? "text-xs" : "text-[13px]";
+    }
+    
+    return { skillsFontSize, titleFontSize };
+  }, [hardSkills, softSkills]);
+
   const styles = {
     "executive-clean": {
       section: "mb-6",
       title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      skillType: "font-bold text-sm text-gray-700 mb-2",
-      skillList: "text-sm text-gray-700"
+      skillType: `font-bold ${dynamicFontSizes.titleFontSize} text-gray-700 mb-2`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "modern-split": {
       section: "mb-6",
       title: "text-[13px] font-semibold text-indigo-600 uppercase tracking-wider mb-3 flex items-center",
-      skillType: "text-[13px] font-medium text-gray-700 mb-2",
-      skillList: "text-[13px] text-gray-600"
+      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
     },
     "minimal-elegant": {
       section: "mb-10",
       title: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-6 font-medium text-center",
-      skillType: "text-xs font-medium text-gray-500 mb-3",
-      skillList: "text-[13px] text-gray-600"
+      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-500 mb-3`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
     },
     "professional-executive": {
       section: "mb-5",
       title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
-      skillType: "font-medium text-[13px] mb-1",
-      skillList: "text-[13px] text-gray-700"
+      skillType: `font-medium ${dynamicFontSizes.titleFontSize} mb-1`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     }
   };
 
@@ -109,7 +141,7 @@ export function SkillsSection({
                 {hardSkills.map((skill, index) => (
                   <span 
                     key={index}
-                    className={`text-[13px] px-3 py-1 bg-gray-50 rounded-full outline-none`}
+                    className={`${dynamicFontSizes.skillsFontSize} px-3 py-1 bg-gray-50 rounded-full outline-none`}
                     contentEditable={isEditing}
                     suppressContentEditableWarning
                   >
@@ -157,7 +189,7 @@ export function SkillsSection({
                 {softSkills.map((skill, index) => (
                   <span 
                     key={index}
-                    className={`text-[13px] px-3 py-1 bg-gray-50 rounded-full outline-none`}
+                    className={`${dynamicFontSizes.skillsFontSize} px-3 py-1 bg-gray-50 rounded-full outline-none`}
                     contentEditable={isEditing}
                     suppressContentEditableWarning
                   >

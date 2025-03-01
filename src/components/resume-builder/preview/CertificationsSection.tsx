@@ -1,6 +1,7 @@
 
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
+import { useMemo } from "react";
 
 interface CertificationsSectionProps {
   certifications: Certification[];
@@ -27,35 +28,70 @@ export function CertificationsSection({
     onUpdate(index, field, newValue);
   };
 
+  // Calculate dynamic font sizes based on content length
+  const dynamicFontSizes = useMemo(() => {
+    const totalItems = certifications.length;
+    
+    // Base font size adjustments
+    let nameFontSize = "text-sm";
+    let orgFontSize = "text-sm";
+    let dateFontSize = "text-xs";
+    
+    // Adjust font sizes based on number of items
+    if (totalItems > 5) {
+      nameFontSize = "text-xs";
+      orgFontSize = "text-xs";
+      dateFontSize = "text-[10px]";
+    } else if (totalItems <= 2) {
+      nameFontSize = "text-base";
+      orgFontSize = "text-sm";
+      dateFontSize = "text-xs";
+    }
+    
+    // Adjust for very long name/organization text
+    const hasLongNames = certifications.some(cert => cert.name.length > 30);
+    const hasLongOrgs = certifications.some(cert => cert.organization.length > 30);
+    
+    if (hasLongNames) {
+      nameFontSize = totalItems > 3 ? "text-xs" : "text-sm";
+    }
+    
+    if (hasLongOrgs) {
+      orgFontSize = totalItems > 3 ? "text-xs" : "text-sm";
+    }
+    
+    return { nameFontSize, orgFontSize, dateFontSize };
+  }, [certifications]);
+
   // Template-specific styles
   const styles = {
     "executive-clean": {
       section: "mb-6",
       title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      name: "font-bold text-sm text-gray-800",
-      organization: "text-sm text-gray-700",
-      date: "text-xs text-gray-500"
+      name: `font-bold ${dynamicFontSizes.nameFontSize} text-gray-800`,
+      organization: `${dynamicFontSizes.orgFontSize} text-gray-700`,
+      date: `${dynamicFontSizes.dateFontSize} text-gray-500`
     },
     "modern-split": {
       section: "mb-6",
       title: "text-[13px] font-semibold text-indigo-600 uppercase tracking-wider mb-3 flex items-center",
-      name: "font-medium text-[13px] text-gray-800",
-      organization: "text-[13px] text-gray-600",
-      date: "text-[12px] text-gray-500"
+      name: `font-medium ${dynamicFontSizes.nameFontSize} text-gray-800`,
+      organization: `${dynamicFontSizes.orgFontSize} text-gray-600`,
+      date: `${dynamicFontSizes.dateFontSize} text-gray-500`
     },
     "minimal-elegant": {
       section: "mb-8",
       title: "text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-4 font-medium flex items-center gap-1.5 after:content-[''] after:h-px after:flex-grow after:bg-gray-200",
-      name: "font-normal text-sm text-gray-700",
-      organization: "text-xs text-gray-500 italic",
-      date: "text-[11px] text-gray-400"
+      name: `font-normal ${dynamicFontSizes.nameFontSize} text-gray-700`,
+      organization: `${dynamicFontSizes.orgFontSize} text-gray-500 italic`,
+      date: `${dynamicFontSizes.dateFontSize} text-gray-400`
     },
     "professional-executive": {
       section: "mb-5",
       title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
-      name: "font-medium text-[13px]",
-      organization: "text-[13px] text-gray-600",
-      date: "text-[12px] text-gray-500"
+      name: `font-medium ${dynamicFontSizes.nameFontSize}`,
+      organization: `${dynamicFontSizes.orgFontSize} text-gray-600`,
+      date: `${dynamicFontSizes.dateFontSize} text-gray-500`
     }
   };
 
