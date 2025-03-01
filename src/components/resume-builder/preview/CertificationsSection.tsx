@@ -37,10 +37,10 @@ export function CertificationsSection({
       date: "text-xs text-gray-500"
     },
     "modern-split": {
-      section: "mb-4",
-      title: "text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-2",
-      name: "font-medium text-xs text-gray-800",
-      organization: "text-xs text-gray-600",
+      section: "mb-3",
+      title: "text-[13px] font-semibold text-indigo-600 uppercase tracking-widest mb-1.5",
+      name: "font-medium text-[11px] text-gray-800",
+      organization: "text-[11px] text-gray-600",
       date: "text-[10px] text-gray-500"
     },
     "minimal-elegant": {
@@ -66,7 +66,7 @@ export function CertificationsSection({
       <h3 className={currentStyle.title}>
         {template.id === "modern-split" ? (
           <span className="flex items-center">
-            <span className="inline-block w-5 h-[2px] bg-indigo-500 mr-2"></span>
+            <span className="inline-block w-4 h-[1px] bg-indigo-500 mr-1.5"></span>
             Certifications
           </span>
         ) : template.id === "professional-executive" ? (
@@ -77,7 +77,7 @@ export function CertificationsSection({
           "Certifications & Licenses"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-3" : "space-y-1.5"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-1" : "space-y-1.5"}>
         {certifications.map((cert, index) => (
           template.id === "minimal-elegant" ? (
             <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
@@ -125,7 +125,7 @@ export function CertificationsSection({
                 >
                   {cert.name}
                 </span>
-                {template.id !== "professional-executive" && <span className="text-gray-500 mx-1.5">•</span>}
+                {template.id !== "professional-executive" && <span className="text-gray-500 mx-1">•</span>}
                 <span 
                   className={`${currentStyle.organization} outline-none`}
                   contentEditable={isEditing}
