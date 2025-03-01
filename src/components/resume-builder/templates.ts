@@ -102,9 +102,9 @@ export const resumeTemplates: ResumeTemplate[] = [
     imageUrl: "/lovable-uploads/50a6d61f-0b70-4d4b-8fd8-e293d40c5ae1.png",
     style: {
       titleFont: "font-sans text-[32px] font-light tracking-wide text-gray-800",
-      headerStyle: "mb-8 pb-4",
-      sectionStyle: "text-[14px] font-semibold text-indigo-600 uppercase tracking-widest mb-4",
-      contentStyle: "grid grid-cols-3 gap-8",
+      headerStyle: "mb-6 pb-3",
+      sectionStyle: "text-[14px] font-semibold text-indigo-600 uppercase tracking-widest mb-3",
+      contentStyle: "grid grid-cols-3 gap-6",
       layout: "modern",
       colors: {
         primary: "#4F46E5",
@@ -114,15 +114,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "2rem",
-        itemGap: "1.5rem",
-        contentPadding: "2.5rem",
-        headerHeight: "180px",
+        sectionGap: "1.5rem",
+        itemGap: "1rem",
+        contentPadding: "2rem",
+        headerHeight: "150px",
         margins: {
-          top: "60px",
-          right: "60px",
-          bottom: "60px",
-          left: "60px"
+          top: "40px",
+          right: "40px",
+          bottom: "40px",
+          left: "40px"
         }
       },
       dimensions: {
@@ -133,7 +133,7 @@ export const resumeTemplates: ResumeTemplate[] = [
         titleSize: "32px",
         subtitleSize: "16px",
         bodySize: "14px",
-        lineHeight: "1.6"
+        lineHeight: "1.5"
       },
       icons: {
         sections: true,

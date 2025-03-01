@@ -112,6 +112,8 @@ export function CertificationsSection({
             <div key={index} className={
               template.id === "minimal-elegant" 
                 ? "flex justify-between items-baseline w-full max-w-lg" 
+                : template.id === "modern-split"
+                ? "flex justify-between items-baseline w-full"
                 : "flex justify-between items-baseline"
             }>
               <div>
