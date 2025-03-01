@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ResumeData } from "@/types/resume";
@@ -55,9 +54,13 @@ export function FinalResumePreview({ resumeData, resumeId }: FinalResumePreviewP
           ...exp,
           responsibilities: Array.isArray(exp.responsibilities) ? exp.responsibilities : [exp.responsibilities]
         })),
-        education: editedResumeData.education,
+        education: editedResumeData.education.map(edu => ({
+          ...edu
+        })),
         skills: editedResumeData.skills,
-        certifications: editedResumeData.certifications,
+        certifications: editedResumeData.certifications.map(cert => ({
+          ...cert
+        })),
         template_id: editedResumeData.template_id
       };
 
