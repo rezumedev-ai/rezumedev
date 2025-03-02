@@ -41,13 +41,12 @@ export function ResumePreviewToolbar({
         return;
       }
       
-      // Convert the resume to a canvas
+      // Convert the resume to a canvas with improved settings
       const canvas = await html2canvas(resumeElement as HTMLElement, {
-        scale: 2,
+        scale: 2, // Higher quality
         useCORS: true,
         logging: false,
         allowTaint: true,
-        // Capture the full content without cutting off
         height: resumeElement.scrollHeight,
         windowHeight: resumeElement.scrollHeight
       });
@@ -59,20 +58,37 @@ export function ResumePreviewToolbar({
         orientation: "portrait",
       });
       
-      // Add the canvas to the PDF with proper margins
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
+      // A4 dimensions
+      const pdfWidth = 210; // mm
+      const pdfHeight = 297; // mm
       
-      // Calculate height based on aspect ratio but leave some margin
+      // Calculate image dimensions while preserving aspect ratio
+      const imgWidth = pdfWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      // Calculate top margin to center content vertically if needed
-      const verticalMargin = Math.max(0, (pageHeight - imgHeight) / 2);
-      const topMargin = Math.min(10, verticalMargin); // Max 10mm top margin
+      // Add padding (in mm)
+      const topPadding = 15;
+      const bottomPadding = 15;
       
-      // Add the image to fit properly on the page
-      pdf.addImage(imgData, "PNG", 0, topMargin, imgWidth, imgHeight);
+      // Calculate the necessary scaling to fit content with padding
+      let scaleFactor = 1;
+      if (imgHeight > (pdfHeight - topPadding - bottomPadding)) {
+        scaleFactor = (pdfHeight - topPadding - bottomPadding) / imgHeight;
+      }
+      
+      // Apply scaling
+      const finalImgWidth = imgWidth * scaleFactor;
+      const finalImgHeight = imgHeight * scaleFactor;
+      
+      // Calculate position to center the image horizontally and add top padding
+      const xPosition = (pdfWidth - finalImgWidth) / 2;
+      const yPosition = topPadding;
+      
+      // Get the image data
+      const imgData = canvas.toDataURL("image/png");
+      
+      // Add the image to the PDF
+      pdf.addImage(imgData, "PNG", xPosition, yPosition, finalImgWidth, finalImgHeight);
       
       // Save the PDF
       pdf.save(`resume-${resumeId}.pdf`);
