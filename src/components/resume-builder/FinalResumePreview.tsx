@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +9,10 @@ import { EducationSection } from "./preview/EducationSection";
 import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
 import { resumeTemplates } from "./templates";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Download, RefreshCw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -19,6 +22,7 @@ interface FinalResumePreviewProps {
 
 export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
+  const navigate = useNavigate();
   
   // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
@@ -180,6 +184,27 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
       toast.error("Failed to save changes");
     }
   };
+
+  // Switch to a different template
+  const handleTemplateChange = async (templateId: string) => {
+    try {
+      setResumeState(prev => {
+        const newState = {
+          ...prev,
+          template_id: templateId
+        };
+        
+        // Update in Supabase
+        updateResumeData(newState);
+        return newState;
+      });
+      
+      toast.success("Template updated successfully");
+    } catch (error) {
+      console.error("Error changing template:", error);
+      toast.error("Failed to update template");
+    }
+  };
   
   // Prepare page style based on template
   const pageStyle = {
@@ -190,6 +215,14 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
+      <ResumePreviewToolbar 
+        currentTemplateId={template.id}
+        templates={resumeTemplates}
+        resumeId={resumeId}
+        onTemplateChange={handleTemplateChange}
+        onBackToDashboard={() => navigate("/dashboard")}
+      />
+      
       <div 
         className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
         style={pageStyle}
