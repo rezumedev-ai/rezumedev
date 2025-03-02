@@ -47,20 +47,32 @@ export function ResumePreviewToolbar({
         useCORS: true,
         logging: false,
         allowTaint: true,
+        // Capture the full content without cutting off
+        height: resumeElement.scrollHeight,
+        windowHeight: resumeElement.scrollHeight
       });
       
       // Create a new PDF document
       const pdf = new jsPDF({
         format: "a4",
         unit: "mm",
+        orientation: "portrait",
       });
       
-      // Add the canvas to the PDF
+      // Add the canvas to the PDF with proper margins
       const imgData = canvas.toDataURL("image/png");
       const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      
+      // Calculate height based on aspect ratio but leave some margin
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      // Calculate top margin to center content vertically if needed
+      const verticalMargin = Math.max(0, (pageHeight - imgHeight) / 2);
+      const topMargin = Math.min(10, verticalMargin); // Max 10mm top margin
+      
+      // Add the image to fit properly on the page
+      pdf.addImage(imgData, "PNG", 0, topMargin, imgWidth, imgHeight);
       
       // Save the PDF
       pdf.save(`resume-${resumeId}.pdf`);
