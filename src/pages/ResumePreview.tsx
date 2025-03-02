@@ -4,15 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Pencil, Save, X } from "lucide-react";
-import { toast } from "sonner";
 
 export default function ResumePreview() {
   const { id } = useParams();
-  const [isEditing, setIsEditing] = useState(false);
-  
+
   const { data: resume, isLoading } = useQuery({
     queryKey: ["resume", id],
     queryFn: async () => {
@@ -26,13 +21,6 @@ export default function ResumePreview() {
       return data;
     }
   });
-
-  const toggleEditMode = () => {
-    setIsEditing(!isEditing);
-    if (!isEditing) {
-      toast.info("Edit mode enabled. Click on any text to edit it directly.");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -52,46 +40,9 @@ export default function ResumePreview() {
 
   return (
     <div className="relative">
-      <div className="fixed right-6 top-6 z-10 flex gap-2">
-        <Button 
-          variant={isEditing ? "outline" : "default"} 
-          size="sm" 
-          onClick={toggleEditMode}
-          className="flex items-center gap-1"
-        >
-          {isEditing ? (
-            <>
-              <X className="w-4 h-4" />
-              <span>Cancel</span>
-            </>
-          ) : (
-            <>
-              <Pencil className="w-4 h-4" />
-              <span>Edit</span>
-            </>
-          )}
-        </Button>
-        
-        {isEditing && (
-          <Button 
-            variant="default" 
-            size="sm"
-            onClick={() => {
-              setIsEditing(false);
-              toast.success("Resume saved successfully");
-            }}
-            className="flex items-center gap-1"
-          >
-            <Save className="w-4 h-4" />
-            <span>Save</span>
-          </Button>
-        )}
-      </div>
-      
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
-        isEditing={isEditing}
       />
     </div>
   );
