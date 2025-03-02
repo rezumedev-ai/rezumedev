@@ -81,9 +81,9 @@ export function SkillsSection({
     },
     "minimal-elegant": {
       section: "mb-10",
-      title: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-6 font-medium text-center",
-      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-500 mb-3`,
-      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
+      title: "text-xs uppercase tracking-[0.2em] text-black mb-6 font-bold text-center",
+      skillType: `${dynamicFontSizes.titleFontSize} font-bold text-black mb-3`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "professional-executive": {
       section: "mb-5",
@@ -95,7 +95,7 @@ export function SkillsSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive";
+  const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive" || template.id === "minimal-elegant";
 
   return (
     <div className={currentStyle.section}>
@@ -136,19 +136,6 @@ export function SkillsSection({
                   </li>
                 ))}
               </ul>
-            ) : template.id === "minimal-elegant" ? (
-              <div className="flex flex-wrap justify-center gap-2 mt-1">
-                {hardSkills.map((skill, index) => (
-                  <span 
-                    key={index}
-                    className={`${dynamicFontSizes.skillsFontSize} px-3 py-1 bg-gray-50 rounded-full outline-none`}
-                    contentEditable={isEditing}
-                    suppressContentEditableWarning
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
             ) : (
               <div 
                 className={`${currentStyle.skillList} outline-none`}
@@ -184,19 +171,6 @@ export function SkillsSection({
                   </li>
                 ))}
               </ul>
-            ) : template.id === "minimal-elegant" ? (
-              <div className="flex flex-wrap justify-center gap-2 mt-1">
-                {softSkills.map((skill, index) => (
-                  <span 
-                    key={index}
-                    className={`${dynamicFontSizes.skillsFontSize} px-3 py-1 bg-gray-50 rounded-full outline-none`}
-                    contentEditable={isEditing}
-                    suppressContentEditableWarning
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
             ) : (
               <div 
                 className={`${currentStyle.skillList} outline-none`}

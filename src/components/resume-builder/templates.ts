@@ -1,4 +1,3 @@
-
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -101,16 +100,16 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Clean and sophisticated design with perfect typography",
     imageUrl: "/lovable-uploads/a6ed21c1-e465-46fb-a6ff-9f66cc7b87b3.png",
     style: {
-      titleFont: "font-sans text-[32px] font-semibold tracking-tight text-[#403E43]",
-      headerStyle: "mb-8 border-b border-[#0EAEDB] pb-4 relative",
-      sectionStyle: "text-xs uppercase tracking-[0.2em] text-[#0EAEDB] mb-4 font-medium relative flex items-center gap-2",
+      titleFont: "font-sans text-[32px] font-semibold tracking-tight text-black",
+      headerStyle: "mb-8 border-b border-black pb-4 relative",
+      sectionStyle: "text-xs uppercase tracking-[0.2em] text-black mb-4 font-bold relative flex items-center gap-2",
       contentStyle: "space-y-8 max-w-2xl mx-auto",
       layout: "minimal",
       colors: {
-        primary: "#0EAEDB",
-        secondary: "#403E43",
+        primary: "#000000",
+        secondary: "#333333",
         text: "#333333",
-        border: "#E2E8F0",
+        border: "#333333",
         background: "#FFFFFF"
       },
       spacing: {
@@ -138,7 +137,7 @@ export const resumeTemplates: ResumeTemplate[] = [
       icons: {
         sections: true,
         contact: true,
-        bullets: "dash"
+        bullets: "dot"
       }
     }
   },

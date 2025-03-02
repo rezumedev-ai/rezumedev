@@ -36,7 +36,7 @@ export function ProfessionalSummarySection({
     },
     "minimal-elegant": {
       section: "mb-8",
-      title: "text-xs uppercase tracking-[0.2em] text-[#0EAEDB] mb-4 font-medium flex items-center",
+      title: "text-xs uppercase tracking-[0.2em] text-black mb-4 font-bold flex items-center",
       content: "text-sm text-gray-700 leading-relaxed"
     },
     "professional-executive": {
@@ -51,7 +51,7 @@ export function ProfessionalSummarySection({
   const getSectionIcon = () => {
     switch (template.id) {
       case "minimal-elegant":
-        return <File className="w-4 h-4 mr-2 text-[#0EAEDB]" />;
+        return <File className="w-4 h-4 mr-2 text-black" />;
       case "modern-split":
         return <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>;
       default:
@@ -69,7 +69,7 @@ export function ProfessionalSummarySection({
           </span>
         ) : template.id === "minimal-elegant" ? (
           <span className="flex items-center">
-            <File className="w-4 h-4 mr-2 text-[#0EAEDB]" />
+            <File className="w-4 h-4 mr-2 text-black" />
             Professional Summary
           </span>
         ) : (

@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe } from "lucide-react";
 
@@ -45,10 +44,10 @@ export function PersonalSection({
       contactContainer: "flex flex-wrap gap-3 mt-2 text-xs text-gray-600"
     },
     "minimal-elegant": {
-      container: "mb-10 pb-6 border-b border-[#0EAEDB]",
-      name: "text-[32px] font-semibold tracking-tight text-[#403E43]",
-      title: "text-lg text-[#0EAEDB] mt-2 font-medium",
-      contactContainer: "flex flex-wrap justify-center gap-6 mt-4 text-sm text-[#403E43]"
+      container: "mb-10 pb-6 border-b border-black",
+      name: "text-[32px] font-semibold tracking-tight text-black",
+      title: "text-lg text-black mt-2 font-medium",
+      contactContainer: "flex flex-wrap justify-center gap-6 mt-4 text-sm text-black"
     },
     "professional-executive": {
       container: "mb-8",
@@ -138,7 +137,7 @@ export function PersonalSection({
       return (
         <div className={currentStyle.contactContainer}>
           <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-[#0EAEDB]" />
+            <Mail className="w-4 h-4 text-black" />
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -149,7 +148,7 @@ export function PersonalSection({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-[#0EAEDB]" />
+            <Phone className="w-4 h-4 text-black" />
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -161,7 +160,7 @@ export function PersonalSection({
           </div>
           {linkedin && (
             <div className="flex items-center gap-2">
-              <Linkedin className="w-4 h-4 text-[#0EAEDB]" />
+              <Linkedin className="w-4 h-4 text-black" />
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
@@ -174,7 +173,7 @@ export function PersonalSection({
           )}
           {website && (
             <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-[#0EAEDB]" />
+              <Globe className="w-4 h-4 text-black" />
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
