@@ -1,6 +1,6 @@
 
 import { ResumeTemplate } from "../templates";
-import { File } from "lucide-react";
+import { File, Briefcase, Award, GraduationCap, Lightbulb } from "lucide-react";
 
 interface ProfessionalSummarySectionProps {
   summary: string;
@@ -48,6 +48,17 @@ export function ProfessionalSummarySection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
+  const getSectionIcon = () => {
+    switch (template.id) {
+      case "minimal-elegant":
+        return <File className="w-4 h-4 mr-2 text-[#0EAEDB]" />;
+      case "modern-split":
+        return <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
@@ -58,7 +69,7 @@ export function ProfessionalSummarySection({
           </span>
         ) : template.id === "minimal-elegant" ? (
           <span className="flex items-center">
-            <File className="w-4 h-4 mr-1 text-[#0EAEDB]" />
+            <File className="w-4 h-4 mr-2 text-[#0EAEDB]" />
             Professional Summary
           </span>
         ) : (
