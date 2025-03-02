@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { resumeTemplates } from "./templates";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut, File, Briefcase, GraduationCap, Award, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ResumePreviewProps {

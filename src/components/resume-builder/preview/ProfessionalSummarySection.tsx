@@ -1,5 +1,6 @@
 
 import { ResumeTemplate } from "../templates";
+import { File } from "lucide-react";
 
 interface ProfessionalSummarySectionProps {
   summary: string;
@@ -34,9 +35,9 @@ export function ProfessionalSummarySection({
       content: "text-[11px] text-gray-700 leading-tight"
     },
     "minimal-elegant": {
-      section: "mb-10 text-center",
-      title: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-4 font-medium",
-      content: "text-sm text-gray-600 max-w-xl mx-auto"
+      section: "mb-8",
+      title: "text-xs uppercase tracking-[0.2em] text-[#0EAEDB] mb-4 font-medium flex items-center",
+      content: "text-sm text-gray-700 leading-relaxed"
     },
     "professional-executive": {
       section: "mb-5",
@@ -53,6 +54,11 @@ export function ProfessionalSummarySection({
         {template.id === "modern-split" ? (
           <span className="flex items-center">
             <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
+            Professional Summary
+          </span>
+        ) : template.id === "minimal-elegant" ? (
+          <span className="flex items-center">
+            <File className="w-4 h-4 mr-1 text-[#0EAEDB]" />
             Professional Summary
           </span>
         ) : (

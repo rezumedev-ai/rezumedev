@@ -1,4 +1,3 @@
-
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -101,28 +100,28 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Clean and sophisticated design with perfect typography",
     imageUrl: "/lovable-uploads/a6ed21c1-e465-46fb-a6ff-9f66cc7b87b3.png",
     style: {
-      titleFont: "font-sans text-[26px] font-light tracking-wide text-gray-800",
-      headerStyle: "mb-10 pb-0 flex flex-col items-center relative",
-      sectionStyle: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-4 font-medium relative",
+      titleFont: "font-sans text-[28px] font-semibold tracking-tight text-[#403E43]",
+      headerStyle: "mb-8 border-b border-[#0EAEDB] pb-4 relative",
+      sectionStyle: "text-xs uppercase tracking-[0.2em] text-[#0EAEDB] mb-3 font-medium relative flex items-center gap-2",
       contentStyle: "space-y-8 max-w-2xl mx-auto",
       layout: "minimal",
       colors: {
-        primary: "#9CA3AF",
-        secondary: "#D1D5DB",
-        text: "#374151",
-        border: "#F3F4F6",
+        primary: "#0EAEDB",
+        secondary: "#403E43",
+        text: "#333333",
+        border: "#E2E8F0",
         background: "#FFFFFF"
       },
       spacing: {
         sectionGap: "2.5rem",
-        itemGap: "1.25rem",
-        contentPadding: "2rem",
+        itemGap: "1.5rem",
+        contentPadding: "2.5rem",
         headerHeight: "auto",
         margins: {
-          top: "80px",
-          right: "80px",
-          bottom: "80px",
-          left: "80px"
+          top: "60px",
+          right: "60px",
+          bottom: "60px",
+          left: "60px"
         }
       },
       dimensions: {
@@ -130,15 +129,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "1056px"
       },
       typography: {
-        titleSize: "26px",
-        subtitleSize: "14px",
+        titleSize: "28px",
+        subtitleSize: "16px",
         bodySize: "13px",
         lineHeight: "1.6"
       },
       icons: {
-        sections: false,
-        contact: false,
-        bullets: "none"
+        sections: true,
+        contact: true,
+        bullets: "dash"
       }
     }
   },
