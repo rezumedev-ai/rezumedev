@@ -184,8 +184,8 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    // Fix the fontFamily reference by using a fallback value
-    fontFamily: template.style.typography.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
+    // Fix the titleFont reference by accessing it from the correct location in the template object
+    fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
   
   return (
