@@ -4,9 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Edit, Save } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ResumePreview() {
   const { id } = useParams();
+  const [isEditing, setIsEditing] = useState(false);
 
   const { data: resume, isLoading } = useQuery({
     queryKey: ["resume", id],
@@ -21,6 +26,13 @@ export default function ResumePreview() {
       return data;
     }
   });
+
+  const toggleEditMode = () => {
+    setIsEditing(!isEditing);
+    if (isEditing) {
+      toast.success("Resume saved successfully");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -40,9 +52,29 @@ export default function ResumePreview() {
 
   return (
     <div className="relative">
+      <div className="fixed top-4 right-4 z-50">
+        <Button 
+          onClick={toggleEditMode} 
+          variant="outline"
+          className="bg-white shadow-md hover:bg-gray-100"
+        >
+          {isEditing ? (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Save
+            </>
+          ) : (
+            <>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </>
+          )}
+        </Button>
+      </div>
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
+        isEditing={isEditing}
       />
     </div>
   );
