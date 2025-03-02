@@ -46,7 +46,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   };
   
   // Handle professional summary updates
-  const handleSummaryUpdate = (field: string, value: string) => {
+  const handleSummaryUpdate = (summary: string) => {
     if (!isEditing) return;
     
     setResumeState(prev => {
@@ -54,7 +54,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         ...prev,
         professional_summary: {
           ...prev.professional_summary,
-          [field]: value
+          summary
         }
       };
       
@@ -184,7 +184,8 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    fontFamily: template.style.fontFamily
+    // Fix the fontFamily reference by using a fallback value
+    fontFamily: template.style.typography.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
   
   return (
@@ -209,7 +210,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
           summary={resumeState.professional_summary.summary} 
           template={template}
           isEditing={isEditing}
-          onUpdate={(summary) => handleSummaryUpdate('summary', summary)}
+          onUpdate={handleSummaryUpdate}
         />
         
         <ExperienceSection 
