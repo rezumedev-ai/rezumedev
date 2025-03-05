@@ -175,7 +175,7 @@ export function ExperienceSection({
                       <div className="w-1.5 h-1.5 rounded-full bg-black mt-[6px] shrink-0"></div>
                     )}
                     <span
-                      className="outline-none"
+                      className="outline-none break-words whitespace-normal"
                       contentEditable={isEditing}
                       suppressContentEditableWarning
                       onBlur={(e) => handleResponsibilityEdit(index, respIndex, e)}

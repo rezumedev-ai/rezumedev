@@ -47,14 +47,15 @@ serve(async (req) => {
     const summaryData = await response.json();
     const enhancedSummary = summaryData.choices[0].message.content.trim();
 
-    // 2. Create responsibilities
+    // 2. Create responsibilities without percentages
     console.log('Processing work experience...');
     const enhancedExperiences = resumeData.work_experience.map(exp => ({
       ...exp,
       responsibilities: [
         "Led key initiatives driving business growth and operational efficiency",
         "Collaborated with cross-functional teams to deliver high-impact solutions",
-        "Managed projects and resources to achieve strategic objectives"
+        "Managed projects and resources to achieve strategic objectives",
+        "Implemented process improvements for enhanced operational effectiveness"
       ]
     }));
 

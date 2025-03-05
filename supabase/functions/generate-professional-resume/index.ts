@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -167,7 +166,7 @@ Format your response as a JSON array of strings only, with no additional comment
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
       // Create a job-specific prompt with a high temperature setting to ensure varied responses
-      // Now with strict character limits
+      // Now with strict character limits and NO percentage metrics
       const jobPrompt = `
 Generate 3-4 CONCISE, HIGHLY SPECIFIC job responsibilities for a ${experience.jobTitle} position at ${experience.companyName} that would impress a hiring manager.
 
@@ -181,7 +180,7 @@ Requirements:
 1. Each bullet point must start with a strong action verb
 2. Each bullet point MUST be 60-80 characters maximum (strict limit for A4 page fitting)
 3. Include 1-2 industry-specific keywords in each bullet
-4. Mention specific impact/result when possible
+4. DO NOT include specific percentage improvements or metrics
 5. Use precise wording and eliminate unnecessary words
 6. Ensure all bullets are different from each other
 
@@ -189,12 +188,13 @@ Format Tips:
 - Do NOT use complete sentences - use resume-style fragments
 - Avoid articles (a, an, the) when possible
 - Use present tense for current job, past tense for previous jobs
-- Focus on achievements over responsibilities when possible
+- Focus on achievements and skills rather than metrics
 
 DO NOT RETURN ANY EXPLANATION OR INTRODUCTION. RETURN ONLY A JSON ARRAY OF STRING BULLET POINTS.
 Example response format: ["Bullet 1", "Bullet 2", "Bullet 3", "Bullet 4"]
 
 IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 resume.
+DO NOT include percentage metrics or specific numerical achievements.
 `;
 
       // Add a random seed to ensure varied responses
@@ -211,7 +211,7 @@ IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 
           messages: [
             { 
               role: 'system', 
-              content: `You are an expert resume writer who specializes in creating ATS-optimized, job-specific responsibilities that fit perfectly on an A4 page. You must create CONCISE bullet points that are no more than 80 characters each. Random seed: ${randomSeed}`
+              content: `You are an expert resume writer who specializes in creating ATS-optimized, job-specific responsibilities that fit perfectly on an A4 page. You must create CONCISE bullet points that are no more than 80 characters each. Do not include specific percentage or numerical metrics. Random seed: ${randomSeed}`
             },
             { role: 'user', content: jobPrompt }
           ],
@@ -249,12 +249,20 @@ IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 
           }
         }
         
-        // Ensure each responsibility is within the character limit
+        // Ensure each responsibility is within the character limit and without percentages
         responsibilities = responsibilities.map(resp => {
-          if (resp.length > 80) {
-            return resp.substring(0, 77) + '...';
-          }
-          return resp;
+          // Remove any percentage metrics
+          let cleanedResp = resp.replace(/\s+by\s+\d+%/gi, '');
+          cleanedResp = cleanedResp.replace(/\d+%/gi, '');
+          cleanedResp = cleanedResp.replace(/reducing\s+by/gi, 'reducing');
+          cleanedResp = cleanedResp.replace(/increasing\s+by/gi, 'increasing');
+          cleanedResp = cleanedResp.replace(/improving\s+by/gi, 'improving');
+          cleanedResp = cleanedResp.replace(/enhancing\s+by/gi, 'enhancing');
+          cleanedResp = cleanedResp.replace(/\s+\s+/g, ' '); // Fix double spaces
+          cleanedResp = cleanedResp.trim();
+          
+          // No truncation - we'll keep full text and handle wrapping in UI
+          return cleanedResp;
         });
         
         // Limit to max 4 responsibilities per job to ensure everything fits on the page
@@ -271,7 +279,7 @@ IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 
           // Log the character count of each responsibility
           console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}:`);
           responsibilities.forEach((resp, idx) => {
-            console.log(`  ${idx+1}. Length: ${resp.length} chars - ${resp.substring(0, 30)}...`);
+            console.log(`  ${idx+1}. Length: ${resp.length} chars - ${resp}`);
           });
         } else {
           // If we couldn't parse any responsibilities, keep the original
@@ -299,8 +307,7 @@ IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 
         enhancedExperiences[i].responsibilities = enhancedExperiences[i].responsibilities.map(resp => {
           // Add job-specific prefix to make it unique
           const prefix = `${enhancedExperiences[i].jobTitle.split(' ')[0]}: `;
-          // Ensure we don't go over character limit with our modification
-          return prefix + resp.substring(0, 80 - prefix.length);
+          return prefix + resp;
         });
       }
       
