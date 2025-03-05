@@ -6,7 +6,7 @@ const NewResume = () => {
   return (
     <main className="min-h-screen bg-white">
       <Header />
-      <div className="pt-16">
+      <div className="max-w-7xl mx-auto pt-16">
         <TemplateSelector />
       </div>
     </main>

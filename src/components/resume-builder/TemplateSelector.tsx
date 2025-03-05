@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +14,7 @@ interface TemplateSelectorProps {
 }
 
 export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {}) {
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>(resumeTemplates[0].id);
   const [selectedStyle, setSelectedStyle] = useState<string>("professional");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
@@ -40,12 +39,18 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     }
 
     if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to continue",
+        variant: "destructive"
+      });
       navigate("/login");
       return;
     }
 
     try {
       setIsLoading(true);
+      console.log("Creating resume with template:", selectedTemplate);
 
       const { data: resume, error: resumeError } = await supabase
         .from('resumes')
@@ -62,8 +67,16 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
         .select()
         .single();
 
-      if (resumeError) throw resumeError;
+      if (resumeError) {
+        console.error('Error creating resume:', resumeError);
+        throw resumeError;
+      }
 
+      if (!resume || !resume.id) {
+        throw new Error("No resume ID returned from database");
+      }
+
+      console.log("Resume created successfully:", resume.id);
       navigate(`/resume-builder/${resume.id}`);
     } catch (error) {
       console.error('Error creating resume:', error);

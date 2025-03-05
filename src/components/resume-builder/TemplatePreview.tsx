@@ -10,6 +10,12 @@ interface TemplatePreviewProps {
 }
 
 export function TemplatePreview({ template, isSelected, onSelect }: TemplatePreviewProps) {
+  // Add error handling for image loading
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error("Failed to load template image:", template.imageUrl);
+    e.currentTarget.src = "/placeholder.svg"; // Fallback to placeholder
+  };
+
   return (
     <div
       onClick={onSelect}
@@ -24,6 +30,7 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
           src={template.imageUrl}
           alt={template.name}
           className="object-cover w-full h-full"
+          onError={handleImageError}
         />
         
         {isSelected && (
