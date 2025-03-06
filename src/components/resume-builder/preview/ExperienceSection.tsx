@@ -65,13 +65,13 @@ export function ExperienceSection({
       responsibility: "text-[11px] text-gray-700 flex items-start gap-1 leading-tight"
     },
     "minimal-elegant": {
-      section: "mb-6",
-      title: "text-xs font-medium text-gray-400 uppercase tracking-widest mb-4 text-center",
-      jobTitle: "font-medium text-base text-gray-800 text-center",
-      company: "text-gray-500 text-sm text-center",
-      date: "text-xs text-gray-500 text-center",
-      responsibilities: "mt-3 space-y-1.5 text-center",
-      responsibility: "text-sm text-gray-600"
+      section: "mb-5",
+      title: "text-[15px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200",
+      jobTitle: "font-semibold text-[15px] text-gray-800",
+      company: "text-gray-700 font-medium text-[14px] mt-1",
+      date: "text-[13px] text-gray-600 font-medium",
+      responsibilities: "mt-2 space-y-2",
+      responsibility: "text-[14px] text-gray-700 flex items-start gap-2 leading-tight"
     },
     "professional-executive": {
       section: "mb-5",
@@ -96,7 +96,7 @@ export function ExperienceSection({
               Professional Experience
             </span>
           ) : template.id === "minimal-elegant" ? (
-            "Experience"
+            "Professional Experience"
           ) : (
             "Professional Experience"
           )}
@@ -111,7 +111,7 @@ export function ExperienceSection({
               template.id === "modern-split" 
                 ? "relative pl-3 border-l border-gray-200"
                 : template.id === "minimal-elegant"
-                ? "border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+                ? "pb-4 mb-2"
                 : "pb-3"
             }
           >
@@ -121,7 +121,7 @@ export function ExperienceSection({
             
             <div className={
               template.id === "minimal-elegant" 
-                ? "flex flex-col items-center space-y-1"
+                ? "space-y-1"
                 : template.id === "modern-split"
                 ? "space-y-0.5"
                 : "space-y-1"
@@ -170,6 +170,9 @@ export function ExperienceSection({
                   <li key={respIndex} className={currentStyle.responsibility}>
                     {template.id === "modern-split" && (
                       <span className="inline-block w-1 h-1 rounded-full bg-gray-400 mt-1.5 mr-1 shrink-0"></span>
+                    )}
+                    {template.id === "minimal-elegant" && (
+                      <div className="w-2 h-2 rounded-full bg-gray-700 mt-[6px] shrink-0"></div>
                     )}
                     {template.id === "professional-executive" && (
                       <div className="w-1.5 h-1.5 rounded-full bg-black mt-[6px] shrink-0"></div>

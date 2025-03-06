@@ -94,26 +94,27 @@ export const resumeTemplates: ResumeTemplate[] = [
       }
     }
   },
+  
   {
     id: "minimal-elegant",
     name: "Minimal Elegant",
     description: "Clean and sophisticated design with perfect typography",
     imageUrl: "/lovable-uploads/a6ed21c1-e465-46fb-a6ff-9f66cc7b87b3.png",
     style: {
-      titleFont: "font-sans text-[32px] font-semibold tracking-tight text-black",
-      headerStyle: "mb-8 border-b border-black pb-4 relative",
-      sectionStyle: "text-xs uppercase tracking-[0.2em] text-black mb-4 font-bold relative flex items-center gap-2",
-      contentStyle: "space-y-8 max-w-2xl mx-auto",
+      titleFont: "font-sans text-[32px] font-bold tracking-tight text-gray-900",
+      headerStyle: "mb-6 pb-4 border-b border-gray-300",
+      sectionStyle: "text-[15px] uppercase tracking-wider text-gray-800 mb-3 font-bold border-b border-gray-200 pb-1",
+      contentStyle: "space-y-6",
       layout: "minimal",
       colors: {
-        primary: "#000000",
-        secondary: "#333333",
+        primary: "#2D2D2D",
+        secondary: "#4A4A4A",
         text: "#333333",
-        border: "#333333",
+        border: "#E5E7EB",
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "2.5rem",
+        sectionGap: "2rem",
         itemGap: "1.5rem",
         contentPadding: "2.5rem",
         headerHeight: "auto",
@@ -132,15 +133,16 @@ export const resumeTemplates: ResumeTemplate[] = [
         titleSize: "32px",
         subtitleSize: "16px",
         bodySize: "14px",
-        lineHeight: "1.6"
+        lineHeight: "1.5"
       },
       icons: {
-        sections: true,
+        sections: false,
         contact: true,
         bullets: "dot"
       }
     }
   },
+  
   {
     id: "professional-executive",
     name: "Professional Executive",
