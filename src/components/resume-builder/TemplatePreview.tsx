@@ -22,19 +22,19 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
       className={cn(
         "relative cursor-pointer transition-all duration-300 rounded-xl overflow-hidden",
         "hover:shadow-xl transform hover:-translate-y-1",
-        isSelected ? "ring-2 ring-black shadow-lg scale-[1.02]" : "hover:ring-1 hover:ring-black/50"
+        isSelected ? "ring-2 ring-primary shadow-lg scale-[1.02]" : "hover:ring-1 hover:ring-black/50"
       )}
     >
-      <div className="aspect-[3/4] relative">
+      <div className="aspect-[8.5/11] relative bg-white">
         <img
           src={template.imageUrl}
-          alt={template.name}
-          className="object-cover w-full h-full"
+          alt={`${template.name} Resume Template`}
+          className="object-contain w-full h-full"
           onError={handleImageError}
         />
         
         {isSelected && (
-          <div className="absolute top-2 right-2 bg-black text-white p-1 rounded-full">
+          <div className="absolute top-2 right-2 bg-primary text-white p-1 rounded-full">
             <Check className="w-4 h-4" />
           </div>
         )}

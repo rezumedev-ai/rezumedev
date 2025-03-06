@@ -51,7 +51,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "executive-clean",
     name: "Executive Clean",
     description: "Traditional single-column layout preferred by Fortune 500 companies",
-    imageUrl: "/lovable-uploads/489267dd-1129-466d-b30b-dd43b3cbe0e8.png",
+    imageUrl: "/lovable-uploads/d2779dee-4e73-4126-8900-b7d93b6692e3.png",
     style: {
       titleFont: "font-serif text-[40px] font-bold tracking-tight text-gray-900",
       headerStyle: "mb-10 pb-6 border-b-2 border-gray-800",
@@ -99,7 +99,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "minimal-elegant",
     name: "Minimal Elegant",
     description: "Clean and sophisticated design with perfect typography",
-    imageUrl: "/lovable-uploads/a6ed21c1-e465-46fb-a6ff-9f66cc7b87b3.png",
+    imageUrl: "/lovable-uploads/1e1aea6a-52be-4563-a0c6-408bfcee87fa.png",
     style: {
       titleFont: "font-sans text-[32px] font-bold tracking-tight text-gray-900",
       headerStyle: "mb-6 pb-4 border-b border-gray-300",
@@ -147,7 +147,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "professional-executive",
     name: "Professional Executive",
     description: "Modern two-column layout with clean typography",
-    imageUrl: "/lovable-uploads/eca7a378-81fd-4d29-9194-b292d08d283c.png",
+    imageUrl: "/lovable-uploads/8d5fd925-5d93-47a6-8b55-7eea43de3e43.png",
     style: {
       titleFont: "font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1",
       headerStyle: "mb-12",
