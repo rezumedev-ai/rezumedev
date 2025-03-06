@@ -35,9 +35,9 @@ export function ProfessionalSummarySection({
       content: "text-[11px] text-gray-700 leading-tight"
     },
     "minimal-elegant": {
-      section: "mb-8",
-      title: "text-xs uppercase tracking-[0.2em] text-black mb-4 font-bold flex items-center",
-      content: "text-sm text-gray-700 leading-relaxed"
+      section: "mb-5",
+      title: "text-[15px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200",
+      content: "text-[14px] text-gray-700 leading-relaxed"
     },
     "professional-executive": {
       section: "mb-5",
@@ -68,10 +68,7 @@ export function ProfessionalSummarySection({
             Professional Summary
           </span>
         ) : template.id === "minimal-elegant" ? (
-          <span className="flex items-center">
-            <File className="w-4 h-4 mr-2 text-black" />
-            Professional Summary
-          </span>
+          "Professional Summary"
         ) : (
           "Professional Summary"
         )}
