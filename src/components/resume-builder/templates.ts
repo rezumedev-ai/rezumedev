@@ -1,3 +1,4 @@
+
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -147,7 +148,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "professional-executive",
     name: "Professional Executive",
     description: "Modern two-column layout with clean typography",
-    imageUrl: "/lovable-uploads/8d5fd925-5d93-47a6-8b55-7eea43de3e43.png",
+    imageUrl: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
     style: {
       titleFont: "font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1",
       headerStyle: "mb-12",
