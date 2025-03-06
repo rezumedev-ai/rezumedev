@@ -7,7 +7,7 @@ import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { WorldMapSection } from "@/components/ui/world-map-section";
+import { AnimatedTestimonialsSection } from "@/components/AnimatedTestimonialsSection";
 
 const Index = () => {
   return (
@@ -17,7 +17,7 @@ const Index = () => {
         <AnimatedHero />
         <Process />
         <Features />
-        <WorldMapSection />
+        <AnimatedTestimonialsSection />
         <ResumeTemplates />
         <FAQ />
         <CTA />
