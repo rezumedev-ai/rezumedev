@@ -7,56 +7,56 @@ export const AnimatedTestimonialsSection = () => {
   const testimonials = [
     {
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
-      text: "The AI-powered resume builder transformed my job search. Got callbacks from top companies within weeks!",
+      text: "The AI-powered resume builder transformed my job search. Got callbacks from top companies within weeks of updating my resume!",
       name: "Sarah Miller",
       username: "@sarahm_tech",
       social: "https://twitter.com/"
     },
     {
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      text: "Switched careers from finance to tech. The resume builder helped highlight my transferable skills perfectly.",
+      text: "Switched careers from finance to tech. The resume builder helped highlight my transferable skills perfectly. I landed interviews at 3 tech startups!",
       name: "Michael Chen",
       username: "@mchen_dev",
       social: "https://twitter.com/"
     },
     {
       image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
-      text: "Got interviews at FAANG companies within weeks. The ATS optimization really works!",
+      text: "Got interviews at FAANG companies within weeks. The ATS optimization feature really helped my resume get past the screening algorithms.",
       name: "Emily Rodriguez",
       username: "@emilycareer",
       social: "https://twitter.com/"
     },
     {
       image: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face",
-      text: "From application to offer in 3 weeks. Best investment in my career journey.",
+      text: "From application to offer in 3 weeks. The resume templates were professional and tailored to my industry. Best investment in my career journey.",
       name: "James Wilson",
       username: "@jwilson_pro",
       social: "https://twitter.com/"
     },
     {
       image: "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?w=149&h=149&fit=crop&crop=face",
-      text: "The scalability and performance have been game-changing for our organization. Highly recommend to any growing business.",
+      text: "As a hiring manager, I can tell when candidates use Resume.dev. Their resumes stand out with clear organization and impactful content.",
       name: "Lisa Thompson",
       username: "@lisathompson",
       social: "https://twitter.com/"
     },
     {
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      text: "The modern templates and real-time preview helped me create a stand-out UX portfolio. Received multiple offers within a month!",
+      text: "The modern templates and real-time preview helped me create a stand-out UX portfolio. The smart suggestions for achievements were invaluable.",
       name: "Lisa Chang",
       username: "@lisac_design",
       social: "https://twitter.com/"
     },
     {
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      text: "Impressed by how the AI customizes content for different roles. Makes targeting specific positions so much easier.",
+      text: "Impressed by how the AI customizes content for different job applications. Makes targeting specific positions so much easier with minimal effort.",
       name: "David Kumar",
       username: "@davidk_work",
       social: "https://twitter.com/"
     },
     {
       image: "https://i.imgur.com/kaDy9hV.jpeg",
-      text: "The tailored suggestions for each job application are brilliant. It's like having a professional resume writer by your side.",
+      text: "The tailored suggestions for each job application are brilliant. Resume.dev helped me highlight the exact skills needed for each position I applied for.",
       name: "Emma Brown",
       username: "@emmabrown",
       social: "https://twitter.com/"
