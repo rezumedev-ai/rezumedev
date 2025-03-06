@@ -1,4 +1,3 @@
-
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -52,7 +51,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "executive-clean",
     name: "Executive Clean",
     description: "Traditional single-column layout preferred by Fortune 500 companies",
-    imageUrl: "/lovable-uploads/d2779dee-4e73-4126-8900-b7d93b6692e3.png",
+    imageUrl: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
     style: {
       titleFont: "font-serif text-[40px] font-bold tracking-tight text-gray-900",
       headerStyle: "mb-10 pb-6 border-b-2 border-gray-800",
