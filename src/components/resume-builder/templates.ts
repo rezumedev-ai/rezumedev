@@ -100,7 +100,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "minimal-elegant",
     name: "Minimal Elegant",
     description: "Clean and sophisticated design with perfect typography",
-    imageUrl: "/lovable-uploads/1e1aea6a-52be-4563-a0c6-408bfcee87fa.png",
+    imageUrl: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
     style: {
       titleFont: "font-sans text-[32px] font-bold tracking-tight text-gray-900",
       headerStyle: "mb-6 pb-4 border-b border-gray-300",
