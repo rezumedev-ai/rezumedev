@@ -37,24 +37,6 @@ const faqs = [
   }
 ];
 
-const helpfulLinks = [
-  {
-    title: "Quick Start Guide",
-    description: "Get started with our platform in just a few minutes",
-    icon: BookOpen,
-  },
-  {
-    title: "Common Resume Mistakes",
-    description: "Avoid these common pitfalls when creating your resume",
-    icon: Info,
-  },
-  {
-    title: "Contact Support",
-    description: "Need more help? Reach out to our support team",
-    icon: HelpCircle,
-  }
-];
-
 export default function Help() {
   const { user } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -105,18 +87,116 @@ export default function Help() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
-              {helpfulLinks.map((link, index) => (
-                <Card key={index} className="p-4 md:p-6 bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-300 border border-gray-200/50">
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <link.icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 text-base md:text-lg">{link.title}</h3>
-                    <p className="text-sm text-gray-600">{link.description}</p>
+            <div className="grid grid-cols-1 gap-6 animate-fade-up" style={{ animationDelay: '200ms' }}>
+              <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-6 h-6 text-primary" />
                   </div>
-                </Card>
-              ))}
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-lg mb-2">Quick Start Guide</h3>
+                    <ul className="space-y-2 text-gray-600">
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">1.</span>
+                        <span>Sign up for an account or log in if you already have one.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">2.</span>
+                        <span>From your dashboard, click "Create New Resume" to start the resume builder.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">3.</span>
+                        <span>Follow the step-by-step process to add your personal information, work experience, education, and skills.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">4.</span>
+                        <span>Choose a template that best showcases your qualifications.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">5.</span>
+                        <span>Preview your resume and make any necessary edits.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">6.</span>
+                        <span>Download your completed resume in your preferred format.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Info className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-lg mb-2">Common Resume Mistakes</h3>
+                    <ul className="space-y-2 text-gray-600">
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">•</span>
+                        <span><strong>Generic objectives</strong>: Use a specific professional summary tailored to each job application.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">•</span>
+                        <span><strong>Typos and grammatical errors</strong>: Always proofread carefully or ask someone else to review.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">•</span>
+                        <span><strong>Including irrelevant experience</strong>: Focus on skills and experience relevant to the job you're applying for.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">•</span>
+                        <span><strong>Poor formatting</strong>: Use consistent spacing, fonts, and design elements throughout.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">•</span>
+                        <span><strong>Too lengthy</strong>: Keep your resume to 1-2 pages maximum, focusing on the most important information.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-medium text-primary">•</span>
+                        <span><strong>Not using action verbs</strong>: Start bullet points with strong action verbs to showcase your accomplishments.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <HelpCircle className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-lg mb-2">Contact Support</h3>
+                    <p className="text-gray-600 mb-4">We're here to help! Reach out through any of these channels:</p>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Mail className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Email Support</p>
+                          <p className="text-sm text-gray-500">support@rezume.dev</p>
+                          <p className="text-sm text-gray-500">Response within 24 hours</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Phone className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Phone Support</p>
+                          <p className="text-sm text-gray-500">+1 (555) 123-4567</p>
+                          <p className="text-sm text-gray-500">Monday-Friday, 9am-5pm EST</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </div>
 
             <div className="space-y-4 md:space-y-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
@@ -138,34 +218,6 @@ export default function Help() {
                   </div>
                 )}
               </Accordion>
-            </div>
-
-            <div className="space-y-4 md:space-y-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
-              <h2 className="text-xl md:text-2xl font-semibold">Need More Help?</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <Card className="p-5 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-md transition-all duration-300">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Mail className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-base md:text-lg">Email Support</h3>
-                      <p className="text-sm md:text-base text-gray-600">support@rezume.dev</p>
-                    </div>
-                  </div>
-                </Card>
-                <Card className="p-5 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-md transition-all duration-300">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Phone className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-base md:text-lg">Phone Support</h3>
-                      <p className="text-sm md:text-base text-gray-600">Mon-Fri, 9am-5pm EST</p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
             </div>
           </div>
         </div>
