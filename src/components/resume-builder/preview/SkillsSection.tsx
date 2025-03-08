@@ -19,52 +19,6 @@ export function SkillsSection({
 }: SkillsSectionProps) {
   if (hardSkills.length === 0 && softSkills.length === 0) return null;
 
-  // Function to ensure skills are properly formatted
-  const formatSkill = (skill: string): string => {
-    // Expand common abbreviations
-    const abbreviations: Record<string, string> = {
-      'Mgmt': 'Management',
-      'Dev': 'Development',
-      'Prog': 'Programming',
-      'Admin': 'Administration',
-      'Comm': 'Communication',
-      'Solv': 'Solving',
-      'Tech': 'Technical',
-      'Eng': 'Engineering',
-      'Sys': 'Systems',
-      'App': 'Application',
-      'Ops': 'Operations',
-      'Arch': 'Architecture',
-      'Prof': 'Professional',
-      'Org': 'Organizational',
-      'Impl': 'Implementation',
-      'Intl': 'International'
-    };
-    
-    // Replace abbreviations with their full forms
-    let formattedSkill = skill;
-    
-    // Check for abbreviated words
-    Object.entries(abbreviations).forEach(([abbr, full]) => {
-      // Match the abbreviation as a whole word or at the end of a word
-      const regex = new RegExp(`\\b${abbr}\\b|\\b\\w+${abbr}\\b`, 'gi');
-      formattedSkill = formattedSkill.replace(regex, (match) => {
-        // If it's a whole word abbreviation, replace with full word
-        if (match.toLowerCase() === abbr.toLowerCase()) {
-          return full;
-        }
-        // If it's at the end of a word, replace just the abbreviation part
-        return match.slice(0, match.length - abbr.length) + full;
-      });
-    });
-    
-    return formattedSkill;
-  };
-  
-  // Format all skills to ensure no abbreviations
-  const formattedHardSkills = hardSkills.map(formatSkill);
-  const formattedSoftSkills = softSkills.map(formatSkill);
-
   const handleSkillsEdit = (type: "hard" | "soft", event: React.FocusEvent<HTMLDivElement>) => {
     if (!isEditing || !onUpdate) return;
     let newSkills: string[] = [];
@@ -160,7 +114,7 @@ export function SkillsSection({
         )}
       </h3>
       <div className="space-y-3">
-        {formattedHardSkills.length > 0 && (
+        {hardSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
               {template.id === "professional-executive" ? "Core Competencies" : 
@@ -169,7 +123,7 @@ export function SkillsSection({
             
             {usesBulletPoints ? (
               <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
-                {formattedHardSkills.map((skill, index) => (
+                {hardSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
                     <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
                     <span
@@ -189,13 +143,13 @@ export function SkillsSection({
                 suppressContentEditableWarning
                 onBlur={(e) => handleSkillsEdit("hard", e)}
               >
-                {formattedHardSkills.join(" • ")}
+                {hardSkills.join(" • ")}
               </div>
             )}
           </div>
         )}
         
-        {formattedSoftSkills.length > 0 && (
+        {softSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
               {template.id === "professional-executive" ? "Professional Skills" : 
@@ -204,7 +158,7 @@ export function SkillsSection({
             
             {usesBulletPoints ? (
               <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
-                {formattedSoftSkills.map((skill, index) => (
+                {softSkills.map((skill, index) => (
                   <li key={index} className="flex items-start">
                     <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
                     <span
@@ -224,7 +178,7 @@ export function SkillsSection({
                 suppressContentEditableWarning
                 onBlur={(e) => handleSkillsEdit("soft", e)}
               >
-                {formattedSoftSkills.join(" • ")}
+                {softSkills.join(" • ")}
               </div>
             )}
           </div>
