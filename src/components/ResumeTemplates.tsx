@@ -11,17 +11,17 @@ export const ResumeTemplates = () => {
   const resumeTemplates = [
     {
       name: "Executive Clean",
-      image: "/lovable-uploads/489267dd-1129-466d-b30b-dd43b3cbe0e8.png",
+      image: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
       description: "Commanding resume design for C-suite executives and senior leaders, highlighting strategic achievements and board experience"
     },
     {
       name: "Minimal Elegant",
-      image: "/lovable-uploads/a6ed21c1-e465-46fb-a6ff-9f66cc7b87b3.png",
+      image: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
       description: "Clean and sophisticated design with perfect typography, optimized for creative professionals"
     },
     {
       name: "Professional Executive",
-      image: "/lovable-uploads/eca7a378-81fd-4d29-9194-b292d08d283c.png",
+      image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
       description: "Bold modern layout with clean typography, perfect for senior managers and directors"
     }
   ];
@@ -167,3 +167,4 @@ export const ResumeTemplates = () => {
     </section>
   );
 };
+

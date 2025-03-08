@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight, FileText } from "lucide-react";
@@ -88,25 +87,6 @@ function AnimatedHero() {
     return () => clearTimeout(timeoutId);
   }, [titleNumber, titles]);
 
-  // Updated resume templates to match the updated images in the template selector
-  const resumeTemplates = [
-    {
-      name: "Executive Clean",
-      image: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
-      description: "Traditional layout preferred by Fortune 500 companies"
-    },
-    {
-      name: "Minimal Elegant",
-      image: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
-      description: "Clean design with sophisticated typography"
-    },
-    {
-      name: "Professional Executive",
-      image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
-      description: "Modern layout with clean typography"
-    }
-  ];
-
   return (
     <div className="w-full">
       <div className="container mx-auto">
@@ -161,33 +141,6 @@ function AnimatedHero() {
               </GradientHeading>
               <div className="mt-8">
                 <LogoCarousel columnCount={3} logos={logos} />
-              </div>
-            </div>
-            
-            {/* Added resume template preview cards */}
-            <div className="w-full mt-16">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {resumeTemplates.map((template, index) => (
-                  <motion.div
-                    key={index}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.2 }}
-                  >
-                    <div className="relative h-[300px] w-full overflow-hidden">
-                      <img
-                        src={template.image}
-                        alt={`${template.name} Resume Template`}
-                        className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold">{template.name}</h3>
-                      <p className="text-sm text-muted-foreground">{template.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
               </div>
             </div>
           </div>
