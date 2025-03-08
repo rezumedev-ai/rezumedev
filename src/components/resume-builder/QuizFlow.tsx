@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -469,17 +470,17 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         </motion.div>
 
         <motion.div 
-          className="mt-8 flex justify-between"
+          className="mt-8 flex items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="flex gap-4">
+          <div className="flex-1 flex items-center gap-4">
             <Button
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0 && currentQuestionIndex === 0}
-              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300"
+              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
               Back
@@ -487,14 +488,14 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             <Button
               variant="outline"
               onClick={handleSaveAndExit}
-              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300"
+              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11"
             >
               Save & Exit
             </Button>
           </div>
           <Button 
             onClick={currentQuestionIndex === questions.length - 1 ? handleStepComplete : handleNext}
-            className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md"
+            className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md h-11"
           >
             {currentStep === quizSteps.length - 1 ? "Complete" : "Next"}
             <ArrowRight className="ml-2 w-4 h-4" />
