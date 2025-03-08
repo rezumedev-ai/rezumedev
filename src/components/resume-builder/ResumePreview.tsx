@@ -60,11 +60,11 @@ export function ResumePreview({
   const resumeRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  const DPI = 96; // Standard screen DPI
+  const DPI = 96;
   const WIDTH_INCHES = 8.5;
   const HEIGHT_INCHES = 11;
-  const WIDTH_PX = Math.floor(WIDTH_INCHES * DPI); // 816px
-  const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI); // 1056px
+  const WIDTH_PX = Math.floor(WIDTH_INCHES * DPI);
+  const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI);
 
   const toggleZoom = () => {
     setIsZoomed(!isZoomed);
@@ -75,7 +75,7 @@ export function ResumePreview({
       if (!containerRef.current || !resumeRef.current) return;
 
       const container = containerRef.current;
-      const containerWidth = container.clientWidth - 48; // Account for padding
+      const containerWidth = container.clientWidth - 48;
       const containerHeight = container.clientHeight - 48;
 
       const scaleX = containerWidth / WIDTH_PX;
@@ -147,13 +147,10 @@ export function ResumePreview({
           style={{
             width: `${WIDTH_PX}px`,
             height: `${HEIGHT_PX}px`,
-            transform: `scale(${scale})`,
-            transformOrigin: isMobile ? 'top center' : 'center',
-            margin: isMobile ? '0 auto 100px' : '0',
-            padding: '0',
             position: 'absolute',
             top: isMobile ? '80px' : '50%',
             left: '50%',
+            transformOrigin: isMobile ? 'top center' : 'center',
             transform: isMobile 
               ? `translateX(-50%) scale(${scale})` 
               : `translate(-50%, -50%) scale(${scale})`,

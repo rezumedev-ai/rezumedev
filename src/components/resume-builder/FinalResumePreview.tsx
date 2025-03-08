@@ -14,17 +14,22 @@ import { ArrowLeft, Download, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getResponsiveScale } from "@/lib/utils";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
   resumeId: string;
   isEditing?: boolean;
+  isZoomed?: boolean;
 }
 
-export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
+export function FinalResumePreview({ 
+  resumeData, 
+  resumeId, 
+  isEditing = false,
+  isZoomed = false 
+}: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
-  const [scale, setScale] = useState(1);
-  const [isZoomed, setIsZoomed] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
@@ -35,18 +40,9 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
     setResumeState(resumeData);
   }, [resumeData]);
 
-  useEffect(() => {
-    if (isMobile) {
-      setScale(isZoomed ? 0.9 : 0.65);
-    } else {
-      setScale(1);
-    }
-  }, [isMobile, isZoomed]);
+  // Get scale based on device and zoom state
+  const scale = getResponsiveScale(isMobile, isZoomed);
   
-  const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
-  };
-
   // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
     if (!isEditing) return;
@@ -224,7 +220,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   const pageStyle = {
     padding: template.style.spacing.margins.top,
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans',
-    transform: isMobile ? `scale(${scale})` : 'none',
+    transform: `scale(${scale})`,
     transformOrigin: 'top center',
   };
   
@@ -237,18 +233,6 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onTemplateChange={handleTemplateChange}
         onBackToDashboard={() => navigate("/dashboard")}
       />
-      
-      {isMobile && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleZoom}
-          className="my-2 shadow-sm"
-        >
-          {isZoomed ? <ZoomOut className="w-3 h-3 mr-1" /> : <ZoomIn className="w-3 h-3 mr-1" />}
-          {isZoomed ? "Zoom Out" : "Zoom In"}
-        </Button>
-      )}
       
       <div 
         className={`w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'transform-gpu' : ''}`}
