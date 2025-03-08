@@ -20,10 +20,6 @@ const faqs = [
     answer: "Click 'Create New' on your dashboard and follow our step-by-step builder to add your information, experience, education, and skills."
   },
   {
-    question: "Can I download my resume in different formats?",
-    answer: "Yes, you can download in PDF, DOCX, and TXT formats. After completing your resume, click 'Download' and select your preferred format."
-  },
-  {
     question: "How can I customize my resume template?",
     answer: "Use the 'Customize' tab in the resume builder to select different themes, fonts, and colors for your resume."
   },
