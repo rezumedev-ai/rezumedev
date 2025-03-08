@@ -1,7 +1,5 @@
 
 import { Brain, MonitorPlay, ListOrdered, Lightbulb, LayoutDashboard, FileText, Network } from 'lucide-react';
-import { Button } from './ui/button';
-import { Link } from 'react-router-dom';
 
 export const Features = () => {
   const features = [
@@ -91,15 +89,6 @@ export const Features = () => {
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-16 text-center">
-          <Button size="lg" asChild className="animate-fade-up">
-            <Link to="/signup" className="group">
-              Start Building Your Resume
-              <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
-            </Link>
-          </Button>
         </div>
       </div>
     </section>
