@@ -90,34 +90,34 @@ export default function Help() {
 
       <div className={`${isMobile ? 'mt-16' : 'ml-64'} transition-all duration-300 ease-in-out`}>
         <div className="p-4 md:p-8">
-          <div className="max-w-4xl mx-auto space-y-8">
+          <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
             <div className="animate-fade-up">
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              <h1 className="text-2xl md:text-4xl font-bold mb-2">
                 Help & <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Support</span>
               </h1>
-              <p className="text-gray-600">Find answers to common questions and get support</p>
+              <p className="text-gray-600 text-sm md:text-base">Find answers to common questions and get support</p>
             </div>
 
             <div className="relative animate-fade-up" style={{ animationDelay: '100ms' }}>
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 md:h-5 md:w-5 text-gray-400" />
               <Input
-                className="pl-10"
+                className="pl-10 text-sm md:text-base"
                 placeholder="Search for help..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
               {resources.map((resource, index) => (
-                <Card key={index} className="p-6 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 border border-gray-200/50">
+                <Card key={index} className="p-4 md:p-6 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 border border-gray-200/50">
                   <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center">
-                      <resource.icon className="w-6 h-6 text-primary" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/5 flex items-center justify-center">
+                      <resource.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-gray-900">{resource.title}</h3>
-                    <p className="text-sm text-gray-600">{resource.description}</p>
-                    <Button variant="ghost" asChild className="mt-2">
+                    <h3 className="font-semibold text-gray-900 text-sm md:text-base">{resource.title}</h3>
+                    <p className="text-xs md:text-sm text-gray-600">{resource.description}</p>
+                    <Button variant="ghost" asChild className="mt-1 md:mt-2 text-xs md:text-sm px-2 py-1 h-auto">
                       <a href={resource.link}>Learn More</a>
                     </Button>
                   </div>
@@ -125,15 +125,15 @@ export default function Help() {
               ))}
             </div>
 
-            <div className="space-y-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
-              <h2 className="text-2xl font-semibold">Frequently Asked Questions</h2>
+            <div className="space-y-4 md:space-y-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
+              <h2 className="text-xl md:text-2xl font-semibold">Frequently Asked Questions</h2>
               <Accordion type="single" collapsible className="bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200/50">
                 {filteredFaqs.map((faq, index) => (
                   <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="px-4 hover:no-underline">
+                    <AccordionTrigger className="px-3 md:px-4 py-3 text-sm md:text-base hover:no-underline">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 text-gray-600">
+                    <AccordionContent className="px-3 md:px-4 text-xs md:text-sm text-gray-600">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
@@ -141,28 +141,28 @@ export default function Help() {
               </Accordion>
             </div>
 
-            <div className="space-y-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
-              <h2 className="text-2xl font-semibold">Need More Help?</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-primary" />
+            <div className="space-y-4 md:space-y-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
+              <h2 className="text-xl md:text-2xl font-semibold">Need More Help?</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <Card className="p-4 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50">
+                  <div className="flex items-center space-x-3 md:space-x-4">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/5 flex items-center justify-center">
+                      <Mail className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Email Support</h3>
-                      <p className="text-sm text-gray-600">support@rezume.dev</p>
+                      <h3 className="font-semibold text-sm md:text-base">Email Support</h3>
+                      <p className="text-xs md:text-sm text-gray-600">support@rezume.dev</p>
                     </div>
                   </div>
                 </Card>
-                <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center">
-                      <Phone className="w-5 h-5 text-primary" />
+                <Card className="p-4 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50">
+                  <div className="flex items-center space-x-3 md:space-x-4">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/5 flex items-center justify-center">
+                      <Phone className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Phone Support</h3>
-                      <p className="text-sm text-gray-600">Mon-Fri, 9am-5pm EST</p>
+                      <h3 className="font-semibold text-sm md:text-base">Phone Support</h3>
+                      <p className="text-xs md:text-sm text-gray-600">Mon-Fri, 9am-5pm EST</p>
                     </div>
                   </div>
                 </Card>
