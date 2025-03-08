@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -51,7 +51,7 @@ export default function ResumePreview() {
   }
 
   return (
-    <div className="relative min-h-screen w-full">
+    <div className="relative">
       <div className="fixed top-4 right-4 z-50">
         <Button 
           onClick={toggleEditMode} 
@@ -71,13 +71,11 @@ export default function ResumePreview() {
           )}
         </Button>
       </div>
-      <div className="min-h-screen w-full">
-        <FinalResumePreview
-          resumeData={resume as unknown as ResumeData}
-          resumeId={id as string}
-          isEditing={isEditing}
-        />
-      </div>
+      <FinalResumePreview
+        resumeData={resume as unknown as ResumeData}
+        resumeId={id as string}
+        isEditing={isEditing}
+      />
     </div>
   );
 }
