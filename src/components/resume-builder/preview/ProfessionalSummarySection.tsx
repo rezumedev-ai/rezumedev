@@ -23,26 +23,36 @@ export function ProfessionalSummarySection({
     onUpdate(newSummary);
   };
 
+  // Calculate dynamic font size based on summary length
+  const getSummaryFontSize = () => {
+    const length = summary.length;
+    
+    if (length > 400) return "text-xs leading-tight";
+    if (length > 300) return "text-[11px] leading-tight";
+    if (length > 200) return "text-[12px] leading-snug";
+    return "text-sm"; // Default size
+  };
+
   const styles = {
     "executive-clean": {
       section: "mb-6",
       title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      content: "text-sm text-gray-700"
+      content: `${getSummaryFontSize()} text-gray-700`
     },
     "modern-split": {
       section: "mb-4",
       title: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center",
-      content: "text-[11px] text-gray-700 leading-tight"
+      content: `${getSummaryFontSize()} text-gray-700 leading-tight`
     },
     "minimal-elegant": {
       section: "mb-5",
       title: "text-[15px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200",
-      content: "text-[14px] text-gray-700 leading-relaxed"
+      content: `${getSummaryFontSize()} text-gray-700 leading-relaxed`
     },
     "professional-executive": {
       section: "mb-5",
       title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
-      content: "text-[13px] text-gray-700"
+      content: `${getSummaryFontSize()} text-gray-700`
     }
   };
 

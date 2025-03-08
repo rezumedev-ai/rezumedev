@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -9,7 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -23,29 +21,23 @@ serve(async (req) => {
 
     console.log(`Starting resume enhancement for ID: ${resumeId}`);
     
-    // Get OpenAI API key from environment variables
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
     
-    // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // First, update the status to enhancing
     await supabase
       .from('resumes')
       .update({ completion_status: 'enhancing' })
       .eq('id', resumeId);
     
-    // Extract job title from resumeData for the overall summary
     const jobTitle = resumeData.professional_summary?.title || '';
-    // Check if job description is provided
     const targetJobDescription = resumeData.professional_summary?.targetJobDescription || '';
     
-    // Generate professional summary
     const summaryPrompt = `
 Create a powerful professional summary for a ${jobTitle} based on the following information:
 ${JSON.stringify(resumeData.personal_info, null, 2)}
@@ -53,7 +45,7 @@ ${JSON.stringify(resumeData.professional_summary, null, 2)}
 ${targetJobDescription ? `\nTarget Job Description: ${targetJobDescription}` : ''}
 
 Requirements:
-- Maximum 35 words
+- Write 3-4 sentences (around 60-80 words) to create a comprehensive professional summary
 - Highlight value and expertise without metrics or years
 - Use powerful, active language
 ${targetJobDescription ? '- Align with the skills and requirements from the provided job description' : '- Include relevant industry keywords for ATS systems'}
@@ -94,10 +86,8 @@ Format your response as plain text only (no JSON).
     const enhancedSummary = summaryData.choices[0].message.content.trim();
     console.log('Generated professional summary');
     
-    // Make a copy of the work experience array to ensure we're not modifying the original
     const enhancedExperiences = [];
     
-    // First, get industry-specific keywords for the target position
     let keywordsPrompt = '';
     
     if (targetJobDescription) {
@@ -158,15 +148,12 @@ Format your response as a JSON array of strings only, with no additional comment
         const keywordsContent = keywordsData.choices[0].message.content.trim();
         
         try {
-          // First try parsing directly
           industryKeywords = JSON.parse(keywordsContent);
         } catch (e) {
-          // If direct parsing fails, try to extract JSON portion
           const jsonMatch = keywordsContent.match(/\[[\s\S]*\]/);
           if (jsonMatch) {
             industryKeywords = JSON.parse(jsonMatch[0]);
           } else {
-            // If that fails, fall back to line-by-line parsing
             industryKeywords = keywordsContent
               .split('\n')
               .filter(line => line.trim())
@@ -177,17 +164,13 @@ Format your response as a JSON array of strings only, with no additional comment
         console.log(`Generated ${industryKeywords.length} industry keywords`);
       } catch (e) {
         console.error('Error parsing industry keywords:', e);
-        // Continue without keywords if parsing fails
       }
     }
     
-    // Process each work experience entry separately to ensure unique responsibilities
     for (let i = 0; i < resumeData.work_experience.length; i++) {
       const experience = resumeData.work_experience[i];
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
-      // Create a job-specific prompt with a high temperature setting to ensure varied responses
-      // Now with strict character limits and NO percentage metrics
       let jobPrompt = `
 Generate 3-4 CONCISE, HIGHLY SPECIFIC job responsibilities for a ${experience.jobTitle} position at ${experience.companyName} that would impress a hiring manager.
 
@@ -198,7 +181,6 @@ ${experience.location ? `- Location: ${experience.location}` : ''}
 - Duration: ${experience.startDate} to ${experience.isCurrentJob ? 'Present' : experience.endDate}
 `;
 
-      // Add job description if available
       if (targetJobDescription) {
         jobPrompt += `
 Target Job Description:
@@ -239,7 +221,6 @@ IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 
 DO NOT include percentage metrics or specific numerical achievements.
 `;
 
-      // Add a random seed to ensure varied responses
       const randomSeed = Math.floor(Math.random() * 10000);
       
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -263,7 +244,6 @@ DO NOT include percentage metrics or specific numerical achievements.
 
       if (!responsibilitiesResponse.ok) {
         console.error(`Error generating responsibilities for job ${i + 1}`);
-        // Add the experience with original responsibilities to avoid empty entries
         enhancedExperiences.push({...experience});
         continue;
       }
@@ -272,18 +252,14 @@ DO NOT include percentage metrics or specific numerical achievements.
         const respData = await responsibilitiesResponse.json();
         const responseContent = respData.choices[0].message.content.trim();
         
-        // Try to parse the response as JSON
         let responsibilities = [];
         try {
-          // First try parsing directly
           responsibilities = JSON.parse(responseContent);
         } catch (e) {
-          // If direct parsing fails, try to extract JSON portion
           const jsonMatch = responseContent.match(/\[[\s\S]*\]/);
           if (jsonMatch) {
             responsibilities = JSON.parse(jsonMatch[0]);
           } else {
-            // If that fails, fall back to line-by-line parsing
             responsibilities = responseContent
               .split('\n')
               .filter(line => line.trim())
@@ -291,26 +267,22 @@ DO NOT include percentage metrics or specific numerical achievements.
           }
         }
         
-        // Ensure each responsibility is within the character limit and without percentages
         responsibilities = responsibilities.map(resp => {
-          // Remove any percentage metrics
           let cleanedResp = resp.replace(/\s+by\s+\d+%/gi, '');
           cleanedResp = cleanedResp.replace(/\d+%/gi, '');
           cleanedResp = cleanedResp.replace(/reducing\s+by/gi, 'reducing');
           cleanedResp = cleanedResp.replace(/increasing\s+by/gi, 'increasing');
           cleanedResp = cleanedResp.replace(/improving\s+by/gi, 'improving');
           cleanedResp = cleanedResp.replace(/enhancing\s+by/gi, 'enhancing');
-          cleanedResp = cleanedResp.replace(/\s+\s+/g, ' '); // Fix double spaces
+          cleanedResp = cleanedResp.replace(/\s+\s+/g, ' ');
           cleanedResp = cleanedResp.trim();
           
-          // No truncation - we'll keep full text and handle wrapping in UI
+          if (responsibilities.length > 4) {
+            responsibilities = responsibilities.slice(0, 4);
+          }
+          
           return cleanedResp;
         });
-        
-        // Limit to max 4 responsibilities per job to ensure everything fits on the page
-        if (responsibilities.length > 4) {
-          responsibilities = responsibilities.slice(0, 4);
-        }
         
         if (responsibilities.length > 0) {
           enhancedExperiences.push({
@@ -318,25 +290,20 @@ DO NOT include percentage metrics or specific numerical achievements.
             responsibilities
           });
           
-          // Log the character count of each responsibility
           console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}:`);
           responsibilities.forEach((resp, idx) => {
             console.log(`  ${idx+1}. Length: ${resp.length} chars - ${resp}`);
           });
         } else {
-          // If we couldn't parse any responsibilities, keep the original
           enhancedExperiences.push({...experience});
           console.log(`Using original responsibilities for ${experience.jobTitle}`);
         }
       } catch (e) {
         console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
-        // Keep the original experience data if processing fails
         enhancedExperiences.push({...experience});
       }
     }
     
-    // Double-check we haven't accidentally created duplicate responsibilities
-    // This is a final verification step to ensure our changes worked
     const allResponsibilitiesSets = new Map();
     
     for (let i = 0; i < enhancedExperiences.length; i++) {
@@ -345,9 +312,7 @@ DO NOT include percentage metrics or specific numerical achievements.
       if (allResponsibilitiesSets.has(respStr)) {
         console.log(`WARNING: Detected duplicate responsibilities for job ${i+1}`);
         
-        // Try to make this set of responsibilities unique by modifying them
         enhancedExperiences[i].responsibilities = enhancedExperiences[i].responsibilities.map(resp => {
-          // Add job-specific prefix to make it unique
           const prefix = `${enhancedExperiences[i].jobTitle.split(' ')[0]}: `;
           return prefix + resp;
         });
@@ -356,7 +321,6 @@ DO NOT include percentage metrics or specific numerical achievements.
       allResponsibilitiesSets.set(respStr, i);
     }
     
-    // Generate skills relevant to the target job
     let skillsPrompt = '';
     
     if (targetJobDescription) {
@@ -366,10 +330,12 @@ Extract a concise skills list for a ${jobTitle} resume based on this job descrip
 ${targetJobDescription}
 
 Requirements:
-- Include 6 hard/technical skills that are SPECIFICALLY MENTIONED or CLEARLY NEEDED for this job (max 15 characters each)
-- Include 4 soft skills most valued in the job description (max 15 characters each)
+- Include 6 hard/technical skills that are SPECIFICALLY MENTIONED or CLEARLY NEEDED for this job
+- Include 4 soft skills most valued in the job description
 - Prioritize skills that appear explicitly in the job description
 - Focus on skills that will help the resume match the job requirements
+- AVOID ALL ABBREVIATIONS AND SHORT FORMS - write out each skill completely (example: "Project Management" not "Project Mgmt")
+- Each skill should be properly capitalized and use complete words
 
 Format your response as a JSON object with this exact structure:
 {
@@ -385,9 +351,11 @@ Industry Context:
 ${industryKeywords.length > 0 ? `- Industry Keywords: ${industryKeywords.join(', ')}` : ''}
 
 Requirements:
-- Include 6 hard/technical skills that are SPECIFIC to the ${jobTitle} role (max 15 characters each)
-- Include 4 soft skills most valued for the ${jobTitle} position (max 15 characters each)
+- Include 6 hard/technical skills that are SPECIFIC to the ${jobTitle} role
+- Include 4 soft skills most valued for the ${jobTitle} position
 - Prioritize skills that appear frequently in job postings for this role
+- AVOID ALL ABBREVIATIONS AND SHORT FORMS - write out each skill completely (example: "Project Management" not "Project Mgmt")
+- Each skill should be properly capitalized and use complete words
 - Focus on skills that will help the resume fit on a single A4 page
 
 Format your response as a JSON object with this exact structure:
@@ -439,16 +407,13 @@ Format your response as a JSON object with this exact structure:
         const skillsData = await skillsResponse.json();
         const skillsContent = skillsData.choices[0].message.content.trim();
         
-        // Try to parse the JSON from the response
         try {
-          // First try parsing directly
           const parsedSkills = JSON.parse(skillsContent);
           if (parsedSkills && parsedSkills.hard_skills && parsedSkills.soft_skills) {
             skills = parsedSkills;
             console.log('Generated skills successfully');
           }
         } catch (e) {
-          // If direct parsing fails, try to extract JSON portion
           const jsonMatch = skillsContent.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
             const parsedSkills = JSON.parse(jsonMatch[0]);
@@ -462,14 +427,11 @@ Format your response as a JSON object with this exact structure:
         }
       } catch (e) {
         console.error('Error processing skills response:', e);
-        // We'll use the default skills defined above
       }
     } else {
       console.error('Error calling OpenAI for skills');
-      // We'll use the default skills defined above
     }
     
-    // Update the resume in the database
     const updatePayload = {
       professional_summary: {
         ...resumeData.professional_summary,
@@ -481,17 +443,6 @@ Format your response as a JSON object with this exact structure:
     };
 
     console.log('Updating resume in database with enhanced data...');
-    
-    // Before update, log what we're about to update
-    console.log('Number of work experiences being updated:', enhancedExperiences.length);
-    for (const exp of enhancedExperiences) {
-      console.log(`${exp.jobTitle} at ${exp.companyName}: ${exp.responsibilities.length} responsibilities`);
-      // Log the first responsibility for each job to verify uniqueness and length
-      if (exp.responsibilities.length > 0) {
-        console.log(`First responsibility: ${exp.responsibilities[0]}`);
-        console.log(`Length: ${exp.responsibilities[0].length} characters`);
-      }
-    }
     
     const { error: updateError } = await supabase
       .from('resumes')
@@ -516,7 +467,6 @@ Format your response as a JSON object with this exact structure:
   } catch (error) {
     console.error('Error in generate-professional-resume function:', error);
     
-    // Try to update the resume status to error
     try {
       const { resumeId } = await req.json();
       if (resumeId) {

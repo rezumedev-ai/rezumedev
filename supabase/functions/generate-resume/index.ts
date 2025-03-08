@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
@@ -13,7 +12,8 @@ const SYSTEM_PROMPTS = {
 - Is based SOLELY on the provided job title and experience
 - Uses natural, professional language
 - Incorporates relevant industry keywords
-- Is 2-3 sentences maximum
+- Is 3-4 sentences in length (around 60-80 words)
+- Provides a comprehensive overview of the candidate's value proposition
 - Highlights only demonstrable skills and experience
 - Does not make assumptions about experience level
 Do not fabricate or assume any details not provided in the input.`,
@@ -31,10 +31,16 @@ Do not fabricate specific metrics or achievements not provided in the input.`,
 - The stated job title
 - The actual work experience provided
 - Industry standards for the role
+
 Generate two categories:
 1. Technical Skills (specific to the role/industry)
 2. Professional Skills (transferable skills)
-Do not include skills that aren't supported by the experience provided.`
+
+Requirements:
+- DO NOT use abbreviations or shortened forms (write "Project Management" not "Project Mgmt")
+- Each skill should be properly capitalized and use complete words
+- Skills should be concise but completely spelled out
+- Do not include skills that aren't supported by the experience provided.`
 };
 
 async function generateWithAI(prompt: string, systemPrompt: string, openAIApiKey: string) {
@@ -81,7 +87,7 @@ async function generateProfessionalSummary(jobTitle: string, experience: any[], 
     .map(exp => `${exp.jobTitle} at ${exp.companyName} (${exp.startDate} - ${exp.isCurrentJob ? 'Present' : exp.endDate})`)
     .join('\n');
 
-  const prompt = `Generate a professional summary for a ${jobTitle} position based on this work history:\n${experienceContext}`;
+  const prompt = `Generate a comprehensive professional summary (3-4 sentences, 60-80 words) for a ${jobTitle} position based on this work history:\n${experienceContext}`;
   return await generateWithAI(prompt, SYSTEM_PROMPTS.summary, openAIApiKey);
 }
 
@@ -101,7 +107,7 @@ async function generateSkills(jobTitle: string, experience: any[], openAIApiKey:
     .map(exp => `${exp.jobTitle} at ${exp.companyName}`)
     .join('\n');
 
-  const prompt = `Based on this professional background for a ${jobTitle} position:\n${experienceContext}\n\nGenerate relevant technical and professional skills.`;
+  const prompt = `Based on this professional background for a ${jobTitle} position:\n${experienceContext}\n\nGenerate relevant technical and professional skills. DO NOT use abbreviations or shortened forms (write "Project Management" not "Project Mgmt"). All skills should be properly capitalized and fully spelled out.`;
   const skillsContent = await generateWithAI(prompt, SYSTEM_PROMPTS.skills, openAIApiKey);
   
   const hardSkills = [];
