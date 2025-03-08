@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight, FileText } from "lucide-react";
@@ -90,7 +91,7 @@ function AnimatedHero() {
   return (
     <div className="w-full">
       <div className="container mx-auto">
-        <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
+        <div className="flex gap-6 py-12 lg:py-24 items-center justify-center flex-col">
           <div>
             <Button variant="secondary" size="sm" className="gap-4">
               AI-Powered Resume Builder <FileText className="w-4 h-4" />
@@ -135,7 +136,7 @@ function AnimatedHero() {
                 Build Your Resume Now <MoveRight className="w-4 h-4" />
               </RainbowButton>
             </Link>
-            <div className="pt-12 text-center">
+            <div className="pt-8 text-center">
               <GradientHeading variant="secondary" size="xs" weight="semi">
                 Our users got hired at
               </GradientHeading>
