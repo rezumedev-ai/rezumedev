@@ -11,7 +11,7 @@ export function QuestionForm({ question, value, onChange }: QuestionFormProps) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
       transition={{ duration: 0.4, ease: "easeInOut" }}
-      className="space-y-6"
+      className="space-y-6 w-full"
     >
       <motion.h2 
         className="text-3xl font-bold text-gray-900 mb-8"
@@ -26,6 +26,7 @@ export function QuestionForm({ question, value, onChange }: QuestionFormProps) {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
+        className="w-full"
       >
         {question.inputType === "textarea" ? (
           <Textarea
@@ -33,7 +34,7 @@ export function QuestionForm({ question, value, onChange }: QuestionFormProps) {
             onChange={(e) => onChange(e.target.value)}
             placeholder={question.placeholder}
             required={question.required}
-            className="text-lg p-6 border-2 focus:ring-2 focus:ring-primary/20 transition-all duration-300 min-h-[200px]"
+            className="text-lg p-6 border-2 focus:ring-2 focus:ring-primary/20 transition-all duration-300 min-h-[200px] bg-white"
           />
         ) : (
           <Input
@@ -42,7 +43,7 @@ export function QuestionForm({ question, value, onChange }: QuestionFormProps) {
             onChange={(e) => onChange(e.target.value)}
             placeholder={question.placeholder}
             required={question.required}
-            className="text-lg p-6 border-2 focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+            className="text-lg p-6 border-2 focus:ring-2 focus:ring-primary/20 transition-all duration-300 bg-white"
           />
         )}
         {question.required && (

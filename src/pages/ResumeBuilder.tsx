@@ -101,7 +101,7 @@ export default function ResumeBuilder() {
 
   if (!resume.completion_status || resume.completion_status === 'draft') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <QuizFlow resumeId={id} onComplete={handleComplete} />
         </div>
@@ -119,7 +119,7 @@ export default function ResumeBuilder() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <QuizFlow resumeId={id} onComplete={handleComplete} />
       </div>

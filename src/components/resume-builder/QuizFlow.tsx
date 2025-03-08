@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -456,12 +455,12 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white">
       <div className="max-w-2xl w-full mx-auto p-6">
         <QuizProgress currentStep={currentStep} steps={quizSteps} />
 
         <motion.div
-          className="relative bg-white rounded-xl shadow-xl p-8 backdrop-blur-sm bg-opacity-90 border border-gray-100"
+          className="relative bg-white rounded-xl shadow-xl p-8 backdrop-blur-sm bg-opacity-90 border border-indigo-100"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -480,7 +479,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0 && currentQuestionIndex === 0}
-              className="transition-all duration-300 hover:shadow-md"
+              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
               Back
@@ -488,7 +487,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             <Button
               variant="outline"
               onClick={handleSaveAndExit}
-              className="transition-all duration-300 hover:shadow-md"
+              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300"
             >
               Save & Exit
             </Button>
