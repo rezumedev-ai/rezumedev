@@ -39,16 +39,30 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   useEffect(() => {
     const calculateScale = () => {
       const pageWidth = 8.5 * 96;
+      const pageHeight = 11 * 96;
       const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
       
       // Calculate the available width for the resume
-      const availableWidth = Math.min(viewportWidth - 32, 800); // Subtract padding and set a max width
+      // Leave more space (48px) on the sides for better padding
+      const availableWidth = Math.min(viewportWidth - 48, 800);
+      
+      // Also account for height to ensure vertical centering
+      const availableHeight = viewportHeight - 120; // Leave space for toolbar and padding
       
       let newScale = 1;
       
-      if (availableWidth < pageWidth) {
+      // Scale based on the most constraining dimension
+      if (availableWidth / pageWidth < availableHeight / pageHeight) {
+        // Width is more constraining
         newScale = availableWidth / pageWidth;
+      } else {
+        // Height is more constraining
+        newScale = availableHeight / pageHeight;
       }
+      
+      // Apply a slight reduction to ensure there's always a bit of margin
+      newScale = newScale * 0.95;
       
       setScale(newScale);
       setContainerWidth(viewportWidth);
@@ -245,8 +259,8 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onBackToDashboard={() => navigate("/dashboard")}
       />
       
-      <div className="w-full max-w-full px-4 pb-8 flex justify-center">
-        <div className="relative" style={{ 
+      <div className="w-full max-w-full px-6 py-4 flex justify-center items-center flex-grow">
+        <div className="relative mx-auto my-4" style={{ 
           width: `${pageWidth * scale}px`, 
           height: `${pageHeight * scale}px`
         }}>
