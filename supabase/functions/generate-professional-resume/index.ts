@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -41,18 +42,21 @@ serve(async (req) => {
     
     // Extract job title from resumeData for the overall summary
     const jobTitle = resumeData.professional_summary?.title || '';
+    // Check if job description is provided
+    const targetJobDescription = resumeData.professional_summary?.targetJobDescription || '';
     
     // Generate professional summary
     const summaryPrompt = `
 Create a powerful professional summary for a ${jobTitle} based on the following information:
 ${JSON.stringify(resumeData.personal_info, null, 2)}
 ${JSON.stringify(resumeData.professional_summary, null, 2)}
+${targetJobDescription ? `\nTarget Job Description: ${targetJobDescription}` : ''}
 
 Requirements:
 - Maximum 35 words
 - Highlight value and expertise without metrics or years
 - Use powerful, active language
-- Include relevant industry keywords for ATS systems
+${targetJobDescription ? '- Align with the skills and requirements from the provided job description' : '- Include relevant industry keywords for ATS systems'}
 - Focus on what makes this candidate valuable to employers
 - Make it tailored specifically for a ${jobTitle} role
 
@@ -94,7 +98,21 @@ Format your response as plain text only (no JSON).
     const enhancedExperiences = [];
     
     // First, get industry-specific keywords for the target position
-    const keywordsPrompt = `
+    let keywordsPrompt = '';
+    
+    if (targetJobDescription) {
+      keywordsPrompt = `
+Extract the top 10 most important skills, keywords, and qualifications from this job description for a ${jobTitle} position:
+
+${targetJobDescription}
+
+Make sure to include specific technical skills, methodologies, and qualifications mentioned in the job posting.
+
+Format your response as a JSON array of strings only, with no additional commentary. Example:
+["Keyword 1", "Keyword 2", "Keyword 3", ...]
+`;
+    } else {
+      keywordsPrompt = `
 Generate the top 10 industry-specific keywords and phrases for a ${jobTitle} position that would best optimize a resume for ATS systems.
 
 Consider:
@@ -107,8 +125,11 @@ Consider:
 Format your response as a JSON array of strings only, with no additional commentary. Example:
 ["Keyword 1", "Keyword 2", "Keyword 3", ...]
 `;
+    }
 
-    console.log('Generating industry-specific keywords for target position...');
+    console.log(targetJobDescription 
+      ? 'Extracting keywords from provided job description...' 
+      : 'Generating industry-specific keywords for target position...');
     
     const keywordsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -167,7 +188,7 @@ Format your response as a JSON array of strings only, with no additional comment
       
       // Create a job-specific prompt with a high temperature setting to ensure varied responses
       // Now with strict character limits and NO percentage metrics
-      const jobPrompt = `
+      let jobPrompt = `
 Generate 3-4 CONCISE, HIGHLY SPECIFIC job responsibilities for a ${experience.jobTitle} position at ${experience.companyName} that would impress a hiring manager.
 
 Job Context:
@@ -175,7 +196,25 @@ Job Context:
 - Company: ${experience.companyName}
 ${experience.location ? `- Location: ${experience.location}` : ''}
 - Duration: ${experience.startDate} to ${experience.isCurrentJob ? 'Present' : experience.endDate}
+`;
 
+      // Add job description if available
+      if (targetJobDescription) {
+        jobPrompt += `
+Target Job Description:
+${targetJobDescription}
+
+Requirements:
+1. Each bullet point must start with a strong action verb
+2. Each bullet point MUST be 60-80 characters maximum (strict limit for A4 page fitting)
+3. Include 1-2 keywords from the target job description in each bullet
+4. Ensure the responsibilities align well with what the target job requires
+5. DO NOT include specific percentage improvements or metrics
+6. Use precise wording and eliminate unnecessary words
+7. Ensure all bullets are different from each other
+`;
+      } else {
+        jobPrompt += `
 Requirements:
 1. Each bullet point must start with a strong action verb
 2. Each bullet point MUST be 60-80 characters maximum (strict limit for A4 page fitting)
@@ -183,7 +222,10 @@ Requirements:
 4. DO NOT include specific percentage improvements or metrics
 5. Use precise wording and eliminate unnecessary words
 6. Ensure all bullets are different from each other
+`;
+      }
 
+      jobPrompt += `
 Format Tips:
 - Do NOT use complete sentences - use resume-style fragments
 - Avoid articles (a, an, the) when possible
@@ -315,7 +357,28 @@ DO NOT include percentage metrics or specific numerical achievements.
     }
     
     // Generate skills relevant to the target job
-    const skillsPrompt = `
+    let skillsPrompt = '';
+    
+    if (targetJobDescription) {
+      skillsPrompt = `
+Extract a concise skills list for a ${jobTitle} resume based on this job description:
+
+${targetJobDescription}
+
+Requirements:
+- Include 6 hard/technical skills that are SPECIFICALLY MENTIONED or CLEARLY NEEDED for this job (max 15 characters each)
+- Include 4 soft skills most valued in the job description (max 15 characters each)
+- Prioritize skills that appear explicitly in the job description
+- Focus on skills that will help the resume match the job requirements
+
+Format your response as a JSON object with this exact structure:
+{
+  "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
+  "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
+}
+`;
+    } else {
+      skillsPrompt = `
 Generate a concise skills list for a ${jobTitle} resume that will maximize success with ATS systems.
 
 Industry Context:
@@ -333,6 +396,7 @@ Format your response as a JSON object with this exact structure:
   "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
 }
 `;
+    }
 
     const skillsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

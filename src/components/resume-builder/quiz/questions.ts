@@ -55,5 +55,14 @@ export const questions: Question[] = [
     required: true,
     placeholder: "e.g. Senior Software Engineer",
     inputType: "text"
+  },
+  {
+    id: "jobDescription",
+    text: "Do you have a job description you'd like to target? (Optional)",
+    type: "professional_summary",
+    field: "targetJobDescription",
+    required: false,
+    placeholder: "Paste the complete job description here to tailor your resume",
+    inputType: "textarea"
   }
 ];
