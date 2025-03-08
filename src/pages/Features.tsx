@@ -2,36 +2,12 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Features as FeaturesSection } from "@/components/Features";
-import { GradientHeading } from "@/components/ui/gradient-heading";
 
 const Features = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <main>
-        {/* Hero Section */}
-        <section className="py-24 bg-gradient-to-b from-accent/50 via-white/80 to-white">
-          <div className="container px-4 mx-auto">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="relative mb-6">
-                <GradientHeading 
-                  variant="resume" 
-                  size="lg" 
-                  weight="bold" 
-                  className="animate-fade-up relative z-10"
-                >
-                  Powerful Features
-                </GradientHeading>
-                <div className="absolute -z-10 w-full h-full top-0 left-0 blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
-              </div>
-              <p className="mb-8 text-lg text-muted-foreground sm:text-xl animate-fade-up leading-relaxed" style={{ animationDelay: '100ms' }}>
-                Discover how our AI-powered platform makes resume creation effortless,
-                professional, and tailored to your career goals
-              </p>
-            </div>
-          </div>
-        </section>
-
         {/* Features Grid */}
         <FeaturesSection />
 
