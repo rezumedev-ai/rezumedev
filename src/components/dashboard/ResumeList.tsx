@@ -1,4 +1,3 @@
-
 import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X, ArrowRight, Archive, Clock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,6 +9,10 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "sonner";
+import { generateResumePDF } from "@/lib/utils";
 
 interface Resume {
   id: string;
@@ -35,6 +38,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
   const [editTitle, setEditTitle] = useState("");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const container = {
     hidden: { opacity: 0 },
@@ -102,8 +106,30 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
     navigate(`/resume-preview/${id}`);
   };
 
-  const handleDownload = (id: string) => {
-    navigate(`/resume-preview/${id}`);
+  const handleDownload = async (id: string) => {
+    setDownloadingId(id);
+    try {
+      const { data: resumeData, error: resumeError } = await supabase
+        .from("resumes")
+        .select("*")
+        .eq("id", id)
+        .single();
+        
+      if (resumeError) {
+        throw resumeError;
+      }
+      
+      toast.info("Preparing your resume for download...");
+      
+      await generateResumePDF(resumeData, id);
+      
+      toast.success("Resume downloaded successfully!");
+    } catch (error) {
+      console.error("Error downloading resume:", error);
+      toast.error("Failed to download resume. Please try viewing the resume first.");
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const startEditingTitle = (resume: Resume) => {
@@ -335,9 +361,14 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                           size="sm" 
                           onClick={() => handleDownload(resume.id)}
                           className="w-full group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+                          disabled={downloadingId === resume.id}
                         >
-                          <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                          Download
+                          {downloadingId === resume.id ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                          )}
+                          {downloadingId === resume.id ? "Processing..." : "Download"}
                         </Button>
                       </motion.div>
                       
