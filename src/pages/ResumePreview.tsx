@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Edit, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -52,11 +54,29 @@ export default function ResumePreview() {
 
   return (
     <div className="relative">
+      <div className="fixed top-20 right-4 sm:top-24 sm:right-6 z-50">
+        <Button 
+          onClick={toggleEditMode} 
+          variant="outline"
+          className="bg-white shadow-md hover:bg-gray-100"
+        >
+          {isEditing ? (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Save
+            </>
+          ) : (
+            <>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </>
+          )}
+        </Button>
+      </div>
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
         isEditing={isEditing}
-        onToggleEditMode={toggleEditMode}
       />
     </div>
   );

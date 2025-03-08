@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Edit, RefreshCw, Save } from "lucide-react";
+import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TemplatePreview } from "../TemplatePreview";
@@ -16,8 +16,6 @@ interface ResumePreviewToolbarProps {
   resumeId: string;
   onTemplateChange: (templateId: string) => void;
   onBackToDashboard: () => void;
-  isEditing?: boolean;
-  onToggleEditMode?: () => void;
 }
 
 export function ResumePreviewToolbar({
@@ -26,8 +24,6 @@ export function ResumePreviewToolbar({
   resumeId,
   onTemplateChange,
   onBackToDashboard,
-  isEditing = false,
-  onToggleEditMode,
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const isMobile = useIsMobile();
@@ -123,27 +119,6 @@ export function ResumePreviewToolbar({
           </Button>
           
           <div className="flex flex-col gap-2">
-            {onToggleEditMode && (
-              <Button 
-                onClick={onToggleEditMode} 
-                variant="outline"
-                className="flex items-center justify-center gap-2 w-full"
-                size="sm"
-              >
-                {isEditing ? (
-                  <>
-                    <Save className="w-4 h-4" />
-                    <span>Save</span>
-                  </>
-                ) : (
-                  <>
-                    <Edit className="w-4 h-4" />
-                    <span>Edit</span>
-                  </>
-                )}
-              </Button>
-            )}
-            
             <Popover>
               <PopoverTrigger asChild>
                 <Button 
@@ -198,26 +173,6 @@ export function ResumePreviewToolbar({
         </Button>
         
         <div className="flex items-center gap-3">
-          {onToggleEditMode && (
-            <Button 
-              onClick={onToggleEditMode} 
-              variant="outline"
-              className="flex items-center gap-2 bg-white hover:bg-gray-100"
-            >
-              {isEditing ? (
-                <>
-                  <Save className="w-4 h-4" />
-                  <span>Save</span>
-                </>
-              ) : (
-                <>
-                  <Edit className="w-4 h-4" />
-                  <span>Edit</span>
-                </>
-              )}
-            </Button>
-          )}
-          
           <Popover>
             <PopoverTrigger asChild>
               <Button 

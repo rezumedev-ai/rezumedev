@@ -18,15 +18,9 @@ interface FinalResumePreviewProps {
   resumeData: ResumeData;
   resumeId: string;
   isEditing?: boolean;
-  onToggleEditMode?: () => void;
 }
 
-export function FinalResumePreview({ 
-  resumeData, 
-  resumeId, 
-  isEditing = false,
-  onToggleEditMode
-}: FinalResumePreviewProps) {
+export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -237,8 +231,6 @@ export function FinalResumePreview({
         resumeId={resumeId}
         onTemplateChange={handleTemplateChange}
         onBackToDashboard={() => navigate("/dashboard")}
-        isEditing={isEditing}
-        onToggleEditMode={onToggleEditMode}
       />
       
       <div className="w-screen max-w-full flex justify-center items-center px-2 sm:px-4 overflow-hidden">
