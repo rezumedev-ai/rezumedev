@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,17 +30,14 @@ export function FinalResumePreview({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
   
   useEffect(() => {
     setResumeState(resumeData);
   }, [resumeData]);
 
-  // Fixed scale based on device size
   const scale = isMobile ? 0.5 : 1;
   
-  // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
     if (!isEditing) return;
     
@@ -59,7 +55,6 @@ export function FinalResumePreview({
     });
   };
   
-  // Handle professional summary updates
   const handleSummaryUpdate = (summary: string) => {
     if (!isEditing) return;
     
@@ -77,7 +72,6 @@ export function FinalResumePreview({
     });
   };
   
-  // Handle skills updates
   const handleSkillsUpdate = (type: "hard" | "soft", skills: string[]) => {
     if (!isEditing) return;
     
@@ -96,7 +90,6 @@ export function FinalResumePreview({
     });
   };
   
-  // Handle education updates
   const handleEducationUpdate = (index: number, field: keyof Education, value: string) => {
     if (!isEditing) return;
     
@@ -117,7 +110,6 @@ export function FinalResumePreview({
     });
   };
   
-  // Handle certification updates
   const handleCertificationUpdate = (index: number, field: keyof Certification, value: string) => {
     if (!isEditing) return;
     
@@ -138,7 +130,6 @@ export function FinalResumePreview({
     });
   };
   
-  // Handle work experience updates
   const handleExperienceUpdate = (index: number, field: keyof WorkExperience, value: string | string[]) => {
     if (!isEditing) return;
     
@@ -159,10 +150,8 @@ export function FinalResumePreview({
     });
   };
   
-  // Update the resume data in Supabase
   const updateResumeData = async (data: ResumeData) => {
     try {
-      // Convert the data to match Supabase's expected format
       const supabaseData = {
         personal_info: data.personal_info,
         professional_summary: data.professional_summary,
@@ -195,7 +184,6 @@ export function FinalResumePreview({
     }
   };
 
-  // Switch to a different template
   const handleTemplateChange = async (templateId: string) => {
     try {
       setResumeState(prev => {
@@ -204,7 +192,6 @@ export function FinalResumePreview({
           template_id: templateId
         };
         
-        // Update in Supabase
         updateResumeData(newState);
         return newState;
       });
@@ -216,19 +203,17 @@ export function FinalResumePreview({
     }
   };
   
-  // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
 
-  // Calculate dimensions for A4 page (for proper scaling)
-  const DPI = 96; // Standard screen DPI
+  const DPI = 96;
   const WIDTH_INCHES = 8.5;
   const HEIGHT_INCHES = 11;
-  const WIDTH_PX = Math.floor(WIDTH_INCHES * DPI); // 816px
-  const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI); // 1056px
-  
+  const WIDTH_PX = Math.floor(WIDTH_INCHES * DPI);
+  const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI);
+
   return (
     <div className="flex flex-col items-center bg-gray-100 min-h-screen overflow-x-hidden">
       <ResumePreviewToolbar 
@@ -249,7 +234,7 @@ export function FinalResumePreview({
             height: `${HEIGHT_PX}px`,
             transform: `scale(${scale})`,
             transformOrigin: 'top center',
-            margin: isMobile ? '-100px auto 0' : '0 auto 40px auto', // Removed bottom margin on mobile
+            margin: isMobile ? '20px auto 20px' : '20px auto 40px auto',
             minWidth: `${WIDTH_PX}px`,
             maxWidth: `${WIDTH_PX}px`,
           }}
