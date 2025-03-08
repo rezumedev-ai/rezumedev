@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,9 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
     const calculateScale = () => {
       const pageWidth = 8.5 * 96;
       const viewportWidth = window.innerWidth;
+      
+      // Calculate the available width for the resume
+      const availableWidth = Math.min(viewportWidth - 32, 800); // Subtract padding and set a max width
       
       let newScale = 1;
       
