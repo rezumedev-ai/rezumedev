@@ -16,6 +16,7 @@ import { Json } from "@/integrations/supabase/types";
 import { LoadingState } from "./LoadingState";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -28,6 +29,8 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  
   const [formData, setFormData] = useState<ResumeData>({
     personal_info: {
       fullName: "",
@@ -455,12 +458,12 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white">
-      <div className="max-w-2xl w-full mx-auto p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white overflow-x-hidden">
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <QuizProgress currentStep={currentStep} steps={quizSteps} />
 
         <motion.div
-          className="relative bg-white rounded-xl shadow-xl p-8 backdrop-blur-sm bg-opacity-90 border border-indigo-100"
+          className="relative bg-white rounded-xl shadow-xl p-4 sm:p-8 backdrop-blur-sm bg-opacity-90 border border-indigo-100 overflow-hidden"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -469,17 +472,17 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         </motion.div>
 
         <motion.div 
-          className="mt-8 flex justify-between items-center"
+          className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0 && currentQuestionIndex === 0}
-              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[100px]"
+              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[90px] sm:min-w-[100px]"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
               Back
@@ -487,14 +490,14 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             <Button
               variant="outline"
               onClick={handleSaveAndExit}
-              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[120px]"
+              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[110px] sm:min-w-[120px]"
             >
               Save & Exit
             </Button>
           </div>
           <Button 
             onClick={currentQuestionIndex === questions.length - 1 ? handleStepComplete : handleNext}
-            className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md h-11 min-w-[100px]"
+            className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md h-11 min-w-[90px] sm:min-w-[100px] w-full sm:w-auto mt-2 sm:mt-0"
           >
             {currentStep === quizSteps.length - 1 ? "Complete" : "Next"}
             <ArrowRight className="ml-2 w-4 h-4" />
