@@ -2,6 +2,8 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Features as FeaturesSection } from "@/components/Features";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Features = () => {
   return (
@@ -23,6 +25,14 @@ const Features = () => {
                 Discover how our AI-powered platform makes resume creation effortless,
                 professional, and tailored to your needs
               </p>
+              <div className="flex flex-wrap justify-center gap-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
+                <Button size="lg" asChild>
+                  <Link to="/signup">Get Started Free</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/resume-builder">Try Demo</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -39,6 +49,12 @@ const Features = () => {
             <p className="mb-8 text-lg text-muted-foreground animate-fade-up" style={{ animationDelay: '100ms' }}>
               Join thousands of job seekers who have successfully landed their dream jobs
             </p>
+            <Button size="lg" asChild className="animate-fade-up" style={{ animationDelay: '200ms' }}>
+              <Link to="/signup">
+                Create Your Resume Now
+                <span className="ml-2">→</span>
+              </Link>
+            </Button>
           </div>
         </section>
       </main>
