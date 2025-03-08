@@ -6,7 +6,7 @@ import { FinalResumePreview } from "@/components/resume-builder/FinalResumePrevi
 import { ResumeData } from "@/types/resume";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Save, ZoomIn, ZoomOut } from "lucide-react";
+import { Edit, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getResponsiveScale } from "@/lib/utils";
@@ -14,7 +14,6 @@ import { getResponsiveScale } from "@/lib/utils";
 export default function ResumePreview() {
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
   const isMobile = useIsMobile();
 
   const { data: resume, isLoading } = useQuery({
@@ -36,10 +35,6 @@ export default function ResumePreview() {
     if (isEditing) {
       toast.success("Resume saved successfully");
     }
-  };
-
-  const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
   };
 
   if (isLoading) {
@@ -81,28 +76,10 @@ export default function ResumePreview() {
         </Button>
       </div>
       
-      {isMobile && (
-        <div className="fixed top-2 left-2 z-50">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleZoom}
-            className="bg-white shadow-md hover:bg-gray-100"
-          >
-            {isZoomed ? 
-              <ZoomOut className="w-3 h-3 mr-1" /> : 
-              <ZoomIn className="w-3 h-3 mr-1" />
-            }
-            {isZoomed ? "Zoom Out" : "Zoom In"}
-          </Button>
-        </div>
-      )}
-      
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
         isEditing={isEditing}
-        isZoomed={isZoomed}
       />
     </div>
   );

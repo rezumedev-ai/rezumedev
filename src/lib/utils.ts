@@ -11,9 +11,6 @@ export function formatDate(dateString: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
-export function getResponsiveScale(isMobile: boolean, isZoomed: boolean): number {
-  if (isMobile) {
-    return isZoomed ? 0.9 : 0.65;
-  }
-  return 1;
+export function getResponsiveScale(isMobile: boolean): number {
+  return isMobile ? 0.75 : 1;
 }

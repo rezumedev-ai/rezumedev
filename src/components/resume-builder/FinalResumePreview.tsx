@@ -10,7 +10,7 @@ import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
 import { resumeTemplates } from "./templates";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -20,14 +20,12 @@ interface FinalResumePreviewProps {
   resumeData: ResumeData;
   resumeId: string;
   isEditing?: boolean;
-  isZoomed?: boolean;
 }
 
 export function FinalResumePreview({ 
   resumeData, 
   resumeId, 
-  isEditing = false,
-  isZoomed = false 
+  isEditing = false
 }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
   const navigate = useNavigate();
@@ -40,8 +38,8 @@ export function FinalResumePreview({
     setResumeState(resumeData);
   }, [resumeData]);
 
-  // Get scale based on device and zoom state
-  const scale = getResponsiveScale(isMobile, isZoomed);
+  // Get scale based on device
+  const scale = getResponsiveScale(isMobile);
   
   // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
@@ -235,7 +233,7 @@ export function FinalResumePreview({
       />
       
       <div 
-        className={`w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'transform-gpu' : ''}`}
+        className={`w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'max-w-full transform-gpu' : ''}`}
         style={pageStyle}
       >
         <PersonalSection 
