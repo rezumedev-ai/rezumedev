@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -209,8 +210,8 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    // Fix the titleFont reference by accessing it from the correct location in the template object
-    fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
+    // Get font family from template
+    fontFamily: template.style.typography?.fontFamily || 'sans-serif'
   };
   
   return (
@@ -223,57 +224,59 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onBackToDashboard={() => navigate("/dashboard")}
       />
       
-      <div 
-        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
-        style={pageStyle}
-      >
-        <PersonalSection 
-          fullName={resumeState.personal_info.fullName}
-          title={resumeState.professional_summary.title}
-          email={resumeState.personal_info.email}
-          phone={resumeState.personal_info.phone}
-          linkedin={resumeState.personal_info.linkedin}
-          website={resumeState.personal_info.website}
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handlePersonalInfoUpdate}
-        />
-        
-        <ProfessionalSummarySection 
-          summary={resumeState.professional_summary.summary} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleSummaryUpdate}
-        />
-        
-        <ExperienceSection 
-          experiences={resumeState.work_experience} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleExperienceUpdate}
-        />
-        
-        <EducationSection 
-          education={resumeState.education} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleEducationUpdate}
-        />
-        
-        <SkillsSection 
-          hardSkills={resumeState.skills.hard_skills} 
-          softSkills={resumeState.skills.soft_skills} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleSkillsUpdate}
-        />
-        
-        <CertificationsSection 
-          certifications={resumeState.certifications} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleCertificationUpdate}
-        />
+      <div className="w-full max-w-full overflow-auto px-4 pb-8">
+        <div 
+          className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto relative"
+          style={pageStyle}
+        >
+          <PersonalSection 
+            fullName={resumeState.personal_info.fullName}
+            title={resumeState.professional_summary.title}
+            email={resumeState.personal_info.email}
+            phone={resumeState.personal_info.phone}
+            linkedin={resumeState.personal_info.linkedin}
+            website={resumeState.personal_info.website}
+            template={template}
+            isEditing={isEditing}
+            onUpdate={handlePersonalInfoUpdate}
+          />
+          
+          <ProfessionalSummarySection 
+            summary={resumeState.professional_summary.summary} 
+            template={template}
+            isEditing={isEditing}
+            onUpdate={handleSummaryUpdate}
+          />
+          
+          <ExperienceSection 
+            experiences={resumeState.work_experience} 
+            template={template}
+            isEditing={isEditing}
+            onUpdate={handleExperienceUpdate}
+          />
+          
+          <EducationSection 
+            education={resumeState.education} 
+            template={template}
+            isEditing={isEditing}
+            onUpdate={handleEducationUpdate}
+          />
+          
+          <SkillsSection 
+            hardSkills={resumeState.skills.hard_skills} 
+            softSkills={resumeState.skills.soft_skills} 
+            template={template}
+            isEditing={isEditing}
+            onUpdate={handleSkillsUpdate}
+          />
+          
+          <CertificationsSection 
+            certifications={resumeState.certifications} 
+            template={template}
+            isEditing={isEditing}
+            onUpdate={handleCertificationUpdate}
+          />
+        </div>
       </div>
     </div>
   );
