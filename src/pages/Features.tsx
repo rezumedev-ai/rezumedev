@@ -29,9 +29,6 @@ const Features = () => {
                 <Button size="lg" asChild>
                   <Link to="/signup">Get Started Free</Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to="/resume-builder">Try Demo</Link>
-                </Button>
               </div>
             </div>
           </div>
