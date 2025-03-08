@@ -30,7 +30,7 @@ export default function ResumePreview() {
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
     if (isEditing) {
-      toast("Resume saved successfully");
+      toast.success("Resume saved successfully");
     }
   };
 
@@ -57,7 +57,6 @@ export default function ResumePreview() {
           onClick={toggleEditMode} 
           variant="outline"
           className="bg-white shadow-md hover:bg-gray-100"
-          size="sm"
         >
           {isEditing ? (
             <>
