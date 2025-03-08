@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,8 +13,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { getResponsiveScale } from "@/lib/utils";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -23,14 +20,9 @@ interface FinalResumePreviewProps {
   isEditing?: boolean;
 }
 
-export function FinalResumePreview({ 
-  resumeData, 
-  resumeId, 
-  isEditing = false
-}: FinalResumePreviewProps) {
+export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   
   // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
@@ -38,9 +30,6 @@ export function FinalResumePreview({
   useEffect(() => {
     setResumeState(resumeData);
   }, [resumeData]);
-
-  // Get scale based on device
-  const scale = getResponsiveScale(isMobile);
   
   // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
@@ -163,6 +152,7 @@ export function FinalResumePreview({
   // Update the resume data in Supabase
   const updateResumeData = async (data: ResumeData) => {
     try {
+      // Convert the data to match Supabase's expected format
       const supabaseData = {
         personal_info: data.personal_info,
         professional_summary: data.professional_summary,
@@ -204,6 +194,7 @@ export function FinalResumePreview({
           template_id: templateId
         };
         
+        // Update in Supabase
         updateResumeData(newState);
         return newState;
       });
@@ -218,9 +209,8 @@ export function FinalResumePreview({
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans',
-    transform: `scale(${scale})`,
-    transformOrigin: 'top center',
+    // Fix the titleFont reference by accessing it from the correct location in the template object
+    fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
   
   return (
@@ -234,7 +224,7 @@ export function FinalResumePreview({
       />
       
       <div 
-        className={`w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'max-w-[98vw] overflow-visible' : ''}`}
+        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
         style={pageStyle}
       >
         <PersonalSection 
