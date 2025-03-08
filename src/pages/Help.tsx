@@ -42,19 +42,16 @@ const helpfulLinks = [
     title: "Quick Start Guide",
     description: "Get started with our platform in just a few minutes",
     icon: BookOpen,
-    link: "/dashboard"
   },
   {
     title: "Common Resume Mistakes",
     description: "Avoid these common pitfalls when creating your resume",
     icon: Info,
-    link: "/dashboard"
   },
   {
     title: "Contact Support",
     description: "Need more help? Reach out to our support team",
     icon: HelpCircle,
-    link: "/contact"
   }
 ];
 
@@ -110,16 +107,13 @@ export default function Help() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
               {helpfulLinks.map((link, index) => (
-                <Card key={index} className="p-4 md:p-6 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 border border-gray-200/50">
+                <Card key={index} className="p-4 md:p-6 bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-300 border border-gray-200/50">
                   <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/5 flex items-center justify-center">
-                      <link.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <link.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-sm md:text-base">{link.title}</h3>
-                    <p className="text-xs md:text-sm text-gray-600">{link.description}</p>
-                    <Button variant="ghost" asChild className="mt-1 md:mt-2 text-xs md:text-sm px-2 py-1 h-auto">
-                      <a href={link.link}>View Details</a>
-                    </Button>
+                    <h3 className="font-semibold text-gray-900 text-base md:text-lg">{link.title}</h3>
+                    <p className="text-sm text-gray-600">{link.description}</p>
                   </div>
                 </Card>
               ))}
@@ -127,42 +121,47 @@ export default function Help() {
 
             <div className="space-y-4 md:space-y-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
               <h2 className="text-xl md:text-2xl font-semibold">Frequently Asked Questions</h2>
-              <Accordion type="single" collapsible className="bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200/50">
+              <Accordion type="single" collapsible className="bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200/50 shadow-sm">
                 {filteredFaqs.map((faq, index) => (
                   <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="px-3 md:px-4 py-3 text-sm md:text-base hover:no-underline">
+                    <AccordionTrigger className="px-4 py-4 text-sm md:text-base hover:no-underline">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="px-3 md:px-4 text-xs md:text-sm text-gray-600">
+                    <AccordionContent className="px-4 pb-4 text-sm md:text-base text-gray-600">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
                 ))}
+                {filteredFaqs.length === 0 && (
+                  <div className="p-4 text-center text-gray-500">
+                    No results found. Try a different search term.
+                  </div>
+                )}
               </Accordion>
             </div>
 
             <div className="space-y-4 md:space-y-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
               <h2 className="text-xl md:text-2xl font-semibold">Need More Help?</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <Card className="p-4 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50">
-                  <div className="flex items-center space-x-3 md:space-x-4">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/5 flex items-center justify-center">
-                      <Mail className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                <Card className="p-5 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-md transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Mail className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm md:text-base">Email Support</h3>
-                      <p className="text-xs md:text-sm text-gray-600">support@rezume.dev</p>
+                      <h3 className="font-semibold text-base md:text-lg">Email Support</h3>
+                      <p className="text-sm md:text-base text-gray-600">support@rezume.dev</p>
                     </div>
                   </div>
                 </Card>
-                <Card className="p-4 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50">
-                  <div className="flex items-center space-x-3 md:space-x-4">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/5 flex items-center justify-center">
-                      <Phone className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                <Card className="p-5 md:p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-md transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Phone className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm md:text-base">Phone Support</h3>
-                      <p className="text-xs md:text-sm text-gray-600">Mon-Fri, 9am-5pm EST</p>
+                      <h3 className="font-semibold text-base md:text-lg">Phone Support</h3>
+                      <p className="text-sm md:text-base text-gray-600">Mon-Fri, 9am-5pm EST</p>
                     </div>
                   </div>
                 </Card>
