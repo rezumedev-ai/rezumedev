@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Menu, Search, FileText, Book, Phone, Mail, ExternalLink } from "lucide-react";
+import { Menu, Search, HelpCircle, Info, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,24 +37,24 @@ const faqs = [
   }
 ];
 
-const resources = [
+const helpfulLinks = [
   {
-    title: "Resume Writing Guide",
-    description: "Learn how to write a professional resume that stands out",
-    icon: FileText,
-    link: "#"
+    title: "Quick Start Guide",
+    description: "Get started with our platform in just a few minutes",
+    icon: BookOpen,
+    link: "/dashboard"
   },
   {
-    title: "Career Blog",
-    description: "Tips and advice for your job search journey",
-    icon: Book,
-    link: "#"
+    title: "Common Resume Mistakes",
+    description: "Avoid these common pitfalls when creating your resume",
+    icon: Info,
+    link: "/dashboard"
   },
   {
-    title: "Video Tutorials",
-    description: "Step-by-step guides on using our platform",
-    icon: ExternalLink,
-    link: "#"
+    title: "Contact Support",
+    description: "Need more help? Reach out to our support team",
+    icon: HelpCircle,
+    link: "/contact"
   }
 ];
 
@@ -109,16 +109,16 @@ export default function Help() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 animate-fade-up" style={{ animationDelay: '200ms' }}>
-              {resources.map((resource, index) => (
+              {helpfulLinks.map((link, index) => (
                 <Card key={index} className="p-4 md:p-6 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 border border-gray-200/50">
                   <div className="flex flex-col items-center text-center space-y-2">
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/5 flex items-center justify-center">
-                      <resource.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                      <link.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-sm md:text-base">{resource.title}</h3>
-                    <p className="text-xs md:text-sm text-gray-600">{resource.description}</p>
+                    <h3 className="font-semibold text-gray-900 text-sm md:text-base">{link.title}</h3>
+                    <p className="text-xs md:text-sm text-gray-600">{link.description}</p>
                     <Button variant="ghost" asChild className="mt-1 md:mt-2 text-xs md:text-sm px-2 py-1 h-auto">
-                      <a href={resource.link}>Learn More</a>
+                      <a href={link.link}>View Details</a>
                     </Button>
                   </div>
                 </Card>
