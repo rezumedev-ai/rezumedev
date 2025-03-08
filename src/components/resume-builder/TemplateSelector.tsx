@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { resumeTemplates } from "./templates";
 import { TemplatePreview } from "./TemplatePreview";
+import { motion } from "framer-motion";
 
 interface TemplateSelectorProps {
   onTemplateSelect?: (templateId: string) => void;
@@ -81,36 +82,94 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 12
+      }
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold mb-4">Choose Your Resume Template</h2>
-        <p className="text-muted-foreground">
-          Select a template that best represents your professional style
+      <motion.div 
+        className="text-center mb-12"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+          Choose Your Resume Template
+        </h2>
+        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          Select a professional template that best showcases your skills and experience
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {resumeTemplates.map((template) => (
-          <TemplatePreview
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {resumeTemplates.map((template, index) => (
+          <motion.div
             key={template.id}
-            template={template}
-            isSelected={selectedTemplate === template.id}
-            onSelect={() => setSelectedTemplate(template.id)}
-          />
+            variants={itemVariants}
+            whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+            className="h-full"
+          >
+            <TemplatePreview
+              template={template}
+              isSelected={selectedTemplate === template.id}
+              onSelect={() => setSelectedTemplate(template.id)}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="mt-8 flex justify-end">
+      <motion.div 
+        className="mt-12 flex justify-end"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.8 }}
+      >
         <Button 
           onClick={handleContinue} 
-          className="min-w-[200px]"
+          className="min-w-[200px] py-6 text-lg transition-all duration-300 hover:shadow-lg hover:scale-105"
           disabled={isLoading}
         >
-          {isLoading ? "Creating..." : "Continue"}
-          <ArrowRight className="ml-2 w-4 h-4" />
+          {isLoading ? (
+            <motion.div
+              className="flex items-center space-x-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <span className="animate-pulse">Creating...</span>
+            </motion.div>
+          ) : (
+            <motion.div className="flex items-center space-x-2">
+              <span>Continue</span>
+              <ArrowRight className="w-5 h-5" />
+            </motion.div>
+          )}
         </Button>
-      </div>
+      </motion.div>
     </div>
   );
 }

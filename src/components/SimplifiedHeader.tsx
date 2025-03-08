@@ -1,5 +1,6 @@
 
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const SimplifiedHeader = () => {
   return (
@@ -8,9 +9,14 @@ export const SimplifiedHeader = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/dashboard" className="flex items-center space-x-2 group">
-            <span className="text-xl font-bold text-primary transition-colors group-hover:text-primary-hover">
+            <motion.span 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-xl font-bold text-primary transition-colors group-hover:text-primary-hover"
+            >
               Rezume.dev
-            </span>
+            </motion.span>
           </Link>
         </div>
       </div>
