@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -233,7 +234,7 @@ export function FinalResumePreview({
       />
       
       <div 
-        className={`w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'max-w-full transform-gpu' : ''}`}
+        className={`w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'max-w-[98vw] overflow-visible' : ''}`}
         style={pageStyle}
       >
         <PersonalSection 

@@ -12,5 +12,5 @@ export function formatDate(dateString: string): string {
 }
 
 export function getResponsiveScale(isMobile: boolean): number {
-  return isMobile ? 0.75 : 1;
+  return isMobile ? 0.45 : 1;
 }
