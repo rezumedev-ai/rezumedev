@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,26 +9,20 @@ import { EducationSection } from "./preview/EducationSection";
 import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
 import { resumeTemplates } from "./templates";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
   resumeId: string;
   isEditing?: boolean;
-  onToggleEditMode?: () => void;
 }
 
-export function FinalResumePreview({ 
-  resumeData, 
-  resumeId, 
-  isEditing = false,
-  onToggleEditMode
-}: FinalResumePreviewProps) {
+export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   
   // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
@@ -37,9 +30,6 @@ export function FinalResumePreview({
   useEffect(() => {
     setResumeState(resumeData);
   }, [resumeData]);
-
-  // Fixed scale based on device size
-  const scale = isMobile ? 0.5 : 1;
   
   // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
@@ -219,101 +209,71 @@ export function FinalResumePreview({
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
+    // Fix the titleFont reference by accessing it from the correct location in the template object
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
-
-  // Calculate dimensions for A4 page (for proper scaling)
-  const DPI = 96; // Standard screen DPI
-  const WIDTH_INCHES = 8.5;
-  const HEIGHT_INCHES = 11;
-  const WIDTH_PX = Math.floor(WIDTH_INCHES * DPI); // 816px
-  const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI); // 1056px
   
   return (
-    <div className="flex flex-col items-center bg-gray-100 py-4 min-h-screen overflow-x-hidden">
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
       <ResumePreviewToolbar 
         currentTemplateId={template.id}
         templates={resumeTemplates}
         resumeId={resumeId}
         onTemplateChange={handleTemplateChange}
         onBackToDashboard={() => navigate("/dashboard")}
-        isEditing={isEditing}
-        onToggleEditMode={onToggleEditMode}
       />
       
-      <div className="w-screen max-w-full flex justify-center items-center px-2 sm:px-4 overflow-hidden">
-        <div 
-          className="bg-white shadow-xl mx-auto origin-top relative"
-          style={{
-            width: `${WIDTH_PX}px`,
-            height: `${HEIGHT_PX}px`,
-            transform: `scale(${scale})`,
-            transformOrigin: 'top center',
-            margin: isMobile ? '0 0 200px 0' : '0 auto 40px auto', // Add bottom margin on mobile for scrolling
-            minWidth: `${WIDTH_PX}px`,
-            maxWidth: `${WIDTH_PX}px`,
-          }}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              top: template.style.spacing.margins.top,
-              right: template.style.spacing.margins.right,
-              bottom: template.style.spacing.margins.bottom,
-              left: template.style.spacing.margins.left,
-              overflow: 'hidden',
-              boxSizing: 'border-box',
-            }}
-          >
-            <PersonalSection 
-              fullName={resumeState.personal_info.fullName}
-              title={resumeState.professional_summary.title}
-              email={resumeState.personal_info.email}
-              phone={resumeState.personal_info.phone}
-              linkedin={resumeState.personal_info.linkedin}
-              website={resumeState.personal_info.website}
-              template={template}
-              isEditing={isEditing}
-              onUpdate={handlePersonalInfoUpdate}
-            />
-            
-            <ProfessionalSummarySection 
-              summary={resumeState.professional_summary.summary} 
-              template={template}
-              isEditing={isEditing}
-              onUpdate={handleSummaryUpdate}
-            />
-            
-            <ExperienceSection 
-              experiences={resumeState.work_experience} 
-              template={template}
-              isEditing={isEditing}
-              onUpdate={handleExperienceUpdate}
-            />
-            
-            <EducationSection 
-              education={resumeState.education} 
-              template={template}
-              isEditing={isEditing}
-              onUpdate={handleEducationUpdate}
-            />
-            
-            <SkillsSection 
-              hardSkills={resumeState.skills.hard_skills} 
-              softSkills={resumeState.skills.soft_skills} 
-              template={template}
-              isEditing={isEditing}
-              onUpdate={handleSkillsUpdate}
-            />
-            
-            <CertificationsSection 
-              certifications={resumeState.certifications} 
-              template={template}
-              isEditing={isEditing}
-              onUpdate={handleCertificationUpdate}
-            />
-          </div>
-        </div>
+      <div 
+        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
+        style={pageStyle}
+      >
+        <PersonalSection 
+          fullName={resumeState.personal_info.fullName}
+          title={resumeState.professional_summary.title}
+          email={resumeState.personal_info.email}
+          phone={resumeState.personal_info.phone}
+          linkedin={resumeState.personal_info.linkedin}
+          website={resumeState.personal_info.website}
+          template={template}
+          isEditing={isEditing}
+          onUpdate={handlePersonalInfoUpdate}
+        />
+        
+        <ProfessionalSummarySection 
+          summary={resumeState.professional_summary.summary} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={handleSummaryUpdate}
+        />
+        
+        <ExperienceSection 
+          experiences={resumeState.work_experience} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={handleExperienceUpdate}
+        />
+        
+        <EducationSection 
+          education={resumeState.education} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={handleEducationUpdate}
+        />
+        
+        <SkillsSection 
+          hardSkills={resumeState.skills.hard_skills} 
+          softSkills={resumeState.skills.soft_skills} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={handleSkillsUpdate}
+        />
+        
+        <CertificationsSection 
+          certifications={resumeState.certifications} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={handleCertificationUpdate}
+        />
       </div>
     </div>
   );
