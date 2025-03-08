@@ -45,14 +45,14 @@ export const ConfirmationEmail = ({
           Thanks for signing up for {brandName}! Please confirm your email address by clicking the button below.
         </Text>
         <Section style={buttonContainer}>
-          <Button style={button} href={confirmLink}>
+          <Button style={{...button, backgroundColor: brandColor}} href={confirmLink}>
             Confirm Email
           </Button>
         </Section>
         <Text style={paragraph}>
           Or copy and paste this link into your browser:
         </Text>
-        <Text style={link}>{confirmLink}</Text>
+        <Text style={{...link, color: brandColor}}>{confirmLink}</Text>
         <Hr style={hr} />
         <Text style={footer}>
           If you didn't create an account with {brandName}, you can safely ignore this email.

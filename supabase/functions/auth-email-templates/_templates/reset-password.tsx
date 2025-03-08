@@ -45,14 +45,14 @@ export const ResetPasswordEmail = ({
           We received a request to reset your password for your {brandName} account.
         </Text>
         <Section style={buttonContainer}>
-          <Button style={button} href={resetLink}>
+          <Button style={{...button, backgroundColor: brandColor}} href={resetLink}>
             Reset Password
           </Button>
         </Section>
         <Text style={paragraph}>
           Or copy and paste this link into your browser:
         </Text>
-        <Text style={link}>{resetLink}</Text>
+        <Text style={{...link, color: brandColor}}>{resetLink}</Text>
         <Hr style={hr} />
         <Text style={footer}>
           If you didn't request a password reset, you can safely ignore this email.

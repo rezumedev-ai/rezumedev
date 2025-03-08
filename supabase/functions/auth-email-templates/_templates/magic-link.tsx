@@ -42,14 +42,14 @@ export const MagicLinkEmail = ({
         />
         <Heading style={h1}>Your magic link</Heading>
         <Section style={buttonContainer}>
-          <Button style={button} href={magicLink}>
+          <Button style={{...button, backgroundColor: brandColor}} href={magicLink}>
             Sign in to {brandName}
           </Button>
         </Section>
         <Text style={paragraph}>
           Or copy and paste this link into your browser:
         </Text>
-        <Text style={link}>{magicLink}</Text>
+        <Text style={{...link, color: brandColor}}>{magicLink}</Text>
         <Hr style={hr} />
         <Text style={footer}>
           If you didn't request this email, you can safely ignore it.

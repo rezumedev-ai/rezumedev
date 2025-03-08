@@ -10,8 +10,8 @@ site_url = "http://localhost:5173"
 additional_redirect_urls = ["https://localhost:5173"]
 hook_functions = [
   {
-    hook_point = "email-templates", 
-    function_name = "auth-email-templates", 
+    hook_point = "email-templates",
+    function_name = "auth-email-templates",
     verify_jwt = false
   }
 ]

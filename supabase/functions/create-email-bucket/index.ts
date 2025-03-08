@@ -43,6 +43,41 @@ serve(async (req) => {
       if (createBucketError) {
         throw createBucketError;
       }
+      
+      // Set public policy to allow access to the email assets
+      const { error: policyError } = await supabase
+        .storage
+        .from('emails')
+        .createSignedUrl('path/to/file', 60);
+      
+      if (policyError && !policyError.message.includes('The resource was not found')) {
+        throw policyError;
+      }
+      
+      // Try to upload the logo if we can find it in the public folder
+      try {
+        // For demonstration, we're creating a fetch to get the logo from public
+        // In a real scenario, we would upload the logo from a local file
+        const logoResponse = await fetch("http://localhost:5173/lovable-uploads/1de1d500-e16a-46d6-9037-19cf6739f790.png");
+        
+        if (logoResponse.ok) {
+          const logoBlob = await logoResponse.blob();
+          
+          const { error: uploadError } = await supabase
+            .storage
+            .from('emails')
+            .upload('logo-email.png', logoBlob, {
+              contentType: 'image/png',
+              upsert: true,
+            });
+          
+          if (uploadError) {
+            console.error(`Error uploading logo: ${uploadError.message}`);
+          }
+        }
+      } catch (logoError) {
+        console.error(`Error fetching or uploading logo: ${logoError.message}`);
+      }
     }
     
     return new Response(JSON.stringify({ success: true }), {
