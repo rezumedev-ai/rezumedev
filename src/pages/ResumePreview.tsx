@@ -6,7 +6,7 @@ import { FinalResumePreview } from "@/components/resume-builder/FinalResumePrevi
 import { ResumeData } from "@/types/resume";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Save } from "lucide-react";
+import { Edit, Save, ZoomIn, ZoomOut } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getResponsiveScale } from "@/lib/utils";
