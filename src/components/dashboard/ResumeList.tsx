@@ -10,8 +10,6 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { generateResumePDF } from "@/lib/utils";
 
 interface Resume {
   id: string;
@@ -30,14 +28,13 @@ interface ResumeListProps {
 }
 
 export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
-  const { toast: uiToast } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState<string | null>(null);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const container = {
     hidden: { opacity: 0 },
@@ -75,14 +72,14 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
       .eq('id', id);
 
     if (error) {
-      uiToast({
+      toast({
         title: "Error",
         description: "Could not delete resume",
         variant: "destructive",
         duration: 3000,
       });
     } else {
-      uiToast({
+      toast({
         title: "Success",
         description: "Resume deleted successfully",
         duration: 3000,
@@ -105,36 +102,8 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
     navigate(`/resume-preview/${id}`);
   };
 
-  const handleDownload = async (id: string) => {
-    setDownloadingId(id);
-    try {
-      const { data: resumeData, error: resumeError } = await supabase
-        .from("resumes")
-        .select("*")
-        .eq("id", id)
-        .single();
-        
-      if (resumeError) {
-        throw resumeError;
-      }
-      
-      toast("Preparing your resume for download...", {
-        type: "info"
-      });
-      
-      await generateResumePDF(resumeData, id);
-      
-      toast("Resume downloaded successfully!", {
-        type: "success"
-      });
-    } catch (error) {
-      console.error("Error downloading resume:", error);
-      toast("Failed to download resume. Please try viewing the resume first.", {
-        type: "error"
-      });
-    } finally {
-      setDownloadingId(null);
-    }
+  const handleDownload = (id: string) => {
+    navigate(`/resume-preview/${id}`);
   };
 
   const startEditingTitle = (resume: Resume) => {
@@ -149,14 +118,14 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
       .eq('id', id);
 
     if (error) {
-      uiToast({
+      toast({
         title: "Error",
         description: "Could not update resume title",
         variant: "destructive",
         duration: 3000,
       });
     } else {
-      uiToast({
+      toast({
         title: "Success",
         description: "Resume title updated",
         duration: 3000,
@@ -366,14 +335,9 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                           size="sm" 
                           onClick={() => handleDownload(resume.id)}
                           className="w-full group/btn hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
-                          disabled={downloadingId === resume.id}
                         >
-                          {downloadingId === resume.id ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          ) : (
-                            <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                          )}
-                          {downloadingId === resume.id ? "Processing..." : "Download"}
+                          <Download className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                          Download
                         </Button>
                       </motion.div>
                       
