@@ -1,4 +1,3 @@
-
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -80,12 +79,13 @@ export function ResumePreview({
       const containerHeight = container.clientHeight - 48;
 
       const scaleX = containerWidth / WIDTH_PX;
-      const scaleY = containerHeight / HEIGHT_PX;
-      let newScale = Math.min(scaleX, scaleY, 1);
+      let newScale;
 
       if (isMobile) {
-        newScale = isZoomed ? 0.8 : 0.4;
+        newScale = isZoomed ? 0.9 : 0.65;
       } else {
+        const scaleY = containerHeight / HEIGHT_PX;
+        newScale = Math.min(scaleX, scaleY, 1);
         newScale = Math.min(newScale, 0.85);
       }
 
@@ -105,10 +105,8 @@ export function ResumePreview({
 
   const margins = getMargins();
 
-  // Compute dynamic font sizes based on template and content length
   const getFontSize = (baseSize: string, contentLength: number, threshold: number) => {
     if (templateId === "modern-split") {
-      // For modern-split template, adjust font sizes based on content length
       if (contentLength > threshold) {
         if (baseSize.includes("text-base")) return "text-sm";
         if (baseSize.includes("text-sm")) return "text-xs";
@@ -119,7 +117,6 @@ export function ResumePreview({
     return baseSize;
   };
 
-  // Dynamic calculation for summary text size
   const summaryTextSize = getFontSize(
     templateId === "modern-split" ? "text-[11px]" : "text-gray-700 mt-2",
     professionalSummary.summary.length,
@@ -141,7 +138,7 @@ export function ResumePreview({
       
       <div 
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center p-6 overflow-hidden"
+        className="w-full h-full flex items-center justify-center p-6 overflow-auto"
       >
         <div 
           ref={resumeRef}
@@ -151,10 +148,15 @@ export function ResumePreview({
             width: `${WIDTH_PX}px`,
             height: `${HEIGHT_PX}px`,
             transform: `scale(${scale})`,
-            transformOrigin: 'center',
-            margin: '0',
+            transformOrigin: isMobile ? 'top center' : 'center',
+            margin: isMobile ? '0 auto 100px' : '0',
             padding: '0',
             position: 'absolute',
+            top: isMobile ? '80px' : '50%',
+            left: '50%',
+            transform: isMobile 
+              ? `translateX(-50%) scale(${scale})` 
+              : `translate(-50%, -50%) scale(${scale})`,
             boxSizing: 'border-box',
             overflow: 'hidden',
             minWidth: `${WIDTH_PX}px`,

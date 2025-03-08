@@ -10,9 +10,10 @@ import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
 import { resumeTemplates } from "./templates";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, RefreshCw } from "lucide-react";
+import { ArrowLeft, Download, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -22,7 +23,10 @@ interface FinalResumePreviewProps {
 
 export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
+  const [scale, setScale] = useState(1);
+  const [isZoomed, setIsZoomed] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
@@ -30,7 +34,19 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   useEffect(() => {
     setResumeState(resumeData);
   }, [resumeData]);
+
+  useEffect(() => {
+    if (isMobile) {
+      setScale(isZoomed ? 0.9 : 0.65);
+    } else {
+      setScale(1);
+    }
+  }, [isMobile, isZoomed]);
   
+  const toggleZoom = () => {
+    setIsZoomed(!isZoomed);
+  };
+
   // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
     if (!isEditing) return;
@@ -152,7 +168,6 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   // Update the resume data in Supabase
   const updateResumeData = async (data: ResumeData) => {
     try {
-      // Convert the data to match Supabase's expected format
       const supabaseData = {
         personal_info: data.personal_info,
         professional_summary: data.professional_summary,
@@ -194,7 +209,6 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
           template_id: templateId
         };
         
-        // Update in Supabase
         updateResumeData(newState);
         return newState;
       });
@@ -209,8 +223,9 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    // Fix the titleFont reference by accessing it from the correct location in the template object
-    fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
+    fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans',
+    transform: isMobile ? `scale(${scale})` : 'none',
+    transformOrigin: 'top center',
   };
   
   return (
@@ -223,8 +238,20 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onBackToDashboard={() => navigate("/dashboard")}
       />
       
+      {isMobile && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleZoom}
+          className="my-2 shadow-sm"
+        >
+          {isZoomed ? <ZoomOut className="w-3 h-3 mr-1" /> : <ZoomIn className="w-3 h-3 mr-1" />}
+          {isZoomed ? "Zoom Out" : "Zoom In"}
+        </Button>
+      )}
+      
       <div 
-        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
+        className={`w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'transform-gpu' : ''}`}
         style={pageStyle}
       >
         <PersonalSection 
