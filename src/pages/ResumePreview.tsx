@@ -36,7 +36,7 @@ export default function ResumePreview() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-16">
         <div className="animate-pulse text-gray-500">Loading preview...</div>
       </div>
     );
@@ -44,14 +44,14 @@ export default function ResumePreview() {
 
   if (!resume) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-16">
         <div className="text-gray-500">Resume not found</div>
       </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className={`relative ${isMobile ? "h-[calc(100vh-80px)]" : "min-h-screen"} overflow-hidden pt-16`}>
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
