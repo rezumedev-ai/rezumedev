@@ -47,16 +47,6 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
             <Check className="w-4 h-4" />
           </motion.div>
         )}
-        
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent",
-          "opacity-0 hover:opacity-100 transition-opacity duration-300"
-        )}>
-          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-            <h3 className="font-semibold text-lg">{template.name}</h3>
-            <p className="text-sm text-gray-200">{template.description}</p>
-          </div>
-        </div>
       </div>
       
       <motion.div 
