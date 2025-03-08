@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -22,7 +24,10 @@ interface FinalResumePreviewProps {
 
 export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
+  const [scale, setScale] = useState(1);
+  const [containerHeight, setContainerHeight] = useState("auto");
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
@@ -30,6 +35,17 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   useEffect(() => {
     setResumeState(resumeData);
   }, [resumeData]);
+
+  useEffect(() => {
+    // Calculate scale for mobile
+    if (isMobile) {
+      setScale(0.45); // Smaller scale for mobile devices
+      setContainerHeight("calc(100vh - 120px)");
+    } else {
+      setScale(1);
+      setContainerHeight("auto");
+    }
+  }, [isMobile]);
   
   // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
@@ -177,11 +193,11 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         
       if (error) {
         console.error("Error updating resume:", error);
-        toast.error("Failed to save changes");
+        toast("Failed to save changes");
       }
     } catch (error) {
       console.error("Error in updateResumeData:", error);
-      toast.error("Failed to save changes");
+      toast("Failed to save changes");
     }
   };
 
@@ -199,22 +215,21 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         return newState;
       });
       
-      toast.success("Template updated successfully");
+      toast("Template updated successfully");
     } catch (error) {
       console.error("Error changing template:", error);
-      toast.error("Failed to update template");
+      toast("Failed to update template");
     }
   };
   
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    // Fix the titleFont reference by accessing it from the correct location in the template object
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
   
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-4 md:py-8 px-2 md:px-0 overflow-x-hidden">
       <ResumePreviewToolbar 
         currentTemplateId={template.id}
         templates={resumeTemplates}
@@ -223,57 +238,66 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onBackToDashboard={() => navigate("/dashboard")}
       />
       
-      <div 
-        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
-        style={pageStyle}
-      >
-        <PersonalSection 
-          fullName={resumeState.personal_info.fullName}
-          title={resumeState.professional_summary.title}
-          email={resumeState.personal_info.email}
-          phone={resumeState.personal_info.phone}
-          linkedin={resumeState.personal_info.linkedin}
-          website={resumeState.personal_info.website}
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handlePersonalInfoUpdate}
-        />
-        
-        <ProfessionalSummarySection 
-          summary={resumeState.professional_summary.summary} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleSummaryUpdate}
-        />
-        
-        <ExperienceSection 
-          experiences={resumeState.work_experience} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleExperienceUpdate}
-        />
-        
-        <EducationSection 
-          education={resumeState.education} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleEducationUpdate}
-        />
-        
-        <SkillsSection 
-          hardSkills={resumeState.skills.hard_skills} 
-          softSkills={resumeState.skills.soft_skills} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleSkillsUpdate}
-        />
-        
-        <CertificationsSection 
-          certifications={resumeState.certifications} 
-          template={template}
-          isEditing={isEditing}
-          onUpdate={handleCertificationUpdate}
-        />
+      <div className="w-full max-w-screen-lg mx-auto overflow-auto" style={{ height: containerHeight }}>
+        <div className="flex justify-center items-center py-4">
+          <div 
+            className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto relative transform-gpu"
+            style={{ 
+              ...pageStyle, 
+              transform: `scale(${scale})`, 
+              transformOrigin: 'top center',
+              marginBottom: isMobile ? '-30%' : '0' // Adjust based on scale
+            }}
+          >
+            <PersonalSection 
+              fullName={resumeState.personal_info.fullName}
+              title={resumeState.professional_summary.title}
+              email={resumeState.personal_info.email}
+              phone={resumeState.personal_info.phone}
+              linkedin={resumeState.personal_info.linkedin}
+              website={resumeState.personal_info.website}
+              template={template}
+              isEditing={isEditing}
+              onUpdate={handlePersonalInfoUpdate}
+            />
+            
+            <ProfessionalSummarySection 
+              summary={resumeState.professional_summary.summary} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={handleSummaryUpdate}
+            />
+            
+            <ExperienceSection 
+              experiences={resumeState.work_experience} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={handleExperienceUpdate}
+            />
+            
+            <EducationSection 
+              education={resumeState.education} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={handleEducationUpdate}
+            />
+            
+            <SkillsSection 
+              hardSkills={resumeState.skills.hard_skills} 
+              softSkills={resumeState.skills.soft_skills} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={handleSkillsUpdate}
+            />
+            
+            <CertificationsSection 
+              certifications={resumeState.certifications} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={handleCertificationUpdate}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
