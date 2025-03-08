@@ -10,23 +10,15 @@ import { resumeTemplates } from "./templates";
 import { TemplatePreview } from "./TemplatePreview";
 
 interface TemplateSelectorProps {
-  onTemplateSelect?: (templateId: string, style: string) => void;
+  onTemplateSelect?: (templateId: string) => void;
 }
 
 export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {}) {
   const [selectedTemplate, setSelectedTemplate] = useState<string>(resumeTemplates[0].id);
-  const [selectedStyle, setSelectedStyle] = useState<string>("professional");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const styles = [
-    { id: "professional", name: "Professional" },
-    { id: "creative", name: "Creative" },
-    { id: "modern", name: "Modern" },
-    { id: "classic", name: "Classic" }
-  ];
 
   const handleContinue = async () => {
     if (!selectedTemplate) {
@@ -59,7 +51,6 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
             user_id: user.id,
             title: 'Untitled Resume',
             template_id: selectedTemplate,
-            style_preference: selectedStyle,
             content: {},
             current_step: 1
           }
@@ -97,22 +88,6 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
         <p className="text-muted-foreground">
           Select a template that best represents your professional style
         </p>
-      </div>
-
-      <div className="mb-12">
-        <h3 className="text-xl font-medium mb-4">Resume Style</h3>
-        <div className="flex flex-wrap gap-4">
-          {styles.map((style) => (
-            <Button
-              key={style.id}
-              variant={selectedStyle === style.id ? "default" : "outline"}
-              onClick={() => setSelectedStyle(style.id)}
-              className="min-w-[120px]"
-            >
-              {style.name}
-            </Button>
-          ))}
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
