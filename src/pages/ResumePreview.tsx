@@ -51,7 +51,7 @@ export default function ResumePreview() {
   }
 
   return (
-    <div className="relative">
+    <div className={`relative ${isMobile ? "h-[calc(100vh-80px)]" : "min-h-screen"} overflow-hidden`}>
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}

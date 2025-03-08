@@ -230,7 +230,7 @@ export function FinalResumePreview({
   const HEIGHT_PX = Math.floor(HEIGHT_INCHES * DPI); // 1056px
   
   return (
-    <div className="flex flex-col items-center bg-gray-100 py-4 min-h-screen overflow-x-hidden">
+    <div className="flex flex-col items-center bg-gray-100 min-h-screen overflow-x-hidden">
       <ResumePreviewToolbar 
         currentTemplateId={template.id}
         templates={resumeTemplates}
@@ -249,7 +249,7 @@ export function FinalResumePreview({
             height: `${HEIGHT_PX}px`,
             transform: `scale(${scale})`,
             transformOrigin: 'top center',
-            margin: isMobile ? '0 0 200px 0' : '0 auto 40px auto', // Add bottom margin on mobile for scrolling
+            margin: isMobile ? '-100px auto 0' : '0 auto 40px auto', // Removed bottom margin on mobile
             minWidth: `${WIDTH_PX}px`,
             maxWidth: `${WIDTH_PX}px`,
           }}
