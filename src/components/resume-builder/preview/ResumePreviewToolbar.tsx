@@ -8,6 +8,7 @@ import { TemplatePreview } from "../TemplatePreview";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -25,6 +26,7 @@ export function ResumePreviewToolbar({
   onBackToDashboard,
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const isMobile = useIsMobile();
 
   // Handle downloading the resume as PDF
   const handleDownload = async () => {
@@ -33,7 +35,7 @@ export function ResumePreviewToolbar({
       toast.info("Preparing your resume for download...");
       
       // Get the resume element
-      const resumeElement = document.querySelector(".w-\\[21cm\\]");
+      const resumeElement = document.querySelector(".bg-white.shadow-xl.mx-auto.origin-top.relative");
       
       if (!resumeElement) {
         toast.error("Could not find resume element");
@@ -101,6 +103,62 @@ export function ResumePreviewToolbar({
       setIsDownloading(false);
     }
   };
+
+  if (isMobile) {
+    return (
+      <div className="w-full px-2 mb-4">
+        <div className="bg-white rounded-lg shadow-md p-3 flex flex-col gap-3">
+          <Button 
+            variant="ghost" 
+            onClick={onBackToDashboard}
+            className="flex items-center justify-start gap-2 text-gray-600 hover:text-primary hover:bg-gray-100 w-full"
+            size="sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
+          </Button>
+          
+          <div className="flex flex-col gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 w-full"
+                  size="sm"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span>Switch Template</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[300px] p-3" align="center">
+                <h3 className="text-base font-semibold mb-3">Choose a Template</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {templates.map((template) => (
+                    <TemplatePreview
+                      key={template.id}
+                      template={template}
+                      isSelected={template.id === currentTemplateId}
+                      onSelect={() => onTemplateChange(template.id)}
+                    />
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            
+            <Button 
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover w-full"
+              size="sm"
+            >
+              <Download className="w-4 h-4" />
+              <span>{isDownloading ? "Preparing..." : "Download PDF"}</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[21cm] mx-auto mb-6 bg-white rounded-lg shadow-md p-3">

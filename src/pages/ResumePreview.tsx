@@ -8,10 +8,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Save } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function ResumePreview() {
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
+  const isMobile = useIsMobile();
 
   const { data: resume, isLoading } = useQuery({
     queryKey: ["resume", id],
@@ -52,7 +54,7 @@ export default function ResumePreview() {
 
   return (
     <div className="relative">
-      <div className="fixed top-4 right-4 z-50">
+      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'top-4 right-4'} z-50`}>
         <Button 
           onClick={toggleEditMode} 
           variant="outline"
