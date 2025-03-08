@@ -1,3 +1,4 @@
+
 import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X, ArrowRight, Archive, Clock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,8 +10,6 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { generateResumePDF } from "@/lib/utils";
 
@@ -31,7 +30,7 @@ interface ResumeListProps {
 }
 
 export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -76,14 +75,14 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
       .eq('id', id);
 
     if (error) {
-      toast({
+      uiToast({
         title: "Error",
         description: "Could not delete resume",
         variant: "destructive",
         duration: 3000,
       });
     } else {
-      toast({
+      uiToast({
         title: "Success",
         description: "Resume deleted successfully",
         duration: 3000,
@@ -119,14 +118,20 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
         throw resumeError;
       }
       
-      toast.info("Preparing your resume for download...");
+      toast("Preparing your resume for download...", {
+        type: "info"
+      });
       
       await generateResumePDF(resumeData, id);
       
-      toast.success("Resume downloaded successfully!");
+      toast("Resume downloaded successfully!", {
+        type: "success"
+      });
     } catch (error) {
       console.error("Error downloading resume:", error);
-      toast.error("Failed to download resume. Please try viewing the resume first.");
+      toast("Failed to download resume. Please try viewing the resume first.", {
+        type: "error"
+      });
     } finally {
       setDownloadingId(null);
     }
@@ -144,14 +149,14 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
       .eq('id', id);
 
     if (error) {
-      toast({
+      uiToast({
         title: "Error",
         description: "Could not update resume title",
         variant: "destructive",
         duration: 3000,
       });
     } else {
-      toast({
+      uiToast({
         title: "Success",
         description: "Resume title updated",
         duration: 3000,

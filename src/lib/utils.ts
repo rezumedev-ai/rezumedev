@@ -62,10 +62,15 @@ export async function generateResumePDF(resumeData: any, resumeId: string): Prom
       document.body.appendChild(tempContainer);
       tempContainer.appendChild(resumeContent);
       
+      // Define default fonts and colors to use if template properties are missing
+      const defaultFontFamily = "'Arial', sans-serif";
+      const defaultTextColor = "#000000";
+      const defaultTextOnPrimary = "#FFFFFF";
+      
       // Create HTML structure for the resume
       resumeContent.innerHTML = `
-        <div class="resume-content" style="font-family: ${template.style.bodyFont}; color: ${template.style.colors.text};">
-          <div class="header" style="background-color: ${template.style.colors.primary}; color: ${template.style.colors.textOnPrimary}; padding: 20px;">
+        <div class="resume-content" style="font-family: ${template.style.typography?.bodyFont || defaultFontFamily}; color: ${template.style.colors.text || defaultTextColor};">
+          <div class="header" style="background-color: ${template.style.colors.primary}; color: ${template.style.colors.textOnPrimary || defaultTextOnPrimary}; padding: 20px;">
             <h1 style="font-size: 24px; margin: 0;">${resumeData.personal_info.fullName}</h1>
             <p style="margin: 5px 0 0 0;">${resumeData.professional_summary.title}</p>
             <div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
