@@ -71,7 +71,7 @@ export default function ResumePreview() {
           )}
         </Button>
       </div>
-      <div className="min-h-screen w-full overflow-x-hidden">
+      <div className="min-h-screen w-full overflow-x-auto">
         <FinalResumePreview
           resumeData={resume as unknown as ResumeData}
           resumeId={id as string}

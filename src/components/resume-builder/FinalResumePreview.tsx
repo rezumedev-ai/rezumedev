@@ -210,7 +210,6 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    // Get font family from template
     fontFamily: template.style.typography?.fontFamily || 'sans-serif'
   };
   

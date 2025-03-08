@@ -1,3 +1,4 @@
+
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -37,6 +38,7 @@ export interface ResumeTemplate {
       subtitleSize: string;
       bodySize: string;
       lineHeight: string;
+      fontFamily?: string;
     };
     icons: {
       sections: boolean;
