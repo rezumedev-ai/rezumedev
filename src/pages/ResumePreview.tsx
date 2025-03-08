@@ -54,7 +54,7 @@ export default function ResumePreview() {
 
   return (
     <div className="relative">
-      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'top-4 right-4'} z-50`}>
+      <div className="fixed top-20 right-4 sm:top-24 sm:right-6 z-50">
         <Button 
           onClick={toggleEditMode} 
           variant="outline"

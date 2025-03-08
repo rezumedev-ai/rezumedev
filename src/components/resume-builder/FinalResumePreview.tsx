@@ -13,8 +13,6 @@ import { resumeTemplates } from "./templates";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ZoomIn, ZoomOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -24,8 +22,6 @@ interface FinalResumePreviewProps {
 
 export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
-  const [scale, setScale] = useState(1);
-  const [isZoomed, setIsZoomed] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
@@ -36,21 +32,8 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
     setResumeState(resumeData);
   }, [resumeData]);
 
-  useEffect(() => {
-    // Determine the appropriate scale based on device size
-    const calculateScale = () => {
-      if (isMobile) {
-        return isZoomed ? 0.85 : 0.5;
-      }
-      return 1;
-    };
-    
-    setScale(calculateScale());
-  }, [isMobile, isZoomed]);
-
-  const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
-  };
+  // Fixed scale based on device size
+  const scale = isMobile ? 0.5 : 1;
   
   // Handle personal info updates
   const handlePersonalInfoUpdate = (field: string, value: string) => {
@@ -249,29 +232,6 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onTemplateChange={handleTemplateChange}
         onBackToDashboard={() => navigate("/dashboard")}
       />
-      
-      {isMobile && (
-        <div className="py-2 mb-2 w-full flex justify-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleZoom}
-            className="bg-white shadow-md"
-          >
-            {isZoomed ? (
-              <div className="flex items-center gap-1">
-                <ZoomOut className="w-4 h-4" />
-                <span className="text-xs">Zoom Out</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1">
-                <ZoomIn className="w-4 h-4" />
-                <span className="text-xs">Zoom In</span>
-              </div>
-            )}
-          </Button>
-        </div>
-      )}
       
       <div className="w-screen max-w-full flex justify-center items-center px-2 sm:px-4 overflow-hidden">
         <div 
