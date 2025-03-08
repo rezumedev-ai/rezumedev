@@ -1,1 +1,17 @@
+
 project_id = "xqkzmcudulutohnskcwt"
+
+[api]
+enabled_apis = ["rest", "realtime", "storage", "auth"]
+
+[auth]
+enable_signup = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["https://localhost:5173"]
+hook_functions = [
+  {
+    hook_point = "email-templates", 
+    function_name = "auth-email-templates", 
+    verify_jwt = false
+  }
+]
