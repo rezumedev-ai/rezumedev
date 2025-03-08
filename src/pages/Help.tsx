@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Menu, Search, HelpCircle, Info, BookOpen } from "lucide-react";
+import { Menu, Search, HelpCircle, Info, BookOpen, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
