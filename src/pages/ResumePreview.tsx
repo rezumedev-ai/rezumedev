@@ -23,6 +23,12 @@ export default function ResumePreview() {
         .single();
 
       if (error) throw error;
+      
+      // Ensure certifications is always an array, even if null/undefined
+      if (!data.certifications) {
+        data.certifications = [];
+      }
+      
       return data;
     }
   });

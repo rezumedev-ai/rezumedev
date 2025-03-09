@@ -16,7 +16,10 @@ export function CertificationsSection({
   isEditing,
   onUpdate 
 }: CertificationsSectionProps) {
-  if (certifications.length === 0) return null;
+  // Return null if the certifications array is empty or undefined
+  if (!certifications || certifications.length === 0) {
+    return null;
+  }
 
   const handleContentEdit = (
     index: number,
