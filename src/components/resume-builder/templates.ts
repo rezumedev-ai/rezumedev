@@ -1,3 +1,4 @@
+
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -187,6 +188,104 @@ export const resumeTemplates: ResumeTemplate[] = [
         sections: false,
         contact: true,
         bullets: "dot"
+      }
+    }
+  },
+  
+  // NEW TEMPLATE 1: Corporate Standard
+  {
+    id: "corporate-standard",
+    name: "Corporate Standard",
+    description: "ATS-optimized format favored by HR departments at Fortune 100 companies",
+    imageUrl: "/lovable-uploads/1de1d500-e16a-46d6-9037-19cf6739f790.png",
+    style: {
+      titleFont: "font-sans text-[36px] font-semibold tracking-tight text-slate-800",
+      headerStyle: "mb-8 pb-4 border-b border-slate-300",
+      sectionStyle: "text-[16px] font-semibold text-slate-700 uppercase tracking-wide mb-3 pb-2 border-b border-slate-200",
+      contentStyle: "space-y-5",
+      layout: "classic",
+      colors: {
+        primary: "#334155", // slate-700
+        secondary: "#64748b", // slate-500
+        text: "#334155", // slate-700
+        border: "#e2e8f0", // slate-200
+        background: "#FFFFFF"
+      },
+      spacing: {
+        sectionGap: "2rem",
+        itemGap: "1.5rem",
+        contentPadding: "2.5rem",
+        headerHeight: "auto",
+        margins: {
+          top: "0.8in",
+          right: "0.8in",
+          bottom: "0.8in",
+          left: "0.8in"
+        }
+      },
+      dimensions: {
+        maxWidth: "8.5in",
+        minHeight: "11in"
+      },
+      typography: {
+        titleSize: "36px",
+        subtitleSize: "18px",
+        bodySize: "14px",
+        lineHeight: "1.5"
+      },
+      icons: {
+        sections: false,
+        contact: true,
+        bullets: "dot"
+      }
+    }
+  },
+  
+  // NEW TEMPLATE 2: Modern Tech
+  {
+    id: "modern-tech",
+    name: "Modern Tech",
+    description: "Contemporary design optimized for tech careers and digital roles",
+    imageUrl: "/lovable-uploads/946c34ac-a462-4649-b919-24aa01a04f02.png",
+    style: {
+      titleFont: "font-sans text-[38px] font-bold tracking-tight text-indigo-900",
+      headerStyle: "mb-8 pb-3",
+      sectionStyle: "text-[14px] font-bold text-indigo-800 uppercase tracking-wider mb-3 flex items-center gap-2 after:content-[''] after:flex-grow after:h-[1px] after:bg-indigo-200",
+      contentStyle: "space-y-4",
+      layout: "modern",
+      colors: {
+        primary: "#312e81", // indigo-900
+        secondary: "#4f46e5", // indigo-600
+        text: "#1e1b4b", // indigo-950
+        border: "#c7d2fe", // indigo-200
+        background: "#FFFFFF"
+      },
+      spacing: {
+        sectionGap: "1.75rem",
+        itemGap: "1.25rem",
+        contentPadding: "2.5rem",
+        headerHeight: "auto",
+        margins: {
+          top: "0.75in",
+          right: "0.75in",
+          bottom: "0.75in",
+          left: "0.75in"
+        }
+      },
+      dimensions: {
+        maxWidth: "8.5in",
+        minHeight: "11in"
+      },
+      typography: {
+        titleSize: "38px",
+        subtitleSize: "16px",
+        bodySize: "13px",
+        lineHeight: "1.6"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "arrow"
       }
     }
   }
