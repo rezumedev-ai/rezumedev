@@ -4,7 +4,7 @@ import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 import { useResumePreview } from "@/hooks/use-resume-preview";
-import { ResumeViewer } from "./preview/ResumeViewer";
+import { ResumeContent } from "./ResumeContent";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -33,6 +33,12 @@ export function FinalResumePreview({
   // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
   
+  // Prepare page style based on template
+  const pageStyle = {
+    padding: template.style.spacing.margins.top,
+    fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
+  };
+  
   return (
     <div className="flex flex-col items-center min-h-screen bg-white py-8">
       <ResumePreviewToolbar 
@@ -45,17 +51,22 @@ export function FinalResumePreview({
         onToggleEdit={toggleEditMode}
       />
       
-      <ResumeViewer 
-        resumeState={resumeState}
-        template={template}
-        isEditing={isEditing}
-        onPersonalInfoUpdate={handlePersonalInfoUpdate}
-        onSummaryUpdate={handleSummaryUpdate}
-        onSkillsUpdate={handleSkillsUpdate}
-        onEducationUpdate={handleEducationUpdate}
-        onCertificationUpdate={handleCertificationUpdate}
-        onExperienceUpdate={handleExperienceUpdate}
-      />
+      <div 
+        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
+        style={pageStyle}
+      >
+        <ResumeContent 
+          resumeState={resumeState}
+          template={template}
+          isEditing={isEditing}
+          onPersonalInfoUpdate={handlePersonalInfoUpdate}
+          onSummaryUpdate={handleSummaryUpdate}
+          onSkillsUpdate={handleSkillsUpdate}
+          onEducationUpdate={handleEducationUpdate}
+          onCertificationUpdate={handleCertificationUpdate}
+          onExperienceUpdate={handleExperienceUpdate}
+        />
+      </div>
     </div>
   );
 }
