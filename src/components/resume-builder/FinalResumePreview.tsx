@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -214,7 +215,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   };
   
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
+    <div className="flex flex-col items-center min-h-screen bg-white py-8">
       <ResumePreviewToolbar 
         currentTemplateId={template.id}
         templates={resumeTemplates}

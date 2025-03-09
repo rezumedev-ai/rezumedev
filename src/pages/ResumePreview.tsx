@@ -65,7 +65,7 @@ export default function ResumePreview() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-pulse text-gray-500">Loading preview...</div>
       </div>
     );
@@ -73,14 +73,14 @@ export default function ResumePreview() {
 
   if (!resume) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-gray-500">Resume not found</div>
       </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className="relative bg-white min-h-screen">
       <div className="fixed top-4 right-4 z-50">
         <Button 
           onClick={toggleEditMode} 
