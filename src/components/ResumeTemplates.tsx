@@ -23,16 +23,6 @@ export const ResumeTemplates = () => {
       name: "Professional Executive",
       image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
       description: "Bold modern layout with clean typography, perfect for senior managers and directors"
-    },
-    {
-      name: "Modern Executive",
-      image: "/lovable-uploads/1de1d500-e16a-46d6-9037-19cf6739f790.png",
-      description: "Sophisticated design with left sidebar for senior professionals and executives - stands out from traditional layouts"
-    },
-    {
-      name: "Tech Innovator",
-      image: "/lovable-uploads/946c34ac-a462-4649-b919-24aa01a04f02.png",
-      description: "Modern tech-focused layout with visual skill indicators and sleek typography - ideal for technology roles"
     }
   ];
 
@@ -177,3 +167,4 @@ export const ResumeTemplates = () => {
     </section>
   );
 };
+
