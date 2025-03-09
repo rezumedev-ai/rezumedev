@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SimplifiedHeader } from "@/components/SimplifiedHeader";
 
 export default function ResumePreview() {
   const { id } = useParams();
@@ -54,7 +55,9 @@ export default function ResumePreview() {
 
   return (
     <div className="relative">
-      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'top-4 right-4'} z-50`}>
+      <SimplifiedHeader />
+      
+      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'top-20 right-4'} z-50`}>
         <Button 
           onClick={toggleEditMode} 
           variant="outline"
@@ -74,11 +77,14 @@ export default function ResumePreview() {
           )}
         </Button>
       </div>
-      <FinalResumePreview
-        resumeData={resume as unknown as ResumeData}
-        resumeId={id as string}
-        isEditing={isEditing}
-      />
+      
+      <div className="pt-16">
+        <FinalResumePreview
+          resumeData={resume as unknown as ResumeData}
+          resumeId={id as string}
+          isEditing={isEditing}
+        />
+      </div>
     </div>
   );
 }

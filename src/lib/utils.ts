@@ -23,16 +23,24 @@ export function getResponsiveStyles(isMobile: boolean): Record<string, string> {
 export function calculateResumeScale(containerWidth: number, isMobile: boolean): number {
   const resumeWidth = 21 * 37.8; // 21cm in pixels at 96 DPI
   
-  if (containerWidth <= 0) return isMobile ? 0.4 : 0.85;
+  if (containerWidth <= 0) return isMobile ? 0.35 : 0.85;
   
   // Calculate scale based on available width with some margin
   const maxScale = (containerWidth - 32) / resumeWidth; 
   
-  // For mobile, use fixed scales to ensure consistency
+  // For mobile, use a fixed smaller scale to ensure the full A4 page is visible
   if (isMobile) {
-    return Math.min(maxScale, 0.45);
+    return Math.min(maxScale, 0.35);
   }
   
   // For desktop, use a comfortable scale that's not too small
   return Math.min(maxScale, 0.85);
 }
+
+// Standard A4 dimensions (in pixels at 96 DPI)
+export const A4_DIMENSIONS = {
+  WIDTH_CM: 21,
+  HEIGHT_CM: 29.7,
+  WIDTH_PX: 21 * 37.8, // ~794px at 96 DPI
+  HEIGHT_PX: 29.7 * 37.8, // ~1123px at 96 DPI
+};
