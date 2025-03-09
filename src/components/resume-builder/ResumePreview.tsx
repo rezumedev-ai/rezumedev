@@ -1,4 +1,3 @@
-
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { resumeTemplates } from "./templates";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ZoomIn, ZoomOut, File, Briefcase, GraduationCap, Award, Lightbulb } from "lucide-react";
+import { ZoomIn, File, Briefcase, GraduationCap, Award, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ResumePreviewProps {
@@ -135,7 +134,7 @@ export function ResumePreview({
           onClick={toggleZoom}
           className="absolute top-4 right-4 z-10"
         >
-          {isZoomed ? <ZoomOut className="h-4 w-4" /> : <ZoomIn className="h-4 w-4" />}
+          <ZoomIn className="h-4 w-4" />
         </Button>
       )}
       

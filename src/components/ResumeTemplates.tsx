@@ -25,14 +25,14 @@ export const ResumeTemplates = () => {
       description: "Bold modern layout with clean typography, perfect for senior managers and directors"
     },
     {
-      name: "Corporate Standard",
+      name: "Modern Executive",
       image: "/lovable-uploads/1de1d500-e16a-46d6-9037-19cf6739f790.png",
-      description: "ATS-optimized format favored by HR departments at Fortune 100 companies"
+      description: "Sophisticated design with left sidebar for senior professionals and executives - stands out from traditional layouts"
     },
     {
-      name: "Modern Tech",
+      name: "Tech Innovator",
       image: "/lovable-uploads/946c34ac-a462-4649-b919-24aa01a04f02.png",
-      description: "Contemporary design optimized for tech careers and digital roles"
+      description: "Modern tech-focused layout with visual skill indicators and sleek typography - ideal for technology roles"
     }
   ];
 
