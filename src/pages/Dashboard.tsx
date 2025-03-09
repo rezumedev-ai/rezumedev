@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { Json } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface ResumeData {
   id: string;
@@ -99,10 +98,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/20 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/20">
       {isMobile && (
         <motion.div 
-          className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-800/50 p-4 flex justify-between items-center"
+          className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 p-4 flex justify-between items-center"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -111,17 +110,16 @@ export default function Dashboard() {
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(!isSidebarOpen)}
-            className="hover:bg-primary/5 dark:hover:bg-primary/10 dark:text-white"
+            className="hover:bg-primary/5"
           >
             <Menu className="h-6 w-6" />
           </Button>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary dark:text-primary animate-pulse" />
-            <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 dark:from-primary dark:to-primary/80">
+            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
               Rezume.dev
             </span>
           </div>
-          <ThemeToggle />
         </motion.div>
       )}
 
@@ -139,20 +137,20 @@ export default function Dashboard() {
             animate="show"
           >
             <motion.div className="space-y-4 w-full" variants={item}>
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Layout className="w-4 h-4" />
                 <span>Dashboard</span>
                 <ChevronRight className="w-4 h-4" />
                 <span>Resumes</span>
               </div>
               <div className="space-y-2">
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white">
+                <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
                   Welcome back, {" "}
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-primary/60 dark:from-primary dark:via-purple-400 dark:to-blue-400 animate-gradient">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-primary/60 animate-gradient">
                     {profile?.full_name?.split(' ')[0] || 'there'}!
                   </span>
                 </h1>
-                <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl" 
+                <p className="text-base md:text-lg text-gray-600 max-w-2xl" 
                   style={{ animationDelay: '100ms' }}>
                   Create and manage your professional resumes with our AI-powered platform. 
                   Stand out from the crowd with beautifully crafted resumes.
@@ -169,10 +167,10 @@ export default function Dashboard() {
           >
             <motion.div variants={item}>
               {isLoading ? (
-                <Card className="p-6 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/30">
+                <Card className="p-6 bg-white/80 backdrop-blur-sm">
                   <div className="h-96 flex flex-col items-center justify-center">
                     <div className="w-20 h-20 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin mb-4"></div>
-                    <p className="text-muted-foreground dark:text-gray-400">Loading your resumes...</p>
+                    <p className="text-muted-foreground">Loading your resumes...</p>
                   </div>
                 </Card>
               ) : (
@@ -181,11 +179,11 @@ export default function Dashboard() {
             </motion.div>
             
             <motion.div variants={item} className="space-y-6">
-              <Card className="p-6 bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30 hover:shadow-lg transition-all duration-300">
+              <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-lg transition-all duration-300">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold dark:text-white">Quick Tips</h3>
-                    <Button variant="ghost" size="sm" onClick={handleQuickTips} className="dark:text-gray-300 dark:hover:bg-gray-700">
+                    <h3 className="text-lg font-semibold">Quick Tips</h3>
+                    <Button variant="ghost" size="sm" onClick={handleQuickTips}>
                       <Star className="h-4 w-4 text-amber-400 mr-1" />
                       More Tips
                     </Button>
@@ -193,22 +191,22 @@ export default function Dashboard() {
                   
                   <ul className="space-y-3">
                     <li className="flex items-start gap-2">
-                      <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-1 mt-0.5">
-                        <Check className="h-3 w-3 text-green-600 dark:text-green-400" />
+                      <div className="rounded-full bg-green-100 p-1 mt-0.5">
+                        <Check className="h-3 w-3 text-green-600" />
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Tailor your resume for each job application</p>
+                      <p className="text-sm text-gray-600">Tailor your resume for each job application</p>
                     </li>
                     <li className="flex items-start gap-2">
-                      <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-1 mt-0.5">
-                        <Check className="h-3 w-3 text-green-600 dark:text-green-400" />
+                      <div className="rounded-full bg-green-100 p-1 mt-0.5">
+                        <Check className="h-3 w-3 text-green-600" />
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Quantify achievements with numbers when possible</p>
+                      <p className="text-sm text-gray-600">Quantify achievements with numbers when possible</p>
                     </li>
                     <li className="flex items-start gap-2">
-                      <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-1 mt-0.5">
-                        <Check className="h-3 w-3 text-green-600 dark:text-green-400" />
+                      <div className="rounded-full bg-green-100 p-1 mt-0.5">
+                        <Check className="h-3 w-3 text-green-600" />
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Use keywords from the job description</p>
+                      <p className="text-sm text-gray-600">Use keywords from the job description</p>
                     </li>
                   </ul>
                 </div>
