@@ -22,8 +22,8 @@ export default function ResumePreview() {
       // Find existing viewport meta tag
       let viewportMeta = document.querySelector('meta[name="viewport"]');
       if (viewportMeta) {
-        // Modify existing viewport meta to set initial-scale to 0.5 for mobile
-        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=0.5, user-scalable=yes');
+        // Modify existing viewport meta to set initial-scale to 0.25 for greater zoom out
+        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=0.25, maximum-scale=1.0, user-scalable=yes');
       }
     }
 
