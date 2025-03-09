@@ -9,11 +9,13 @@ import { ResumeContent } from "./ResumeContent";
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
   resumeId: string;
+  onMaxZoomOut?: () => void;
 }
 
 export function FinalResumePreview({ 
   resumeData, 
-  resumeId
+  resumeId,
+  onMaxZoomOut
 }: FinalResumePreviewProps) {
   const navigate = useNavigate();
   
@@ -49,6 +51,7 @@ export function FinalResumePreview({
         onBackToDashboard={() => navigate("/dashboard")}
         isEditing={isEditing}
         onToggleEdit={toggleEditMode}
+        onMaxZoomOut={onMaxZoomOut}
       />
       
       <div 

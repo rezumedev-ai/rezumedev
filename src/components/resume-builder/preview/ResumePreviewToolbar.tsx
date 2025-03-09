@@ -1,13 +1,14 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Edit, RefreshCw, Save } from "lucide-react";
+import { ArrowLeft, Download, Edit, RefreshCw, Save, ZoomOut } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TemplatePreview } from "../TemplatePreview";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -17,6 +18,7 @@ interface ResumePreviewToolbarProps {
   onBackToDashboard: () => void;
   isEditing?: boolean;
   onToggleEdit?: () => void;
+  onMaxZoomOut?: () => void;
 }
 
 export function ResumePreviewToolbar({
@@ -27,8 +29,10 @@ export function ResumePreviewToolbar({
   onBackToDashboard,
   isEditing = false,
   onToggleEdit,
+  onMaxZoomOut,
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const isMobile = useIsMobile();
 
   // Handle downloading the resume as PDF
   const handleDownload = async () => {
@@ -119,6 +123,18 @@ export function ResumePreviewToolbar({
         </Button>
         
         <div className="flex items-center gap-3">
+          {isMobile && onMaxZoomOut && (
+            <Button
+              onClick={onMaxZoomOut}
+              variant="outline"
+              className="flex items-center gap-2 bg-white shadow-sm hover:bg-gray-100"
+              title="Maximum zoom out"
+            >
+              <ZoomOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Zoom Out</span>
+            </Button>
+          )}
+          
           {onToggleEdit && (
             <Button 
               onClick={onToggleEdit} 
