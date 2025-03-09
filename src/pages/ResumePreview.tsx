@@ -4,13 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
+import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function ResumePreview() {
   const { id } = useParams();
-  const [isEditing, setIsEditing] = useState(false);
   const isMobile = useIsMobile();
 
   // Set initial zoom level depending on device
@@ -54,13 +52,6 @@ export default function ResumePreview() {
     }
   });
 
-  const toggleEditMode = () => {
-    setIsEditing(!isEditing);
-    if (isEditing) {
-      toast.success("Resume saved successfully");
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -82,8 +73,6 @@ export default function ResumePreview() {
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
-        isEditing={isEditing}
-        onToggleEdit={toggleEditMode}
       />
     </div>
   );
