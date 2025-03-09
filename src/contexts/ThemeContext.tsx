@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
@@ -27,13 +28,37 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Update localStorage when theme changes
     localStorage.setItem("theme", theme);
     
-    // Update document class
+    // Update document class and apply transition
+    document.documentElement.classList.add('transition-colors');
+    document.documentElement.classList.add('duration-300');
+    
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
     }
   }, [theme]);
+
+  // Listen for system preference changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      const newTheme = e.matches ? "dark" : "light";
+      // Only update if user hasn't manually set a preference
+      if (!localStorage.getItem("theme")) {
+        setTheme(newTheme);
+      }
+    };
+    
+    mediaQuery.addEventListener("change", handleChange);
+    
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));

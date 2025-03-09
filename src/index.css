@@ -98,7 +98,11 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+
+  body.dark {
+    @apply bg-gray-950 text-gray-100;
   }
 
   .prose {
@@ -238,4 +242,34 @@
 
 .animate-rainbow {
   animation: rainbow var(--speed, 2s) infinite linear;
+}
+
+/* New dark mode styles */
+.dark-card {
+  @apply dark:bg-gray-800/90 dark:backdrop-blur-md dark:border dark:border-gray-700/30 dark:shadow-lg dark:shadow-black/10;
+}
+
+.dark-gradient-bg {
+  @apply dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800;
+}
+
+.dark-section {
+  @apply dark:bg-gray-900;
+}
+
+.dark-text-gradient {
+  @apply dark:bg-gradient-to-r dark:from-blue-400 dark:to-violet-300 dark:bg-clip-text dark:text-transparent;
+}
+
+.dark-button-glow {
+  @apply dark:shadow-lg dark:shadow-primary/20;
+}
+
+.dark-hover-effect {
+  @apply dark:hover:bg-gray-800/80 dark:hover:border-gray-700;
+}
+
+/* Dark mode transition */
+.theme-transition {
+  @apply transition-colors duration-300;
 }

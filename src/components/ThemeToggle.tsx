@@ -21,14 +21,15 @@ export function ThemeToggle({
       variant={variant}
       size={size}
       onClick={toggleTheme}
-      className={`transition-all duration-200 ${className}`}
+      className={`relative overflow-hidden transition-all duration-300 ${className}`}
       aria-label="Toggle theme"
     >
-      {theme === "light" ? (
-        <Moon className="h-5 w-5 transition-transform rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
-      ) : (
-        <Sun className="h-5 w-5 transition-transform rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
-      )}
+      <span className={`absolute inset-0 ${theme === 'dark' ? 'bg-gray-800' : 'bg-transparent'} opacity-0 transition-opacity duration-300 rounded-md ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`} />
+      
+      <Sun className={`h-[1.2rem] w-[1.2rem] transition-all duration-500 rotate-0 scale-100 ${theme === 'dark' ? 'rotate-90 scale-0' : 'text-amber-500'}`} />
+      
+      <Moon className={`absolute h-[1.2rem] w-[1.2rem] transition-all duration-500 rotate-90 scale-0 ${theme === 'dark' ? 'rotate-0 scale-100 text-sky-400' : ''}`} />
+      
       <span className="sr-only">Toggle theme</span>
     </Button>
   );
