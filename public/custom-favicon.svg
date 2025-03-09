@@ -1,6 +1,25 @@
 
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="12" fill="#8B5CF6"/>
-  <path d="M20 32L28 40L44 24" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M18 14H46C47.0609 14 48.0783 14.4214 48.8284 15.1716C49.5786 15.9217 50 16.9391 50 18V46C50 47.0609 49.5786 48.0783 48.8284 48.8284C48.0783 49.5786 47.0609 50 46 50H18C16.9391 50 15.9217 49.5786 15.1716 48.8284C14.4214 48.0783 14 47.0609 14 46V18C14 16.9391 14.4214 15.9217 15.1716 15.1716C15.9217 14.4214 16.9391 14 18 14Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Gradient background -->
+  <rect width="64" height="64" rx="12" fill="url(#paint0_linear)" />
+  
+  <!-- Document outline -->
+  <rect x="16" y="12" width="32" height="40" rx="3" fill="white" stroke="#FFFFFF" stroke-width="1.5" />
+  
+  <!-- Document lines -->
+  <line x1="22" y1="22" x2="42" y2="22" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" />
+  <line x1="22" y1="30" x2="42" y2="30" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" />
+  <line x1="22" y1="38" x2="36" y2="38" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" />
+  
+  <!-- Checkmark badge -->
+  <circle cx="44" cy="44" r="12" fill="#22C55E" />
+  <path d="M38 44L42 48L50 40" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="paint0_linear" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#9B87F5" />
+      <stop offset="100%" stop-color="#6E59A5" />
+    </linearGradient>
+  </defs>
 </svg>
