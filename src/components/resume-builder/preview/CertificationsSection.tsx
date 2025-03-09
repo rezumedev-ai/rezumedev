@@ -1,4 +1,3 @@
-
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
@@ -106,14 +105,14 @@ export function CertificationsSection({
         {template.id === "modern-split" ? (
           <span className="flex items-center">
             <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
-            Certifications
+            Certificates
           </span>
         ) : template.id === "professional-executive" ? (
-          "Certifications"
+          "Certificates"
         ) : template.id === "minimal-elegant" ? (
-          <span>Certifications</span>
+          <span>Certificates</span>
         ) : (
-          "Certifications & Licenses"
+          "Certificates"
         )}
       </h3>
       <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-1.5" : "space-y-1.5"}>
