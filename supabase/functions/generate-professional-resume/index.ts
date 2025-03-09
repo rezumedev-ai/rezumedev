@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -45,7 +44,7 @@ serve(async (req) => {
     // Check if job description is provided
     const targetJobDescription = resumeData.professional_summary?.targetJobDescription || '';
     
-    // Generate professional summary
+    // Generate professional summary with increased length
     const summaryPrompt = `
 Create a powerful professional summary for a ${jobTitle} based on the following information:
 ${JSON.stringify(resumeData.personal_info, null, 2)}
@@ -53,7 +52,7 @@ ${JSON.stringify(resumeData.professional_summary, null, 2)}
 ${targetJobDescription ? `\nTarget Job Description: ${targetJobDescription}` : ''}
 
 Requirements:
-- Maximum 35 words
+- Write 3-4 sentences (approximately 50-70 words)
 - Highlight value and expertise without metrics or years
 - Use powerful, active language
 ${targetJobDescription ? '- Align with the skills and requirements from the provided job description' : '- Include relevant industry keywords for ATS systems'}
@@ -356,7 +355,7 @@ DO NOT include percentage metrics or specific numerical achievements.
       allResponsibilitiesSets.set(respStr, i);
     }
     
-    // Generate skills relevant to the target job
+    // Generate skills with full words (no abbreviations)
     let skillsPrompt = '';
     
     if (targetJobDescription) {
@@ -366,10 +365,13 @@ Extract a concise skills list for a ${jobTitle} resume based on this job descrip
 ${targetJobDescription}
 
 Requirements:
-- Include 6 hard/technical skills that are SPECIFICALLY MENTIONED or CLEARLY NEEDED for this job (max 15 characters each)
-- Include 4 soft skills most valued in the job description (max 15 characters each)
+- Include 6 hard/technical skills that are SPECIFICALLY MENTIONED or CLEARLY NEEDED for this job
+- Include 4 soft skills most valued in the job description
 - Prioritize skills that appear explicitly in the job description
 - Focus on skills that will help the resume match the job requirements
+- DO NOT use abbreviations or short forms (e.g., use "Project Management" not "Project Mgmt" or "Proj Mgmt")
+- Use complete words for all skills (e.g., "Problem Solving" not "Problem Solv")
+- Each skill should be written out completely with proper capitalization
 
 Format your response as a JSON object with this exact structure:
 {
@@ -382,13 +384,15 @@ Format your response as a JSON object with this exact structure:
 Generate a concise skills list for a ${jobTitle} resume that will maximize success with ATS systems.
 
 Industry Context:
-${industryKeywords.length > 0 ? `- Industry Keywords: ${industryKeywords.join(', ')}` : ''}
+${industryKeywords && industryKeywords.length > 0 ? `- Industry Keywords: ${industryKeywords.join(', ')}` : ''}
 
 Requirements:
-- Include 6 hard/technical skills that are SPECIFIC to the ${jobTitle} role (max 15 characters each)
-- Include 4 soft skills most valued for the ${jobTitle} position (max 15 characters each)
+- Include 6 hard/technical skills that are SPECIFIC to the ${jobTitle} role
+- Include 4 soft skills most valued for the ${jobTitle} position
 - Prioritize skills that appear frequently in job postings for this role
-- Focus on skills that will help the resume fit on a single A4 page
+- DO NOT use abbreviations or short forms (e.g., use "Project Management" not "Project Mgmt" or "Proj Mgmt")
+- Use complete words for all skills (e.g., "Problem Solving" not "Problem Solv")
+- Each skill should be written out completely with proper capitalization
 
 Format your response as a JSON object with this exact structure:
 {
@@ -409,7 +413,7 @@ Format your response as a JSON object with this exact structure:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a professional resume skills expert. Generate concise skills that will help a candidate pass ATS systems and fit on a single A4 page. Return only the JSON object with no additional commentary.'
+            content: 'You are a professional resume skills expert. Generate concise skills that will help a candidate pass ATS systems. DO NOT use abbreviations or shortened forms of words. Use complete terms for all skills. Return only the JSON object with no additional commentary.'
           },
           { role: 'user', content: skillsPrompt }
         ],

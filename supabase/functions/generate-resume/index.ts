@@ -13,7 +13,7 @@ const SYSTEM_PROMPTS = {
 - Is based SOLELY on the provided job title and experience
 - Uses natural, professional language
 - Incorporates relevant industry keywords
-- Is 2-3 sentences maximum
+- Is 3-4 sentences (50-70 words)
 - Highlights only demonstrable skills and experience
 - Does not make assumptions about experience level
 Do not fabricate or assume any details not provided in the input.`,
@@ -34,6 +34,9 @@ Do not fabricate specific metrics or achievements not provided in the input.`,
 Generate two categories:
 1. Technical Skills (specific to the role/industry)
 2. Professional Skills (transferable skills)
+DO NOT use abbreviations or short forms (e.g., use "Project Management" not "Project Mgmt")
+Use complete words for all skills (e.g., "Problem Solving" not "Problem Solv")
+Each skill should be written out completely with proper capitalization.
 Do not include skills that aren't supported by the experience provided.`
 };
 
@@ -101,7 +104,7 @@ async function generateSkills(jobTitle: string, experience: any[], openAIApiKey:
     .map(exp => `${exp.jobTitle} at ${exp.companyName}`)
     .join('\n');
 
-  const prompt = `Based on this professional background for a ${jobTitle} position:\n${experienceContext}\n\nGenerate relevant technical and professional skills.`;
+  const prompt = `Based on this professional background for a ${jobTitle} position:\n${experienceContext}\n\nGenerate relevant technical and professional skills. DO NOT use abbreviations or shortened forms. Write out all skill names completely (e.g., "Project Management" not "Project Mgmt").`;
   const skillsContent = await generateWithAI(prompt, SYSTEM_PROMPTS.skills, openAIApiKey);
   
   const hardSkills = [];
