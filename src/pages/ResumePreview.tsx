@@ -4,14 +4,37 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Save } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function ResumePreview() {
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Set initial zoom level depending on device
+  useEffect(() => {
+    // Add meta tag to prevent user scaling if on mobile
+    if (isMobile) {
+      // Find existing viewport meta tag
+      let viewportMeta = document.querySelector('meta[name="viewport"]');
+      if (viewportMeta) {
+        // Modify existing viewport meta to set initial-scale to 0.5 for mobile
+        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=0.5, user-scalable=yes');
+      }
+    }
+
+    // Cleanup function to restore original viewport meta
+    return () => {
+      const viewportMeta = document.querySelector('meta[name="viewport"]');
+      if (viewportMeta) {
+        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+      }
+    };
+  }, [isMobile]);
 
   const { data: resume, isLoading } = useQuery({
     queryKey: ["resume", id],
