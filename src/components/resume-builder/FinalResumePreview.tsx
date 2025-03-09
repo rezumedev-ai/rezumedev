@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +10,8 @@ import { EducationSection } from "./preview/EducationSection";
 import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
 import { resumeTemplates } from "./templates";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, RefreshCw } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
+import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FinalResumePreviewProps {
@@ -215,7 +214,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   };
   
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-4 md:py-8 overflow-x-hidden">
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-4 md:py-8">
       <ResumePreviewToolbar 
         currentTemplateId={template.id}
         templates={resumeTemplates}
@@ -224,10 +223,11 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onBackToDashboard={() => navigate("/dashboard")}
       />
       
-      <div className="w-full max-w-full overflow-auto md:overflow-visible px-2 md:px-0 pb-12">
+      <div className="w-full overflow-auto scrollbar-hide pb-12">
         <div className="flex justify-center">
+          {/* Important: Do not change size or dimensions of this div */}
           <div 
-            className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative transform-none"
+            className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
             style={pageStyle}
           >
             <PersonalSection 

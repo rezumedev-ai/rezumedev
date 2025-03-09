@@ -34,7 +34,7 @@ export function ResumePreviewToolbar({
       setIsDownloading(true);
       toast.info("Preparing your resume for download...");
       
-      // Get the resume element
+      // Get the resume element - this selector must match exactly what's in FinalResumePreview
       const resumeElement = document.querySelector(".w-\\[21cm\\]");
       
       if (!resumeElement) {
@@ -44,6 +44,7 @@ export function ResumePreviewToolbar({
       }
       
       // Convert the resume to a canvas with improved settings
+      // Do not modify these settings as they affect the PDF output quality
       const canvas = await html2canvas(resumeElement as HTMLElement, {
         scale: 2, // Higher quality
         useCORS: true,
@@ -53,14 +54,14 @@ export function ResumePreviewToolbar({
         windowHeight: resumeElement.scrollHeight
       });
       
-      // Create a new PDF document
+      // Create a new PDF document - do not change format
       const pdf = new jsPDF({
         format: "a4",
         unit: "mm",
         orientation: "portrait",
       });
       
-      // A4 dimensions
+      // A4 dimensions - do not change
       const pdfWidth = 210; // mm
       const pdfHeight = 297; // mm
       
@@ -69,8 +70,8 @@ export function ResumePreviewToolbar({
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
       // Add padding (in mm)
-      const topPadding = 15;
-      const bottomPadding = 15;
+      const topPadding = 0;
+      const bottomPadding = 0;
       
       // Calculate the necessary scaling to fit content with padding
       let scaleFactor = 1;
@@ -89,7 +90,7 @@ export function ResumePreviewToolbar({
       // Get the image data
       const imgData = canvas.toDataURL("image/png");
       
-      // Add the image to the PDF
+      // Add the image to the PDF - don't change these parameters
       pdf.addImage(imgData, "PNG", xPosition, yPosition, finalImgWidth, finalImgHeight);
       
       // Save the PDF
@@ -105,7 +106,7 @@ export function ResumePreviewToolbar({
   };
 
   return (
-    <div className="w-full max-w-[21cm] mx-auto mb-3 md:mb-6 bg-white rounded-lg shadow-md p-2 md:p-3">
+    <div className="w-full max-w-[21cm] mx-auto mb-3 md:mb-6 bg-white rounded-lg shadow-md p-2 md:p-3 overflow-x-auto">
       <div className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-between'} items-center`}>
         <Button 
           variant="ghost" 
