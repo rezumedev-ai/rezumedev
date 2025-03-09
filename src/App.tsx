@@ -28,6 +28,7 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NewResume from "./pages/NewResume";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Create the queryClient outside of the component
@@ -48,81 +49,83 @@ const App: React.FC = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <AuthProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/cookies" element={<Cookies />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:id" element={<BlogPost />} />
-                <Route path="/features" element={<Features />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/careers" element={<Careers />} />
-                <Route path="/guides" element={<Guides />} />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/help"
-                  element={
-                    <ProtectedRoute>
-                      <Help />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/new-resume"
-                  element={
-                    <ProtectedRoute>
-                      <NewResume />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/resume-builder/:id?"
-                  element={
-                    <ProtectedRoute>
-                      <ResumeBuilder />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/resume-preview/:id"
-                  element={
-                    <ProtectedRoute>
-                      <ResumePreview />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/onboarding"
-                  element={
-                    <ProtectedRoute>
-                      <Onboarding />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AuthProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/cookies" element={<Cookies />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:id" element={<BlogPost />} />
+                  <Route path="/features" element={<Features />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/careers" element={<Careers />} />
+                  <Route path="/guides" element={<Guides />} />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/help"
+                    element={
+                      <ProtectedRoute>
+                        <Help />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/new-resume"
+                    element={
+                      <ProtectedRoute>
+                        <NewResume />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/resume-builder/:id?"
+                    element={
+                      <ProtectedRoute>
+                        <ResumeBuilder />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/resume-preview/:id"
+                    element={
+                      <ProtectedRoute>
+                        <ResumePreview />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/onboarding"
+                    element={
+                      <ProtectedRoute>
+                        <Onboarding />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AuthProvider>
+            </ThemeProvider>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
