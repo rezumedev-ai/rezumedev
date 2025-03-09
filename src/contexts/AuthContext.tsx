@@ -29,22 +29,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-      
-      // Only redirect to login if we're not on a public route and there's no session
-      const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
-      if (!session && !isPublicRoute) {
-        navigate('/login');
+    const initializeAuth = async () => {
+      try {
+        setLoading(true);
+        
+        // Get the current session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        setUser(session?.user ?? null);
+        
+        // Only redirect to login if we're not on a public route and there's no session
+        const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
+        if (!session && !isPublicRoute) {
+          navigate('/login');
+        }
+      } catch (error) {
+        console.error("Error checking auth state:", error);
+      } finally {
+        setLoading(false);
       }
-    });
+    };
+
+    initializeAuth();
 
     // Listen for changes on auth state (signed in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
-      setLoading(false);
-
+      
       // Handle different auth events
       switch (event) {
         case 'SIGNED_IN':
