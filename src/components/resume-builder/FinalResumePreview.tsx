@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
@@ -246,7 +245,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         onBackToDashboard={() => navigate("/dashboard")}
       />
       
-      <div ref={containerRef} className="w-full overflow-hidden pb-12">
+      <div ref={containerRef} className="w-full overflow-auto pb-12">
         <div className="flex justify-center">
           {/* A4 resume container with dynamic scaling */}
           <div 
@@ -256,7 +255,7 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
               height: `${A4_DIMENSIONS.HEIGHT_PX}px`,
               transform: `scale(${scale})`,
               transformOrigin: 'top center',
-              marginBottom: isMobile ? `${A4_DIMENSIONS.HEIGHT_PX * scale * 0.1}px` : '40px'
+              marginBottom: `${A4_DIMENSIONS.HEIGHT_PX * scale * 0.1}px`
             }}
           >
             <div style={pageStyle}>

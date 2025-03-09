@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { A4_DIMENSIONS } from "@/lib/utils";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -34,8 +35,8 @@ export function ResumePreviewToolbar({
       setIsDownloading(true);
       toast.info("Preparing your resume for download...");
       
-      // Get the resume element - this selector must match exactly what's in FinalResumePreview
-      const resumeElement = document.querySelector(".w-\\[21cm\\]");
+      // Target the exact resume element
+      const resumeElement = document.querySelector(`[style*="width: ${A4_DIMENSIONS.WIDTH_PX}px"]`);
       
       if (!resumeElement) {
         toast.error("Could not find resume element");
@@ -44,7 +45,6 @@ export function ResumePreviewToolbar({
       }
       
       // Convert the resume to a canvas with improved settings
-      // Do not modify these settings as they affect the PDF output quality
       const canvas = await html2canvas(resumeElement as HTMLElement, {
         scale: 2, // Higher quality
         useCORS: true,
@@ -54,7 +54,7 @@ export function ResumePreviewToolbar({
         windowHeight: resumeElement.scrollHeight
       });
       
-      // Create a new PDF document - do not change format
+      // Create a new PDF document in A4 format
       const pdf = new jsPDF({
         format: "a4",
         unit: "mm",
@@ -65,33 +65,11 @@ export function ResumePreviewToolbar({
       const pdfWidth = 210; // mm
       const pdfHeight = 297; // mm
       
-      // Calculate image dimensions while preserving aspect ratio
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Add padding (in mm)
-      const topPadding = 0;
-      const bottomPadding = 0;
-      
-      // Calculate the necessary scaling to fit content with padding
-      let scaleFactor = 1;
-      if (imgHeight > (pdfHeight - topPadding - bottomPadding)) {
-        scaleFactor = (pdfHeight - topPadding - bottomPadding) / imgHeight;
-      }
-      
-      // Apply scaling
-      const finalImgWidth = imgWidth * scaleFactor;
-      const finalImgHeight = imgHeight * scaleFactor;
-      
-      // Calculate position to center the image horizontally and add top padding
-      const xPosition = (pdfWidth - finalImgWidth) / 2;
-      const yPosition = topPadding;
-      
       // Get the image data
       const imgData = canvas.toDataURL("image/png");
       
-      // Add the image to the PDF - don't change these parameters
-      pdf.addImage(imgData, "PNG", xPosition, yPosition, finalImgWidth, finalImgHeight);
+      // Add the image to the PDF - use full page dimensions
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       
       // Save the PDF
       pdf.save(`resume-${resumeId}.pdf`);
@@ -106,7 +84,7 @@ export function ResumePreviewToolbar({
   };
 
   return (
-    <div className="w-full max-w-[21cm] mx-auto mb-3 md:mb-6 bg-white rounded-lg shadow-md p-2 md:p-3 overflow-x-auto">
+    <div className="w-full max-w-4xl mx-auto mb-3 md:mb-6 bg-white rounded-lg shadow-md p-2 md:p-3 overflow-x-auto">
       <div className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-between'} items-center`}>
         <Button 
           variant="ghost" 

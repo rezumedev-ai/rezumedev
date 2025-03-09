@@ -21,7 +21,7 @@ export function getResponsiveStyles(isMobile: boolean): Record<string, string> {
 
 // Helper to calculate mobile-friendly scale
 export function calculateResumeScale(containerWidth: number, isMobile: boolean): number {
-  const resumeWidth = 21 * 37.8; // 21cm in pixels at 96 DPI
+  const resumeWidth = A4_DIMENSIONS.WIDTH_PX;
   
   if (containerWidth <= 0) return isMobile ? 0.35 : 0.85;
   
@@ -41,6 +41,6 @@ export function calculateResumeScale(containerWidth: number, isMobile: boolean):
 export const A4_DIMENSIONS = {
   WIDTH_CM: 21,
   HEIGHT_CM: 29.7,
-  WIDTH_PX: 21 * 37.8, // ~794px at 96 DPI
-  HEIGHT_PX: 29.7 * 37.8, // ~1123px at 96 DPI
+  WIDTH_PX: 794, // Exact A4 width in pixels at 96 DPI
+  HEIGHT_PX: 1123, // Exact A4 height in pixels at 96 DPI
 };

@@ -54,7 +54,7 @@ export default function ResumePreview() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen">
       <SimplifiedHeader />
       
       <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'top-20 right-4'} z-50`}>
@@ -78,7 +78,7 @@ export default function ResumePreview() {
         </Button>
       </div>
       
-      <div className="pt-16">
+      <div className="pt-16 pb-8 px-2 md:px-4 overflow-x-auto">
         <FinalResumePreview
           resumeData={resume as unknown as ResumeData}
           resumeId={id as string}
