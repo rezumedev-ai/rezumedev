@@ -9,12 +9,10 @@ import jsPDF from "jspdf";
 
 interface DownloadOptionsDialogProps {
   isDownloading: boolean;
-  resumeId: string;
 }
 
 export function DownloadOptionsDialog({
-  isDownloading,
-  resumeId
+  isDownloading
 }: DownloadOptionsDialogProps) {
   const [open, setOpen] = useState(false);
 
@@ -22,8 +20,8 @@ export function DownloadOptionsDialog({
     setOpen(false);
     
     try {
-      // Updated selector to match the resume content div - this must be exactly the same as in FinalResumePreview
-      const resumeElement = document.querySelector(".w-\\[21cm\\]");
+      // Updated selector to match the resume content div
+      const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
         toast.error("Could not find resume content");
         return;
@@ -35,28 +33,48 @@ export function DownloadOptionsDialog({
       // Wait for dialog to close and any transitions to complete
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Convert to canvas with optimal settings - Do not change these settings
-      const canvas = await html2canvas(resumeElement as HTMLElement, {
+      // Store original styles
+      const originalStyles = {
+        transform: resumeElement.style.transform,
+        transition: resumeElement.style.transition,
+        width: resumeElement.style.width,
+        height: resumeElement.style.height,
+      };
+
+      // Reset styles for capture
+      resumeElement.style.transform = 'none';
+      resumeElement.style.transition = 'none';
+
+      // Capture with optimal settings
+      const canvas = await html2canvas(resumeElement, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff",
+        onclone: (clonedDoc, element) => {
+          const clonedElement = element as HTMLDivElement;
+          clonedElement.style.transform = 'none';
+          clonedElement.style.transformOrigin = 'top left';
+        }
       });
 
-      // Create PDF - Do not change these settings
+      // Restore original styles
+      Object.assign(resumeElement.style, originalStyles);
+
+      // Create PDF
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       });
 
-      // Calculate dimensions to maintain aspect ratio - Do not change these calculations
+      // Calculate dimensions to maintain aspect ratio
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Add image to PDF - Do not change these parameters
+      // Add image to PDF
       pdf.addImage(
         imgData,
         'JPEG',
@@ -69,7 +87,7 @@ export function DownloadOptionsDialog({
       );
 
       // Save PDF directly
-      pdf.save(`resume-${resumeId}.pdf`);
+      pdf.save('resume.pdf');
       
       // Clear loading toast and show success
       toast.dismiss(loadingToast);

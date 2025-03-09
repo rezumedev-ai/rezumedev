@@ -8,13 +8,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Save } from "lucide-react";
 import { toast } from "sonner";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { SimplifiedHeader } from "@/components/SimplifiedHeader";
 
 export default function ResumePreview() {
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(false);
-  const isMobile = useIsMobile();
 
   const { data: resume, isLoading } = useQuery({
     queryKey: ["resume", id],
@@ -54,14 +51,11 @@ export default function ResumePreview() {
   }
 
   return (
-    <div className="relative min-h-screen">
-      <SimplifiedHeader />
-      
-      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'top-20 right-4'} z-50`}>
+    <div className="relative">
+      <div className="fixed top-4 right-4 z-50">
         <Button 
           onClick={toggleEditMode} 
           variant="outline"
-          size={isMobile ? "sm" : "default"}
           className="bg-white shadow-md hover:bg-gray-100"
         >
           {isEditing ? (
@@ -77,14 +71,11 @@ export default function ResumePreview() {
           )}
         </Button>
       </div>
-      
-      <div className="pt-16 pb-8 px-2 md:px-4 overflow-x-auto">
-        <FinalResumePreview
-          resumeData={resume as unknown as ResumeData}
-          resumeId={id as string}
-          isEditing={isEditing}
-        />
-      </div>
+      <FinalResumePreview
+        resumeData={resume as unknown as ResumeData}
+        resumeId={id as string}
+        isEditing={isEditing}
+      />
     </div>
   );
 }
