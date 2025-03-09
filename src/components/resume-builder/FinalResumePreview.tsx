@@ -10,8 +10,6 @@ import { EducationSection } from "./preview/EducationSection";
 import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
 import { resumeTemplates } from "./templates";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 
@@ -19,9 +17,15 @@ interface FinalResumePreviewProps {
   resumeData: ResumeData;
   resumeId: string;
   isEditing?: boolean;
+  onToggleEdit?: () => void;
 }
 
-export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: FinalResumePreviewProps) {
+export function FinalResumePreview({ 
+  resumeData, 
+  resumeId, 
+  isEditing = false, 
+  onToggleEdit 
+}: FinalResumePreviewProps) {
   const [resumeState, setResumeState] = useState<ResumeData>(resumeData);
   const navigate = useNavigate();
   
@@ -210,7 +214,6 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
   // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
-    // Fix the titleFont reference by accessing it from the correct location in the template object
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
   
@@ -222,6 +225,8 @@ export function FinalResumePreview({ resumeData, resumeId, isEditing = false }: 
         resumeId={resumeId}
         onTemplateChange={handleTemplateChange}
         onBackToDashboard={() => navigate("/dashboard")}
+        isEditing={isEditing}
+        onToggleEdit={onToggleEdit}
       />
       
       <div 

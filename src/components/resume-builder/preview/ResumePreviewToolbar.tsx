@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, RefreshCw } from "lucide-react";
+import { ArrowLeft, Download, Edit, RefreshCw, Save } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TemplatePreview } from "../TemplatePreview";
@@ -15,6 +15,8 @@ interface ResumePreviewToolbarProps {
   resumeId: string;
   onTemplateChange: (templateId: string) => void;
   onBackToDashboard: () => void;
+  isEditing?: boolean;
+  onToggleEdit?: () => void;
 }
 
 export function ResumePreviewToolbar({
@@ -23,6 +25,8 @@ export function ResumePreviewToolbar({
   resumeId,
   onTemplateChange,
   onBackToDashboard,
+  isEditing = false,
+  onToggleEdit,
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -115,6 +119,26 @@ export function ResumePreviewToolbar({
         </Button>
         
         <div className="flex items-center gap-3">
+          {onToggleEdit && (
+            <Button 
+              onClick={onToggleEdit} 
+              variant="outline"
+              className="flex items-center gap-2 bg-white shadow-sm hover:bg-gray-100"
+            >
+              {isEditing ? (
+                <>
+                  <Save className="w-4 h-4" />
+                  Save
+                </>
+              ) : (
+                <>
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </>
+              )}
+            </Button>
+          )}
+          
           <Popover>
             <PopoverTrigger asChild>
               <Button 
