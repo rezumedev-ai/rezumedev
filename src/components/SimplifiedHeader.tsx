@@ -22,4 +22,4 @@ export const SimplifiedHeader = () => {
       </div>
     </header>
   );
-};
+}
