@@ -1,21 +1,28 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // Wait for authentication to initialize
     if (!loading) {
       if (!user) {
-        navigate("/login");
+        // Save current location to redirect back after login
+        const returnPath = location.pathname !== "/login" ? location.pathname : undefined;
+        navigate("/login", { 
+          replace: true,
+          state: returnPath ? { returnTo: returnPath } : undefined
+        });
       }
       setIsInitialized(true);
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, location.pathname]);
 
   if (loading || !isInitialized) {
     return (

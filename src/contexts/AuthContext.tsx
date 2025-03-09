@@ -20,6 +20,13 @@ const AuthContext = createContext<AuthContextType>({
 // Define public routes that don't require authentication
 const PUBLIC_ROUTES = ['/', '/login', '/signup', '/features', '/pricing', '/blog'];
 
+const isPublicRoute = (pathname: string) => {
+  return PUBLIC_ROUTES.some(route => {
+    // Check for exact match or if the pathname starts with the route
+    return pathname === route || pathname.startsWith(`${route}/`);
+  });
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,9 +46,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         // Only redirect to login if we're not on a public route and there's no session
-        const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
-        if (!session && !isPublicRoute) {
-          navigate('/login');
+        const currentPath = location.pathname;
+        if (!session && !isPublicRoute(currentPath)) {
+          navigate('/login', { replace: true });
         }
       } catch (error) {
         console.error("Error checking auth state:", error);
@@ -54,17 +61,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Listen for changes on auth state (signed in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, "User:", session?.user?.email);
       setUser(session?.user ?? null);
       
       // Handle different auth events
       switch (event) {
         case 'SIGNED_IN':
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
           break;
         case 'SIGNED_OUT':
           // Only redirect to login if we're not trying to access a public route
-          if (!PUBLIC_ROUTES.includes(location.pathname)) {
-            navigate('/login');
+          if (!isPublicRoute(location.pathname)) {
+            navigate('/login', { replace: true });
           }
           break;
         case 'TOKEN_REFRESHED':
@@ -99,7 +107,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       
       // Navigate to login page
-      navigate('/login');
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
