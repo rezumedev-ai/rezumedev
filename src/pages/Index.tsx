@@ -8,7 +8,6 @@ import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { AnimatedTestimonialsSection } from "@/components/AnimatedTestimonialsSection";
-import { ComparisonTable } from "@/components/ComparisonTable";
 
 const Index = () => {
   return (
@@ -19,7 +18,6 @@ const Index = () => {
         <Process />
         <Features />
         <AnimatedTestimonialsSection />
-        <ComparisonTable />
         <ResumeTemplates />
         <FAQ />
         <CTA />
