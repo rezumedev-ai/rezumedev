@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CheckIcon, XIcon } from 'lucide-react';
+import { CheckIcon, XIcon, TrophyIcon } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -56,18 +56,24 @@ export const ComparisonTable = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-accent/30">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-accent/30">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center gap-2 mb-3 bg-accent/50 px-4 py-1 rounded-full">
+            <TrophyIcon size={18} className="text-primary" />
+            <span className="text-sm font-medium text-primary">Feature Comparison</span>
+          </div>
+          
           <GradientHeading 
             asChild 
             variant="resume" 
             size="lg" 
             weight="bold" 
-            className="mb-2"
+            className="mb-3"
           >
-            <h2>Why Rezume.dev Outshines the Rest</h2>
+            <h2>The Ultimate Resume Builder</h2>
           </GradientHeading>
+          
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
             See how Rezume.dev stands out with premium features included at no extra cost
           </p>
@@ -242,7 +248,7 @@ export const ComparisonTable = () => {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 
