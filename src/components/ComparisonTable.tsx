@@ -63,7 +63,7 @@ export const ComparisonTable = () => {
             weight="bold" 
             className="mb-2"
           >
-            <h2>Feature Comparison</h2>
+            <h2>Why Rezume.dev Outshines the Rest</h2>
           </GradientHeading>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
             See how Rezume.dev stands out with premium features included at no extra cost
@@ -83,9 +83,14 @@ export const ComparisonTable = () => {
                       </span>
                     </span>
                   </th>
-                  <th scope="col" className="py-4 px-6 text-center text-sm font-semibold text-gray-700">Competitor A</th>
-                  <th scope="col" className="py-4 px-6 text-center text-sm font-semibold text-gray-700">Competitor B</th>
-                  <th scope="col" className="py-4 px-6 text-center text-sm font-semibold text-gray-700">Competitor C</th>
+                  <th scope="col" colSpan={3} className="py-4 px-6 text-center text-sm font-semibold text-gray-700">
+                    <span className="block text-gray-600">Other Resume Builders</span>
+                    <div className="flex justify-center space-x-12 mt-2">
+                      <span>Builder A</span>
+                      <span>Builder B</span>
+                      <span>Builder C</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
