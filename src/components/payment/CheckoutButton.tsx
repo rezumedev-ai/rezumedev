@@ -37,6 +37,10 @@ export const CheckoutButton = ({
     }
 
     setIsLoading(true);
+    toast.info("Preparing checkout...", {
+      description: "Please wait while we connect to Stripe"
+    });
+
     try {
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
@@ -52,6 +56,9 @@ export const CheckoutButton = ({
 
       // Redirect to Stripe checkout
       if (sessionData?.url) {
+        toast.success("Redirecting to Stripe", {
+          description: "You'll be redirected to complete your payment"
+        });
         window.location.href = sessionData.url;
       } else {
         throw new Error("No checkout URL returned");
