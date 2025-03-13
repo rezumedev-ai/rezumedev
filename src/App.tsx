@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignUp from "./pages/SignUp";
@@ -27,10 +26,10 @@ import Guides from "./pages/Guides";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NewResume from "./pages/NewResume";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
-// Create the queryClient outside of the component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -40,14 +39,14 @@ const queryClient = new QueryClient({
   },
 });
 
-const App: React.FC = () => {
+function App() {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <Router>
             <AuthProvider>
               <Routes>
                 <Route path="/" element={<Index />} />
@@ -57,6 +56,7 @@ const App: React.FC = () => {
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/cookies" element={<Cookies />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:id" element={<BlogPost />} />
                 <Route path="/features" element={<Features />} />
@@ -123,11 +123,11 @@ const App: React.FC = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AuthProvider>
-          </BrowserRouter>
+          </Router>
         </TooltipProvider>
       </QueryClientProvider>
     </React.StrictMode>
   );
-};
+}
 
 export default App;

@@ -3,8 +3,13 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { CheckoutButton } from "@/components/payment/CheckoutButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Pricing = () => {
+  const { user } = useAuth();
+  const betaPhase = true; // Set to false when ready to enable payments
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -22,12 +27,14 @@ const Pricing = () => {
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: '200ms' }}>
               Choose the plan that works best for you. Get started for free and upgrade anytime.
             </p>
-            <div 
-              className="inline-block bg-accent/50 backdrop-blur-sm px-6 py-3 rounded-full animate-bounce hover:scale-105 transition-transform cursor-pointer"
-              style={{ animationDuration: '3s' }}
-            >
-              <p className="text-primary font-medium">🎉 Currently FREE during our beta phase!</p>
-            </div>
+            {betaPhase && (
+              <div 
+                className="inline-block bg-accent/50 backdrop-blur-sm px-6 py-3 rounded-full animate-bounce hover:scale-105 transition-transform cursor-pointer"
+                style={{ animationDuration: '3s' }}
+              >
+                <p className="text-primary font-medium">🎉 Currently FREE during our beta phase!</p>
+              </div>
+            )}
           </div>
 
           {/* Pricing Cards */}
@@ -47,7 +54,16 @@ const Pricing = () => {
                 <PricingFeature text="Export to PDF" />
                 <PricingFeature text="24/7 support" />
               </ul>
-              <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>
+              {betaPhase ? (
+                <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>
+              ) : (
+                <CheckoutButton
+                  planType="monthly"
+                  className="w-full hover:scale-105 transition-transform"
+                >
+                  Subscribe Now
+                </CheckoutButton>
+              )}
             </div>
 
             {/* Yearly Plan */}
@@ -68,7 +84,16 @@ const Pricing = () => {
                 <PricingFeature text="Early access to new features" />
                 <PricingFeature text="LinkedIn integration" />
               </ul>
-              <Button variant="default" className="w-full hover:scale-105 transition-transform bg-primary hover:bg-primary/90" disabled>Coming Soon</Button>
+              {betaPhase ? (
+                <Button variant="default" className="w-full hover:scale-105 transition-transform bg-primary hover:bg-primary/90" disabled>Coming Soon</Button>
+              ) : (
+                <CheckoutButton
+                  planType="yearly"
+                  className="w-full hover:scale-105 transition-transform bg-primary hover:bg-primary/90"
+                >
+                  Subscribe Now
+                </CheckoutButton>
+              )}
             </div>
 
             {/* Lifetime Plan */}
@@ -86,7 +111,16 @@ const Pricing = () => {
                 <PricingFeature text="Custom branding" />
                 <PricingFeature text="API access" />
               </ul>
-              <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>
+              {betaPhase ? (
+                <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>
+              ) : (
+                <CheckoutButton
+                  planType="lifetime"
+                  className="w-full hover:scale-105 transition-transform"
+                >
+                  Buy Now
+                </CheckoutButton>
+              )}
             </div>
           </div>
 
