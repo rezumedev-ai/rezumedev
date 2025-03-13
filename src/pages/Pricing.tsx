@@ -5,15 +5,53 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { CheckoutButton } from "@/components/payment/CheckoutButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { SimplifiedHeader } from "@/components/SimplifiedHeader";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Pricing = () => {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const betaPhase = false; // Changed from true to false to enable payments
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check if the user is on a dashboard route
+  useEffect(() => {
+    if (user) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, [user]);
+
+  // Determine which header to show based on authentication
+  const renderHeader = () => {
+    if (isAuthenticated) {
+      if (isMobile) {
+        return (
+          <div className="md:hidden">
+            <SimplifiedHeader />
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
+          </div>
+        );
+      } else {
+        return (
+          <div className="hidden md:block">
+            <Sidebar />
+          </div>
+        );
+      }
+    } else {
+      return <Header />;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
-      <main className="py-24">
+      {renderHeader()}
+      <main className={`py-24 ${isAuthenticated && !isMobile ? 'md:ml-64' : ''}`}>
         <div className="container mx-auto px-4">
           {/* Header Section */}
           <div className="text-center mb-16 animate-fade-up">
@@ -135,7 +173,7 @@ const Pricing = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      {!isAuthenticated && <Footer />}
     </div>
   );
 };

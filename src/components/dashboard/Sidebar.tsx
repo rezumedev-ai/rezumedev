@@ -7,6 +7,7 @@ import {
   HelpCircle,
   LogOut,
   X,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -85,6 +86,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { id: 'pricing', icon: CreditCard, label: 'Pricing', path: '/pricing' },
     { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
     { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
   ];
