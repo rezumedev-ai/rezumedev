@@ -18,11 +18,11 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Define price IDs for each plan
+// Define price IDs for each plan - using actual Stripe price IDs
 const PRICE_IDS = {
-  monthly: 'price_MONTHLY_PLACEHOLDER', // Replace with actual price ID from Stripe dashboard
-  yearly: 'price_YEARLY_PLACEHOLDER',   // Replace with actual price ID from Stripe dashboard
-  lifetime: 'price_LIFETIME_PLACEHOLDER', // Replace with actual price ID from Stripe dashboard
+  monthly: 'price_1OvDSiJEGqPHzSqoxX59tJv0', // $9.99/month plan
+  yearly: 'price_1OvDT8JEGqPHzSqohDnJc73N',  // $89.88/year plan ($7.49/month)
+  lifetime: 'price_1OvDTXJEGqPHzSqoe2hZDrKI', // $199 one-time payment
 };
 
 Deno.serve(async (req) => {

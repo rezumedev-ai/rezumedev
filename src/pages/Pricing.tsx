@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Pricing = () => {
   const { user } = useAuth();
-  const betaPhase = true; // Set to false when ready to enable payments
+  const betaPhase = false; // Changed from true to false to enable payments
 
   return (
     <div className="min-h-screen bg-white">
