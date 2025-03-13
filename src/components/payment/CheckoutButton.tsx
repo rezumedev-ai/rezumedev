@@ -29,10 +29,8 @@ export const CheckoutButton = ({
 
   const handleCheckout = async () => {
     if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to subscribe to a plan",
-        variant: "destructive"
+      toast.error("Login Required", {
+        description: "Please log in to subscribe to a plan"
       });
       navigate("/login", { state: { returnTo: "/pricing" } });
       return;
@@ -60,10 +58,8 @@ export const CheckoutButton = ({
       }
     } catch (error) {
       console.error("Error starting checkout:", error);
-      toast({
-        title: "Checkout Error",
-        description: error.message || "Failed to start checkout process",
-        variant: "destructive"
+      toast.error("Checkout Error", {
+        description: error.message || "Failed to start checkout process"
       });
     } finally {
       setIsLoading(false);
