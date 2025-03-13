@@ -61,7 +61,7 @@ export const ComparisonTable = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center gap-2 mb-3 bg-accent/50 px-4 py-1 rounded-full">
             <TrophyIcon size={18} className="text-primary" />
-            <span className="text-sm font-medium text-primary">Feature Comparison</span>
+            <span className="text-sm font-medium text-primary">Compare Features</span>
           </div>
           
           <GradientHeading 
@@ -71,7 +71,7 @@ export const ComparisonTable = () => {
             weight="bold" 
             className="mb-3"
           >
-            <h2>The Ultimate Resume Builder</h2>
+            <h2>Feature Comparison</h2>
           </GradientHeading>
           
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
