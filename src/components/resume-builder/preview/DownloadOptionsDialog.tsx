@@ -20,7 +20,7 @@ export function DownloadOptionsDialog({
     setOpen(false);
     
     try {
-      // Updated selector to match the resume content div
+      // Get the resume element with more precise selector
       const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
         toast.error("Could not find resume content");
@@ -33,7 +33,7 @@ export function DownloadOptionsDialog({
       // Wait for dialog to close and any transitions to complete
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Store original styles
+      // Store original styles to restore later
       const originalStyles = {
         transform: resumeElement.style.transform,
         transition: resumeElement.style.transition,
@@ -41,47 +41,97 @@ export function DownloadOptionsDialog({
         height: resumeElement.style.height,
       };
 
-      // Reset styles for capture
-      resumeElement.style.transform = 'none';
-      resumeElement.style.transition = 'none';
+      // Create a clone of the resume element to work with
+      const clone = resumeElement.cloneNode(true) as HTMLElement;
+      
+      // Apply necessary styles to the clone for accurate capture
+      clone.style.transform = 'none';
+      clone.style.transition = 'none';
+      clone.style.position = 'absolute';
+      clone.style.top = '-9999px';
+      clone.style.left = '-9999px';
+      clone.style.width = `${resumeElement.offsetWidth}px`;
+      clone.style.height = `${resumeElement.offsetHeight}px`;
+      
+      // Append clone to body for rendering
+      document.body.appendChild(clone);
 
-      // Capture with optimal settings
-      const canvas = await html2canvas(resumeElement, {
-        scale: 2,
+      // Capture with optimal settings for precise rendering
+      const canvas = await html2canvas(clone, {
+        scale: 3, // Higher scale for better quality
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff",
-        onclone: (clonedDoc, element) => {
-          const clonedElement = element as HTMLDivElement;
-          clonedElement.style.transform = 'none';
-          clonedElement.style.transformOrigin = 'top left';
+        onclone: (clonedDoc) => {
+          // Ensure all styles are preserved in the clone
+          const clonedElement = clonedDoc.getElementById('resume-content') as HTMLElement;
+          if (clonedElement) {
+            clonedElement.style.transform = 'none';
+            clonedElement.style.transformOrigin = 'top left';
+            // Preserve all computed styles exactly as seen in the preview
+            const originalComputedStyle = window.getComputedStyle(resumeElement);
+            for (let i = 0; i < originalComputedStyle.length; i++) {
+              const prop = originalComputedStyle[i];
+              clonedElement.style.setProperty(
+                prop,
+                originalComputedStyle.getPropertyValue(prop),
+                originalComputedStyle.getPropertyPriority(prop)
+              );
+            }
+          }
         }
       });
 
-      // Restore original styles
+      // Remove the clone from the DOM
+      document.body.removeChild(clone);
+
+      // Restore original styles to the resume element
       Object.assign(resumeElement.style, originalStyles);
 
-      // Create PDF
+      // Create PDF with precise dimensions
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
+        compress: true,
       });
 
-      // Calculate dimensions to maintain aspect ratio
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
+      // Get PDF dimensions (A4)
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      // Add image to PDF
+      // Convert canvas to image
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      
+      // Calculate scaling to maintain exact proportions
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const pdfAspectRatio = pdfWidth / pdfHeight;
+      
+      // Determine dimensions that preserve aspect ratio
+      let renderWidth, renderHeight;
+      if (canvasAspectRatio > pdfAspectRatio) {
+        // Canvas is wider than PDF
+        renderWidth = pdfWidth;
+        renderHeight = pdfWidth / canvasAspectRatio;
+      } else {
+        // Canvas is taller than PDF
+        renderHeight = pdfHeight;
+        renderWidth = pdfHeight * canvasAspectRatio;
+      }
+      
+      // Center the image on the page
+      const xOffset = (pdfWidth - renderWidth) / 2;
+      const yOffset = (pdfHeight - renderHeight) / 2;
+      
+      // Add image to PDF with precise positioning
       pdf.addImage(
         imgData,
         'JPEG',
-        0,
-        0,
-        pageWidth,
-        pageHeight,
+        xOffset,
+        yOffset,
+        renderWidth,
+        renderHeight,
         undefined,
         'FAST'
       );
