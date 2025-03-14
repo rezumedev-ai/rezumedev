@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 type PlanType = "monthly" | "yearly" | "lifetime";
 
@@ -43,7 +44,12 @@ export const CheckoutButton = ({
 
     try {
       // Get the current session for authentication
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        throw new Error("Authentication error. Please try logging in again.");
+      }
       
       if (!session) {
         throw new Error("Authentication session expired. Please log in again.");
@@ -92,8 +98,17 @@ export const CheckoutButton = ({
       }
     } catch (error) {
       console.error("Error starting checkout:", error);
+      
+      let errorMessage = "Failed to start checkout process. Please try again later.";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        errorMessage = JSON.stringify(error);
+      }
+      
       toast.error("Checkout Error", {
-        description: error.message || "Failed to start checkout process. Please try again later."
+        description: errorMessage
       });
     } finally {
       setIsLoading(false);
@@ -110,7 +125,7 @@ export const CheckoutButton = ({
       {isLoading ? (
         <div className="flex items-center">
           <span className="mr-2">Processing</span>
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          <Loader2 className="h-4 w-4 animate-spin" />
         </div>
       ) : (
         children

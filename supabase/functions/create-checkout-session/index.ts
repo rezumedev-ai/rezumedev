@@ -9,7 +9,8 @@ const corsHeaders = {
 };
 
 // Initialize Stripe with the secret key from environment variable
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 });
 
@@ -18,20 +19,24 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Define price IDs for each plan
-const PRICE_IDS = {
-  monthly: 'price_1OweEfJEGqPHzSqoLjK9LIYu', // Monthly plan
-  yearly: 'price_1OweF9JEGqPHzSqoT0WDJv5C',  // Yearly plan
-  lifetime: 'price_1OweFaJEGqPHzSqokvGFpQwv', // Lifetime plan
-};
-
-// Log environment for debugging
-console.log('Function environment:', {
-  hasStripeKey: !!Deno.env.get('STRIPE_SECRET_KEY'),
-  hasSupabaseUrl: !!supabaseUrl,
-  hasSupabaseAnonKey: !!supabaseAnonKey,
-  priceIds: PRICE_IDS
-});
+// Validate environment setup
+function validateEnvironment() {
+  const issues = [];
+  
+  if (!stripeSecretKey) {
+    issues.push("STRIPE_SECRET_KEY is not set");
+  }
+  
+  if (!supabaseUrl) {
+    issues.push("SUPABASE_URL is not set");
+  }
+  
+  if (!supabaseAnonKey) {
+    issues.push("SUPABASE_ANON_KEY is not set");
+  }
+  
+  return issues;
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -40,6 +45,19 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Validate environment variables
+    const envIssues = validateEnvironment();
+    if (envIssues.length > 0) {
+      console.error("Environment validation failed:", envIssues);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Server configuration error', 
+          details: envIssues.join(', ')
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Get the request body first to avoid parsing errors
     let requestBody;
     try {
@@ -96,7 +114,7 @@ Deno.serve(async (req) => {
     console.log('Authenticated user:', { id: user.id, email: user.email });
     
     // Validate plan type
-    if (!planType || !Object.keys(PRICE_IDS).includes(planType)) {
+    if (!planType || !['monthly', 'yearly', 'lifetime'].includes(planType)) {
       console.error('Invalid plan type:', planType);
       return new Response(
         JSON.stringify({ error: 'Invalid plan type' }),
@@ -104,24 +122,45 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Choose price ID based on selected plan
-    const priceId = PRICE_IDS[planType as keyof typeof PRICE_IDS];
-    console.log('Selected price ID:', priceId);
+    // First, try to find an existing product for this plan type
+    let productName;
+    let unitAmount;
     
-    // Determine checkout mode based on plan type
+    switch (planType) {
+      case 'monthly':
+        productName = 'Monthly Subscription';
+        unitAmount = 999; // $9.99 in cents
+        break;
+      case 'yearly': 
+        productName = 'Yearly Subscription';
+        unitAmount = 8988; // $89.88 in cents
+        break;
+      case 'lifetime':
+        productName = 'Lifetime Access';
+        unitAmount = 19900; // $199 in cents
+        break;
+    }
+    
     const mode = planType === 'lifetime' ? 'payment' : 'subscription';
     console.log('Checkout mode:', mode);
     
     try {
-      // Create a checkout session
-      const session = await stripe.checkout.sessions.create({
+      // Create a checkout session without hardcoded price IDs
+      const sessionData = {
         payment_method_types: ['card'],
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: productName,
+            },
+            unit_amount: unitAmount,
+            recurring: mode === 'subscription' ? {
+              interval: planType === 'monthly' ? 'month' : 'year',
+            } : undefined,
           },
-        ],
+          quantity: 1,
+        }],
         mode: mode,
         success_url: successUrl || 'https://rezume.dev/payment-success',
         cancel_url: cancelUrl || 'https://rezume.dev/pricing',
@@ -131,7 +170,10 @@ Deno.serve(async (req) => {
           userId: user.id,
           planType: planType,
         },
-      });
+      };
+      
+      console.log('Creating checkout session with data:', JSON.stringify(sessionData, null, 2));
+      const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
       console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}`);
