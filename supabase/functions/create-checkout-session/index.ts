@@ -18,16 +18,20 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Define price IDs for each plan - these need to be updated with valid IDs from your Stripe account
-// The previous ones were failing with: "No such price: 'price_1OvDSJEGqPHzSqoxX59tJv0'"
+// Define price IDs for each plan
 const PRICE_IDS = {
-  monthly: 'price_1OweEfJEGqPHzSqoLjK9LIYu', // Updated price ID for monthly plan
-  yearly: 'price_1OweF9JEGqPHzSqoT0WDJv5C',  // Updated price ID for yearly plan
-  lifetime: 'price_1OweFaJEGqPHzSqokvGFpQwv', // Updated price ID for lifetime plan
+  monthly: 'price_1OweEfJEGqPHzSqoLjK9LIYu', // Monthly plan
+  yearly: 'price_1OweF9JEGqPHzSqoT0WDJv5C',  // Yearly plan
+  lifetime: 'price_1OweFaJEGqPHzSqokvGFpQwv', // Lifetime plan
 };
 
-// Log the price IDs being used to help with debugging
-console.log('Using price IDs:', PRICE_IDS);
+// Log environment for debugging
+console.log('Function environment:', {
+  hasStripeKey: !!Deno.env.get('STRIPE_SECRET_KEY'),
+  hasSupabaseUrl: !!supabaseUrl,
+  hasSupabaseAnonKey: !!supabaseAnonKey,
+  priceIds: PRICE_IDS
+});
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -36,8 +40,27 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Get the authorization header
+    // Get the request body first to avoid parsing errors
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (e) {
+      console.error('Error parsing request body:', e);
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Extract parameters from request body
+    const { planType, successUrl, cancelUrl } = requestBody;
+    
+    // Log the received request for debugging
+    console.log('Request received:', { planType, successUrl, cancelUrl });
+    
+    // Get the JWT token from authorization header
     const authHeader = req.headers.get('Authorization');
+    
     if (!authHeader) {
       console.error('No authorization header provided');
       return new Response(
@@ -45,25 +68,32 @@ Deno.serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // Get the JWT token from the authorization header
+    
+    // Extract the token from the Authorization header
     const token = authHeader.replace('Bearer ', '');
     
     // Verify the JWT token and get the user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: userData, error: authError } = await supabase.auth.getUser(token);
     
-    if (authError || !user) {
+    if (authError) {
       console.error('Authentication error:', authError);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized', details: authError }),
+        JSON.stringify({ error: 'Authentication failed', details: authError }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // Parse the request body
-    const { planType, successUrl, cancelUrl } = await req.json();
     
-    console.log('User:', user.id, 'Plan:', planType, 'Success URL:', successUrl, 'Cancel URL:', cancelUrl);
+    const user = userData?.user;
+    
+    if (!user) {
+      console.error('No user found after authentication');
+      return new Response(
+        JSON.stringify({ error: 'User not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    console.log('Authenticated user:', { id: user.id, email: user.email });
     
     // Validate plan type
     if (!planType || !Object.keys(PRICE_IDS).includes(planType)) {
@@ -78,44 +108,63 @@ Deno.serve(async (req) => {
     const priceId = PRICE_IDS[planType as keyof typeof PRICE_IDS];
     console.log('Selected price ID:', priceId);
     
-    // Create a checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
+    // Determine checkout mode based on plan type
+    const mode = planType === 'lifetime' ? 'payment' : 'subscription';
+    console.log('Checkout mode:', mode);
+    
+    try {
+      // Create a checkout session
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: mode,
+        success_url: successUrl || 'https://rezume.dev/payment-success',
+        cancel_url: cancelUrl || 'https://rezume.dev/pricing',
+        client_reference_id: user.id,
+        customer_email: user.email,
+        metadata: {
+          userId: user.id,
+          planType: planType,
         },
-      ],
-      mode: planType === 'lifetime' ? 'payment' : 'subscription',
-      success_url: successUrl || 'https://rezume.dev/payment-success',
-      cancel_url: cancelUrl || 'https://rezume.dev/pricing',
-      client_reference_id: user.id,
-      customer_email: user.email,
-      metadata: {
-        userId: user.id,
-        planType: planType,
-      },
-    });
+      });
 
-    // Log the session creation
-    console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}`);
+      // Log the session creation
+      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}`);
 
-    // Return the session ID to the client
-    return new Response(
-      JSON.stringify({ sessionId: session.id, url: session.url }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      // Return the session ID and URL to the client
+      return new Response(
+        JSON.stringify({ sessionId: session.id, url: session.url }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } catch (stripeError) {
+      // Handle Stripe-specific errors
+      console.error('Stripe error:', stripeError);
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'Stripe checkout error', 
+          message: stripeError.message,
+          code: stripeError.statusCode || 500,
+          type: stripeError.type || 'unknown'
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
   } catch (error) {
-    // Log the error
-    console.error('Error creating checkout session:', error);
+    // Log the general error
+    console.error('General error in function:', error);
     
     // Return error response with additional details
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: error.type || 'unknown',
-        code: error.statusCode || 500
+        error: 'Checkout process failed',
+        message: error.message || 'Unknown error',
+        details: error.stack || 'No stack trace available'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

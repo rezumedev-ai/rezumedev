@@ -42,8 +42,22 @@ export const CheckoutButton = ({
     });
 
     try {
+      // Get the current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Authentication session expired. Please log in again.");
+      }
+      
       // Add timestamp parameter to avoid caching issues
       const timestamp = new Date().getTime();
+      
+      // Log the attempt with useful debugging info
+      console.log("Initiating checkout for:", {
+        user: user.id,
+        plan: planType,
+        timestamp
+      });
       
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
@@ -59,6 +73,7 @@ export const CheckoutButton = ({
       }
 
       if (!sessionData) {
+        console.error("No session data returned");
         throw new Error("No response from checkout service");
       }
 
@@ -72,6 +87,7 @@ export const CheckoutButton = ({
         });
         window.location.href = sessionData.url;
       } else {
+        console.error("Missing checkout URL in response", sessionData);
         throw new Error("No checkout URL returned");
       }
     } catch (error) {
