@@ -42,17 +42,28 @@ export const CheckoutButton = ({
     });
 
     try {
+      // Add timestamp parameter to avoid caching issues
+      const timestamp = new Date().getTime();
+      
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
           planType,
-          successUrl: `${window.location.origin}/payment-success`,
-          cancelUrl: `${window.location.origin}/pricing`,
+          successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
+          cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
         },
       });
 
       if (error) {
-        throw new Error(error.message);
+        console.error("Function error:", error);
+        throw new Error(error.message || "Function error");
       }
+
+      if (!sessionData) {
+        throw new Error("No response from checkout service");
+      }
+
+      // Log checkout details for debugging
+      console.log("Checkout response:", sessionData);
 
       // Redirect to Stripe checkout
       if (sessionData?.url) {
@@ -66,7 +77,7 @@ export const CheckoutButton = ({
     } catch (error) {
       console.error("Error starting checkout:", error);
       toast.error("Checkout Error", {
-        description: error.message || "Failed to start checkout process"
+        description: error.message || "Failed to start checkout process. Please try again later."
       });
     } finally {
       setIsLoading(false);

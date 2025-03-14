@@ -18,12 +18,16 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Define price IDs for each plan - using actual Stripe price IDs
+// Define price IDs for each plan - these need to be updated with valid IDs from your Stripe account
+// The previous ones were failing with: "No such price: 'price_1OvDSJEGqPHzSqoxX59tJv0'"
 const PRICE_IDS = {
-  monthly: 'price_1OvDSiJEGqPHzSqoxX59tJv0', // $9.99/month plan
-  yearly: 'price_1OvDT8JEGqPHzSqohDnJc73N',  // $89.88/year plan ($7.49/month)
-  lifetime: 'price_1OvDTXJEGqPHzSqoe2hZDrKI', // $199 one-time payment
+  monthly: 'price_1OweEfJEGqPHzSqoLjK9LIYu', // Updated price ID for monthly plan
+  yearly: 'price_1OweF9JEGqPHzSqoT0WDJv5C',  // Updated price ID for yearly plan
+  lifetime: 'price_1OweFaJEGqPHzSqokvGFpQwv', // Updated price ID for lifetime plan
 };
+
+// Log the price IDs being used to help with debugging
+console.log('Using price IDs:', PRICE_IDS);
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -35,6 +39,7 @@ Deno.serve(async (req) => {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error('No authorization header provided');
       return new Response(
         JSON.stringify({ error: 'No authorization header provided' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -48,6 +53,7 @@ Deno.serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
+      console.error('Authentication error:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized', details: authError }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -57,8 +63,11 @@ Deno.serve(async (req) => {
     // Parse the request body
     const { planType, successUrl, cancelUrl } = await req.json();
     
+    console.log('User:', user.id, 'Plan:', planType, 'Success URL:', successUrl, 'Cancel URL:', cancelUrl);
+    
     // Validate plan type
     if (!planType || !Object.keys(PRICE_IDS).includes(planType)) {
+      console.error('Invalid plan type:', planType);
       return new Response(
         JSON.stringify({ error: 'Invalid plan type' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -67,6 +76,7 @@ Deno.serve(async (req) => {
 
     // Choose price ID based on selected plan
     const priceId = PRICE_IDS[planType as keyof typeof PRICE_IDS];
+    console.log('Selected price ID:', priceId);
     
     // Create a checkout session
     const session = await stripe.checkout.sessions.create({
@@ -100,9 +110,13 @@ Deno.serve(async (req) => {
     // Log the error
     console.error('Error creating checkout session:', error);
     
-    // Return error response
+    // Return error response with additional details
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.type || 'unknown',
+        code: error.statusCode || 500
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
