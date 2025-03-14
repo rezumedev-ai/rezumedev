@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +50,8 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from("resumes")
         .select("id, title, updated_at, completion_status, current_step, professional_summary")
-        .eq("user_id", user?.id);
+        .eq("user_id", user?.id)
+        .order('updated_at', { ascending: false });
 
       if (error) throw error;
 

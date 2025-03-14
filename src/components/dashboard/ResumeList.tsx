@@ -1,4 +1,3 @@
-
 import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X, ArrowRight, Archive, Clock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -58,6 +57,11 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
       }
     }
   };
+
+  // Sort resumes by updated_at date (newest first)
+  const sortedResumes = [...resumes].sort((a, b) => {
+    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+  });
 
   const handleDelete = async (id: string) => {
     if (showConfirmDelete !== id) {
@@ -193,7 +197,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         variants={container}
       >
-        {resumes.map((resume, index) => (
+        {sortedResumes.map((resume, index) => (
           <motion.div 
             key={resume.id}
             variants={item}
