@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -194,7 +193,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   };
 
   const getSubscriptionBadge = () => {
-    // Fix: Use the actual component instead of trying to use it as a JSX element
     let BadgeIcon = profile?.subscription_plan ? Crown : Gift;
     let gradientColors = "from-blue-500 to-purple-600";
     let planText = "Free Plan";
@@ -211,7 +209,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         statusDot = "bg-green-500";
       } else if (profile.subscription_status === 'canceled') {
         gradientColors = "from-amber-400 to-orange-500";
-        statusText = "Canceled";
+        statusText = "Canceled - Access until billing cycle ends";
         hoverEffect = "hover:shadow-md hover:shadow-orange-200/50";
         statusDot = "bg-orange-500";
       } else if (profile.subscription_status === 'past_due') {

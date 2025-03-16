@@ -45,7 +45,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
 
   const hasActiveSubscription = profile && 
     profile.subscription_plan && 
-    profile.subscription_status === 'active';
+    (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
   const handleContinue = async () => {
     if (!selectedTemplate) {
