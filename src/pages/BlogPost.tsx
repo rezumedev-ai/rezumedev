@@ -1,4 +1,5 @@
 
+import { Helmet } from 'react-helmet';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useParams } from "react-router-dom";
@@ -194,24 +195,55 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main className="py-24">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <BlogHeader 
-            title={post.title}
-            author={post.author}
-            date={post.date}
-            readTime={post.readTime}
-          />
-          <BlogContent 
-            content={post.content}
-            image={post.image}
-          />
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <>
+      <Helmet>
+        <title>{post.title} | Rezume.dev Blog</title>
+        <meta name="description" content={post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
+        <meta name="keywords" content={`${post.category.toLowerCase()}, resume tips, career advice, professional resume, job search, ${post.title.toLowerCase()}`} />
+        <link rel="canonical" href={`https://rezume.dev/blog/${id}`} />
+        {/* Article structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": post.title,
+            "image": post.image,
+            "author": post.author,
+            "publisher": {
+              "@type": "Organization",
+              "name": "Rezume.dev",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://rezume.dev/custom-favicon.svg"
+              }
+            },
+            "datePublished": post.date,
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://rezume.dev/blog/${id}`
+            }
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-white">
+        <Header />
+        <main className="py-24">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <BlogHeader 
+              title={post.title}
+              author={post.author}
+              date={post.date}
+              readTime={post.readTime}
+            />
+            <BlogContent 
+              content={post.content}
+              image={post.image}
+            />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 };
 
