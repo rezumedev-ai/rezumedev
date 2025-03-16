@@ -198,7 +198,7 @@ const BlogPost = () => {
     <>
       <Helmet>
         <title>{post.title} | Rezume.dev Blog</title>
-        <meta name="description" content={post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
+        <meta name="description" content={post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
         <meta name="keywords" content={`${post.category.toLowerCase()}, resume tips, career advice, professional resume, job search, ${post.title.toLowerCase()}`} />
         <link rel="canonical" href={`https://rezume.dev/blog/${id}`} />
         {/* Article structured data */}
