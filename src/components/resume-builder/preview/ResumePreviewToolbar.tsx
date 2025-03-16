@@ -1,18 +1,20 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Edit, LayoutTemplate, Save } from "lucide-react";
+import { ArrowLeft, Download, Edit, LayoutTemplate, Save, Lock } from "lucide-react";
 import { ResumeTemplate } from "../templates";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { TemplatePreview } from "../TemplatePreview";
-import { toast } from "sonner";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { TemplateSelectionGrid } from "./TemplateSelectionGrid";
 import { motion } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -35,10 +37,43 @@ export function ResumePreviewToolbar({
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const isMobile = useIsMobile();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Fetch user profile to check subscription status
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("subscription_plan, subscription_status")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      return data;
+    },
+    enabled: !!user
+  });
+
+  const hasActiveSubscription = profile && 
+    profile.subscription_plan && 
+    (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
   // Handle downloading the resume as PDF
   const handleDownload = async () => {
+    // If user doesn't have an active subscription, show subscription dialog
+    if (!hasActiveSubscription) {
+      setShowSubscriptionDialog(true);
+      return;
+    }
+    
     try {
       setIsDownloading(true);
       toast.info("Preparing your resume for download...");
@@ -116,6 +151,11 @@ export function ResumePreviewToolbar({
   const handleTemplateChange = (templateId: string) => {
     onTemplateChange(templateId);
     setIsDialogOpen(false);
+  };
+
+  const navigateToPricing = () => {
+    setShowSubscriptionDialog(false);
+    navigate("/pricing");
   };
 
   return (
@@ -202,6 +242,41 @@ export function ResumePreviewToolbar({
           </Button>
         </div>
       </div>
+
+      {/* Subscription Required Dialog */}
+      <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" />
+              Subscription Required
+            </DialogTitle>
+            <DialogDescription>
+              Downloading resumes requires an active subscription plan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-center text-gray-700 mb-4">
+              Upgrade to a paid plan to unlock resume downloads, unlimited resume creation, premium templates, and AI-powered resume optimization.
+            </p>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowSubscriptionDialog(false)}
+              className="sm:w-auto w-full"
+            >
+              Maybe Later
+            </Button>
+            <Button 
+              onClick={navigateToPricing}
+              className="sm:w-auto w-full bg-gradient-to-r from-primary to-primary-hover"
+            >
+              View Pricing Plans
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

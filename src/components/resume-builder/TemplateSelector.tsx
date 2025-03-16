@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock } from "lucide-react";
@@ -43,9 +44,30 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     enabled: !!user
   });
 
+  // Get the count of existing resumes for free users
+  const { data: resumeCount } = useQuery({
+    queryKey: ["resumeCount", user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      const { count, error } = await supabase
+        .from("resumes")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Error fetching resume count:", error);
+        return 0;
+      }
+      return count || 0;
+    },
+    enabled: !!user
+  });
+
   const hasActiveSubscription = profile && 
     profile.subscription_plan && 
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
+
+  const canCreateResume = hasActiveSubscription || (resumeCount !== undefined && resumeCount < 1);
 
   const handleContinue = async () => {
     if (!selectedTemplate) {
@@ -67,8 +89,8 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
       return;
     }
 
-    // Check if user has an active subscription
-    if (!hasActiveSubscription) {
+    // Check if user has an active subscription or this is their first resume
+    if (!canCreateResume) {
       setShowSubscriptionDialog(true);
       return;
     }
@@ -217,7 +239,9 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
               Subscription Required
             </DialogTitle>
             <DialogDescription>
-              Creating resumes requires an active subscription plan.
+              {resumeCount && resumeCount > 0 
+                ? "You've reached the limit for free resumes. Subscribe to create more."
+                : "Creating resumes requires an active subscription plan."}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
