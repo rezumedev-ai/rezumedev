@@ -1,4 +1,3 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
@@ -151,14 +150,51 @@ Deno.serve(async (req) => {
         }
         
         const userId = profiles[0].id;
+        console.log(`Subscription deleted/ended: ${subscription.id} for user: ${userId}`);
+        
+        // Update subscription status to canceled and remove plan access
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'inactive',
+            subscription_plan: null,  // Remove plan when subscription is completely ended
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error('Error updating subscription status to inactive:', updateError);
+        }
+        break;
+      }
+      
+      case 'customer.subscription.canceled': {
+        // This is different from deleted - canceled means the user has requested to cancel
+        // but they should keep access until the end of their billing period
+        const subscription = event.data.object;
+        
+        // Find the user with this subscription ID
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('subscription_id', subscription.id)
+          .limit(1);
+          
+        if (error || !profiles || profiles.length === 0) {
+          console.error('Could not find user for subscription:', subscription.id);
+          break;
+        }
+        
+        const userId = profiles[0].id;
         console.log(`Subscription canceled: ${subscription.id} for user: ${userId}`);
         
-        // Update subscription status to canceled
+        // Mark as canceled but DO NOT remove the plan yet - they keep access until period ends
         const { error: updateError } = await supabase
           .from('profiles')
           .update({
             subscription_status: 'canceled',
             updated_at: new Date().toISOString()
+            // Note: NOT removing subscription_plan here to maintain access
           })
           .eq('id', userId);
           
@@ -194,6 +230,7 @@ Deno.serve(async (req) => {
             .update({
               subscription_status: 'past_due',
               updated_at: new Date().toISOString()
+              // Note: Keep subscription_plan to maintain access during grace period
             })
             .eq('id', userId);
             
