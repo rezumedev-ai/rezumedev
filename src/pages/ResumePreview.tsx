@@ -40,8 +40,8 @@ export default function ResumePreview() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-          <div className="text-base sm:text-lg text-gray-600 font-medium px-6 text-center">Loading your resume preview...</div>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="text-lg text-gray-600 font-medium">Loading your resume preview...</div>
         </motion.div>
       </div>
     );
@@ -49,10 +49,10 @@ export default function ResumePreview() {
 
   if (!resume) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white p-4">
-        <div className="text-gray-500 text-center max-w-md">
-          <div className="text-lg sm:text-xl font-medium mb-2">Resume not found</div>
-          <p className="text-gray-400 text-sm sm:text-base">The resume you're looking for may have been deleted or doesn't exist</p>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-gray-500 text-center">
+          <div className="text-xl font-medium mb-2">Resume not found</div>
+          <p className="text-gray-400">The resume you're looking for may have been deleted or doesn't exist</p>
         </div>
       </div>
     );
@@ -78,7 +78,6 @@ export default function ResumePreview() {
           name="description" 
           content={`Professional resume for ${name}${metaDescription ? ` - ${metaDescription}` : ''}`} 
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
         <link rel="icon" href="/custom-favicon.svg" />
       </Helmet>
       <FinalResumePreview
