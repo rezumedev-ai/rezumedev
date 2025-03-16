@@ -8,6 +8,7 @@ import { ResumeContent } from "./ResumeContent";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -19,6 +20,7 @@ export function FinalResumePreview({
   resumeId
 }: FinalResumePreviewProps) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const {
     resumeState,
@@ -49,6 +51,9 @@ export function FinalResumePreview({
     handleTemplateChange(templateId);
     toast.success(`Template updated to ${resumeTemplates.find(t => t.id === templateId)?.name || 'new template'}`);
   };
+
+  // Calculate responsive scaling for mobile
+  const resumeScale = isMobile ? Math.min(1, window.innerWidth / 950) : 1;
   
   return (
     <motion.div 
@@ -69,7 +74,12 @@ export function FinalResumePreview({
       
       <motion.div 
         className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
-        style={pageStyle}
+        style={{
+          ...pageStyle,
+          transform: `scale(${resumeScale})`,
+          transformOrigin: 'top center',
+          marginBottom: isMobile ? `${40 * resumeScale}px` : '2.5rem',
+        }}
         key={template.id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
