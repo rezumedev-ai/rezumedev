@@ -6,6 +6,7 @@ import { FinalResumePreview } from "@/components/resume-builder/FinalResumePrevi
 import { ResumeData } from "@/types/resume";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet";
+import { isObject, getStringProperty } from "@/utils/type-guards";
 
 export default function ResumePreview() {
   const { id } = useParams();
@@ -57,24 +58,17 @@ export default function ResumePreview() {
     );
   }
 
-  // Get the name from resume data for the page title
-  // Handle JSON types properly by using type assertion or checking if object
-  const personalInfo = typeof resume.personal_info === 'object' ? resume.personal_info : {};
-  const professionalSummary = typeof resume.professional_summary === 'object' ? resume.professional_summary : {};
+  // Extract data from resume safely
+  const personalInfo = isObject(resume.personal_info) ? resume.personal_info : {};
+  const professionalSummary = isObject(resume.professional_summary) ? resume.professional_summary : {};
   
-  // Safely access properties using type guards
-  const name = personalInfo && typeof personalInfo === 'object' && 'fullName' in personalInfo 
-    ? String(personalInfo.fullName) 
-    : "Your Professional Resume";
-    
-  const position = professionalSummary && typeof professionalSummary === 'object' && 'title' in professionalSummary 
-    ? String(professionalSummary.title) 
-    : "Resume";
+  // Get name and position for title
+  const name = getStringProperty(personalInfo, 'fullName', "Your Professional Resume");
+  const position = getStringProperty(professionalSummary, 'title', "Resume");
 
-  // Get summary for meta description - handle with type guards
-  const summary = professionalSummary && typeof professionalSummary === 'object' && 'summary' in professionalSummary 
-    ? String(professionalSummary.summary).substring(0, 100) + '...'
-    : '';
+  // Get summary for meta description
+  const summary = getStringProperty(professionalSummary, 'summary', "");
+  const metaDescription = summary ? summary.substring(0, 100) + '...' : '';
 
   return (
     <div className="relative bg-white min-h-screen">
@@ -82,7 +76,7 @@ export default function ResumePreview() {
         <title>{`${name}'s ${position} | Rezume.dev`}</title>
         <meta 
           name="description" 
-          content={`Professional resume for ${name}${summary ? ` - ${summary}` : ''}`} 
+          content={`Professional resume for ${name}${metaDescription ? ` - ${metaDescription}` : ''}`} 
         />
         <link rel="icon" href="/custom-favicon.svg" />
       </Helmet>
