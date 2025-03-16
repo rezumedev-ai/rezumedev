@@ -58,8 +58,8 @@ export default function ResumePreview() {
   }
 
   // Get the name from resume data for the page title
-  const name = resume.personal?.name || "Your Professional Resume";
-  const position = resume.personal?.jobTitle || "Resume";
+  const name = resume.personal_info?.fullName || "Your Professional Resume";
+  const position = resume.professional_summary?.title || "Resume";
 
   return (
     <div className="relative bg-white min-h-screen">
@@ -67,7 +67,7 @@ export default function ResumePreview() {
         <title>{`${name}'s ${position} | Rezume.dev`}</title>
         <meta 
           name="description" 
-          content={`Professional resume for ${name}${resume.professionalSummary ? ` - ${resume.professionalSummary.substring(0, 100)}...` : ''}`} 
+          content={`Professional resume for ${name}${resume.professional_summary ? ` - ${resume.professional_summary.summary?.substring(0, 100)}...` : ''}`} 
         />
         <link rel="icon" href="/custom-favicon.svg" />
       </Helmet>
