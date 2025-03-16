@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet";
 
 export default function ResumePreview() {
   const { id } = useParams();
@@ -56,8 +57,20 @@ export default function ResumePreview() {
     );
   }
 
+  // Get the name from resume data for the page title
+  const name = resume.personal?.name || "Your Professional Resume";
+  const position = resume.personal?.jobTitle || "Resume";
+
   return (
     <div className="relative bg-white min-h-screen">
+      <Helmet>
+        <title>{`${name}'s ${position} | Rezume.dev`}</title>
+        <meta 
+          name="description" 
+          content={`Professional resume for ${name}${resume.professionalSummary ? ` - ${resume.professionalSummary.substring(0, 100)}...` : ''}`} 
+        />
+        <link rel="icon" href="/custom-favicon.svg" />
+      </Helmet>
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
