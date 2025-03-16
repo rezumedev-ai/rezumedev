@@ -67,6 +67,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     profile.subscription_plan && 
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
+  // Update this logic to allow creating the first resume even without subscription
   const canCreateResume = hasActiveSubscription || (resumeCount !== undefined && resumeCount < 1);
 
   const handleContinue = async () => {

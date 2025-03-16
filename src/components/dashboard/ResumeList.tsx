@@ -189,10 +189,10 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
   };
 
   const handleCreateNewResume = () => {
-    if (!hasActiveSubscription) {
-      setShowSubscriptionDialog(true);
-    } else {
+    if (resumes.length === 0 || hasActiveSubscription) {
       onCreateNew();
+    } else {
+      setShowSubscriptionDialog(true);
     }
   };
 
@@ -450,7 +450,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                {hasActiveSubscription ? (
+                {resumes.length === 0 || hasActiveSubscription ? (
                   <Plus className="w-8 h-8 text-primary/60" />
                 ) : (
                   <Lock className="w-8 h-8 text-primary/60" />
@@ -458,8 +458,8 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
               </motion.div>
               <div className="text-center space-y-1">
                 <p className="font-medium text-lg">Create New Resume</p>
-                {!hasActiveSubscription && (
-                  <p className="text-xs text-amber-600">Subscription required</p>
+                {resumes.length > 0 && !hasActiveSubscription && (
+                  <p className="text-xs text-amber-600">Subscription required for multiple resumes</p>
                 )}
                 <p className="text-sm text-gray-500">Start building your professional story</p>
               </div>
@@ -476,7 +476,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
               Subscription Required
             </DialogTitle>
             <DialogDescription>
-              Creating resumes requires an active subscription plan.
+              You've reached the limit for free resumes. Subscribe to create more.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
