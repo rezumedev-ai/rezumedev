@@ -10,6 +10,8 @@ import {
   X,
   CreditCard,
   Badge,
+  Crown,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,6 +19,19 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -29,6 +44,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -42,6 +60,37 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       if (error) throw error;
       return data;
     },
+  });
+
+  const cancelSubscription = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          subscription_status: "canceled",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", user?.id);
+
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast({
+        title: "Subscription canceled",
+        description: "Your subscription has been canceled successfully. You'll still have access until the end of your current billing period.",
+      });
+      setShowCancelDialog(false);
+    },
+    onError: (error) => {
+      console.error("Error canceling subscription:", error);
+      toast({
+        variant: "destructive",
+        title: "Error canceling subscription",
+        description: "There was a problem canceling your subscription. Please try again or contact support."
+      });
+    }
   });
 
   const sidebarVariants = {
@@ -98,29 +147,98 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     navigate("/");
   };
 
+  const handleCancelSubscription = () => {
+    cancelSubscription.mutate();
+  };
+
   const sidebarClasses = cn(
     "fixed top-0 h-full w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 z-50",
     isMobile ? "left-0" : "left-0"
   );
 
-  // Helper function to get subscription badge color
-  const getSubscriptionBadgeColor = (status: string | null) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'canceled':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'past_due':
-        return 'bg-red-100 text-red-700 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
-  };
-
-  // Helper function to format plan name
+  // Helper function to format subscription plan name
   const formatPlanName = (plan: string | null) => {
     if (!plan) return 'Free';
     return plan.charAt(0).toUpperCase() + plan.slice(1);
+  };
+
+  // Get subscription badge and styling
+  const getSubscriptionBadge = () => {
+    if (!profile?.subscription_plan) return null;
+    
+    const isActive = profile.subscription_status === 'active';
+    const isCanceled = profile.subscription_status === 'canceled';
+    const isPastDue = profile.subscription_status === 'past_due';
+    
+    let badgeIcon = ShieldCheck;
+    let gradientColors = "from-blue-500 to-purple-600";
+    let statusText = "Active";
+    let hoverEffect = "hover:shadow-md hover:shadow-purple-200/50";
+    let statusDot = "bg-green-500";
+    
+    if (isCanceled) {
+      gradientColors = "from-amber-400 to-orange-500";
+      statusText = "Canceled";
+      hoverEffect = "hover:shadow-md hover:shadow-orange-200/50";
+      statusDot = "bg-orange-500";
+    } else if (isPastDue) {
+      gradientColors = "from-red-400 to-pink-500";
+      statusText = "Past Due";
+      hoverEffect = "hover:shadow-md hover:shadow-red-200/50";
+      statusDot = "bg-red-500";
+    }
+    
+    return (
+      <motion.div 
+        variants={itemVariants}
+        whileHover={{ y: -2 }}
+        className={`mt-4 mx-2 p-3 rounded-lg bg-gradient-to-r ${gradientColors} ${hoverEffect} transition-all duration-300`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="bg-white/20 p-2 rounded-md backdrop-blur-sm">
+            <Crown className="w-5 h-5 text-white" />
+          </div>
+          <div className="text-white">
+            <div className="font-medium text-sm">{formatPlanName(profile.subscription_plan)} Plan</div>
+            <div className="flex items-center gap-1.5 text-xs opacity-90">
+              <div className={`w-1.5 h-1.5 rounded-full ${statusDot} animate-pulse`}></div>
+              <span>{statusText}</span>
+            </div>
+          </div>
+        </div>
+        
+        {isActive && (
+          <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full mt-2 bg-white/20 text-white hover:bg-white/30 text-xs"
+              >
+                Cancel Subscription
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleCancelSubscription}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Yes, Cancel Subscription
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </motion.div>
+    );
   };
 
   return (
@@ -205,22 +323,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
               </motion.div>
 
-              {profile?.subscription_plan && (
-                <motion.div
-                  variants={itemVariants}
-                  className="px-4"
-                >
-                  <div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium border ${getSubscriptionBadgeColor(profile.subscription_status)}`}>
-                    <Badge className="h-3.5 w-3.5" />
-                    <span>
-                      {formatPlanName(profile.subscription_plan)} Plan
-                      {profile.subscription_status === 'active' ? ' (Active)' : 
-                       profile.subscription_status === 'canceled' ? ' (Canceled)' : 
-                       profile.subscription_status === 'past_due' ? ' (Past Due)' : ''}
-                    </span>
-                  </div>
-                </motion.div>
-              )}
+              {getSubscriptionBadge()}
 
               <motion.div 
                 className="pt-4 space-y-1"
