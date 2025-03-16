@@ -1,14 +1,16 @@
-import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X, ArrowRight, Archive, Clock, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText, Eye, Download, Check, X, ArrowRight, Archive, Clock, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 interface Resume {
   id: string;
@@ -34,6 +36,28 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
   const [editTitle, setEditTitle] = useState("");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState<string | null>(null);
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("subscription_plan, subscription_status")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user
+  });
+
+  const hasActiveSubscription = profile && 
+    profile.subscription_plan && 
+    profile.subscription_status === 'active';
 
   const container = {
     hidden: { opacity: 0 },
@@ -58,7 +82,6 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
     }
   };
 
-  // Sort resumes by updated_at date (newest first)
   const sortedResumes = [...resumes].sort((a, b) => {
     return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
   });
@@ -162,6 +185,19 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
     }
   };
 
+  const handleCreateNewResume = () => {
+    if (!hasActiveSubscription) {
+      setShowSubscriptionDialog(true);
+    } else {
+      onCreateNew();
+    }
+  };
+
+  const navigateToPricing = () => {
+    setShowSubscriptionDialog(false);
+    navigate("/pricing");
+  };
+
   return (
     <motion.div 
       className="space-y-8"
@@ -184,7 +220,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
           whileTap={{ scale: 0.97 }}
         >
           <Button 
-            onClick={onCreateNew} 
+            onClick={handleCreateNewResume} 
             className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-primary/25 w-full sm:w-auto group"
           >
             <Plus className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" />
@@ -400,7 +436,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
         >
           <Card 
             className="h-full group p-6 border-dashed hover:border-primary/50 transition-all duration-500 cursor-pointer bg-white/50 backdrop-blur-sm"
-            onClick={onCreateNew}
+            onClick={handleCreateNewResume}
           >
             <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-4 p-6">
               <motion.div 
@@ -411,16 +447,57 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Plus className="w-8 h-8 text-primary/60" />
+                {hasActiveSubscription ? (
+                  <Plus className="w-8 h-8 text-primary/60" />
+                ) : (
+                  <Lock className="w-8 h-8 text-primary/60" />
+                )}
               </motion.div>
               <div className="text-center space-y-1">
                 <p className="font-medium text-lg">Create New Resume</p>
+                {!hasActiveSubscription && (
+                  <p className="text-xs text-amber-600">Subscription required</p>
+                )}
                 <p className="text-sm text-gray-500">Start building your professional story</p>
               </div>
             </div>
           </Card>
         </motion.div>
       </motion.div>
+
+      <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" />
+              Subscription Required
+            </DialogTitle>
+            <DialogDescription>
+              Creating resumes requires an active subscription plan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-center text-gray-700 mb-4">
+              Upgrade to a paid plan to unlock unlimited resume creation, premium templates, and AI-powered resume optimization.
+            </p>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowSubscriptionDialog(false)}
+              className="sm:w-auto w-full"
+            >
+              Maybe Later
+            </Button>
+            <Button 
+              onClick={navigateToPricing}
+              className="sm:w-auto w-full bg-gradient-to-r from-primary to-primary-hover"
+            >
+              View Pricing Plans
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

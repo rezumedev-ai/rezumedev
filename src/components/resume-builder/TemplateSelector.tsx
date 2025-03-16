@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { resumeTemplates } from "./templates";
 import { TemplatePreview } from "./TemplatePreview";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 interface TemplateSelectorProps {
   onTemplateSelect?: (templateId: string) => void;
@@ -17,9 +19,31 @@ interface TemplateSelectorProps {
 export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {}) {
   const [selectedTemplate, setSelectedTemplate] = useState<string>(resumeTemplates[0].id);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Fetch user profile to check subscription status
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("subscription_plan, subscription_status")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user
+  });
+
+  const hasActiveSubscription = profile && 
+    profile.subscription_plan && 
+    profile.subscription_status === 'active';
 
   const handleContinue = async () => {
     if (!selectedTemplate) {
@@ -38,6 +62,12 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
         variant: "destructive"
       });
       navigate("/login");
+      return;
+    }
+
+    // Check if user has an active subscription
+    if (!hasActiveSubscription) {
+      setShowSubscriptionDialog(true);
       return;
     }
 
@@ -80,6 +110,11 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const navigateToPricing = () => {
+    setShowSubscriptionDialog(false);
+    navigate("/pricing");
   };
 
   const containerVariants = {
@@ -170,6 +205,41 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
           )}
         </Button>
       </motion.div>
+
+      {/* Subscription Required Dialog */}
+      <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" />
+              Subscription Required
+            </DialogTitle>
+            <DialogDescription>
+              Creating resumes requires an active subscription plan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-center text-gray-700 mb-4">
+              Upgrade to a paid plan to unlock unlimited resume creation, premium templates, and AI-powered resume optimization.
+            </p>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowSubscriptionDialog(false)}
+              className="sm:w-auto w-full"
+            >
+              Maybe Later
+            </Button>
+            <Button 
+              onClick={navigateToPricing}
+              className="sm:w-auto w-full bg-gradient-to-r from-primary to-primary-hover"
+            >
+              View Pricing Plans
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
