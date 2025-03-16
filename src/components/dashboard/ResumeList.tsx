@@ -49,7 +49,10 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
         .eq("id", user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
       return data;
     },
     enabled: !!user
