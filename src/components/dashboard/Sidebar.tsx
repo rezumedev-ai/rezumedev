@@ -11,7 +11,14 @@ import {
   CreditCard,
   Badge,
   Crown,
-  ShieldCheck
+  ShieldCheck,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  CreditCard as CreditCardIcon,
+  Sparkles,
+  ArrowUpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -31,7 +38,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -47,6 +64,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showManageDialog, setShowManageDialog] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -82,6 +100,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         description: "Your subscription has been canceled successfully. You'll still have access until the end of your current billing period.",
       });
       setShowCancelDialog(false);
+      setShowManageDialog(false);
     },
     onError: (error) => {
       console.error("Error canceling subscription:", error);
@@ -162,6 +181,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     return plan.charAt(0).toUpperCase() + plan.slice(1);
   };
 
+  // Get human-readable subscription date
+  const formatSubscriptionDate = (date: string | null) => {
+    if (!date) return 'N/A';
+    return format(new Date(date), 'MMMM d, yyyy');
+  };
+
+  // Get subscription expiry date (mock for now, would come from actual API in production)
+  const getExpiryDate = () => {
+    // In a real app, this would come from the subscription data
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setMonth(today.getMonth() + 1);
+    return format(futureDate, 'MMMM d, yyyy');
+  };
+
   // Get subscription badge and styling
   const getSubscriptionBadge = () => {
     if (!profile?.subscription_plan) return null;
@@ -208,34 +242,126 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
         
         {isActive && (
-          <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-            <AlertDialogTrigger asChild>
+          <Dialog open={showManageDialog} onOpenChange={setShowManageDialog}>
+            <DialogTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
                 className="w-full mt-2 bg-white/20 text-white hover:bg-white/30 text-xs"
               >
-                Cancel Subscription
+                Manage Subscription
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleCancelSubscription}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Subscription Details
+                </DialogTitle>
+                <DialogDescription>
+                  Manage your {formatPlanName(profile.subscription_plan)} subscription
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-primary/10">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="font-semibold text-primary flex items-center gap-1.5">
+                      <Crown className="h-4 w-4" />
+                      <span>{formatPlanName(profile.subscription_plan)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-green-600 font-medium">Active</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span>Started on</span>
+                      </div>
+                      <span className="font-medium">{formatSubscriptionDate(profile.updated_at)}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <span>Next billing date</span>
+                      </div>
+                      <span className="font-medium">{getExpiryDate()}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <CreditCardIcon className="h-4 w-4 text-gray-500" />
+                        <span>Payment method</span>
+                      </div>
+                      <span className="font-medium">•••• 4242</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-700">Subscription Benefits:</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Unlimited resume creations</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Access to all premium templates</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>AI-powered resume enhancement</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <DialogFooter className="flex flex-col gap-3 sm:flex-row">
+                <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto"
+                  onClick={() => navigate("/pricing")}
                 >
-                  Yes, Cancel Subscription
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                  <ArrowUpCircle className="mr-2 h-4 w-4" />
+                  Upgrade Plan
+                </Button>
+                
+                <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                    >
+                      Cancel Subscription
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleCancelSubscription}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        Yes, Cancel Subscription
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
       </motion.div>
     );
