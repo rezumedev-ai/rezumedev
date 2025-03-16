@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +17,8 @@ import {
   AlertCircle,
   CreditCard as CreditCardIcon,
   Sparkles,
-  ArrowUpCircle
+  ArrowUpCircle,
+  Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -175,51 +175,53 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     isMobile ? "left-0" : "left-0"
   );
 
-  // Helper function to format subscription plan name
   const formatPlanName = (plan: string | null) => {
     if (!plan) return 'Free';
     return plan.charAt(0).toUpperCase() + plan.slice(1);
   };
 
-  // Get human-readable subscription date
   const formatSubscriptionDate = (date: string | null) => {
     if (!date) return 'N/A';
     return format(new Date(date), 'MMMM d, yyyy');
   };
 
-  // Get subscription expiry date (mock for now, would come from actual API in production)
   const getExpiryDate = () => {
-    // In a real app, this would come from the subscription data
     const today = new Date();
     const futureDate = new Date(today);
     futureDate.setMonth(today.getMonth() + 1);
     return format(futureDate, 'MMMM d, yyyy');
   };
 
-  // Get subscription badge and styling
   const getSubscriptionBadge = () => {
-    if (!profile?.subscription_plan) return null;
-    
-    const isActive = profile.subscription_status === 'active';
-    const isCanceled = profile.subscription_status === 'canceled';
-    const isPastDue = profile.subscription_status === 'past_due';
-    
-    let badgeIcon = ShieldCheck;
+    let badgeIcon = profile?.subscription_plan ? Crown : Gift;
     let gradientColors = "from-blue-500 to-purple-600";
+    let planText = "Free Plan";
     let statusText = "Active";
     let hoverEffect = "hover:shadow-md hover:shadow-purple-200/50";
     let statusDot = "bg-green-500";
+    let showStatusDot = true;
     
-    if (isCanceled) {
-      gradientColors = "from-amber-400 to-orange-500";
-      statusText = "Canceled";
-      hoverEffect = "hover:shadow-md hover:shadow-orange-200/50";
-      statusDot = "bg-orange-500";
-    } else if (isPastDue) {
-      gradientColors = "from-red-400 to-pink-500";
-      statusText = "Past Due";
-      hoverEffect = "hover:shadow-md hover:shadow-red-200/50";
-      statusDot = "bg-red-500";
+    if (profile?.subscription_plan) {
+      planText = `${formatPlanName(profile.subscription_plan)} Plan`;
+      
+      if (profile.subscription_status === 'active') {
+        statusText = "Active";
+        statusDot = "bg-green-500";
+      } else if (profile.subscription_status === 'canceled') {
+        gradientColors = "from-amber-400 to-orange-500";
+        statusText = "Canceled";
+        hoverEffect = "hover:shadow-md hover:shadow-orange-200/50";
+        statusDot = "bg-orange-500";
+      } else if (profile.subscription_status === 'past_due') {
+        gradientColors = "from-red-400 to-pink-500";
+        statusText = "Past Due";
+        hoverEffect = "hover:shadow-md hover:shadow-red-200/50";
+        statusDot = "bg-red-500";
+      }
+    } else {
+      gradientColors = "from-gray-400 to-gray-600";
+      hoverEffect = "hover:shadow-md hover:shadow-gray-200/50";
+      showStatusDot = false;
     }
     
     return (
@@ -230,40 +232,44 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex items-center gap-3">
           <div className="bg-white/20 p-2 rounded-md backdrop-blur-sm">
-            <Crown className="w-5 h-5 text-white" />
+            <badgeIcon className="w-5 h-5 text-white" />
           </div>
           <div className="text-white">
-            <div className="font-medium text-sm">{formatPlanName(profile.subscription_plan)} Plan</div>
-            <div className="flex items-center gap-1.5 text-xs opacity-90">
-              <div className={`w-1.5 h-1.5 rounded-full ${statusDot} animate-pulse`}></div>
-              <span>{statusText}</span>
-            </div>
+            <div className="font-medium text-sm">{planText}</div>
+            {showStatusDot && (
+              <div className="flex items-center gap-1.5 text-xs opacity-90">
+                <div className={`w-1.5 h-1.5 rounded-full ${statusDot} animate-pulse`}></div>
+                <span>{statusText}</span>
+              </div>
+            )}
           </div>
         </div>
         
-        {isActive && (
-          <Dialog open={showManageDialog} onOpenChange={setShowManageDialog}>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full mt-2 bg-white/20 text-white hover:bg-white/30 text-xs"
-              >
-                Manage Subscription
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-xl">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Subscription Details
-                </DialogTitle>
-                <DialogDescription>
-                  Manage your {formatPlanName(profile.subscription_plan)} subscription
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4 py-4">
+        <Dialog open={showManageDialog} onOpenChange={setShowManageDialog}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full mt-2 bg-white/20 text-white hover:bg-white/30 text-xs"
+            >
+              Manage Subscription
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Subscription Details
+              </DialogTitle>
+              <DialogDescription>
+                {profile?.subscription_plan 
+                  ? `Manage your ${formatPlanName(profile.subscription_plan)} subscription`
+                  : "Upgrade to access premium features"}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              {profile?.subscription_plan ? (
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-primary/10">
                   <div className="flex justify-between items-center mb-2">
                     <div className="font-semibold text-primary flex items-center gap-1.5">
@@ -271,8 +277,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       <span>{formatPlanName(profile.subscription_plan)}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-green-600 font-medium">Active</span>
+                      {profile.subscription_status === 'active' && (
+                        <>
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                          <span className="text-green-600 font-medium">Active</span>
+                        </>
+                      )}
+                      {profile.subscription_status === 'canceled' && (
+                        <>
+                          <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
+                          <span className="text-orange-600 font-medium">Canceled</span>
+                        </>
+                      )}
+                      {profile.subscription_status === 'past_due' && (
+                        <>
+                          <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                          <span className="text-red-600 font-medium">Past Due</span>
+                        </>
+                      )}
                     </div>
                   </div>
                   
@@ -285,13 +307,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       <span className="font-medium">{formatSubscriptionDate(profile.updated_at)}</span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <span>Next billing date</span>
+                    {profile.subscription_status === 'active' && (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Clock className="h-4 w-4 text-gray-500" />
+                          <span>Next billing date</span>
+                        </div>
+                        <span className="font-medium">{getExpiryDate()}</span>
                       </div>
-                      <span className="font-medium">{getExpiryDate()}</span>
-                    </div>
+                    )}
+                    
+                    {profile.subscription_status === 'canceled' && (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Clock className="h-4 w-4 text-gray-500" />
+                          <span>Access until</span>
+                        </div>
+                        <span className="font-medium">{getExpiryDate()}</span>
+                      </div>
+                    )}
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
@@ -302,67 +336,107 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     </div>
                   </div>
                 </div>
-                
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700">Subscription Benefits:</h4>
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Unlimited resume creations</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Access to all premium templates</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>AI-powered resume enhancement</span>
-                    </li>
-                  </ul>
+              ) : (
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="font-semibold text-gray-700 flex items-center gap-1.5">
+                      <Gift className="h-4 w-4" />
+                      <span>Free Plan</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Limited Features
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-gray-600 mb-2">
+                    Upgrade to a premium plan to unlock all features and create unlimited resumes.
+                  </p>
                 </div>
-              </div>
+              )}
               
-              <DialogFooter className="flex flex-col gap-3 sm:flex-row">
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-gray-700">
+                  {profile?.subscription_plan ? "Your Benefits:" : "Premium Benefits:"}
+                </h4>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className={`h-4 w-4 ${profile?.subscription_plan ? "text-green-500" : "text-gray-400"} mt-0.5 flex-shrink-0`} />
+                    <span className={profile?.subscription_plan ? "" : "text-gray-500"}>Unlimited resume creations</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className={`h-4 w-4 ${profile?.subscription_plan ? "text-green-500" : "text-gray-400"} mt-0.5 flex-shrink-0`} />
+                    <span className={profile?.subscription_plan ? "" : "text-gray-500"}>Access to all premium templates</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className={`h-4 w-4 ${profile?.subscription_plan ? "text-green-500" : "text-gray-400"} mt-0.5 flex-shrink-0`} />
+                    <span className={profile?.subscription_plan ? "" : "text-gray-500"}>AI-powered resume enhancement</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <DialogFooter className="flex flex-col gap-3 sm:flex-row">
+              {profile?.subscription_plan ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    className="w-full sm:w-auto"
+                    onClick={() => navigate("/pricing")}
+                  >
+                    <ArrowUpCircle className="mr-2 h-4 w-4" />
+                    {profile.subscription_status === 'active' ? "Upgrade Plan" : "View Plans"}
+                  </Button>
+                  
+                  {profile.subscription_status === 'active' && (
+                    <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                        >
+                          Cancel Subscription
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleCancelSubscription}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            Yes, Cancel Subscription
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                  
+                  {profile.subscription_status === 'canceled' && (
+                    <Button 
+                      className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-hover"
+                      onClick={() => navigate("/pricing")}
+                    >
+                      Reactivate Subscription
+                    </Button>
+                  )}
+                </>
+              ) : (
                 <Button 
-                  variant="outline" 
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-hover"
                   onClick={() => navigate("/pricing")}
                 >
-                  <ArrowUpCircle className="mr-2 h-4 w-4" />
-                  Upgrade Plan
+                  Upgrade to Premium
                 </Button>
-                
-                <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                    >
-                      Cancel Subscription
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleCancelSubscription}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        Yes, Cancel Subscription
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </motion.div>
     );
   };
