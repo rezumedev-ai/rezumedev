@@ -4,6 +4,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { isPublicRoute } from "@/lib/utils";
 
 type AuthContextType = {
   user: User | null;
@@ -16,16 +17,6 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signOut: async () => {},
 });
-
-// Define public routes that don't require authentication
-const PUBLIC_ROUTES = ['/', '/login', '/signup', '/features', '/pricing', '/blog'];
-
-const isPublicRoute = (pathname: string) => {
-  return PUBLIC_ROUTES.some(route => {
-    // Check for exact match or if the pathname starts with the route
-    return pathname === route || pathname.startsWith(`${route}/`);
-  });
-};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
