@@ -115,7 +115,11 @@ export type Database = {
           email_notifications: boolean | null
           full_name: string | null
           id: string
+          payment_method: string | null
           resume_preferences: Json | null
+          subscription_id: string | null
+          subscription_plan: string | null
+          subscription_status: string | null
           updated_at: string
         }
         Insert: {
@@ -125,7 +129,11 @@ export type Database = {
           email_notifications?: boolean | null
           full_name?: string | null
           id: string
+          payment_method?: string | null
           resume_preferences?: Json | null
+          subscription_id?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
           updated_at?: string
         }
         Update: {
@@ -135,7 +143,11 @@ export type Database = {
           email_notifications?: boolean | null
           full_name?: string | null
           id?: string
+          payment_method?: string | null
           resume_preferences?: Json | null
+          subscription_id?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
           updated_at?: string
         }
         Relationships: []
