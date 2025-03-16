@@ -62,16 +62,17 @@ export default function ResumePreview() {
   const personalInfo = typeof resume.personal_info === 'object' ? resume.personal_info : {};
   const professionalSummary = typeof resume.professional_summary === 'object' ? resume.professional_summary : {};
   
-  const name = typeof personalInfo === 'object' && personalInfo !== null && 'fullName' in personalInfo 
+  // Safely access properties using type guards
+  const name = personalInfo && typeof personalInfo === 'object' && 'fullName' in personalInfo 
     ? String(personalInfo.fullName) 
     : "Your Professional Resume";
     
-  const position = typeof professionalSummary === 'object' && professionalSummary !== null && 'title' in professionalSummary 
+  const position = professionalSummary && typeof professionalSummary === 'object' && 'title' in professionalSummary 
     ? String(professionalSummary.title) 
     : "Resume";
 
-  // Get summary for meta description
-  const summary = typeof professionalSummary === 'object' && professionalSummary !== null && 'summary' in professionalSummary 
+  // Get summary for meta description - handle with type guards
+  const summary = professionalSummary && typeof professionalSummary === 'object' && 'summary' in professionalSummary 
     ? String(professionalSummary.summary).substring(0, 100) + '...'
     : '';
 
