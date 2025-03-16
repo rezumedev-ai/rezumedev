@@ -1,13 +1,16 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Edit, RefreshCw, Save } from "lucide-react";
+import { ArrowLeft, Download, Edit, LayoutTemplate, Save } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TemplatePreview } from "../TemplatePreview";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { TemplateSelectionGrid } from "./TemplateSelectionGrid";
+import { motion } from "framer-motion";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -29,6 +32,7 @@ export function ResumePreviewToolbar({
   onToggleEdit,
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Handle downloading the resume as PDF
   const handleDownload = async () => {
@@ -106,6 +110,11 @@ export function ResumePreviewToolbar({
     }
   };
 
+  const handleTemplateChange = (templateId: string) => {
+    onTemplateChange(templateId);
+    setIsDialogOpen(false);
+  };
+
   return (
     <div className="w-full max-w-[21cm] mx-auto mb-6 bg-white rounded-lg shadow-md p-3">
       <div className="flex justify-between items-center">
@@ -139,30 +148,24 @@ export function ResumePreviewToolbar({
             </Button>
           )}
           
-          <Popover>
-            <PopoverTrigger asChild>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
               <Button 
                 variant="outline" 
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-white shadow-sm hover:bg-gray-100"
               >
-                <RefreshCw className="w-4 h-4" />
-                <span>Switch Template</span>
+                <LayoutTemplate className="w-4 h-4" />
+                <span>Change Template</span>
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-3" align="end">
-              <h3 className="text-lg font-semibold mb-3">Choose a Template</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {templates.map((template) => (
-                  <TemplatePreview
-                    key={template.id}
-                    template={template}
-                    isSelected={template.id === currentTemplateId}
-                    onSelect={() => onTemplateChange(template.id)}
-                  />
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-white">
+              <TemplateSelectionGrid 
+                templates={templates}
+                currentTemplateId={currentTemplateId}
+                onTemplateChange={handleTemplateChange}
+              />
+            </DialogContent>
+          </Dialog>
           
           <Button 
             onClick={handleDownload}

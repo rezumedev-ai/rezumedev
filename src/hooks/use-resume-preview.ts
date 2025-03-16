@@ -7,6 +7,7 @@ import { toast } from "sonner";
 export function useResumePreview(initialResumeData: ResumeData, resumeId: string) {
   const [resumeState, setResumeState] = useState<ResumeData>(initialResumeData);
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingTemplate, setIsChangingTemplate] = useState(false);
   
   useEffect(() => {
     setResumeState(initialResumeData);
@@ -176,6 +177,8 @@ export function useResumePreview(initialResumeData: ResumeData, resumeId: string
   // Handle template changes
   const handleTemplateChange = async (templateId: string) => {
     try {
+      setIsChangingTemplate(true);
+      
       setResumeState(prev => {
         const newState = {
           ...prev,
@@ -187,16 +190,20 @@ export function useResumePreview(initialResumeData: ResumeData, resumeId: string
         return newState;
       });
       
-      toast.success("Template updated successfully");
     } catch (error) {
       console.error("Error changing template:", error);
       toast.error("Failed to update template");
+    } finally {
+      setTimeout(() => {
+        setIsChangingTemplate(false);
+      }, 500);
     }
   };
   
   return {
     resumeState,
     isEditing,
+    isChangingTemplate,
     toggleEditMode,
     handlePersonalInfoUpdate,
     handleSummaryUpdate,

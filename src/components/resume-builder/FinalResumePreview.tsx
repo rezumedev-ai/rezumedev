@@ -5,6 +5,9 @@ import { resumeTemplates } from "./templates";
 import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 import { useResumePreview } from "@/hooks/use-resume-preview";
 import { ResumeContent } from "./ResumeContent";
+import { toast } from "sonner";
+import { useEffect } from "react";
+import { motion } from "framer-motion";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -38,22 +41,39 @@ export function FinalResumePreview({
     padding: template.style.spacing.margins.top,
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
+
+  // Handle template change with animated feedback
+  const handleTemplateSwitching = (templateId: string) => {
+    if (templateId === resumeState.template_id) return;
+    
+    handleTemplateChange(templateId);
+    toast.success(`Template updated to ${resumeTemplates.find(t => t.id === templateId)?.name || 'new template'}`);
+  };
   
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white py-8">
+    <motion.div 
+      className="flex flex-col items-center min-h-screen bg-white py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <ResumePreviewToolbar 
         currentTemplateId={template.id}
         templates={resumeTemplates}
         resumeId={resumeId}
-        onTemplateChange={handleTemplateChange}
+        onTemplateChange={handleTemplateSwitching}
         onBackToDashboard={() => navigate("/dashboard")}
         isEditing={isEditing}
         onToggleEdit={toggleEditMode}
       />
       
-      <div 
+      <motion.div 
         className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
         style={pageStyle}
+        key={template.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
       >
         <ResumeContent 
           resumeState={resumeState}
@@ -66,7 +86,7 @@ export function FinalResumePreview({
           onCertificationUpdate={handleCertificationUpdate}
           onExperienceUpdate={handleExperienceUpdate}
         />
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
+import { motion } from "framer-motion";
 
 export default function ResumePreview() {
   const { id } = useParams();
@@ -31,7 +32,15 @@ export default function ResumePreview() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-pulse text-gray-500">Loading preview...</div>
+        <motion.div 
+          className="flex flex-col items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="text-lg text-gray-600 font-medium">Loading your resume preview...</div>
+        </motion.div>
       </div>
     );
   }
@@ -39,7 +48,10 @@ export default function ResumePreview() {
   if (!resume) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-gray-500">Resume not found</div>
+        <div className="text-gray-500 text-center">
+          <div className="text-xl font-medium mb-2">Resume not found</div>
+          <p className="text-gray-400">The resume you're looking for may have been deleted or doesn't exist</p>
+        </div>
       </div>
     );
   }
