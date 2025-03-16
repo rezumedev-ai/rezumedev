@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
@@ -6,7 +5,7 @@ import { ResumePreviewToolbar } from "./preview/ResumePreviewToolbar";
 import { useResumePreview } from "@/hooks/use-resume-preview";
 import { ResumeContent } from "./ResumeContent";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -21,6 +20,7 @@ export function FinalResumePreview({
 }: FinalResumePreviewProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [resumeScale, setResumeScale] = useState(1);
   
   const {
     resumeState,
@@ -35,16 +35,13 @@ export function FinalResumePreview({
     handleTemplateChange
   } = useResumePreview(resumeData, resumeId);
   
-  // Get the template
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
   
-  // Prepare page style based on template
   const pageStyle = {
     padding: template.style.spacing.margins.top,
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
   };
 
-  // Handle template change with animated feedback
   const handleTemplateSwitching = (templateId: string) => {
     if (templateId === resumeState.template_id) return;
     
@@ -52,8 +49,23 @@ export function FinalResumePreview({
     toast.success(`Template updated to ${resumeTemplates.find(t => t.id === templateId)?.name || 'new template'}`);
   };
 
-  // Calculate responsive scaling for mobile
-  const resumeScale = isMobile ? Math.min(1, window.innerWidth / 950) : 1;
+  useEffect(() => {
+    const updateScale = () => {
+      if (isMobile) {
+        const containerWidth = 21 * 37.8;
+        const padding = 32;
+        const availableWidth = window.innerWidth - padding;
+        const newScale = Math.min(0.95, availableWidth / containerWidth);
+        setResumeScale(newScale);
+      } else {
+        setResumeScale(1);
+      }
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [isMobile]);
   
   return (
     <motion.div 
@@ -78,7 +90,7 @@ export function FinalResumePreview({
           ...pageStyle,
           transform: `scale(${resumeScale})`,
           transformOrigin: 'top center',
-          marginBottom: isMobile ? `${40 * resumeScale}px` : '2.5rem',
+          marginBottom: isMobile ? '2rem' : '2.5rem',
         }}
         key={template.id}
         initial={{ opacity: 0, y: 20 }}
