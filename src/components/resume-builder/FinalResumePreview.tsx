@@ -8,6 +8,7 @@ import { ResumeContent } from "./ResumeContent";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -19,6 +20,7 @@ export function FinalResumePreview({
   resumeId
 }: FinalResumePreviewProps) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const {
     resumeState,
@@ -52,7 +54,7 @@ export function FinalResumePreview({
   
   return (
     <motion.div 
-      className="flex flex-col items-center min-h-screen bg-white py-8"
+      className="flex flex-col items-center min-h-screen bg-white py-4 sm:py-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -68,7 +70,7 @@ export function FinalResumePreview({
       />
       
       <motion.div 
-        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative"
+        className={`w-full sm:w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-10 relative ${isMobile ? 'scale-[0.8] origin-top' : ''}`}
         style={pageStyle}
         key={template.id}
         initial={{ opacity: 0, y: 20 }}

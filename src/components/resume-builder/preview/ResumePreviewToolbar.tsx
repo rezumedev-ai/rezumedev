@@ -11,6 +11,8 @@ import jsPDF from "jspdf";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { TemplateSelectionGrid } from "./TemplateSelectionGrid";
 import { motion } from "framer-motion";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -33,6 +35,7 @@ export function ResumePreviewToolbar({
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   // Handle downloading the resume as PDF
   const handleDownload = async () => {
@@ -115,65 +118,99 @@ export function ResumePreviewToolbar({
     setIsDialogOpen(false);
   };
 
+  const renderTemplateSelector = () => {
+    if (isMobile) {
+      return (
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-1 bg-white shadow-sm hover:bg-gray-100 px-2 sm:px-3"
+              size={isMobile ? "sm" : "default"}
+            >
+              <LayoutTemplate className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Change</span>
+              <span>Template</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[85vh] p-0 rounded-t-xl overflow-hidden">
+            <TemplateSelectionGrid 
+              templates={templates}
+              currentTemplateId={currentTemplateId}
+              onTemplateChange={onTemplateChange}
+            />
+          </SheetContent>
+        </Sheet>
+      );
+    } else {
+      return (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 bg-white shadow-sm hover:bg-gray-100"
+            >
+              <LayoutTemplate className="w-4 h-4" />
+              <span>Change Template</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-white">
+            <TemplateSelectionGrid 
+              templates={templates}
+              currentTemplateId={currentTemplateId}
+              onTemplateChange={handleTemplateChange}
+            />
+          </DialogContent>
+        </Dialog>
+      );
+    }
+  };
+
   return (
-    <div className="w-full max-w-[21cm] mx-auto mb-6 bg-white rounded-lg shadow-md p-3">
-      <div className="flex justify-between items-center">
+    <div className="w-full max-w-[21cm] mx-auto mb-4 sm:mb-6 bg-white rounded-lg shadow-md p-2 sm:p-3">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <Button 
           variant="ghost" 
           onClick={onBackToDashboard}
-          className="flex items-center gap-2 text-gray-600 hover:text-primary hover:bg-gray-100"
+          className="flex items-center gap-2 text-gray-600 hover:text-primary hover:bg-gray-100 justify-start"
+          size={isMobile ? "sm" : "default"}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span>Back to Dashboard</span>
         </Button>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 justify-end">
           {onToggleEdit && (
             <Button 
               onClick={onToggleEdit} 
               variant="outline"
-              className="flex items-center gap-2 bg-white shadow-sm hover:bg-gray-100"
+              className="flex items-center gap-1 sm:gap-2 bg-white shadow-sm hover:bg-gray-100"
+              size={isMobile ? "sm" : "default"}
             >
               {isEditing ? (
                 <>
-                  <Save className="w-4 h-4" />
-                  Save
+                  <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>Save</span>
                 </>
               ) : (
                 <>
-                  <Edit className="w-4 h-4" />
-                  Edit
+                  <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>Edit</span>
                 </>
               )}
             </Button>
           )}
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-2 bg-white shadow-sm hover:bg-gray-100"
-              >
-                <LayoutTemplate className="w-4 h-4" />
-                <span>Change Template</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-white">
-              <TemplateSelectionGrid 
-                templates={templates}
-                currentTemplateId={currentTemplateId}
-                onTemplateChange={handleTemplateChange}
-              />
-            </DialogContent>
-          </Dialog>
+          {renderTemplateSelector()}
           
           <Button 
             onClick={handleDownload}
             disabled={isDownloading}
-            className="flex items-center gap-2 bg-primary hover:bg-primary-hover"
+            className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary-hover"
+            size={isMobile ? "sm" : "default"}
           >
-            <Download className="w-4 h-4" />
-            <span>{isDownloading ? "Preparing..." : "Download PDF"}</span>
+            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>{isDownloading ? "Preparing..." : "Download"}</span>
           </Button>
         </div>
       </div>
