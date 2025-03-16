@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -193,7 +194,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   };
 
   const getSubscriptionBadge = () => {
-    let badgeIcon = profile?.subscription_plan ? Crown : Gift;
+    // Fix: Use the actual component instead of trying to use it as a JSX element
+    let BadgeIcon = profile?.subscription_plan ? Crown : Gift;
     let gradientColors = "from-blue-500 to-purple-600";
     let planText = "Free Plan";
     let statusText = "Active";
@@ -232,7 +234,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex items-center gap-3">
           <div className="bg-white/20 p-2 rounded-md backdrop-blur-sm">
-            <badgeIcon className="w-5 h-5 text-white" />
+            <BadgeIcon className="w-5 h-5 text-white" />
           </div>
           <div className="text-white">
             <div className="font-medium text-sm">{planText}</div>
