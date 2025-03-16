@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +8,8 @@ import {
   HelpCircle,
   LogOut,
   X,
-  CreditCard
+  CreditCard,
+  Badge,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -101,6 +103,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     isMobile ? "left-0" : "left-0"
   );
 
+  // Helper function to get subscription badge color
+  const getSubscriptionBadgeColor = (status: string | null) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'canceled':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'past_due':
+        return 'bg-red-100 text-red-700 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  // Helper function to format plan name
+  const formatPlanName = (plan: string | null) => {
+    if (!plan) return 'Free';
+    return plan.charAt(0).toUpperCase() + plan.slice(1);
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -182,6 +204,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </motion.p>
                 </div>
               </motion.div>
+
+              {profile?.subscription_plan && (
+                <motion.div
+                  variants={itemVariants}
+                  className="px-4"
+                >
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium border ${getSubscriptionBadgeColor(profile.subscription_status)}`}>
+                    <Badge className="h-3.5 w-3.5" />
+                    <span>
+                      {formatPlanName(profile.subscription_plan)} Plan
+                      {profile.subscription_status === 'active' ? ' (Active)' : 
+                       profile.subscription_status === 'canceled' ? ' (Canceled)' : 
+                       profile.subscription_status === 'past_due' ? ' (Past Due)' : ''}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
 
               <motion.div 
                 className="pt-4 space-y-1"
