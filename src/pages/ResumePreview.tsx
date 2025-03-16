@@ -58,8 +58,22 @@ export default function ResumePreview() {
   }
 
   // Get the name from resume data for the page title
-  const name = resume.personal_info?.fullName || "Your Professional Resume";
-  const position = resume.professional_summary?.title || "Resume";
+  // Handle JSON types properly by using type assertion or checking if object
+  const personalInfo = typeof resume.personal_info === 'object' ? resume.personal_info : {};
+  const professionalSummary = typeof resume.professional_summary === 'object' ? resume.professional_summary : {};
+  
+  const name = typeof personalInfo === 'object' && personalInfo !== null && 'fullName' in personalInfo 
+    ? String(personalInfo.fullName) 
+    : "Your Professional Resume";
+    
+  const position = typeof professionalSummary === 'object' && professionalSummary !== null && 'title' in professionalSummary 
+    ? String(professionalSummary.title) 
+    : "Resume";
+
+  // Get summary for meta description
+  const summary = typeof professionalSummary === 'object' && professionalSummary !== null && 'summary' in professionalSummary 
+    ? String(professionalSummary.summary).substring(0, 100) + '...'
+    : '';
 
   return (
     <div className="relative bg-white min-h-screen">
@@ -67,7 +81,7 @@ export default function ResumePreview() {
         <title>{`${name}'s ${position} | Rezume.dev`}</title>
         <meta 
           name="description" 
-          content={`Professional resume for ${name}${resume.professional_summary ? ` - ${resume.professional_summary.summary?.substring(0, 100)}...` : ''}`} 
+          content={`Professional resume for ${name}${summary ? ` - ${summary}` : ''}`} 
         />
         <link rel="icon" href="/custom-favicon.svg" />
       </Helmet>
