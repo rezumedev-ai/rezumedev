@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
@@ -52,10 +53,13 @@ export function FinalResumePreview({
   useEffect(() => {
     const updateScale = () => {
       if (isMobile) {
-        const containerWidth = 21 * 37.8;
+        // For mobile, set a smaller initial scale to show more of the resume
+        // This matches the zoomed-out view in the second screenshot
+        const containerWidth = 21 * 37.8; // A4 width in pixels
         const padding = 32;
         const availableWidth = window.innerWidth - padding;
-        const newScale = Math.min(0.95, availableWidth / containerWidth);
+        // Set a maximum scale factor for mobile to ensure the resume is zoomed out enough
+        const newScale = Math.min(0.42, availableWidth / containerWidth);
         setResumeScale(newScale);
       } else {
         setResumeScale(1);
