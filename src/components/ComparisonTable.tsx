@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CheckIcon, XIcon, TrophyIcon } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
@@ -57,15 +58,19 @@ export const ComparisonTable = () => {
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-accent/30">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center gap-2 mb-3 bg-accent/50 px-4 py-1 rounded-full">
+        {/* Badge positioned at the top */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex items-center justify-center gap-2 bg-accent/50 px-4 py-1 rounded-full">
             <TrophyIcon size={18} className="text-primary" />
             <span className="text-sm font-medium text-primary">Compare Features</span>
           </div>
-          
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">
-            <span className="bg-gradient-to-t from-indigo-700 to-indigo-500 bg-clip-text text-transparent">
-              Why Choose Rezume.dev?
+        </div>
+        
+        {/* Main heading with larger size and gradient color */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold mb-3 text-center">
+            <span className="bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
+              The Rezume.dev Advantage
             </span>
           </h2>
           
