@@ -11,14 +11,14 @@ import { SectionHeader } from "./SectionHeader";
 import { formatDateRange } from "@/utils/format-dates";
 
 interface ExperienceSectionProps {
-  experience: WorkExperience[];
+  experiences: WorkExperience[];
   template: ResumeTemplate;
   isEditing: boolean;
   onUpdate: (experiences: WorkExperience[]) => void;
 }
 
 export function ExperienceSection({
-  experience = [],
+  experiences = [],
   template,
   isEditing,
   onUpdate
@@ -27,15 +27,15 @@ export function ExperienceSection({
   
   const handleEditExperience = (index: number) => {
     if (isEditing) {
-      setEditingExp({...experience[index]});
+      setEditingExp({...experiences[index]});
     }
   };
   
   const handleSaveExperience = () => {
     if (!editingExp) return;
     
-    const updatedExperiences = [...experience];
-    const index = experience.findIndex(exp => 
+    const updatedExperiences = [...experiences];
+    const index = experiences.findIndex(exp => 
       exp.jobTitle === editingExp.jobTitle && 
       exp.companyName === editingExp.companyName
     );
@@ -66,7 +66,7 @@ export function ExperienceSection({
   };
   
   const handleDeleteExperience = (index: number) => {
-    const updatedExperiences = [...experience];
+    const updatedExperiences = [...experiences];
     updatedExperiences.splice(index, 1);
     onUpdate(updatedExperiences);
   };
@@ -104,13 +104,13 @@ export function ExperienceSection({
     });
   };
   
-  if (experience.length === 0 && !isEditing) {
+  if (experiences.length === 0 && !isEditing) {
     return null;
   }
   
   return (
     <div className="mt-1">
-      <SectionHeader title="Work Experience" template={template} />
+      <SectionHeader title="Work Experience" type="experience" template={template} />
       
       {editingExp ? (
         <div className="bg-gray-50 p-4 rounded-md mt-2 border border-gray-200">
@@ -232,11 +232,11 @@ export function ExperienceSection({
           </div>
         </div>
       ) : (
-        <div className={`space-y-${template.style.itemGap === '1.5rem' ? '5' : '4'}`}>
-          {experience.map((exp, index) => (
+        <div className="space-y-4">
+          {experiences.map((exp, index) => (
             <div 
               key={index} 
-              className={`pb-${template.style.sectionGap === '2rem' ? '4' : '3'} ${index < experience.length - 1 ? 'border-b border-gray-200' : ''} cursor-pointer`}
+              className={`pb-3 ${index < experiences.length - 1 ? 'border-b border-gray-200' : ''} cursor-pointer`}
               onClick={() => handleEditExperience(index)}
             >
               <div className="flex justify-between items-start">
@@ -290,7 +290,3 @@ export function ExperienceSection({
     </div>
   );
 }
-
-const formatDateRange = (startDate: string, endDate: string) => {
-  return `${startDate} - ${endDate}`;
-};

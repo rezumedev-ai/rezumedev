@@ -4,7 +4,7 @@ import { ResumeTemplate } from "../templates";
 
 interface SectionHeaderProps {
   title: string;
-  type: "experience" | "education" | "skills" | "certifications";
+  type?: "experience" | "education" | "skills" | "certifications";
   template: ResumeTemplate;
 }
 
@@ -14,13 +14,13 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
 
     switch (type) {
       case "experience":
-        return <Briefcase className="w-5 h-5" />;
+        return <Briefcase className="w-5 h-5 mr-2" />;
       case "education":
-        return <GraduationCap className="w-5 h-5" />;
+        return <GraduationCap className="w-5 h-5 mr-2" />;
       case "certifications":
-        return <Award className="w-5 h-5" />;
+        return <Award className="w-5 h-5 mr-2" />;
       case "skills":
-        return <Star className="w-5 h-5" />;
+        return <Star className="w-5 h-5 mr-2" />;
       default:
         return null;
     }
@@ -28,8 +28,10 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
 
   return (
     <h3 className={template.style.sectionStyle}>
-      {getIcon()}
-      {title}
+      <div className="flex items-center">
+        {getIcon()}
+        <span>{title}</span>
+      </div>
     </h3>
   );
 }

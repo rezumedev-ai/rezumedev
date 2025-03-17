@@ -31,6 +31,14 @@ export function ResumeContent({
   onCertificationUpdate,
   onExperienceUpdate
 }: ResumeContentProps) {
+  
+  // Create a function to handle the WorkExperience array updates for the ExperienceSection
+  const handleExperienceArrayUpdate = (experiences: WorkExperience[]) => {
+    // Since we're replacing the entire array, we don't need index or field
+    // We'll just update the resume state with the new array
+    resumeState.work_experience = experiences;
+  };
+  
   return (
     <>
       <PersonalSection 
@@ -56,7 +64,7 @@ export function ResumeContent({
         experiences={resumeState.work_experience} 
         template={template}
         isEditing={isEditing}
-        onUpdate={onExperienceUpdate}
+        onUpdate={handleExperienceArrayUpdate}
       />
       
       <EducationSection 
