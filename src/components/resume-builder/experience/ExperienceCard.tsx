@@ -105,6 +105,14 @@ export function ExperienceCard({
           </label>
         </div>
       </div>
+      
+      {!hideResponsibilities && (
+        <ResponsibilitiesSection 
+          responsibilities={experience.responsibilities} 
+          onUpdate={(value) => onUpdate("responsibilities", value)}
+          jobTitle={experience.jobTitle}
+        />
+      )}
     </Card>
   );
 }

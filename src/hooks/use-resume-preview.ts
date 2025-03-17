@@ -1,13 +1,18 @@
 
 import { useState, useEffect } from "react";
-import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
-import { supabase } from "@/integrations/supabase/client";
+import { ResumeData } from "@/types/resume";
 import { toast } from "sonner";
+import { useResumePersonalInfo } from "./resume/use-resume-personal-info";
+import { useResumeSummary } from "./resume/use-resume-summary";
+import { useResumeSkills } from "./resume/use-resume-skills";
+import { useResumeEducation } from "./resume/use-resume-education";
+import { useResumeCertifications } from "./resume/use-resume-certifications";
+import { useResumeExperience } from "./resume/use-resume-experience";
+import { useResumeTemplate } from "./resume/use-resume-template";
 
 export function useResumePreview(initialResumeData: ResumeData, resumeId: string) {
   const [resumeState, setResumeState] = useState<ResumeData>(initialResumeData);
   const [isEditing, setIsEditing] = useState(false);
-  const [isChangingTemplate, setIsChangingTemplate] = useState(false);
   
   useEffect(() => {
     setResumeState(initialResumeData);
@@ -20,185 +25,61 @@ export function useResumePreview(initialResumeData: ResumeData, resumeId: string
     }
   };
   
-  // Update resume data in Supabase
-  const updateResumeData = async (data: ResumeData) => {
-    try {
-      // Convert the data to match Supabase's expected format
-      const supabaseData = {
-        personal_info: data.personal_info,
-        professional_summary: data.professional_summary,
-        work_experience: data.work_experience.map(exp => ({
-          ...exp,
-          responsibilities: Array.isArray(exp.responsibilities) ? exp.responsibilities : []
-        })),
-        education: data.education.map(edu => ({
-          ...edu
-        })),
-        skills: data.skills,
-        certifications: data.certifications.map(cert => ({
-          ...cert
-        })),
-        template_id: data.template_id
-      };
-      
-      const { error } = await supabase
-        .from('resumes')
-        .update(supabaseData)
-        .eq('id', resumeId);
-        
-      if (error) {
-        console.error("Error updating resume:", error);
-        toast.error("Failed to save changes");
-      }
-    } catch (error) {
-      console.error("Error in updateResumeData:", error);
-      toast.error("Failed to save changes");
-    }
-  };
+  // Use all the specialized hooks
+  const { personalInfo, handlePersonalInfoUpdate } = useResumePersonalInfo(
+    resumeState,
+    resumeId,
+    isEditing
+  );
   
-  // Handle personal info updates
-  const handlePersonalInfoUpdate = (field: string, value: string) => {
-    if (!isEditing) return;
-    
-    setResumeState(prev => {
-      const newState = {
-        ...prev,
-        personal_info: {
-          ...prev.personal_info,
-          [field]: value
-        }
-      };
-      
-      updateResumeData(newState);
-      return newState;
-    });
-  };
+  const { summary, handleSummaryUpdate } = useResumeSummary(
+    resumeState,
+    resumeId,
+    isEditing
+  );
   
-  // Handle professional summary updates
-  const handleSummaryUpdate = (summary: string) => {
-    if (!isEditing) return;
-    
-    setResumeState(prev => {
-      const newState = {
-        ...prev,
-        professional_summary: {
-          ...prev.professional_summary,
-          summary
-        }
-      };
-      
-      updateResumeData(newState);
-      return newState;
-    });
-  };
+  const { skills, handleSkillsUpdate } = useResumeSkills(
+    resumeState,
+    resumeId,
+    isEditing
+  );
   
-  // Handle skills updates
-  const handleSkillsUpdate = (type: "hard" | "soft", skills: string[]) => {
-    if (!isEditing) return;
-    
-    setResumeState(prev => {
-      const skillType = type === "hard" ? "hard_skills" : "soft_skills";
-      const newState = {
-        ...prev,
-        skills: {
-          ...prev.skills,
-          [skillType]: skills
-        }
-      };
-      
-      updateResumeData(newState);
-      return newState;
-    });
-  };
+  const { education, handleEducationUpdate } = useResumeEducation(
+    resumeState,
+    resumeId,
+    isEditing
+  );
   
-  // Handle education updates
-  const handleEducationUpdate = (index: number, field: keyof Education, value: string) => {
-    if (!isEditing) return;
-    
-    setResumeState(prev => {
-      const newEducation = [...prev.education];
-      newEducation[index] = {
-        ...newEducation[index],
-        [field]: value
-      };
-      
-      const newState = {
-        ...prev,
-        education: newEducation
-      };
-      
-      updateResumeData(newState);
-      return newState;
-    });
-  };
+  const { certifications, handleCertificationUpdate } = useResumeCertifications(
+    resumeState,
+    resumeId,
+    isEditing
+  );
   
-  // Handle certification updates
-  const handleCertificationUpdate = (index: number, field: keyof Certification, value: string) => {
-    if (!isEditing) return;
-    
-    setResumeState(prev => {
-      const newCertifications = [...prev.certifications];
-      newCertifications[index] = {
-        ...newCertifications[index],
-        [field]: value
-      };
-      
-      const newState = {
-        ...prev,
-        certifications: newCertifications
-      };
-      
-      updateResumeData(newState);
-      return newState;
-    });
-  };
+  const { experience, handleExperienceUpdate } = useResumeExperience(
+    resumeState,
+    resumeId,
+    isEditing
+  );
   
-  // Handle work experience updates
-  const handleExperienceUpdate = (index: number, field: keyof WorkExperience, value: string | string[]) => {
-    if (!isEditing) return;
-    
-    setResumeState(prev => {
-      const newExperiences = [...prev.work_experience];
-      newExperiences[index] = {
-        ...newExperiences[index],
-        [field]: value
-      };
-      
-      const newState = {
-        ...prev,
-        work_experience: newExperiences
-      };
-      
-      updateResumeData(newState);
-      return newState;
-    });
-  };
+  const { templateId, isChangingTemplate, handleTemplateChange } = useResumeTemplate(
+    resumeState,
+    resumeId
+  );
   
-  // Handle template changes
-  const handleTemplateChange = async (templateId: string) => {
-    try {
-      setIsChangingTemplate(true);
-      
-      setResumeState(prev => {
-        const newState = {
-          ...prev,
-          template_id: templateId
-        };
-        
-        // Update in Supabase
-        updateResumeData(newState);
-        return newState;
-      });
-      
-    } catch (error) {
-      console.error("Error changing template:", error);
-      toast.error("Failed to update template");
-    } finally {
-      setTimeout(() => {
-        setIsChangingTemplate(false);
-      }, 500);
-    }
-  };
+  // Update resumeState when any of the individual parts change
+  useEffect(() => {
+    setResumeState(prev => ({
+      ...prev,
+      personal_info: personalInfo,
+      professional_summary: summary,
+      skills: skills,
+      education: education,
+      certifications: certifications,
+      work_experience: experience,
+      template_id: templateId
+    }));
+  }, [personalInfo, summary, skills, education, certifications, experience, templateId]);
   
   return {
     resumeState,

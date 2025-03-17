@@ -1,128 +1,70 @@
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { ResponsibilityInput } from "./ResponsibilityInput";
 
-interface ResponsibilitiesSectionProps {
-  jobTitle: string;
+export interface ResponsibilitiesSectionProps {
   responsibilities: string[];
-  onUpdate: (responsibilities: string[]) => void;
-  hideAiSuggestions?: boolean;
+  onUpdate: (value: string[]) => void;
+  jobTitle: string;
 }
 
 export function ResponsibilitiesSection({ 
-  jobTitle, 
   responsibilities, 
   onUpdate,
-  hideAiSuggestions = false 
+  jobTitle 
 }: ResponsibilitiesSectionProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const { toast } = useToast();
-
-  const addResponsibility = () => {
+  const handleAddResponsibility = () => {
     onUpdate([...responsibilities, ""]);
   };
 
-  const updateResponsibility = (index: number, value: string) => {
-    const updated = responsibilities.map((resp, i) => (i === index ? value : resp));
+  const handleRemoveResponsibility = (index: number) => {
+    const updated = responsibilities.filter((_, i) => i !== index);
     onUpdate(updated);
   };
 
-  const removeResponsibility = (index: number) => {
-    onUpdate(responsibilities.filter((_, i) => i !== index));
-  };
-
-  const generateResponsibilities = async () => {
-    if (!jobTitle) {
-      toast({
-        title: "Job Title Required",
-        description: "Please enter a job title first to generate relevant responsibilities.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('resume-suggestions', {
-        body: { type: 'responsibilities', jobTitle }
-      });
-
-      if (error) throw error;
-
-      const generatedResponsibilities = JSON.parse(data.suggestion);
-      onUpdate(generatedResponsibilities);
-      
-      toast({
-        title: "Responsibilities Generated",
-        description: "Review and customize the suggested responsibilities to match your experience.",
-      });
-    } catch (error) {
-      console.error('Error generating responsibilities:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate responsibilities. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsGenerating(false);
-    }
+  const handleChangeResponsibility = (index: number, value: string) => {
+    const updated = [...responsibilities];
+    updated[index] = value;
+    onUpdate(updated);
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700">
-          Key Responsibilities <span className="text-red-500">*</span>
-        </label>
-        <div className="flex gap-2">
-          {!hideAiSuggestions && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateResponsibilities}
-              disabled={isGenerating}
-              className="text-xs"
-            >
-              <Sparkles className="w-4 h-4 mr-1" />
-              {isGenerating ? "Generating..." : "Suggest Responsibilities"}
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={addResponsibility}
-            className="text-xs"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Add Responsibility
-          </Button>
-        </div>
+    <div className="space-y-4 pt-2">
+      <div className="flex justify-between items-center">
+        <h4 className="text-sm font-medium text-gray-700">
+          Key Responsibilities & Achievements
+        </h4>
+        <Button
+          type="button"
+          onClick={handleAddResponsibility}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1 text-xs"
+        >
+          <Plus className="h-3 w-3" />
+          Add
+        </Button>
       </div>
 
-      {responsibilities.map((resp, index) => (
-        <div key={index} className="flex gap-2">
-          <Textarea
-            value={resp}
-            onChange={(e) => updateResponsibility(index, e.target.value)}
-            placeholder="e.g. Led a team of 5 developers in developing a new feature"
-            className="flex-1"
-          />
-          {responsibilities.length > 1 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeResponsibility(index)}
-              className="text-gray-400 hover:text-red-500"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          )}
+      {responsibilities.length === 0 ? (
+        <p className="text-sm text-gray-500 italic">
+          Add responsibilities or achievements for {jobTitle || "this position"}
+        </p>
+      ) : (
+        <div>
+          {responsibilities.map((responsibility, index) => (
+            <ResponsibilityInput
+              key={index}
+              value={responsibility}
+              index={index}
+              onChange={handleChangeResponsibility}
+              onRemove={handleRemoveResponsibility}
+            />
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
