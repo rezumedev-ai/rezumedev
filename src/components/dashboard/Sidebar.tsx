@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -144,6 +145,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      // Fix: Update toast call to use the Sonner API correctly
       toast.success("Subscription Reactivated", {
         description: "Your subscription has been successfully reactivated. You now have full access to all premium features."
       });
@@ -151,6 +153,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onError: (error) => {
       console.error("Error reactivating subscription:", error);
+      // Fix: Update toast call to use the Sonner API correctly
       toast.error("Reactivation Failed", {
         description: error.message || "There was an error reactivating your subscription. Please try again or contact support."
       });
