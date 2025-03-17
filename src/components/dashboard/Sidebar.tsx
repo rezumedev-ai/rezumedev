@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,9 +106,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onError: (error) => {
       console.error("Error canceling subscription:", error);
-      toast("Error canceling subscription", {
+      toast.error("Error canceling subscription", {
         description: "There was a problem canceling your subscription. Please try again or contact support.",
-        variant: "destructive",
       });
     }
   });
