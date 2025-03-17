@@ -3,6 +3,7 @@ import { Check, CheckCircle2, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
 
 const PricingSection = () => {
   const tiers = [
@@ -141,13 +142,16 @@ const PricingSection = () => {
           </motion.div>
           
           <motion.h2 
-            className="mb-4 text-3xl font-bold tracking-tight text-secondary md:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover"
+            className="mb-4 text-3xl font-bold tracking-tight md:text-4xl"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Invest in Your Career Success
+            <span className="text-black">Invest</span>{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover">
+              in Your Career Success
+            </span>
           </motion.h2>
           
           <motion.p 
@@ -193,15 +197,26 @@ const PricingSection = () => {
               
               {tier.popular && (
                 <motion.div 
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full shadow-md bg-primary"
+                  className="absolute -top-6 left-1/2 -translate-x-1/2 z-20"
                   initial={{ y: -10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.3, delay: 0.5 }}
                 >
-                  <span className="text-sm font-medium text-white flex items-center gap-1">
-                    <Star className="h-3 w-3 animate-pulse" />
-                    Most Popular
-                  </span>
+                  <div className="relative">
+                    {/* Animated glow effect */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-70 blur-sm animate-pulse"></div>
+                    
+                    {/* Badge content */}
+                    <div className="relative px-4 py-1.5 rounded-full shadow-lg bg-gradient-to-r from-purple-600 to-pink-500 border border-white/20">
+                      <div className="flex items-center gap-1.5">
+                        <Star className="h-3.5 w-3.5 text-yellow-200 animate-pulse" fill="currentColor" />
+                        <span className="text-sm font-semibold text-white tracking-wide">
+                          Most Popular
+                        </span>
+                        <Star className="h-3.5 w-3.5 text-yellow-200 animate-pulse" fill="currentColor" />
+                      </div>
+                    </div>
+                  </div>
                 </motion.div>
               )}
               
