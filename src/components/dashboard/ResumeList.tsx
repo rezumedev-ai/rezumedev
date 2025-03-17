@@ -37,6 +37,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState<string | null>(null);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
+  const [showDeleteFeatureDialog, setShowDeleteFeatureDialog] = useState(false);
   const { user } = useAuth();
 
   const { data: profile } = useQuery({
@@ -60,7 +61,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
 
   const hasActiveSubscription = profile && 
     profile.subscription_plan && 
-    profile.subscription_status === 'active';
+    (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
   const container = {
     hidden: { opacity: 0 },
@@ -90,6 +91,11 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
   });
 
   const handleDelete = async (id: string) => {
+    if (!hasActiveSubscription) {
+      setShowDeleteFeatureDialog(true);
+      return;
+    }
+    
     if (showConfirmDelete !== id) {
       setShowConfirmDelete(id);
       return;
@@ -198,6 +204,7 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
 
   const navigateToPricing = () => {
     setShowSubscriptionDialog(false);
+    setShowDeleteFeatureDialog(false);
     navigate("/pricing");
   };
 
@@ -417,9 +424,18 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleDelete(resume.id)}
-                            className="w-full group/btn hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
+                            className={cn(
+                              "w-full group/btn transition-all duration-300",
+                              hasActiveSubscription 
+                                ? "hover:bg-red-50 hover:text-red-600 hover:border-red-200" 
+                                : "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed"
+                            )}
                           >
-                            <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                            {hasActiveSubscription ? (
+                              <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                            ) : (
+                              <Lock className="w-4 h-4" />
+                            )}
                             Delete
                           </Button>
                         </motion.div>
@@ -488,6 +504,40 @@ export function ResumeList({ resumes, onCreateNew }: ResumeListProps) {
             <Button
               variant="outline"
               onClick={() => setShowSubscriptionDialog(false)}
+              className="sm:w-auto w-full"
+            >
+              Maybe Later
+            </Button>
+            <Button 
+              onClick={navigateToPricing}
+              className="sm:w-auto w-full bg-gradient-to-r from-primary to-primary-hover"
+            >
+              View Pricing Plans
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDeleteFeatureDialog} onOpenChange={setShowDeleteFeatureDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" />
+              Premium Feature
+            </DialogTitle>
+            <DialogDescription>
+              Deleting resumes is a premium feature available to subscribers only.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-center text-gray-700 mb-4">
+              Upgrade to a paid plan to unlock the ability to delete resumes, along with other premium features like unlimited resume creation and AI-powered resume optimization.
+            </p>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteFeatureDialog(false)}
               className="sm:w-auto w-full"
             >
               Maybe Later
