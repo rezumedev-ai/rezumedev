@@ -1,3 +1,4 @@
+
 import { Check, CheckCircle2, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -171,7 +172,7 @@ const PricingSection = () => {
           {tiers.map((tier, index) => (
             <motion.div
               key={tier.name}
-              className={`relative p-8 bg-white border rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${tier.popular ? 'border-primary md:scale-105 z-10' : 'border-gray-200'} overflow-hidden`}
+              className={`relative p-8 pt-10 bg-white border rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${tier.popular ? 'border-primary md:scale-105 z-10' : 'border-gray-200'} overflow-hidden`}
               variants={itemVariants}
               whileHover={{ y: -8, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
               transition={{ duration: 0.3 }}
@@ -191,20 +192,22 @@ const PricingSection = () => {
               
               {tier.popular && (
                 <motion.div 
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full shadow-lg"
-                  initial={{ y: -10, opacity: 0 }}
+                  className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20"
+                  initial={{ y: -5, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.3, delay: 0.5 }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
                 >
-                  <span className="text-sm font-medium text-white flex items-center">
-                    <Star className="w-3 h-3 mr-1 animate-pulse" />
-                    Most Popular
-                  </span>
+                  <div className="bg-primary px-4 py-1 rounded-full shadow-md">
+                    <span className="text-sm font-medium text-white flex items-center justify-center">
+                      <Star className="w-3 h-3 mr-1.5 animate-pulse" />
+                      Most Popular
+                    </span>
+                  </div>
                 </motion.div>
               )}
               
               <motion.div 
-                className="mb-4"
+                className="mb-4 mt-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: tier.delay }}
