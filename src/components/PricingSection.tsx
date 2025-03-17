@@ -74,7 +74,7 @@ const PricingSection = () => {
             Plans for Every Career Stage
           </div>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-secondary md:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover">
-            Simple, Transparent Pricing
+            Invest in Your Career Success
           </h2>
           <p className="text-lg text-muted-foreground">
             Choose the perfect plan for your career journey. All plans include our core AI-powered resume features.
