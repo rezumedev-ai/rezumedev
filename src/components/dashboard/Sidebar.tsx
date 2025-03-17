@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,8 +97,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast({
-        title: "Subscription canceled",
+      toast("Subscription canceled", {
         description: "Your subscription has been canceled successfully. You'll still have access until the end of your current billing period.",
       });
       setShowCancelDialog(false);
@@ -107,10 +105,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onError: (error) => {
       console.error("Error canceling subscription:", error);
-      toast({
+      toast("Error canceling subscription", {
+        description: "There was a problem canceling your subscription. Please try again or contact support.",
         variant: "destructive",
-        title: "Error canceling subscription",
-        description: "There was a problem canceling your subscription. Please try again or contact support."
       });
     }
   });
@@ -119,7 +116,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     mutationFn: async () => {
       setIsReactivating(true);
       
-      // Get the current session for authentication
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
@@ -131,7 +127,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         throw new Error("Authentication session expired. Please log in again.");
       }
       
-      // Call the reactivate-subscription edge function
       const { data, error } = await supabase.functions.invoke("reactivate-subscription", {
         body: { userId: user?.id }
       });
@@ -145,7 +140,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      // Fix: Update toast call to use the Sonner API correctly
       toast.success("Subscription Reactivated", {
         description: "Your subscription has been successfully reactivated. You now have full access to all premium features."
       });
@@ -153,7 +147,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onError: (error) => {
       console.error("Error reactivating subscription:", error);
-      // Fix: Update toast call to use the Sonner API correctly
       toast.error("Reactivation Failed", {
         description: error.message || "There was an error reactivating your subscription. Please try again or contact support."
       });
