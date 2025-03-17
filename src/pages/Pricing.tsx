@@ -140,7 +140,7 @@ const Pricing = () => {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
             {/* Monthly Plan */}
             <motion.div 
-              className="relative overflow-hidden border rounded-2xl p-8 pt-12 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 mt-6"
+              className="relative overflow-hidden border rounded-2xl p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -150,7 +150,7 @@ const Pricing = () => {
               <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 opacity-80 rounded-full"></div>
               
               {hasActiveSubscription && currentPlan === 'monthly' && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full shadow-lg z-10">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full shadow-lg">
                   <span className="text-sm font-medium text-white flex items-center">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Current Plan
@@ -198,7 +198,7 @@ const Pricing = () => {
 
             {/* Yearly Plan */}
             <motion.div 
-              className={`relative border-2 ${hasActiveSubscription && currentPlan === 'yearly' ? 'border-green-500' : 'border-primary'} rounded-2xl p-8 pt-12 bg-gradient-to-b from-primary/5 to-transparent shadow-lg transform md:scale-105 z-10 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 mt-6`}
+              className={`relative border-2 ${hasActiveSubscription && currentPlan === 'yearly' ? 'border-green-500' : 'border-primary'} rounded-2xl p-8 bg-gradient-to-b from-primary/5 to-transparent shadow-lg transform md:scale-105 z-10 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -207,8 +207,7 @@ const Pricing = () => {
               {/* Spotlight effect */}
               <div className="absolute -z-10 inset-0 bg-gradient-to-tr from-primary/0 via-primary/5 to-primary/0 animate-pulse rounded-2xl"></div>
               
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full shadow-lg z-10 
-               ${hasActiveSubscription && currentPlan === 'yearly' ? 'bg-green-500' : 'bg-primary'}">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full shadow-lg">
                 <span className="text-sm font-medium text-white flex items-center">
                   {hasActiveSubscription && currentPlan === 'yearly' ? (
                     <>
@@ -266,7 +265,7 @@ const Pricing = () => {
 
             {/* Lifetime Plan */}
             <motion.div 
-              className="relative overflow-hidden border rounded-2xl p-8 pt-12 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 mt-6"
+              className="relative overflow-hidden border rounded-2xl p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -276,7 +275,7 @@ const Pricing = () => {
               <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-emerald-500/20 to-green-500/20 opacity-80 rounded-full"></div>
               
               {hasActiveSubscription && currentPlan === 'lifetime' && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full shadow-lg z-10">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full shadow-lg">
                   <span className="text-sm font-medium text-white flex items-center">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Current Plan
