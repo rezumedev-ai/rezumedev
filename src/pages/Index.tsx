@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { AnimatedTestimonialsSection } from "@/components/AnimatedTestimonialsSection";
 import ComparisonTable from "@/components/ComparisonTable";
+import PricingSection from "@/components/PricingSection";
 
 const Index = () => {
   return (
@@ -27,6 +28,7 @@ const Index = () => {
           <Process />
           <Features />
           <AnimatedTestimonialsSection />
+          <PricingSection />
           <ComparisonTable />
           <ResumeTemplates />
           <FAQ />
