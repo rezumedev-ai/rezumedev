@@ -71,7 +71,7 @@ export const ComparisonTable = () => {
             weight="bold" 
             className="mb-3"
           >
-            <h2>Feature Comparison</h2>
+            <h2>Why Choose Rezume.dev?</h2>
           </GradientHeading>
           
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
