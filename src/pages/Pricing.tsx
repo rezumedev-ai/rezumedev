@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -149,15 +148,6 @@ const Pricing = () => {
               {/* Decorative corner gradient */}
               <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 opacity-80 rounded-full"></div>
               
-              {hasActiveSubscription && currentPlan === 'monthly' && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full shadow-lg">
-                  <span className="text-sm font-medium text-white flex items-center">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Current Plan
-                  </span>
-                </div>
-              )}
-              
               <div className="mb-4">
                 <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 text-xs font-medium rounded-full mb-2">
                   Monthly Plan
@@ -209,17 +199,8 @@ const Pricing = () => {
               
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full shadow-lg">
                 <span className="text-sm font-medium text-white flex items-center">
-                  {hasActiveSubscription && currentPlan === 'yearly' ? (
-                    <>
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Current Plan
-                    </>
-                  ) : (
-                    <>
-                      <Star className="w-3 h-3 mr-1 animate-pulse" />
-                      Most Popular
-                    </>
-                  )}
+                  <Star className="w-3 h-3 mr-1 animate-pulse" />
+                  Most Popular
                 </span>
               </div>
               
