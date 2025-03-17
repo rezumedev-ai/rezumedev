@@ -30,32 +30,32 @@ export function EducationSection({
   // Template-specific styles
   const styles = {
     "executive-clean": {
-      section: "mb-6",
-      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      degree: "font-bold text-sm text-gray-800",
-      school: "text-sm text-gray-700",
-      date: "text-sm text-gray-500"
+      section: "mb-5",
+      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-300",
+      degree: "font-bold text-base text-gray-800",
+      school: "text-base text-gray-700",
+      date: "text-[15px] text-gray-500"
     },
     "modern-split": {
       section: "mb-4",
-      title: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2",
-      degree: "font-semibold text-[12px] text-gray-800",
-      school: "text-[11px] text-gray-600",
-      date: "text-[10px] text-gray-500"
+      title: "text-[14px] font-bold text-gray-800 uppercase tracking-wider mb-2",
+      degree: "font-semibold text-[13px] text-gray-800",
+      school: "text-[12px] text-gray-600",
+      date: "text-[11px] text-gray-500"
     },
     "minimal-elegant": {
-      section: "mb-10",
-      title: "text-xs uppercase tracking-[0.2em] text-gray-400 mb-6 font-medium text-center",
-      degree: "font-medium text-sm text-gray-800",
-      school: "text-[13px] text-gray-500",
-      date: "text-xs text-gray-400"
+      section: "mb-8",
+      title: "text-[14px] uppercase tracking-[0.2em] text-gray-400 mb-5 font-medium text-center",
+      degree: "font-medium text-base text-gray-800",
+      school: "text-[15px] text-gray-500",
+      date: "text-[14px] text-gray-400"
     },
     "professional-executive": {
       section: "mb-5",
-      title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
-      degree: "font-semibold text-[13px]",
-      school: "text-[13px] text-gray-600",
-      date: "text-[12px] text-gray-500"
+      title: "text-[18px] font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
+      degree: "font-semibold text-[15px]",
+      school: "text-[15px] text-gray-600",
+      date: "text-[14px] text-gray-500"
     }
   };
 
@@ -73,7 +73,7 @@ export function EducationSection({
           "Education"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-6 flex flex-col items-center" : template.id === "modern-split" ? "space-y-2" : "space-y-3"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-5 flex flex-col items-center" : template.id === "modern-split" ? "space-y-2" : "space-y-3"}>
         {education.map((edu, index) => (
           <div key={index} className={template.id === "minimal-elegant" ? "text-center w-full max-w-md" : ""}>
             {template.id === "minimal-elegant" ? (

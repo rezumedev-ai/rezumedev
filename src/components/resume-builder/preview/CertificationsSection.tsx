@@ -1,3 +1,4 @@
+
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
@@ -35,19 +36,19 @@ export function CertificationsSection({
     const totalItems = certifications.length;
     
     // Base font size adjustments
-    let nameFontSize = "text-sm";
-    let orgFontSize = "text-sm";
-    let dateFontSize = "text-xs";
+    let nameFontSize = "text-base";
+    let orgFontSize = "text-base";
+    let dateFontSize = "text-[14px]";
     
     // Adjust font sizes based on number of items
     if (totalItems > 5) {
-      nameFontSize = "text-xs";
-      orgFontSize = "text-xs";
-      dateFontSize = "text-[10px]";
+      nameFontSize = "text-[15px]";
+      orgFontSize = "text-[15px]";
+      dateFontSize = "text-[13px]";
     } else if (totalItems <= 2) {
-      nameFontSize = "text-sm";
-      orgFontSize = "text-xs";
-      dateFontSize = "text-xs";
+      nameFontSize = "text-base";
+      orgFontSize = "text-[15px]";
+      dateFontSize = "text-[14px]";
     }
     
     // Adjust for very long name/organization text
@@ -55,11 +56,11 @@ export function CertificationsSection({
     const hasLongOrgs = certifications.some(cert => cert.organization.length > 30);
     
     if (hasLongNames) {
-      nameFontSize = totalItems > 3 ? "text-xs" : "text-sm";
+      nameFontSize = totalItems > 3 ? "text-[15px]" : "text-base";
     }
     
     if (hasLongOrgs) {
-      orgFontSize = totalItems > 3 ? "text-xs" : "text-xs";
+      orgFontSize = totalItems > 3 ? "text-[14px]" : "text-[15px]";
     }
     
     return { nameFontSize, orgFontSize, dateFontSize };
@@ -68,29 +69,29 @@ export function CertificationsSection({
   // Template-specific styles
   const styles = {
     "executive-clean": {
-      section: "mb-6",
-      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      section: "mb-5",
+      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-300",
       name: `font-bold ${dynamicFontSizes.nameFontSize} text-gray-800`,
       organization: `${dynamicFontSizes.orgFontSize} text-gray-700`,
       date: `${dynamicFontSizes.dateFontSize} text-gray-500`
     },
     "modern-split": {
       section: "mb-4",
-      title: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center",
-      name: `font-semibold text-[12px] text-gray-800`,
-      organization: `text-[11px] text-gray-600`,
-      date: `text-[10px] text-gray-500`
+      title: "text-[14px] font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center",
+      name: `font-semibold text-[13px] text-gray-800`,
+      organization: `text-[12px] text-gray-600`,
+      date: `text-[11px] text-gray-500`
     },
     "minimal-elegant": {
-      section: "mb-8",
-      title: "text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-4 font-medium flex items-center gap-1.5 after:content-[''] after:h-px after:flex-grow after:bg-gray-200",
+      section: "mb-7",
+      title: "text-[14px] uppercase tracking-[0.2em] text-gray-400 mb-4 font-medium flex items-center gap-1.5 after:content-[''] after:h-px after:flex-grow after:bg-gray-200",
       name: `font-normal ${dynamicFontSizes.nameFontSize} text-gray-700`,
       organization: `${dynamicFontSizes.orgFontSize} text-gray-500 italic`,
       date: `${dynamicFontSizes.dateFontSize} text-gray-400`
     },
     "professional-executive": {
       section: "mb-5",
-      title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
+      title: "text-[18px] font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
       name: `font-medium ${dynamicFontSizes.nameFontSize}`,
       organization: `${dynamicFontSizes.orgFontSize} text-gray-600`,
       date: `${dynamicFontSizes.dateFontSize} text-gray-500`
@@ -115,7 +116,7 @@ export function CertificationsSection({
           "Certificates"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-1.5" : "space-y-1.5"}>
+      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-1.5" : "space-y-2"}>
         {certifications.map((cert, index) => (
           template.id === "minimal-elegant" ? (
             <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">

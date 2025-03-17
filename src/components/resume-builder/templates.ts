@@ -1,3 +1,4 @@
+
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -53,10 +54,10 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Traditional single-column layout preferred by Fortune 500 companies",
     imageUrl: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
     style: {
-      titleFont: "font-serif text-[40px] font-bold tracking-tight text-gray-900",
-      headerStyle: "mb-10 pb-6 border-b-2 border-gray-800",
-      sectionStyle: "text-[20px] font-bold text-gray-900 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      contentStyle: "space-y-6",
+      titleFont: "font-serif text-[48px] font-bold tracking-tight text-gray-900",
+      headerStyle: "mb-8 pb-4 border-b-2 border-gray-800",
+      sectionStyle: "text-[22px] font-bold text-gray-900 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      contentStyle: "space-y-5",
       layout: "classic",
       colors: {
         primary: "#1A1A1A",
@@ -66,15 +67,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "2.5rem",
-        itemGap: "2rem",
-        contentPadding: "3rem",
-        headerHeight: "200px",
+        sectionGap: "2rem",
+        itemGap: "1.5rem",
+        contentPadding: "2.5rem",
+        headerHeight: "170px",
         margins: {
-          top: "1in",
-          right: "1in",
-          bottom: "1in",
-          left: "1in"
+          top: "0.7in",
+          right: "0.7in",
+          bottom: "0.7in",
+          left: "0.7in"
         }
       },
       dimensions: {
@@ -82,10 +83,10 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "11in"
       },
       typography: {
-        titleSize: "40px",
-        subtitleSize: "20px",
-        bodySize: "14px",
-        lineHeight: "1.6"
+        titleSize: "48px",
+        subtitleSize: "22px",
+        bodySize: "16px",
+        lineHeight: "1.5"
       },
       icons: {
         sections: false,
@@ -101,10 +102,10 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Clean and sophisticated design with perfect typography",
     imageUrl: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
     style: {
-      titleFont: "font-sans text-[32px] font-bold tracking-tight text-gray-900",
-      headerStyle: "mb-6 pb-4 border-b border-gray-300",
-      sectionStyle: "text-[15px] uppercase tracking-wider text-gray-800 mb-3 font-bold border-b border-gray-200 pb-1",
-      contentStyle: "space-y-6",
+      titleFont: "font-sans text-[36px] font-bold tracking-tight text-gray-900",
+      headerStyle: "mb-6 pb-3 border-b border-gray-300",
+      sectionStyle: "text-[17px] uppercase tracking-wider text-gray-800 mb-3 font-bold border-b border-gray-200 pb-1",
+      contentStyle: "space-y-5",
       layout: "minimal",
       colors: {
         primary: "#2D2D2D",
@@ -114,15 +115,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "2rem",
-        itemGap: "1.5rem",
-        contentPadding: "2.5rem",
+        sectionGap: "1.75rem",
+        itemGap: "1.25rem",
+        contentPadding: "2rem",
         headerHeight: "auto",
         margins: {
-          top: "60px",
-          right: "60px",
-          bottom: "60px",
-          left: "60px"
+          top: "0.6in",
+          right: "0.6in",
+          bottom: "0.6in",
+          left: "0.6in"
         }
       },
       dimensions: {
@@ -130,10 +131,10 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "1056px"
       },
       typography: {
-        titleSize: "32px",
-        subtitleSize: "16px",
-        bodySize: "14px",
-        lineHeight: "1.5"
+        titleSize: "36px",
+        subtitleSize: "18px",
+        bodySize: "16px",
+        lineHeight: "1.4"
       },
       icons: {
         sections: false,
@@ -149,10 +150,10 @@ export const resumeTemplates: ResumeTemplate[] = [
     description: "Modern two-column layout with clean typography",
     imageUrl: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
     style: {
-      titleFont: "font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1",
-      headerStyle: "mb-12",
-      sectionStyle: "text-[16px] font-bold text-black uppercase tracking-wider mb-4",
-      contentStyle: "grid grid-cols-12 gap-8",
+      titleFont: "font-sans text-[46px] font-black tracking-wide text-black uppercase mb-1",
+      headerStyle: "mb-8",
+      sectionStyle: "text-[18px] font-bold text-black uppercase tracking-wider mb-3",
+      contentStyle: "grid grid-cols-12 gap-7",
       layout: "executive",
       colors: {
         primary: "#000000",
@@ -162,15 +163,15 @@ export const resumeTemplates: ResumeTemplate[] = [
         background: "#FFFFFF"
       },
       spacing: {
-        sectionGap: "2rem",
+        sectionGap: "1.75rem",
         itemGap: "1rem",
-        contentPadding: "2.5rem",
+        contentPadding: "2rem",
         headerHeight: "auto",
         margins: {
-          top: "60px",
-          right: "60px",
-          bottom: "60px",
-          left: "60px"
+          top: "0.6in",
+          right: "0.6in",
+          bottom: "0.6in",
+          left: "0.6in"
         }
       },
       dimensions: {
@@ -178,10 +179,10 @@ export const resumeTemplates: ResumeTemplate[] = [
         minHeight: "1056px"
       },
       typography: {
-        titleSize: "42px",
-        subtitleSize: "16px",
-        bodySize: "14px",
-        lineHeight: "1.6"
+        titleSize: "46px",
+        subtitleSize: "18px",
+        bodySize: "16px",
+        lineHeight: "1.5"
       },
       icons: {
         sections: false,
