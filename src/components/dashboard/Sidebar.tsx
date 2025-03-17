@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +19,8 @@ import {
   CreditCard as CreditCardIcon,
   Sparkles,
   ArrowUpCircle,
-  Gift
+  Gift,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,7 +28,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +51,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { useProfileQuery } from "../dashboard/resume-list/useProfileQuery";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -61,10 +64,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showManageDialog, setShowManageDialog] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -109,6 +112,52 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         title: "Error canceling subscription",
         description: "There was a problem canceling your subscription. Please try again or contact support."
       });
+    }
+  });
+
+  const reactivateSubscription = useMutation({
+    mutationFn: async () => {
+      setIsReactivating(true);
+      
+      // Get the current session for authentication
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        throw new Error("Authentication error. Please try logging in again.");
+      }
+      
+      if (!session) {
+        throw new Error("Authentication session expired. Please log in again.");
+      }
+      
+      // Call the reactivate-subscription edge function
+      const { data, error } = await supabase.functions.invoke("reactivate-subscription", {
+        body: { userId: user?.id }
+      });
+
+      if (error) {
+        console.error("Error reactivating subscription:", error);
+        throw new Error(error.message || "Failed to reactivate subscription");
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Subscription Reactivated", {
+        description: "Your subscription has been successfully reactivated. You now have full access to all premium features."
+      });
+      setShowManageDialog(false);
+    },
+    onError: (error) => {
+      console.error("Error reactivating subscription:", error);
+      toast.error("Reactivation Failed", {
+        description: error.message || "There was an error reactivating your subscription. Please try again or contact support."
+      });
+    },
+    onSettled: () => {
+      setIsReactivating(false);
     }
   });
 
@@ -420,9 +469,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   {profile.subscription_status === 'canceled' && (
                     <Button 
                       className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-hover"
-                      onClick={() => navigate("/pricing")}
+                      onClick={() => reactivateSubscription.mutate()}
+                      disabled={isReactivating}
                     >
-                      Reactivate Subscription
+                      {isReactivating ? (
+                        <div className="flex items-center">
+                          <span className="mr-2">Processing</span>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </div>
+                      ) : (
+                        "Reactivate Subscription"
+                      )}
                     </Button>
                   )}
                 </>
