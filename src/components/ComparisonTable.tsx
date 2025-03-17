@@ -56,12 +56,12 @@ export const ComparisonTable = () => {
   const isMobile = useIsMobile();
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-accent/30">
+    <section className="pt-4 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-accent/30">
       <div className="max-w-7xl mx-auto">
         {/* Main heading with larger size and gradient color */}
         <div className="text-center mb-8">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
               Feature Comparison
             </span>
           </h2>
