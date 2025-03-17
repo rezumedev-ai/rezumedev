@@ -1,4 +1,3 @@
-
 import { Check, CheckCircle2, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -66,7 +65,6 @@ const PricingSection = () => {
     }
   ];
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -94,7 +92,6 @@ const PricingSection = () => {
 
   return (
     <section className="relative py-20 overflow-hidden bg-white sm:py-32">
-      {/* Animated background elements */}
       <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-accent/50 to-transparent"></div>
       <motion.div 
         className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl"
@@ -122,7 +119,6 @@ const PricingSection = () => {
       ></motion.div>
       
       <div className="container relative z-10">
-        {/* Header */}
         <motion.div 
           className="max-w-2xl mx-auto mb-16 text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -165,7 +161,6 @@ const PricingSection = () => {
           </motion.p>
         </motion.div>
         
-        {/* Pricing Cards */}
         <motion.div 
           className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto"
           variants={containerVariants}
@@ -181,7 +176,6 @@ const PricingSection = () => {
               whileHover={{ y: -8, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
               transition={{ duration: 0.3 }}
             >
-              {/* Animated corner gradient */}
               <motion.div 
                 className={`absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br ${tier.color} opacity-80 rounded-full`}
                 animate={{ 
@@ -197,30 +191,18 @@ const PricingSection = () => {
               
               {tier.popular && (
                 <motion.div 
-                  className="absolute -top-6 left-1/2 -translate-x-1/2 z-20"
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full shadow-lg"
                   initial={{ y: -10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.3, delay: 0.5 }}
                 >
-                  <div className="relative">
-                    {/* Animated glow effect */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-70 blur-sm animate-pulse"></div>
-                    
-                    {/* Badge content */}
-                    <div className="relative px-4 py-1.5 rounded-full shadow-lg bg-gradient-to-r from-purple-600 to-pink-500 border border-white/20">
-                      <div className="flex items-center gap-1.5">
-                        <Star className="h-3.5 w-3.5 text-yellow-200 animate-pulse" fill="currentColor" />
-                        <span className="text-sm font-semibold text-white tracking-wide">
-                          Most Popular
-                        </span>
-                        <Star className="h-3.5 w-3.5 text-yellow-200 animate-pulse" fill="currentColor" />
-                      </div>
-                    </div>
-                  </div>
+                  <span className="text-sm font-medium text-white flex items-center">
+                    <Star className="w-3 h-3 mr-1 animate-pulse" />
+                    Most Popular
+                  </span>
                 </motion.div>
               )}
               
-              {/* Badge and Name */}
               <motion.div 
                 className="mb-4"
                 initial={{ opacity: 0 }}
@@ -233,7 +215,6 @@ const PricingSection = () => {
                 <h3 className="text-xl font-semibold text-secondary">{tier.name}</h3>
               </motion.div>
               
-              {/* Price */}
               <motion.div 
                 className="mb-6"
                 initial={{ opacity: 0 }}
@@ -247,7 +228,6 @@ const PricingSection = () => {
                 <p className="mt-2 text-sm text-muted-foreground">{tier.description}</p>
               </motion.div>
               
-              {/* Features */}
               <motion.div 
                 className="space-y-4 mb-8"
                 initial="hidden"
@@ -281,7 +261,6 @@ const PricingSection = () => {
                 ))}
               </motion.div>
               
-              {/* CTA Button */}
               <motion.div 
                 className="mt-auto"
                 initial={{ opacity: 0 }}
@@ -314,7 +293,6 @@ const PricingSection = () => {
           ))}
         </motion.div>
         
-        {/* Extra Info */}
         <motion.div 
           className="max-w-2xl mx-auto mt-16 text-center"
           initial={{ opacity: 0, y: 20 }}
