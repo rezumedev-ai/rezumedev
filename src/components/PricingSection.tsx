@@ -1,4 +1,3 @@
-
 import { Check, CheckCircle2, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -119,7 +118,13 @@ const PricingSection = () => {
         }}
       ></motion.div>
       
-      <div className="container relative z-10">
+      <motion.div 
+        className="container relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}
+      >
         <motion.div 
           className="max-w-2xl mx-auto mb-16 text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -172,7 +177,7 @@ const PricingSection = () => {
           {tiers.map((tier, index) => (
             <motion.div
               key={tier.name}
-              className={`relative p-8 pt-10 bg-white border rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${tier.popular ? 'border-primary md:scale-105 z-10' : 'border-gray-200'} overflow-hidden`}
+              className={`relative p-8 bg-white border rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${tier.popular ? 'border-primary md:scale-105 z-10 mt-4' : 'border-gray-200'} overflow-hidden`}
               variants={itemVariants}
               whileHover={{ y: -8, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
               transition={{ duration: 0.3 }}
@@ -191,23 +196,23 @@ const PricingSection = () => {
               ></motion.div>
               
               {tier.popular && (
-                <motion.div 
-                  className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20"
-                  initial={{ y: -5, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 0.3 }}
-                >
-                  <div className="bg-primary px-4 py-1 rounded-full shadow-md">
-                    <span className="text-sm font-medium text-white flex items-center justify-center">
-                      <Star className="w-3 h-3 mr-1.5 animate-pulse" />
+                <div className="absolute -top-4 right-0 left-0 flex justify-center">
+                  <motion.div 
+                    className="bg-primary px-5 py-1.5 rounded-full flex items-center shadow-md"
+                    initial={{ y: -10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.5 }}
+                  >
+                    <Star className="w-4 h-4 mr-1.5 text-white" />
+                    <span className="text-sm font-medium text-white">
                       Most Popular
                     </span>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               )}
               
               <motion.div 
-                className="mb-4 mt-2"
+                className="mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: tier.delay }}
@@ -335,7 +340,7 @@ const PricingSection = () => {
             </Link>
           </p>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 };
