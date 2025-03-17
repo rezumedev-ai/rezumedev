@@ -9,6 +9,11 @@ import { PricingInfo } from "@/components/pricing/PricingInfo";
 
 export type PlanType = "monthly" | "yearly" | "lifetime";
 
+export interface SubscriptionStatus {
+  hasActiveSubscription: boolean;
+  currentPlan?: PlanType;
+}
+
 const Pricing = () => {
   const { user } = useAuth();
 
@@ -33,20 +38,19 @@ const Pricing = () => {
     enabled: !!user
   });
 
-  const hasActiveSubscription = profile?.subscription_status === 'active' && profile?.subscription_plan;
-  const currentPlan = profile?.subscription_plan as PlanType | undefined;
+  const subscriptionStatus: SubscriptionStatus = {
+    hasActiveSubscription: profile?.subscription_status === 'active',
+    currentPlan: profile?.subscription_plan as PlanType | undefined
+  };
 
   return (
     <PricingLayout>
       <PricingHeader 
-        hasActiveSubscription={hasActiveSubscription} 
-        currentPlan={currentPlan} 
+        hasActiveSubscription={subscriptionStatus.hasActiveSubscription}
+        currentPlan={subscriptionStatus.currentPlan} 
       />
       
-      <PricingPlans 
-        hasActiveSubscription={hasActiveSubscription} 
-        currentPlan={currentPlan} 
-      />
+      <PricingPlans subscriptionStatus={subscriptionStatus} />
       
       <PricingInfo />
     </PricingLayout>

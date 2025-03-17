@@ -2,10 +2,14 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { PricingFeatureList } from "./PricingFeatureList";
 import { CheckoutButton } from "@/components/payment/CheckoutButton";
-import { PlanType } from "@/pages/Pricing";
+import { PlanType, SubscriptionStatus } from "@/pages/Pricing";
+import { CurrentPlanIndicator } from "./CurrentPlanIndicator";
+import { PricingPlanBadge } from "./PricingPlanBadge";
+import { PricingPopularBadge } from "./PricingPopularBadge";
+import { PricingPlanPrice } from "./PricingPlanPrice";
 
 interface PricingPlanProps {
   planType: PlanType;
@@ -17,8 +21,7 @@ interface PricingPlanProps {
   features: string[];
   highlightFeatures?: boolean;
   popularPlan?: boolean;
-  hasActiveSubscription: boolean;
-  currentPlan?: PlanType;
+  subscriptionStatus: SubscriptionStatus;
   animationDelay?: number;
   initialX?: number;
 }
@@ -33,20 +36,16 @@ export function PricingPlan({
   features, 
   highlightFeatures = false,
   popularPlan = false,
-  hasActiveSubscription,
-  currentPlan,
+  subscriptionStatus,
   animationDelay = 0,
   initialX = 0
 }: PricingPlanProps) {
+  const { hasActiveSubscription, currentPlan } = subscriptionStatus;
+  const isCurrentPlan = hasActiveSubscription && currentPlan === planType;
   
   const renderSubscriptionButton = () => {
-    if (hasActiveSubscription && currentPlan === planType) {
-      return (
-        <Button variant="outline" className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800" disabled>
-          <CheckCircle className="mr-2 h-4 w-4" />
-          Current Plan
-        </Button>
-      );
+    if (isCurrentPlan) {
+      return <CurrentPlanIndicator />;
     }
 
     return (
@@ -79,31 +78,18 @@ export function PricingPlan({
         {/* Decorative corner gradient */}
         <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 opacity-80 rounded-full"></div>
         
-        {popularPlan && (
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full shadow-lg">
-            <span className="text-sm font-medium text-white flex items-center">
-              <Star className="w-3 h-3 mr-1 animate-pulse" />
-              Most Popular
-            </span>
-          </div>
-        )}
+        {popularPlan && <PricingPopularBadge />}
         
         <div className="mb-4">
-          <span className={`inline-block ${badgeColor} px-3 py-1 text-xs font-medium rounded-full mb-2`}>
-            {badgeText}
-          </span>
+          <PricingPlanBadge text={badgeText} colorClass={badgeColor} />
           <h3 className="text-xl font-semibold text-secondary">{title}</h3>
         </div>
         
-        <div className="mb-6">
-          <div className="flex items-baseline">
-            <span className="text-3xl font-bold text-primary">{price}</span>
-            <span className="text-muted-foreground">{period}</span>
-          </div>
-          {planType === 'yearly' && (
-            <p className="text-sm mt-2 text-muted-foreground">Billed annually ($89.88/year)</p>
-          )}
-        </div>
+        <PricingPlanPrice
+          price={price}
+          period={period}
+          planType={planType}
+        />
         
         <PricingFeatureList 
           features={features} 

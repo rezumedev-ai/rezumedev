@@ -1,10 +1,11 @@
 
 import { Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { PlanType } from "@/pages/Pricing";
 
 interface PricingHeaderProps {
   hasActiveSubscription: boolean;
-  currentPlan?: string;
+  currentPlan?: PlanType;
 }
 
 export function PricingHeader({ hasActiveSubscription, currentPlan }: PricingHeaderProps) {

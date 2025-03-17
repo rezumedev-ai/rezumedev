@@ -1,13 +1,12 @@
 
-import { PlanType } from "@/pages/Pricing";
 import { PricingPlan } from "./PricingPlan";
+import { SubscriptionStatus } from "@/pages/Pricing";
 
 interface PricingPlansProps {
-  hasActiveSubscription: boolean;
-  currentPlan?: PlanType;
+  subscriptionStatus: SubscriptionStatus;
 }
 
-export function PricingPlans({ hasActiveSubscription, currentPlan }: PricingPlansProps) {
+export function PricingPlans({ subscriptionStatus }: PricingPlansProps) {
   // Monthly plan features
   const monthlyFeatures = [
     "Unlimited resume creations",
@@ -46,8 +45,7 @@ export function PricingPlans({ hasActiveSubscription, currentPlan }: PricingPlan
         badgeText="Monthly Plan"
         badgeColor="bg-blue-100 text-blue-700"
         features={monthlyFeatures}
-        hasActiveSubscription={hasActiveSubscription}
-        currentPlan={currentPlan}
+        subscriptionStatus={subscriptionStatus}
         initialX={-50}
       />
 
@@ -62,8 +60,7 @@ export function PricingPlans({ hasActiveSubscription, currentPlan }: PricingPlan
         features={yearlyFeatures}
         popularPlan={true}
         highlightFeatures={true}
-        hasActiveSubscription={hasActiveSubscription}
-        currentPlan={currentPlan}
+        subscriptionStatus={subscriptionStatus}
         animationDelay={0.2}
         initialX={0}
       />
@@ -77,8 +74,7 @@ export function PricingPlans({ hasActiveSubscription, currentPlan }: PricingPlan
         badgeText="Lifetime Plan"
         badgeColor="bg-emerald-100 text-emerald-700"
         features={lifetimeFeatures}
-        hasActiveSubscription={hasActiveSubscription}
-        currentPlan={currentPlan}
+        subscriptionStatus={subscriptionStatus}
         animationDelay={0.4}
         initialX={50}
       />
