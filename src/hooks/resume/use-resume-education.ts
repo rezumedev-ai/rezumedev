@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ResumeData, Education } from "@/types/resume";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Json } from "@/integrations/supabase/types";
 
 export function useResumeEducation(
   initialResumeData: ResumeData,
@@ -16,7 +17,7 @@ export function useResumeEducation(
       const { error } = await supabase
         .from('resumes')
         .update({
-          education: data.education,
+          education: data.education as unknown as Json[],
         })
         .eq('id', resumeId);
         
