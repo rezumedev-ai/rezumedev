@@ -118,8 +118,9 @@ const Pricing = () => {
             </div>
             
             <h1 className="text-4xl md:text-5xl font-bold mb-6 relative">
+              <span className="text-black">Invest</span>{" "}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-                Invest in Your Future
+                in Your Future
               </span>
               <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
             </h1>
