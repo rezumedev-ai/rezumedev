@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,6 +57,12 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
+// Helper function to format plan names
+const formatPlanName = (plan: string | null) => {
+  if (!plan) return 'Free';
+  return plan.charAt(0).toUpperCase() + plan.slice(1);
+};
+
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
@@ -98,8 +103,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast("Subscription canceled", {
-        description: "Your subscription has been canceled successfully. You'll still have access until the end of your current billing period.",
+      toast.success("Subscription canceled", {
+        description: "Your subscription has been canceled successfully. You'll still have access until the end of your current billing period."
       });
       setShowCancelDialog(false);
       setShowManageDialog(false);
@@ -107,7 +112,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     onError: (error) => {
       console.error("Error canceling subscription:", error);
       toast.error("Error canceling subscription", {
-        description: "There was a problem canceling your subscription. Please try again or contact support.",
+        description: "There was a problem canceling your subscription. Please try again or contact support."
       });
     }
   });
@@ -225,11 +230,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     "fixed top-0 h-full w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 z-50",
     isMobile ? "left-0" : "left-0"
   );
-
-  const formatPlanName = (plan: string | null) => {
-    if (!plan) return 'Free';
-    return plan.charAt(0).toUpperCase() + plan.slice(1);
-  };
 
   const formatSubscriptionDate = (date: string | null) => {
     if (!date) return 'N/A';

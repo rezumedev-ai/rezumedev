@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -76,7 +75,7 @@ const Pricing = () => {
   };
 
   // Function to render the subscription button based on plan
-  const renderSubscriptionButton = (planType: string) => {
+  const renderSubscriptionButton = (planType: "monthly" | "yearly" | "lifetime") => {
     if (betaPhase) {
       return <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>;
     }
@@ -152,7 +151,7 @@ const Pricing = () => {
                 <PricingFeature text="Export to PDF" />
                 <PricingFeature text="24/7 support" />
               </ul>
-              {renderSubscriptionButton('monthly')}
+              {renderSubscriptionButton("monthly")}
             </div>
 
             {/* Yearly Plan */}
@@ -175,7 +174,7 @@ const Pricing = () => {
                 <PricingFeature text="Early access to new features" />
                 <PricingFeature text="LinkedIn integration" />
               </ul>
-              {renderSubscriptionButton('yearly')}
+              {renderSubscriptionButton("yearly")}
             </div>
 
             {/* Lifetime Plan */}
@@ -197,7 +196,7 @@ const Pricing = () => {
                 <PricingFeature text="Custom branding" />
                 <PricingFeature text="API access" />
               </ul>
-              {renderSubscriptionButton('lifetime')}
+              {renderSubscriptionButton("lifetime")}
             </div>
           </div>
 
