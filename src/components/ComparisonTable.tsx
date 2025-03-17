@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CheckIcon, XIcon, TrophyIcon } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
@@ -64,15 +63,11 @@ export const ComparisonTable = () => {
             <span className="text-sm font-medium text-primary">Compare Features</span>
           </div>
           
-          <GradientHeading 
-            asChild 
-            variant="resume" 
-            size="lg" 
-            weight="bold" 
-            className="mb-3"
-          >
-            <h2>Why Choose Rezume.dev?</h2>
-          </GradientHeading>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            <span className="bg-gradient-to-t from-indigo-700 to-indigo-500 bg-clip-text text-transparent">
+              Why Choose Rezume.dev?
+            </span>
+          </h2>
           
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
             See how Rezume.dev stands out with premium features included at no extra cost
