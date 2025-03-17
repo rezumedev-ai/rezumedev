@@ -1,197 +1,296 @@
 
 import { WorkExperience } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Briefcase } from "lucide-react";
+import { useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { SectionHeader } from "./SectionHeader";
+import { formatDateRange } from "@/utils/format-dates";
 
 interface ExperienceSectionProps {
-  experiences: WorkExperience[];
+  experience: WorkExperience[];
   template: ResumeTemplate;
-  isEditing?: boolean;
-  onUpdate?: (index: number, field: keyof WorkExperience, value: string | string[]) => void;
-  onAdd?: () => void;
-  onRemove?: (index: number) => void;
+  isEditing: boolean;
+  onUpdate: (experiences: WorkExperience[]) => void;
 }
 
-export function ExperienceSection({ 
-  experiences, 
+export function ExperienceSection({
+  experience = [],
   template,
   isEditing,
-  onUpdate,
-  onAdd,
-  onRemove
+  onUpdate
 }: ExperienceSectionProps) {
-  const handleContentEdit = (
-    index: number,
-    field: keyof WorkExperience,
-    event: React.FocusEvent<HTMLElement>
-  ) => {
-    if (!isEditing || !onUpdate) return;
-    const newValue = event.target.innerText.trim();
-    onUpdate(index, field, newValue);
-  };
-
-  const handleResponsibilityEdit = (
-    index: number,
-    respIndex: number,
-    event: React.FocusEvent<HTMLElement>
-  ) => {
-    if (!isEditing || !onUpdate) return;
-    const newValue = event.target.innerText.trim();
-    const newResponsibilities = [...experiences[index].responsibilities];
-    newResponsibilities[respIndex] = newValue;
-    onUpdate(index, "responsibilities", newResponsibilities);
-  };
-
-  // Template-specific styles
-  const styles = {
-    "executive-clean": {
-      section: "mb-6",
-      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      jobTitle: "font-bold text-base text-gray-800",
-      company: "text-gray-700 font-medium text-sm",
-      date: "text-sm text-gray-500",
-      responsibilities: "mt-2 space-y-1.5 list-disc list-inside",
-      responsibility: "text-sm text-gray-700"
-    },
-    "modern-split": {
-      section: "mb-4",
-      title: "text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-2",
-      jobTitle: "font-semibold text-[13px] text-gray-800",
-      company: "text-gray-600 text-xs font-medium",
-      date: "text-[10px] text-gray-500 whitespace-nowrap",
-      responsibilities: "mt-1 space-y-1",
-      responsibility: "text-[11px] text-gray-700 flex items-start gap-1 leading-tight"
-    },
-    "minimal-elegant": {
-      section: "mb-5",
-      title: "text-[15px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200",
-      jobTitle: "font-semibold text-[15px] text-gray-800",
-      company: "text-gray-700 font-medium text-[14px] mt-1",
-      date: "text-[13px] text-gray-600 font-medium",
-      responsibilities: "mt-2 space-y-2",
-      responsibility: "text-[14px] text-gray-700 flex items-start gap-2 leading-tight"
-    },
-    "professional-executive": {
-      section: "mb-5",
-      title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
-      jobTitle: "font-bold uppercase text-gray-900 text-[14px]",
-      company: "text-gray-700 font-semibold text-[13px]",
-      date: "text-[12px] text-gray-500",
-      responsibilities: "mt-2 space-y-1.5",
-      responsibility: "text-[13px] text-gray-700 leading-snug flex items-start gap-2"
+  const [editingExp, setEditingExp] = useState<WorkExperience | null>(null);
+  
+  const handleEditExperience = (index: number) => {
+    if (isEditing) {
+      setEditingExp({...experience[index]});
     }
   };
-
-  const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
-
+  
+  const handleSaveExperience = () => {
+    if (!editingExp) return;
+    
+    const updatedExperiences = [...experience];
+    const index = experience.findIndex(exp => 
+      exp.jobTitle === editingExp.jobTitle && 
+      exp.companyName === editingExp.companyName
+    );
+    
+    if (index !== -1) {
+      updatedExperiences[index] = editingExp;
+    } else {
+      updatedExperiences.push(editingExp);
+    }
+    
+    onUpdate(updatedExperiences);
+    setEditingExp(null);
+  };
+  
+  const handleCancelEdit = () => {
+    setEditingExp(null);
+  };
+  
+  const handleAddExperience = () => {
+    setEditingExp({
+      jobTitle: "",
+      companyName: "",
+      location: "",
+      startDate: "",
+      endDate: "",
+      responsibilities: [""]
+    });
+  };
+  
+  const handleDeleteExperience = (index: number) => {
+    const updatedExperiences = [...experience];
+    updatedExperiences.splice(index, 1);
+    onUpdate(updatedExperiences);
+  };
+  
+  const handleUpdateResponsibility = (index: number, value: string) => {
+    if (!editingExp) return;
+    
+    const updatedResponsibilities = [...editingExp.responsibilities];
+    updatedResponsibilities[index] = value;
+    
+    setEditingExp({
+      ...editingExp,
+      responsibilities: updatedResponsibilities
+    });
+  };
+  
+  const handleAddResponsibility = () => {
+    if (!editingExp) return;
+    
+    setEditingExp({
+      ...editingExp,
+      responsibilities: [...editingExp.responsibilities, ""]
+    });
+  };
+  
+  const handleDeleteResponsibility = (index: number) => {
+    if (!editingExp) return;
+    
+    const updatedResponsibilities = [...editingExp.responsibilities];
+    updatedResponsibilities.splice(index, 1);
+    
+    setEditingExp({
+      ...editingExp,
+      responsibilities: updatedResponsibilities
+    });
+  };
+  
+  if (experience.length === 0 && !isEditing) {
+    return null;
+  }
+  
   return (
-    <div className={currentStyle.section}>
-      <div className="flex justify-between items-center mb-2">
-        <h3 className={currentStyle.title}>
-          {template.id === "modern-split" ? (
-            <span className="flex items-center">
-              <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
-              Professional Experience
-            </span>
-          ) : template.id === "minimal-elegant" ? (
-            "Professional Experience"
-          ) : (
-            "Professional Experience"
-          )}
-        </h3>
-      </div>
+    <div className="mt-1">
+      <SectionHeader title="Work Experience" template={template} />
       
-      <div className={template.id === "modern-split" ? "space-y-2.5" : "space-y-5"}>
-        {experiences.map((exp, index) => (
-          <div 
-            key={index} 
-            className={
-              template.id === "modern-split" 
-                ? "relative pl-3 border-l border-gray-200"
-                : template.id === "minimal-elegant"
-                ? "pb-4 mb-2"
-                : "pb-3"
-            }
-          >
-            {template.id === "modern-split" && (
-              <div className="absolute top-1 left-[-2px] w-1 h-1 rounded-full bg-gray-400"></div>
-            )}
+      {editingExp ? (
+        <div className="bg-gray-50 p-4 rounded-md mt-2 border border-gray-200">
+          <div className="grid grid-cols-1 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Job Title
+              </label>
+              <Input 
+                value={editingExp.jobTitle}
+                onChange={(e) => setEditingExp({...editingExp, jobTitle: e.target.value})}
+                placeholder="e.g. Senior Software Engineer"
+              />
+            </div>
             
-            <div className={
-              template.id === "minimal-elegant" 
-                ? "space-y-1"
-                : template.id === "modern-split"
-                ? "space-y-0.5"
-                : "space-y-1"
-            }>
-              <div className="flex justify-between items-baseline gap-2">
-                <div 
-                  className={`${currentStyle.jobTitle} outline-none`}
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit(index, "jobTitle", e)}
-                >
-                  {exp.jobTitle}
-                </div>
-                <div className={currentStyle.date}>
-                  <span
-                    className="outline-none"
-                    contentEditable={isEditing}
-                    suppressContentEditableWarning
-                    onBlur={(e) => handleContentEdit(index, "startDate", e)}
-                  >
-                    {exp.startDate}
-                  </span>
-                  {" - "}
-                  <span
-                    className="outline-none"
-                    contentEditable={isEditing}
-                    suppressContentEditableWarning
-                    onBlur={(e) => handleContentEdit(index, "endDate", e)}
-                  >
-                    {exp.isCurrentJob ? "Present" : exp.endDate}
-                  </span>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Company
+                </label>
+                <Input 
+                  value={editingExp.companyName}
+                  onChange={(e) => setEditingExp({...editingExp, companyName: e.target.value})}
+                  placeholder="e.g. Acme Inc."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Location
+                </label>
+                <Input 
+                  value={editingExp.location || ""}
+                  onChange={(e) => setEditingExp({...editingExp, location: e.target.value})}
+                  placeholder="e.g. San Francisco, CA"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <Input 
+                  value={editingExp.startDate}
+                  onChange={(e) => setEditingExp({...editingExp, startDate: e.target.value})}
+                  placeholder="e.g. Jan 2020"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    value={editingExp.endDate}
+                    onChange={(e) => setEditingExp({...editingExp, endDate: e.target.value})}
+                    placeholder="e.g. Present"
+                    disabled={editingExp.isCurrentJob}
+                  />
+                  <div className="flex items-center">
+                    <input 
+                      type="checkbox" 
+                      id="current-job"
+                      checked={editingExp.isCurrentJob || false}
+                      onChange={(e) => setEditingExp({
+                        ...editingExp, 
+                        isCurrentJob: e.target.checked,
+                        endDate: e.target.checked ? "Present" : editingExp.endDate
+                      })}
+                      className="mr-1"
+                    />
+                    <label htmlFor="current-job" className="text-xs">Current</label>
+                  </div>
                 </div>
               </div>
-              
-              <div 
-                className={`${currentStyle.company} outline-none`}
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit(index, "companyName", e)}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Responsibilities
+              </label>
+              {editingExp.responsibilities.map((resp, index) => (
+                <div key={index} className="flex items-start gap-2 mb-2">
+                  <Textarea 
+                    value={resp}
+                    onChange={(e) => handleUpdateResponsibility(index, e.target.value)}
+                    placeholder="Describe your responsibilities and achievements"
+                    className="min-h-[80px]"
+                  />
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => handleDeleteResponsibility(index)}
+                    disabled={editingExp.responsibilities.length <= 1}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddResponsibility}
+                className="mt-1"
               >
-                {exp.companyName}
-              </div>
-              
-              <ul className={currentStyle.responsibilities}>
-                {exp.responsibilities.map((resp, respIndex) => (
-                  <li key={respIndex} className={currentStyle.responsibility}>
-                    {template.id === "modern-split" && (
-                      <span className="inline-block w-1 h-1 rounded-full bg-gray-400 mt-1.5 mr-1 shrink-0"></span>
-                    )}
-                    {template.id === "minimal-elegant" && (
-                      <div className="w-2 h-2 rounded-full bg-gray-700 mt-[6px] shrink-0"></div>
-                    )}
-                    {template.id === "professional-executive" && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-black mt-[6px] shrink-0"></div>
-                    )}
-                    <span
-                      className="outline-none break-words whitespace-normal"
-                      contentEditable={isEditing}
-                      suppressContentEditableWarning
-                      onBlur={(e) => handleResponsibilityEdit(index, respIndex, e)}
-                    >
-                      {resp}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+                <Plus className="w-4 h-4 mr-1" /> Add Responsibility
+              </Button>
+            </div>
+            
+            <div className="flex justify-end gap-2 mt-2">
+              <Button variant="outline" onClick={handleCancelEdit}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveExperience}>
+                Save
+              </Button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className={`space-y-${template.style.itemGap === '1.5rem' ? '5' : '4'}`}>
+          {experience.map((exp, index) => (
+            <div 
+              key={index} 
+              className={`pb-${template.style.sectionGap === '2rem' ? '4' : '3'} ${index < experience.length - 1 ? 'border-b border-gray-200' : ''} cursor-pointer`}
+              onClick={() => handleEditExperience(index)}
+            >
+              <div className="flex justify-between items-start">
+                <div className="space-y-0.5">
+                  <div className="font-semibold text-gray-900">{exp.jobTitle}</div>
+                  <div className="text-sm text-gray-600">
+                    {exp.companyName}
+                    {exp.location && <span> • {exp.location}</span>}
+                  </div>
+                </div>
+                <div className="text-sm text-gray-500 whitespace-nowrap">
+                  {formatDateRange(exp.startDate, exp.endDate)}
+                </div>
+              </div>
+              
+              <ul className="mt-2 text-sm text-gray-600 list-disc pl-5 space-y-1">
+                {exp.responsibilities.map((resp, respIndex) => (
+                  <li key={respIndex} className="leading-snug">{resp}</li>
+                ))}
+              </ul>
+              
+              {isEditing && (
+                <div className="mt-2 flex justify-end">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteExperience(index);
+                    }}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" /> Delete
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))}
+          
+          {isEditing && (
+            <Button 
+              variant="outline" 
+              className="w-full mt-2"
+              onClick={handleAddExperience}
+            >
+              <Plus className="w-4 h-4 mr-1" /> Add Work Experience
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
+
+const formatDateRange = (startDate: string, endDate: string) => {
+  return `${startDate} - ${endDate}`;
+};
