@@ -11,7 +11,7 @@ export function useProfileQuery(user: User | null) {
       
       const { data, error } = await supabase
         .from("profiles")
-        .select("subscription_plan, subscription_status")
+        .select("*")
         .eq("id", user.id)
         .single();
 

@@ -2,13 +2,15 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, CheckCircle } from "lucide-react";
 import { CheckoutButton } from "@/components/payment/CheckoutButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { SimplifiedHeader } from "@/components/SimplifiedHeader";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Pricing = () => {
   const { user } = useAuth();
@@ -16,6 +18,31 @@ const Pricing = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const betaPhase = false; // Changed from true to false to enable payments
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Fetch user profile to get subscription details
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!user
+  });
+
+  const hasActiveSubscription = profile?.subscription_status === 'active' && profile?.subscription_plan;
+  const currentPlan = profile?.subscription_plan;
 
   // Check if the user is on a dashboard route
   useEffect(() => {
@@ -48,6 +75,33 @@ const Pricing = () => {
     }
   };
 
+  // Function to render the subscription button based on plan
+  const renderSubscriptionButton = (planType: string) => {
+    if (betaPhase) {
+      return <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>;
+    }
+
+    if (hasActiveSubscription && currentPlan === planType) {
+      return (
+        <Button variant="outline" className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800" disabled>
+          <CheckCircle className="mr-2 h-4 w-4" />
+          Current Plan
+        </Button>
+      );
+    }
+
+    return (
+      <CheckoutButton
+        planType={planType}
+        className={`w-full hover:scale-105 transition-transform ${
+          hasActiveSubscription ? "bg-blue-600 hover:bg-blue-700" : ""
+        }`}
+      >
+        {hasActiveSubscription ? "Switch Plan" : "Subscribe Now"}
+      </CheckoutButton>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {renderHeader()}
@@ -63,7 +117,9 @@ const Pricing = () => {
               <div className="absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-primary via-accent to-primary/60 animate-pulse"></div>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: '200ms' }}>
-              Choose the plan that works best for you. Get started for free and upgrade anytime.
+              {hasActiveSubscription 
+                ? "You're currently on the " + currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1) + " plan. You can switch plans anytime."
+                : "Choose the plan that works best for you. Get started for free and upgrade anytime."}
             </p>
             {betaPhase && (
               <div 
@@ -79,7 +135,11 @@ const Pricing = () => {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
             {/* Monthly Plan */}
             <div className="relative border rounded-2xl p-8 bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-up" style={{ animationDelay: '100ms' }}>
-              <div className="absolute -top-px left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/50 rounded-t-2xl"></div>
+              {hasActiveSubscription && currentPlan === 'monthly' && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full">
+                  <span className="text-sm font-medium text-white">Current Plan</span>
+                </div>
+              )}
               <h3 className="text-xl font-semibold mb-4 text-secondary">Monthly</h3>
               <div className="mb-6">
                 <span className="text-3xl font-bold">$9.99</span>
@@ -92,22 +152,15 @@ const Pricing = () => {
                 <PricingFeature text="Export to PDF" />
                 <PricingFeature text="24/7 support" />
               </ul>
-              {betaPhase ? (
-                <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>
-              ) : (
-                <CheckoutButton
-                  planType="monthly"
-                  className="w-full hover:scale-105 transition-transform"
-                >
-                  Subscribe Now
-                </CheckoutButton>
-              )}
+              {renderSubscriptionButton('monthly')}
             </div>
 
             {/* Yearly Plan */}
-            <div className="relative border-2 border-primary rounded-2xl p-8 bg-gradient-to-b from-primary/5 to-transparent shadow-lg transform scale-105 animate-fade-up" style={{ animationDelay: '200ms' }}>
+            <div className={`relative border-2 ${hasActiveSubscription && currentPlan === 'yearly' ? 'border-green-500' : 'border-primary'} rounded-2xl p-8 bg-gradient-to-b from-primary/5 to-transparent shadow-lg transform scale-105 animate-fade-up`} style={{ animationDelay: '200ms' }}>
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full">
-                <span className="text-sm font-medium text-white">Most Popular</span>
+                <span className="text-sm font-medium text-white">
+                  {hasActiveSubscription && currentPlan === 'yearly' ? 'Current Plan' : 'Most Popular'}
+                </span>
               </div>
               <h3 className="text-xl font-semibold mb-4 text-secondary">Yearly</h3>
               <div className="mb-4">
@@ -122,21 +175,16 @@ const Pricing = () => {
                 <PricingFeature text="Early access to new features" />
                 <PricingFeature text="LinkedIn integration" />
               </ul>
-              {betaPhase ? (
-                <Button variant="default" className="w-full hover:scale-105 transition-transform bg-primary hover:bg-primary/90" disabled>Coming Soon</Button>
-              ) : (
-                <CheckoutButton
-                  planType="yearly"
-                  className="w-full hover:scale-105 transition-transform bg-primary hover:bg-primary/90"
-                >
-                  Subscribe Now
-                </CheckoutButton>
-              )}
+              {renderSubscriptionButton('yearly')}
             </div>
 
             {/* Lifetime Plan */}
             <div className="relative border rounded-2xl p-8 bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-up" style={{ animationDelay: '300ms' }}>
-              <div className="absolute -top-px left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/50 rounded-t-2xl"></div>
+              {hasActiveSubscription && currentPlan === 'lifetime' && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full">
+                  <span className="text-sm font-medium text-white">Current Plan</span>
+                </div>
+              )}
               <h3 className="text-xl font-semibold mb-4 text-secondary">Lifetime</h3>
               <div className="mb-6">
                 <span className="text-3xl font-bold">$199</span>
@@ -149,16 +197,7 @@ const Pricing = () => {
                 <PricingFeature text="Custom branding" />
                 <PricingFeature text="API access" />
               </ul>
-              {betaPhase ? (
-                <Button className="w-full hover:scale-105 transition-transform" disabled>Coming Soon</Button>
-              ) : (
-                <CheckoutButton
-                  planType="lifetime"
-                  className="w-full hover:scale-105 transition-transform"
-                >
-                  Buy Now
-                </CheckoutButton>
-              )}
+              {renderSubscriptionButton('lifetime')}
             </div>
           </div>
 

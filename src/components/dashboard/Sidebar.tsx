@@ -200,7 +200,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { id: 'pricing', icon: CreditCard, label: 'Pricing', path: '/pricing' },
+    { 
+      id: 'pricing', 
+      icon: CreditCard, 
+      label: 'Pricing', 
+      path: '/pricing',
+      badge: profile?.subscription_plan && profile?.subscription_status === 'active' ? 
+        `${formatPlanName(profile.subscription_plan)}` : null
+    },
     { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
     { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
   ];
@@ -584,7 +591,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="text-xs text-gray-500 uppercase tracking-wider px-4 mb-2">
                   Main Menu
                 </div>
-                {menuItems.map(({ id, icon: Icon, label, path }) => (
+                {menuItems.map(({ id, icon: Icon, label, path, badge }) => (
                   <motion.button
                     key={id}
                     onClick={() => {
@@ -611,6 +618,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       )} />
                       <span className="truncate">{label}</span>
                     </div>
+                    
+                    {badge && (
+                      <div className="flex items-center ml-2">
+                        <span className="text-xs py-0.5 px-2 rounded-full bg-green-100 text-green-700 font-medium">
+                          {badge}
+                        </span>
+                      </div>
+                    )}
                   </motion.button>
                 ))}
               </motion.div>
