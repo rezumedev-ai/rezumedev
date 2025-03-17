@@ -8,6 +8,7 @@ export function useProfileQuery(user: User | null) {
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user) return null;
+      
       const { data, error } = await supabase
         .from("profiles")
         .select("subscription_plan, subscription_status")
@@ -18,6 +19,7 @@ export function useProfileQuery(user: User | null) {
         console.error("Error fetching profile:", error);
         return null;
       }
+      
       return data;
     },
     enabled: !!user
