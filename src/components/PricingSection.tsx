@@ -21,7 +21,8 @@ const PricingSection = () => {
       cta: "Start Monthly",
       link: "/pricing",
       popular: false,
-      color: "from-blue-500/20 to-cyan-500/20"
+      color: "from-blue-500/20 to-cyan-500/20",
+      badgeColor: "bg-blue-100 text-blue-700"
     },
     {
       name: "Yearly",
@@ -38,7 +39,8 @@ const PricingSection = () => {
       cta: "Start Yearly",
       link: "/pricing",
       popular: true,
-      color: "from-violet-500/20 to-purple-500/20"
+      color: "from-violet-500/20 to-purple-500/20",
+      badgeColor: "bg-primary/80 text-white"
     },
     {
       name: "Lifetime",
@@ -55,7 +57,8 @@ const PricingSection = () => {
       cta: "Get Lifetime",
       link: "/pricing",
       popular: false,
-      color: "from-emerald-500/20 to-green-500/20"
+      color: "from-emerald-500/20 to-green-500/20",
+      badgeColor: "bg-emerald-100 text-emerald-700"
     }
   ];
 
@@ -86,20 +89,26 @@ const PricingSection = () => {
           {tiers.map((tier, index) => (
             <motion.div
               key={tier.name}
-              className={`relative p-8 bg-white border rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${tier.popular ? 'border-primary md:scale-105' : 'border-gray-200'}`}
+              className={`relative p-8 bg-white border rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${tier.popular ? 'border-primary md:scale-105' : 'border-gray-200'} overflow-hidden`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
+              {/* Decorative corner gradient */}
+              <div className={`absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br ${tier.color} opacity-80 rounded-full`}></div>
+              
               {tier.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full shadow-sm bg-primary">
                   <span className="text-sm font-medium text-white">Most Popular</span>
                 </div>
               )}
               
               {/* Badge and Name */}
               <div className="mb-4">
+                <span className={`inline-block ${tier.badgeColor} px-3 py-1 text-xs font-medium rounded-full mb-2`}>
+                  {tier.name} Plan
+                </span>
                 <h3 className="text-xl font-semibold text-secondary">{tier.name}</h3>
               </div>
               
