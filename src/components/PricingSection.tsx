@@ -1,5 +1,5 @@
 
-import { Check, CheckCircle2, Sparkles, Star } from "lucide-react";
+import { Check, CheckCircle2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -190,21 +190,7 @@ const PricingSection = () => {
                 }}
               ></motion.div>
               
-              {tier.popular && (
-                <motion.div 
-                  className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20"
-                  initial={{ y: -5, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 0.3 }}
-                >
-                  <div className="bg-primary px-4 py-1 rounded-full shadow-md">
-                    <span className="text-sm font-medium text-white flex items-center justify-center">
-                      <Star className="w-3 h-3 mr-1.5 animate-pulse" />
-                      Most Popular
-                    </span>
-                  </div>
-                </motion.div>
-              )}
+              {/* Most Popular badge removed */}
               
               <motion.div 
                 className="mb-4 mt-2"
