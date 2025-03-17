@@ -58,21 +58,21 @@ export const ComparisonTable = () => {
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-accent/30">
       <div className="max-w-7xl mx-auto">
-        {/* Badge positioned at the top */}
-        <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center justify-center gap-2 bg-accent/50 px-4 py-1 rounded-full">
-            <TrophyIcon size={18} className="text-primary" />
-            <span className="text-sm font-medium text-primary">Compare Features</span>
-          </div>
-        </div>
-        
         {/* Main heading with larger size and gradient color */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-3 text-center">
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
-              The Rezume.dev Advantage
+        <div className="text-center mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Feature Comparison
             </span>
           </h2>
+          
+          {/* Badge positioned below the heading */}
+          <div className="flex justify-center mb-4">
+            <div className="inline-flex items-center justify-center gap-2 bg-accent/50 px-4 py-1 rounded-full">
+              <TrophyIcon size={18} className="text-primary" />
+              <span className="text-sm font-medium text-primary">Compare Features</span>
+            </div>
+          </div>
           
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
             See how Rezume.dev stands out with premium features included at no extra cost
