@@ -24,42 +24,60 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const signature = req.headers.get('stripe-signature');
-  
-  if (!signature) {
-    console.error('Missing Stripe signature header');
-    return new Response(JSON.stringify({ error: 'Missing Stripe signature header' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-
   try {
+    console.log('Received webhook request');
+    
+    // Get the stripe signature from headers
+    const signature = req.headers.get('stripe-signature');
+    
+    if (!signature) {
+      console.error('No stripe signature found in request headers');
+      return new Response(
+        JSON.stringify({ error: 'No Stripe signature found' }), 
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     // Get the raw body for signature verification
     const body = await req.text();
-    console.log('Received webhook body:', body);
+    console.log('Webhook body:', body);
     
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+    if (!webhookSecret) {
+      console.error('Webhook secret is not configured');
+      return new Response(
+        JSON.stringify({ error: 'Webhook secret not configured' }), 
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     let event;
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
-    
     try {
       // Verify the event with Stripe
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      console.log('Webhook verified successfully');
+      console.log('Webhook verified successfully, event type:', event.type);
     } catch (err) {
-      console.error(`Webhook signature verification failed: ${err.message}`);
-      return new Response(JSON.stringify({ error: `Webhook Error: ${err.message}` }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      console.error(`Webhook signature verification failed:`, err);
+      return new Response(
+        JSON.stringify({ error: `Webhook Error: ${err.message}` }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
-    // Process the event
-    console.log(`Processing Stripe event: ${event.type}`);
-    
+    // Handle the event
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
+        console.log('Processing checkout.session.completed', session);
         
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
@@ -67,13 +85,19 @@ Deno.serve(async (req) => {
         
         if (!userId) {
           console.error('No user ID found in session metadata');
-          break;
+          return new Response(
+            JSON.stringify({ error: 'No user ID found in session' }),
+            { 
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
         
-        console.log(`Payment successful for user ${userId} - Plan: ${planType}`);
+        console.log(`Updating subscription for user ${userId} with plan ${planType}`);
         
         // Update user profile with subscription info
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('profiles')
           .update({
             subscription_plan: planType,
@@ -84,31 +108,45 @@ Deno.serve(async (req) => {
           })
           .eq('id', userId);
         
-        if (error) {
-          console.error('Error updating profile:', error);
-        } else {
-          console.log(`Successfully updated subscription for user ${userId}`);
+        if (updateError) {
+          console.error('Error updating profile:', updateError);
+          return new Response(
+            JSON.stringify({ error: 'Failed to update user profile' }),
+            { 
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
+        
+        console.log(`Successfully updated subscription for user ${userId}`);
         break;
       }
       
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
+        console.log('Processing customer.subscription.deleted', subscription);
         
         // Find the user with this subscription ID
-        const { data: profiles, error } = await supabase
+        const { data: profiles, error: lookupError } = await supabase
           .from('profiles')
           .select('id')
           .eq('subscription_id', subscription.id)
           .limit(1);
           
-        if (error || !profiles || profiles.length === 0) {
+        if (lookupError || !profiles || profiles.length === 0) {
           console.error('Could not find user for subscription:', subscription.id);
-          break;
+          return new Response(
+            JSON.stringify({ error: 'User not found for subscription' }),
+            { 
+              status: 404,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
         
         const userId = profiles[0].id;
-        console.log(`Subscription deleted/ended: ${subscription.id} for user: ${userId}`);
+        console.log(`Updating subscription status to inactive for user ${userId}`);
         
         // Update subscription status to inactive
         const { error: updateError } = await supabase
@@ -122,7 +160,16 @@ Deno.serve(async (req) => {
           
         if (updateError) {
           console.error('Error updating subscription status:', updateError);
+          return new Response(
+            JSON.stringify({ error: 'Failed to update subscription status' }),
+            { 
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
+        
+        console.log(`Successfully deactivated subscription for user ${userId}`);
         break;
       }
 
@@ -130,15 +177,21 @@ Deno.serve(async (req) => {
         console.log(`Unhandled event type: ${event.type}`);
     }
 
-    return new Response(JSON.stringify({ received: true }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({ received: true }),
+      { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   } catch (error) {
-    console.error('Error handling webhook:', error);
-    return new Response(JSON.stringify({ error: 'Error processing webhook' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    console.error('Unexpected error handling webhook:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });
