@@ -26,16 +26,15 @@ import { handlePaymentFailed, handlePaymentSucceeded } from './payment-handlers.
 // Log environment configuration at initialization
 logEnvironmentConfig();
 
-// Main webhook handler
+// Main webhook handler for Stripe events
 Deno.serve(async (req) => {
-  // Log webhook execution start to help with debugging
+  // Log webhook execution start
   console.log(`Webhook request received: ${req.method} ${req.url.toString()}`);
   
-  // Log all request headers for debugging
-  console.log('Request headers:');
-  req.headers.forEach((value, key) => {
-    console.log(`${key}: ${key === 'stripe-signature' ? value.substring(0, 15) + '...' : value}`);
-  });
+  // Log relevant request headers for debugging
+  const stripe_signature = req.headers.get('stripe-signature');
+  console.log(`Stripe-Signature: ${stripe_signature ? 'Present' : 'MISSING'}`);
+  console.log(`Content-Type: ${req.headers.get('content-type')}`);
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -55,43 +54,39 @@ Deno.serve(async (req) => {
     const rawBody = await req.text();
     console.log(`Request body received (${rawBody.length} bytes)`);
     
-    // For debugging, log a small part of the payload without sensitive data
+    // Log the event type for debugging
     try {
       const bodyObj = JSON.parse(rawBody);
-      console.log(`Event type: ${bodyObj.type}, Event ID: ${bodyObj.id}`);
-      console.log(`Event data: ${JSON.stringify(bodyObj.data.object).substring(0, 200)}...`);
+      console.log(`Event type: ${bodyObj.type || 'unknown'}, Event ID: ${bodyObj.id || 'unknown'}`);
     } catch (e) {
       console.log('Could not parse body for logging:', e);
     }
     
-    // Check for Stripe signature header
+    // Process the webhook - with or without signature verification
     const signature = req.headers.get('stripe-signature');
-    
-    // Process the webhook without strict signature verification in live mode
-    // This is not ideal for production but useful when debugging webhook issues
     let event;
     
     try {
       if (signature && webhookSecret) {
-        console.log(`Verifying Stripe signature: ${signature.substring(0, 10)}...`);
+        console.log(`Verifying Stripe signature: ${signature.substring(0, 15)}...`);
         event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
         console.log(`✅ Stripe signature verified for event: ${event.type}`);
       } else {
-        console.log(`⚠️ No signature verification - processing event directly`);
+        // If no signature or webhook secret, try to parse the event directly
+        console.log(`⚠️ No signature verification - parsing event directly`);
         event = JSON.parse(rawBody);
-        console.log(`Processing unverified event type: ${event.type}`);
+        console.log(`Parsing unverified event: ${event.type || 'unknown type'}`);
       }
     } catch (err) {
-      console.error(`⚠️ Event verification failed: ${err.message}`);
-      console.error(`First 50 chars of raw body: "${rawBody.substring(0, 50)}..."`);
+      console.error(`⚠️ Event processing failed: ${err.message}`);
       
-      // We'll try to process the event anyway to overcome potential signature issues
+      // Try to parse the event anyway
       try {
         console.log(`Attempting to process without verification`);
         event = JSON.parse(rawBody);
       } catch (parseErr) {
         console.error(`Failed to parse event JSON: ${parseErr.message}`);
-        return errorResponse(`Webhook processing failed: ${parseErr.message}`, 400);
+        return errorResponse(`Webhook error: ${parseErr.message}`, 400);
       }
     }
 
@@ -101,7 +96,7 @@ Deno.serve(async (req) => {
     
     if (handlerResult === false) {
       console.error(`Handler for ${event.type} failed to process the event correctly`);
-      return errorResponse(`Handler for ${event.type} failed to process the event correctly`, 422);
+      return errorResponse(`Handler for ${event.type} failed`, 422);
     }
     
     console.log(`Successfully processed event: ${event.type}`);
@@ -110,7 +105,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error in webhook handler:', error);
     return errorResponse(
-      'Unexpected error processing webhook', 
+      'Webhook processing error', 
       500, 
       { message: error.message, stack: error.stack }
     );
@@ -121,6 +116,7 @@ Deno.serve(async (req) => {
 async function processEvent(event: any): Promise<boolean> {
   console.log(`Processing Stripe event: ${event.type} (${event.id})`);
   
+  // Handle different event types
   switch (event.type) {
     case 'checkout.session.completed':
       console.log('Handling checkout.session.completed event');
@@ -152,35 +148,29 @@ async function processEvent(event: any): Promise<boolean> {
       
     case 'payment_intent.succeeded':
       console.log('Handling payment_intent.succeeded event');
-      return true; // We just log this event for now
+      return true; // Just acknowledge these events for now
       
     case 'charge.succeeded':
       console.log('Handling charge.succeeded event');
-      return true; // We just log this event for now
+      return true; // Just acknowledge these events for now
       
     case 'customer.created':
       console.log('Handling customer.created event');
-      return true; // We just log this event for now
+      return true; // Just acknowledge these events for now
       
     case 'customer.updated':
       console.log('Handling customer.updated event');
-      return true; // We just log this event for now
+      return true; // Just acknowledge these events for now
       
+    // Handle other common events
     case 'invoice.created':
-      console.log('Handling invoice.created event');
-      return true; // We just log this event for now
-      
     case 'invoice.updated':
-      console.log('Handling invoice.updated event');
-      return true; // We just log this event for now
-      
     case 'invoice.finalized':
-      console.log('Handling invoice.finalized event');
-      return true; // We just log this event for now
-      
     case 'invoice.paid':
-      console.log('Handling invoice.paid event');
-      return true; // We just log this event for now
+    case 'setup_intent.created':
+    case 'setup_intent.succeeded':
+      console.log(`Handling ${event.type} event`);
+      return true; // Just acknowledge these events for now
       
     default:
       console.log(`Unhandled event type: ${event.type} - acknowledging receipt`);

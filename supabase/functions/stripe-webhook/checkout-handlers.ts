@@ -34,6 +34,7 @@ export async function handleCheckoutSessionCompleted(session: any) {
         subscription_plan: planType,
         subscription_status: 'active',
         subscription_id: session.id, // Use session ID as reference for one-time payments
+        stripe_customer_id: session.customer, // Store the customer ID for future reference
         payment_method: 'card',
         updated_at: new Date().toISOString()
       })
@@ -56,6 +57,7 @@ export async function handleCheckoutSessionCompleted(session: any) {
         subscription_plan: planType,
         subscription_status: 'active',
         subscription_id: session.subscription,
+        stripe_customer_id: session.customer, // Store the customer ID for future reference
         payment_method: 'card',
         updated_at: new Date().toISOString()
       })

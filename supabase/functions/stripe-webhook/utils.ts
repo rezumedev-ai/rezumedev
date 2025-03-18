@@ -19,11 +19,12 @@ export const supabase = createClient(
   supabaseServiceKey || ''
 );
 
-// Define CORS headers with more permissive settings for webhook testing
+// Define maximally permissive CORS headers for webhook testing
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature, *',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Access-Control-Max-Age': '86400',
 };
 
 // Helper to create consistent error responses
@@ -60,6 +61,7 @@ export const validateEnvironment = () => {
   
   if (!webhookSecret) {
     console.warn('STRIPE_WEBHOOK_SECRET is not configured - webhook signature validation will be disabled!');
+    // Don't return error; we'll process webhooks without verification
   }
   
   if (!supabaseUrl || !supabaseServiceKey) {
