@@ -30,7 +30,7 @@ const supabase = createClient(
 // Define CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 };
 
 // Helper to create consistent error responses
@@ -314,6 +314,12 @@ Deno.serve(async (req) => {
   // Log webhook execution start to help with debugging
   console.log(`Webhook request received: ${req.method} ${req.url.toString()}`);
   
+  // Log all request headers for debugging
+  console.log('Request headers:');
+  req.headers.forEach((value, key) => {
+    console.log(`${key}: ${key === 'stripe-signature' ? value.substring(0, 15) + '...' : value}`);
+  });
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
@@ -336,7 +342,8 @@ Deno.serve(async (req) => {
   // Check for Stripe signature header
   const signature = req.headers.get('stripe-signature');
   if (!signature) {
-    return errorResponse('Missing Stripe signature header');
+    console.error('Missing Stripe signature header. Headers available:', Array.from(req.headers.keys()));
+    return errorResponse('Missing Stripe signature header', 401);
   }
   
   console.log(`Stripe signature received: ${signature.substring(0, 10)}...`);
@@ -361,9 +368,10 @@ Deno.serve(async (req) => {
       console.log(`✅ Stripe signature verified for event: ${event.type}`);
     } catch (err) {
       console.error(`⚠️ Webhook signature verification failed: ${err.message}`);
-      console.error(`Webhook secret length: ${webhookSecret.length} characters`);
+      console.error(`Webhook secret length: ${webhookSecret?.length} characters`);
       console.error(`First 50 chars of raw body: "${rawBody.substring(0, 50)}..."`);
-      return errorResponse(`Webhook signature verification failed: ${err.message}`);
+      console.error(`Signature header: ${signature?.substring(0, 20)}...`);
+      return errorResponse(`Webhook signature verification failed: ${err.message}`, 401);
     }
 
     // Process the event
