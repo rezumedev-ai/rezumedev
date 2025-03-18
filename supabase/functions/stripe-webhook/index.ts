@@ -12,24 +12,16 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Define extremely permissive CORS headers
+// Define permissive CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': '*',
-  'Access-Control-Max-Age': '86400',
 };
 
 Deno.serve(async (req) => {
-  // Log all request details
-  console.log('======== WEBHOOK REQUEST RECEIVED ========');
-  console.log('Request URL:', req.url);
-  console.log('Request method:', req.method);
-  console.log('Headers:', Object.fromEntries(req.headers.entries()));
-  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS request');
     return new Response(null, {
       status: 204,
       headers: corsHeaders
@@ -40,14 +32,10 @@ Deno.serve(async (req) => {
     if (req.method === 'POST') {
       // Get the raw request body as text
       const body = await req.text();
-      console.log('Raw body (truncated):', body.substring(0, 100) + '...');
       
-      // Get and log stripe signature and webhook secret
+      // Get the stripe signature header
       const signature = req.headers.get('stripe-signature');
-      console.log('Stripe signature present:', !!signature);
-      
       const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-      console.log('Webhook secret configured:', !!webhookSecret);
 
       if (!signature || !webhookSecret) {
         console.error('Missing signature or webhook secret');
@@ -64,7 +52,7 @@ Deno.serve(async (req) => {
       let event;
       try {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-        console.log('Event constructed successfully:', event.type);
+        console.log('Event verified successfully:', event.type);
       } catch (err) {
         console.error('Error verifying webhook signature:', err.message);
         return new Response(
@@ -79,7 +67,6 @@ Deno.serve(async (req) => {
       // Handle the event based on its type
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-        console.log('Processing checkout.session.completed:', session.id);
         
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
@@ -112,20 +99,13 @@ Deno.serve(async (req) => {
         
         if (updateError) {
           console.error('Error updating profile:', updateError);
-          return new Response(
-            JSON.stringify({ error: 'Failed to update user profile' }),
-            { 
-              status: 500,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
+          throw new Error(`Failed to update user profile: ${updateError.message}`);
         }
         
         console.log(`Successfully updated subscription for user ${userId}`);
       } 
       else if (event.type === 'customer.subscription.deleted') {
         const subscription = event.data.object;
-        console.log('Processing subscription deletion:', subscription.id);
         
         // Find user with this subscription ID
         const { data: profiles, error: lookupError } = await supabase
@@ -136,17 +116,10 @@ Deno.serve(async (req) => {
           
         if (lookupError || !profiles || profiles.length === 0) {
           console.error('Could not find user for subscription:', subscription.id);
-          return new Response(
-            JSON.stringify({ error: 'User not found for subscription' }),
-            { 
-              status: 404,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
+          throw new Error(`User not found for subscription: ${subscription.id}`);
         }
         
         const userId = profiles[0].id;
-        console.log(`Updating subscription status to inactive for user ${userId}`);
         
         // Update subscription status to inactive
         const { error: updateError } = await supabase
@@ -160,13 +133,7 @@ Deno.serve(async (req) => {
           
         if (updateError) {
           console.error('Error updating subscription status:', updateError);
-          return new Response(
-            JSON.stringify({ error: 'Failed to update subscription status' }),
-            { 
-              status: 500,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
+          throw new Error(`Failed to update subscription status: ${updateError.message}`);
         }
         
         console.log(`Successfully deactivated subscription for user ${userId}`);
