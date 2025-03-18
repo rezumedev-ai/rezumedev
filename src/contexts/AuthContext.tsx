@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { isPublicRoute } from "@/lib/utils";
+import { sendWelcomeEmail } from "@/utils/email-service";
 
 type AuthContextType = {
   user: User | null;
@@ -58,6 +59,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Handle different auth events
       switch (event) {
         case 'SIGNED_IN':
+          // If this is a new sign-in (not just a refresh), send a welcome email
+          if (session?.user) {
+            const fullName = session.user.user_metadata?.full_name || "there";
+            await sendWelcomeEmail(session.user.email!, fullName);
+          }
           navigate('/dashboard', { replace: true });
           break;
         case 'SIGNED_OUT':

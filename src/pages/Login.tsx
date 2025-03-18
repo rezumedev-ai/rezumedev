@@ -7,9 +7,13 @@ import { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { sendPasswordResetEmail } from "@/utils/email-service";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -48,6 +52,46 @@ const Login = () => {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResetting(true);
+
+    try {
+      // Using Supabase's built-in password reset but sending via our custom email service
+      const { data, error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      // Get the reset URL from Supabase
+      const resetLink = `${window.location.origin}/reset-password?token=${data?.user?.email_change_token_new}`;
+      
+      // Send our custom email
+      const result = await sendPasswordResetEmail(resetEmail, resetLink);
+      
+      if (!result.success) {
+        throw new Error(result.error || "Failed to send password reset email");
+      }
+
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for a link to reset your password",
+      });
+      
+      setShowResetForm(false);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error resetting password",
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
@@ -66,56 +110,116 @@ const Login = () => {
         </div>
         
         <div className="mt-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+          {!showResetForm ? (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      className="pl-10"
+                      placeholder="you@example.com"
+                    />
                   </div>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="pl-10"
-                    placeholder="you@example.com"
-                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      required
+                      className="pl-10"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <button
+                    type="button"
+                    onClick={() => setShowResetForm(true)}
+                    className="font-medium text-primary hover:text-primary-hover"
+                  >
+                    Forgot your password?
+                  </button>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="password">Password</Label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="pl-10"
-                    placeholder="••••••••"
-                  />
-                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Signing in..." : "Sign in"}
+                </Button>
               </div>
-            </div>
 
-            <div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
-            </div>
+              <div className="text-center text-sm">
+                <span className="text-gray-600">Don't have an account? </span>
+                <Link to="/signup" className="font-medium text-primary hover:text-primary-hover">
+                  Sign up
+                </Link>
+              </div>
+            </form>
+          ) : (
+            <div className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                <p className="text-sm text-blue-700">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+              </div>
+              
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div>
+                  <Label htmlFor="reset-email">Email</Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input
+                      id="reset-email"
+                      type="email"
+                      required
+                      className="pl-10"
+                      placeholder="you@example.com"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div className="text-center text-sm">
-              <span className="text-gray-600">Don't have an account? </span>
-              <Link to="/signup" className="font-medium text-primary hover:text-primary-hover">
-                Sign up
-              </Link>
+                <div className="flex space-x-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowResetForm(false)}
+                  >
+                    Back to Login
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1"
+                    disabled={isResetting || !resetEmail}
+                  >
+                    {isResetting ? "Sending..." : "Send Reset Link"}
+                  </Button>
+                </div>
+              </form>
             </div>
-          </form>
+          )}
         </div>
       </div>
     </div>
