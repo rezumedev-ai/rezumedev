@@ -1,8 +1,10 @@
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
 // Initialize Stripe with the secret key from environment variable
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 });
 
@@ -17,10 +19,47 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Validate environment setup
+function validateEnvironment() {
+  const issues = [];
+  
+  if (!stripeSecretKey) {
+    issues.push("STRIPE_SECRET_KEY is not set");
+  }
+  
+  if (!supabaseUrl) {
+    issues.push("SUPABASE_URL is not set");
+  }
+  
+  if (!supabaseServiceKey) {
+    issues.push("SUPABASE_SERVICE_ROLE_KEY is not set");
+  }
+  
+  const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+  if (!webhookSecret) {
+    issues.push("STRIPE_WEBHOOK_SECRET is not set");
+  }
+  
+  return issues;
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Validate environment variables first
+  const envIssues = validateEnvironment();
+  if (envIssues.length > 0) {
+    console.error("Environment validation failed:", envIssues);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Webhook configuration error', 
+        details: envIssues.join(', ')
+      }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 
   const signature = req.headers.get('stripe-signature');
@@ -34,28 +73,22 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Use your webhook signing secret from Stripe dashboard
+    // Get the webhook secret from environment variables
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
     const body = await req.text();
     
     let event;
     
-    // Skip verification during development if no webhook secret is set
-    if (webhookSecret) {
-      try {
-        // Verify the event with Stripe
-        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      } catch (err) {
-        console.error(`Webhook signature verification failed: ${err.message}`);
-        return new Response(JSON.stringify({ error: `Webhook Error: ${err.message}` }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-    } else {
-      // For development - parse without verification (not recommended for production)
-      event = JSON.parse(body);
-      console.warn('⚠️ Webhook secret not configured. Skipping signature verification.');
+    try {
+      // Always verify the event with Stripe when we have a webhook secret
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log(`✅ Stripe signature verified for event: ${event.type}`);
+    } catch (err) {
+      console.error(`⚠️ Webhook signature verification failed: ${err.message}`);
+      return new Response(JSON.stringify({ error: `Webhook Error: ${err.message}` }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     // Process the event
@@ -115,8 +148,8 @@ Deno.serve(async (req) => {
             break;
           }
           
-          const userId = profiles[0].id;
-          console.log(`Subscription updated: ${subscription.id} for user: ${userId}`);
+          const foundUserId = profiles[0].id;
+          console.log(`Subscription updated: ${subscription.id} for user: ${foundUserId}`);
           
           // Update subscription status
           const { error: updateError } = await supabase
@@ -125,7 +158,7 @@ Deno.serve(async (req) => {
               subscription_status: subscription.status,
               updated_at: new Date().toISOString()
             })
-            .eq('id', userId);
+            .eq('id', foundUserId);
             
           if (updateError) {
             console.error('Error updating subscription status:', updateError);
@@ -252,7 +285,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('Error handling webhook:', error);
-    return new Response(JSON.stringify({ error: 'Error processing webhook' }), {
+    return new Response(JSON.stringify({ error: 'Error processing webhook', details: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
