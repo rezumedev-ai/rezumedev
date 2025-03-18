@@ -1,178 +1,260 @@
-import { 
-  stripe, 
-  supabase, 
-  corsHeaders, 
-  errorResponse, 
-  successResponse,
-  validateEnvironment,
-  logEnvironmentConfig,
-  webhookSecret
-} from './utils.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
+import Stripe from 'https://esm.sh/stripe@13.10.0';
 
-import { 
-  handleCheckoutSessionCompleted, 
-  handleCheckoutSessionExpired 
-} from './checkout-handlers.ts';
+// Initialize Stripe with the secret key from environment variable
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+  apiVersion: '2023-10-16',
+});
 
-import { 
-  handleSubscriptionUpdated, 
-  handleSubscriptionCanceled, 
-  handleSubscriptionDeleted 
-} from './subscription-handlers.ts';
+// Initialize Supabase client
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-import { handlePaymentFailed, handlePaymentSucceeded } from './payment-handlers.ts';
+// Define CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
-// Log environment configuration at initialization
-logEnvironmentConfig();
-
-// Main webhook handler for Stripe events
 Deno.serve(async (req) => {
-  // Log webhook execution start
-  console.log(`Webhook request received: ${req.method} ${req.url.toString()}`);
-  
-  // Log relevant request headers for debugging
-  const stripe_signature = req.headers.get('stripe-signature');
-  console.log(`Stripe-Signature: ${stripe_signature ? 'Present' : 'MISSING'}`);
-  console.log(`Content-Type: ${req.headers.get('content-type')}`);
-  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Validate environment variables
-  const envError = validateEnvironment();
-  if (envError) {
-    console.error('Environment validation failed:', envError);
-    return errorResponse(envError, 500);
+  const signature = req.headers.get('stripe-signature');
+  
+  if (!signature) {
+    console.error('Missing Stripe signature header');
+    return new Response(JSON.stringify({ error: 'Missing Stripe signature header' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 
   try {
-    // Get the raw request body
-    const rawBody = await req.text();
-    console.log(`Request body received (${rawBody.length} bytes)`);
+    // Use your webhook signing secret from Stripe dashboard
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
+    const body = await req.text();
     
-    // Log the event type for debugging
-    try {
-      const bodyObj = JSON.parse(rawBody);
-      console.log(`Event type: ${bodyObj.type || 'unknown'}, Event ID: ${bodyObj.id || 'unknown'}`);
-    } catch (e) {
-      console.log('Could not parse body for logging:', e);
-    }
-    
-    // Process the webhook - with or without signature verification
-    const signature = req.headers.get('stripe-signature');
     let event;
     
-    try {
-      if (signature && webhookSecret) {
-        console.log(`Verifying Stripe signature: ${signature.substring(0, 15)}...`);
-        event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-        console.log(`✅ Stripe signature verified for event: ${event.type}`);
-      } else {
-        // If no signature or webhook secret, try to parse the event directly
-        console.log(`⚠️ No signature verification - parsing event directly`);
-        event = JSON.parse(rawBody);
-        console.log(`Parsing unverified event: ${event.type || 'unknown type'}`);
-      }
-    } catch (err) {
-      console.error(`⚠️ Event processing failed: ${err.message}`);
-      
-      // Try to parse the event anyway
+    // Skip verification during development if no webhook secret is set
+    if (webhookSecret) {
       try {
-        console.log(`Attempting to process without verification`);
-        event = JSON.parse(rawBody);
-      } catch (parseErr) {
-        console.error(`Failed to parse event JSON: ${parseErr.message}`);
-        return errorResponse(`Webhook error: ${parseErr.message}`, 400);
+        // Verify the event with Stripe
+        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      } catch (err) {
+        console.error(`Webhook signature verification failed: ${err.message}`);
+        return new Response(JSON.stringify({ error: `Webhook Error: ${err.message}` }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
+    } else {
+      // For development - parse without verification (not recommended for production)
+      event = JSON.parse(body);
+      console.warn('⚠️ Webhook secret not configured. Skipping signature verification.');
     }
 
     // Process the event
-    console.log(`Processing Stripe event: ${event.type} (${event.id})`);
-    const handlerResult = await processEvent(event);
+    console.log(`Processing Stripe event: ${event.type}`);
     
-    if (handlerResult === false) {
-      console.error(`Handler for ${event.type} failed to process the event correctly`);
-      return errorResponse(`Handler for ${event.type} failed`, 422);
+    // Handle specific events
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        
+        // Get user ID from session metadata
+        const userId = session.metadata?.userId || session.client_reference_id;
+        const planType = session.metadata?.planType;
+        
+        if (!userId) {
+          console.error('No user ID found in session metadata');
+          break;
+        }
+        
+        console.log(`Payment successful for user ${userId} - Plan: ${planType}`);
+        
+        // Update user profile with subscription info
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            subscription_plan: planType,
+            subscription_status: 'active',
+            subscription_id: session.subscription || session.id,
+            payment_method: 'card',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+        
+        if (error) {
+          console.error('Error updating profile:', error);
+        } else {
+          console.log(`Successfully updated subscription for user ${userId}`);
+        }
+        
+        break;
+      }
+      
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object;
+        const userId = subscription.metadata?.userId;
+        
+        if (!userId) {
+          // Try to find the user by subscription ID
+          const { data: profiles, error } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('subscription_id', subscription.id)
+            .limit(1);
+            
+          if (error || !profiles || profiles.length === 0) {
+            console.error('Could not find user for subscription:', subscription.id);
+            break;
+          }
+          
+          const userId = profiles[0].id;
+          console.log(`Subscription updated: ${subscription.id} for user: ${userId}`);
+          
+          // Update subscription status
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              subscription_status: subscription.status,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
+            
+          if (updateError) {
+            console.error('Error updating subscription status:', updateError);
+          }
+        }
+        break;
+      }
+      
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object;
+        
+        // Find the user with this subscription ID
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('subscription_id', subscription.id)
+          .limit(1);
+          
+        if (error || !profiles || profiles.length === 0) {
+          console.error('Could not find user for subscription:', subscription.id);
+          break;
+        }
+        
+        const userId = profiles[0].id;
+        console.log(`Subscription deleted/ended: ${subscription.id} for user: ${userId}`);
+        
+        // Update subscription status to canceled and remove plan access
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'inactive',
+            subscription_plan: null,  // Remove plan when subscription is completely ended
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error('Error updating subscription status to inactive:', updateError);
+        }
+        break;
+      }
+      
+      case 'customer.subscription.canceled': {
+        // This is different from deleted - canceled means the user has requested to cancel
+        // but they should keep access until the end of their billing period
+        const subscription = event.data.object;
+        
+        // Find the user with this subscription ID
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('subscription_id', subscription.id)
+          .limit(1);
+          
+        if (error || !profiles || profiles.length === 0) {
+          console.error('Could not find user for subscription:', subscription.id);
+          break;
+        }
+        
+        const userId = profiles[0].id;
+        console.log(`Subscription canceled: ${subscription.id} for user: ${userId}`);
+        
+        // Mark as canceled but DO NOT remove the plan yet - they keep access until period ends
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'canceled',
+            updated_at: new Date().toISOString()
+            // Note: NOT removing subscription_plan here to maintain access
+          })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error('Error updating subscription status to canceled:', updateError);
+        }
+        break;
+      }
+      
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object;
+        const subscriptionId = invoice.subscription;
+        
+        if (subscriptionId) {
+          // Find the user with this subscription ID
+          const { data: profiles, error } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('subscription_id', subscriptionId)
+            .limit(1);
+            
+          if (error || !profiles || profiles.length === 0) {
+            console.error('Could not find user for subscription:', subscriptionId);
+            break;
+          }
+          
+          const userId = profiles[0].id;
+          console.log(`Payment failed for subscription: ${subscriptionId}, user: ${userId}`);
+          
+          // Update subscription status to past_due
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              subscription_status: 'past_due',
+              updated_at: new Date().toISOString()
+              // Note: Keep subscription_plan to maintain access during grace period
+            })
+            .eq('id', userId);
+            
+          if (updateError) {
+            console.error('Error updating subscription status to past_due:', updateError);
+          }
+        }
+        break;
+      }
+      
+      default:
+        // Unexpected event type
+        console.log(`Unhandled event type: ${event.type}`);
     }
-    
-    console.log(`Successfully processed event: ${event.type}`);
-    return successResponse({ received: true, event_type: event.type, processed: true });
-    
+
+    return new Response(JSON.stringify({ received: true }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   } catch (error) {
-    console.error('Unexpected error in webhook handler:', error);
-    return errorResponse(
-      'Webhook processing error', 
-      500, 
-      { message: error.message, stack: error.stack }
-    );
+    console.error('Error handling webhook:', error);
+    return new Response(JSON.stringify({ error: 'Error processing webhook' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 });
-
-// Process different types of Stripe events
-async function processEvent(event: any): Promise<boolean> {
-  console.log(`Processing Stripe event: ${event.type} (${event.id})`);
-  
-  // Handle different event types
-  switch (event.type) {
-    case 'checkout.session.completed':
-      console.log('Handling checkout.session.completed event');
-      return await handleCheckoutSessionCompleted(event.data.object);
-      
-    case 'checkout.session.expired':
-      console.log('Handling checkout.session.expired event');
-      return await handleCheckoutSessionExpired(event.data.object);
-      
-    case 'customer.subscription.updated':
-      console.log('Handling customer.subscription.updated event');
-      return await handleSubscriptionUpdated(event.data.object);
-      
-    case 'customer.subscription.deleted':
-      console.log('Handling customer.subscription.deleted event');
-      return await handleSubscriptionDeleted(event.data.object);
-      
-    case 'customer.subscription.canceled':
-      console.log('Handling customer.subscription.canceled event');
-      return await handleSubscriptionCanceled(event.data.object);
-      
-    case 'invoice.payment_failed':
-      console.log('Handling invoice.payment_failed event');
-      return await handlePaymentFailed(event.data.object);
-      
-    case 'invoice.payment_succeeded':
-      console.log('Handling invoice.payment_succeeded event');
-      return await handlePaymentSucceeded(event.data.object);
-      
-    case 'payment_intent.succeeded':
-      console.log('Handling payment_intent.succeeded event');
-      return true; // Just acknowledge these events for now
-      
-    case 'charge.succeeded':
-      console.log('Handling charge.succeeded event');
-      return true; // Just acknowledge these events for now
-      
-    case 'customer.created':
-      console.log('Handling customer.created event');
-      return true; // Just acknowledge these events for now
-      
-    case 'customer.updated':
-      console.log('Handling customer.updated event');
-      return true; // Just acknowledge these events for now
-      
-    // Handle other common events
-    case 'invoice.created':
-    case 'invoice.updated':
-    case 'invoice.finalized':
-    case 'invoice.paid':
-    case 'setup_intent.created':
-    case 'setup_intent.succeeded':
-      console.log(`Handling ${event.type} event`);
-      return true; // Just acknowledge these events for now
-      
-    default:
-      console.log(`Unhandled event type: ${event.type} - acknowledging receipt`);
-      return true; // We're successfully ignoring this event type
-  }
-}
