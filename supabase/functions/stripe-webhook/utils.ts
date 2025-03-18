@@ -19,11 +19,11 @@ export const supabase = createClient(
   supabaseServiceKey || ''
 );
 
-// Define CORS headers
+// Define CORS headers with more permissive settings for webhook testing
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature, *',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 };
 
 // Helper to create consistent error responses

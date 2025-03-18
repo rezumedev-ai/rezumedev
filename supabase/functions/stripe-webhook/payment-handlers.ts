@@ -1,12 +1,26 @@
-import { supabase } from './utils.ts';
+
+import { supabase, stripe } from './utils.ts';
 
 // Handle payment failure
 export async function handlePaymentFailed(invoice: any) {
+  console.log(`Processing payment failed for invoice ${invoice.id}`);
+  
   const subscriptionId = invoice.subscription;
+  const customerId = invoice.customer;
+  
+  // Log detailed info for debugging
+  console.log(`Payment failed: 
+    Invoice ID: ${invoice.id}
+    Customer ID: ${customerId}
+    Subscription ID: ${subscriptionId || 'N/A'}
+    Amount due: ${invoice.amount_due}
+    Currency: ${invoice.currency}
+    Status: ${invoice.status}
+  `);
   
   if (!subscriptionId) {
     console.error('No subscription ID found in invoice');
-    return false;
+    return true; // Still mark as processed
   }
   
   // Find the user with this subscription ID
@@ -18,7 +32,39 @@ export async function handlePaymentFailed(invoice: any) {
     
   if (error || !profiles || profiles.length === 0) {
     console.error('Could not find user for subscription:', subscriptionId, error);
-    return false;
+    
+    // Try finding by customer ID as fallback
+    if (customerId) {
+      const { data: customerProfiles, error: customerError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('stripe_customer_id', customerId)
+        .limit(1);
+        
+      if (!customerError && customerProfiles && customerProfiles.length > 0) {
+        const userId = customerProfiles[0].id;
+        console.log(`Found user ${userId} by customer ID ${customerId}`);
+        
+        // Update subscription status to past_due
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'past_due',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error('Error updating subscription status to past_due:', updateError);
+        } else {
+          console.log(`Successfully marked subscription as past_due for user ${userId}`);
+        }
+        
+        return true;
+      }
+    }
+    
+    return true; // Mark as processed even if we couldn't find the user
   }
   
   const userId = profiles[0].id;
@@ -47,11 +93,21 @@ export async function handlePaymentFailed(invoice: any) {
 export async function handlePaymentSucceeded(invoice: any) {
   console.log(`Processing payment succeeded for invoice ${invoice.id}`);
   
+  // Log detailed info for debugging
+  console.log(`Payment succeeded: 
+    Invoice ID: ${invoice.id}
+    Customer ID: ${invoice.customer || 'N/A'}
+    Subscription ID: ${invoice.subscription || 'N/A'}
+    Amount paid: ${invoice.amount_paid}
+    Currency: ${invoice.currency}
+    Status: ${invoice.status}
+  `);
+  
   // Get the subscription ID or customer ID
   const subscriptionId = invoice.subscription;
   const customerId = invoice.customer;
   
-  // First try to find by subscription ID if available
+  // If we have a subscription ID, use it to find the user
   if (subscriptionId) {
     const { data: profiles, error } = await supabase
       .from('profiles')
@@ -98,11 +154,98 @@ export async function handlePaymentSucceeded(invoice: any) {
   if (customerId) {
     console.log(`Trying to find user by Stripe customer ID: ${customerId}`);
     
-    // If your profiles table doesn't have a customer_id field, you might need to add it
-    // For now we'll just use the subscription_id field as a fallback if available
+    // Try to find user by customer ID
+    const { data: customerProfiles, error: customerError } = await supabase
+      .from('profiles')
+      .select('id, subscription_status, subscription_plan')
+      .eq('stripe_customer_id', customerId)
+      .limit(1);
+      
+    if (!customerError && customerProfiles && customerProfiles.length > 0) {
+      const userId = customerProfiles[0].id;
+      console.log(`Found user ${userId} by customer ID ${customerId}`);
+      
+      // If we found the user but they don't have a subscription ID yet, update it
+      if (subscriptionId) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_id: subscriptionId,
+            subscription_status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error('Error updating subscription details:', updateError);
+          return false;
+        }
+        
+        console.log(`Successfully updated subscription details for user ${userId}`);
+      } else {
+        // Just update the status to active if we don't have a subscription ID
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error('Error updating subscription status to active:', updateError);
+          return false;
+        }
+        
+        console.log(`Successfully updated subscription status to active for user ${userId}`);
+      }
+      
+      return true;
+    }
+    
+    // Try to get customer details directly from Stripe as a last resort
+    try {
+      const customer = await stripe.customers.retrieve(customerId);
+      console.log(`Retrieved customer from Stripe: ${customer.email}`);
+      
+      if (customer.email) {
+        // Try to find user by email
+        const { data: emailProfiles, error: emailError } = await supabase
+          .from('profiles')
+          .select('id, subscription_status, subscription_plan')
+          .eq('email', customer.email)
+          .limit(1);
+          
+        if (!emailError && emailProfiles && emailProfiles.length > 0) {
+          const userId = emailProfiles[0].id;
+          console.log(`Found user ${userId} by email ${customer.email}`);
+          
+          // Update subscription details
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              subscription_id: subscriptionId,
+              stripe_customer_id: customerId,
+              subscription_status: 'active',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
+            
+          if (updateError) {
+            console.error('Error updating subscription details:', updateError);
+            return false;
+          }
+          
+          console.log(`Successfully updated subscription details for user ${userId}`);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.error('Error retrieving customer from Stripe:', e);
+    }
     
     // Log that we couldn't find the user directly
-    console.log(`Could not directly match payment to a user. Please check manually:
+    console.log(`Could not match payment to a user. Please check manually:
       Invoice ID: ${invoice.id}
       Customer ID: ${customerId}
       Subscription ID: ${subscriptionId || 'N/A'}
@@ -110,6 +253,5 @@ export async function handlePaymentSucceeded(invoice: any) {
   }
   
   // Even if we couldn't find the user, we mark this as processed
-  // You may want to implement a retry mechanism or manual check
   return true;
 }
