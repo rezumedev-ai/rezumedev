@@ -23,6 +23,7 @@ export const supabase = createClient(
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 // Helper to create consistent error responses
@@ -58,7 +59,7 @@ export const validateEnvironment = () => {
   }
   
   if (!webhookSecret) {
-    return 'STRIPE_WEBHOOK_SECRET is not configured';
+    console.warn('STRIPE_WEBHOOK_SECRET is not configured - webhook signature validation will be disabled!');
   }
   
   if (!supabaseUrl || !supabaseServiceKey) {
