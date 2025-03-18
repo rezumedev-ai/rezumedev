@@ -6,56 +6,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('send-contact-email', {
-        body: formData
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Failed to send message');
-      }
-
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false);
       toast({
         title: "Message sent!",
         description: "We'll get back to you as soon as possible.",
       });
-
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        message: ""
-      });
-    } catch (error) {
-      console.error('Error sending contact form:', error);
-      toast({
-        title: "Error sending message",
-        description: "Please try again later or contact us directly.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    }, 1000);
   };
 
   return (
@@ -80,32 +46,15 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-6 animate-fade-up" style={{ animationDelay: '200ms' }}>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-secondary mb-2">Name</label>
-                <Input 
-                  id="name" 
-                  value={formData.name}
-                  onChange={handleChange}
-                  required 
-                />
+                <Input id="name" required />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-secondary mb-2">Email</label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  value={formData.email}
-                  onChange={handleChange}
-                  required 
-                />
+                <Input id="email" type="email" required />
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-secondary mb-2">Message</label>
-                <Textarea 
-                  id="message" 
-                  value={formData.message}
-                  onChange={handleChange}
-                  required 
-                  className="min-h-[150px]" 
-                />
+                <Textarea id="message" required className="min-h-[150px]" />
               </div>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Sending..." : "Send Message"}
