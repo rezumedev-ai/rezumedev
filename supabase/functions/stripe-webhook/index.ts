@@ -1,17 +1,30 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
-// Initialize Stripe with the secret key from environment variable
-const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
-const stripe = new Stripe(stripeSecretKey, {
+// Initialize environment variables with explicit error handling
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+// Log initial environment check - this helps confirm if the function is invoked
+console.log(`Stripe webhook function loaded. Environment check:
+  - STRIPE_SECRET_KEY: ${stripeSecretKey ? 'Present' : 'MISSING'}
+  - STRIPE_WEBHOOK_SECRET: ${webhookSecret ? 'Present' : 'MISSING'}
+  - SUPABASE_URL: ${supabaseUrl ? 'Present' : 'MISSING'}
+  - SUPABASE_SERVICE_ROLE_KEY: ${supabaseServiceKey ? 'Present' : 'MISSING'}`
+);
+
+// Initialize Stripe client
+const stripe = new Stripe(stripeSecretKey || '', {
   apiVersion: '2023-10-16',
 });
 
 // Initialize Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = createClient(
+  supabaseUrl || '',
+  supabaseServiceKey || ''
+);
 
 // Define CORS headers
 const corsHeaders = {
@@ -19,296 +32,317 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Validate environment setup
-function validateEnvironment() {
-  const issues = [];
+// Helper to create consistent error responses
+const errorResponse = (message, status = 400, details = null) => {
+  console.error(`Error: ${message}`, details ? `Details: ${JSON.stringify(details)}` : '');
+  return new Response(
+    JSON.stringify({
+      error: message,
+      details: details
+    }),
+    {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    }
+  );
+};
+
+// Helper to create success responses
+const successResponse = (data) => {
+  return new Response(
+    JSON.stringify(data),
+    {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    }
+  );
+};
+
+// Handle Stripe checkout.session.completed event
+async function handleCheckoutSessionCompleted(session) {
+  const userId = session.metadata?.userId || session.client_reference_id;
+  const planType = session.metadata?.planType;
   
-  if (!stripeSecretKey) {
-    issues.push("STRIPE_SECRET_KEY is not set");
+  console.log(`Processing checkout.session.completed:
+    Session ID: ${session.id}
+    User ID: ${userId || 'MISSING'}
+    Plan Type: ${planType || 'MISSING'}
+    Subscription ID: ${session.subscription || 'MISSING'}`
+  );
+  
+  if (!userId) {
+    console.error('No user ID found in session metadata or client_reference_id');
+    return false;
   }
   
-  if (!supabaseUrl) {
-    issues.push("SUPABASE_URL is not set");
-  }
+  // Update user profile with subscription info
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      subscription_plan: planType,
+      subscription_status: 'active',
+      subscription_id: session.subscription || session.id,
+      payment_method: 'card',
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId);
   
-  if (!supabaseServiceKey) {
-    issues.push("SUPABASE_SERVICE_ROLE_KEY is not set");
-  }
+  if (error) {
+    console.error('Error updating profile after checkout:', error);
+    return false;
+  } 
   
-  const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-  if (!webhookSecret) {
-    issues.push("STRIPE_WEBHOOK_SECRET is not set");
-  }
-  
-  return issues;
+  console.log(`Successfully updated subscription for user ${userId}`);
+  return true;
 }
 
-// This will write an initial log entry to test if the function is being invoked at all
-console.log("Stripe webhook function loaded and waiting for events");
+// Handle Stripe subscription updated event
+async function handleSubscriptionUpdated(subscription) {
+  const userId = subscription.metadata?.userId;
+  let profileId = userId;
+  
+  if (!profileId) {
+    // Try to find user by subscription ID
+    console.log(`No userId in metadata, looking up profile by subscription_id: ${subscription.id}`);
+    const { data: profiles, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('subscription_id', subscription.id)
+      .limit(1);
+      
+    if (error || !profiles || profiles.length === 0) {
+      console.error('Could not find user for subscription:', subscription.id, error);
+      return false;
+    }
+    
+    profileId = profiles[0].id;
+    console.log(`Found user ${profileId} for subscription ${subscription.id}`);
+  }
+  
+  // Update subscription status
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      subscription_status: subscription.status,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', profileId);
+    
+  if (updateError) {
+    console.error('Error updating subscription status:', updateError);
+    return false;
+  }
+  
+  console.log(`Updated subscription status to ${subscription.status} for user ${profileId}`);
+  return true;
+}
 
+// Handle subscription canceled
+async function handleSubscriptionCanceled(subscription) {
+  // Find the user with this subscription ID
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('subscription_id', subscription.id)
+    .limit(1);
+    
+  if (error || !profiles || profiles.length === 0) {
+    console.error('Could not find user for subscription:', subscription.id, error);
+    return false;
+  }
+  
+  const userId = profiles[0].id;
+  console.log(`Subscription canceled: ${subscription.id} for user: ${userId}`);
+  
+  // Mark as canceled but DO NOT remove the plan yet - they keep access until period ends
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      subscription_status: 'canceled',
+      updated_at: new Date().toISOString()
+      // Note: NOT removing subscription_plan here to maintain access
+    })
+    .eq('id', userId);
+    
+  if (updateError) {
+    console.error('Error updating subscription status to canceled:', updateError);
+    return false;
+  }
+  
+  console.log(`Successfully marked subscription as canceled for user ${userId}`);
+  return true;
+}
+
+// Handle subscription deleted
+async function handleSubscriptionDeleted(subscription) {
+  // Find the user with this subscription ID
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('subscription_id', subscription.id)
+    .limit(1);
+    
+  if (error || !profiles || profiles.length === 0) {
+    console.error('Could not find user for subscription:', subscription.id, error);
+    return false;
+  }
+  
+  const userId = profiles[0].id;
+  console.log(`Subscription deleted/ended: ${subscription.id} for user: ${userId}`);
+  
+  // Update subscription status to canceled and remove plan access
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      subscription_status: 'inactive',
+      subscription_plan: null,  // Remove plan when subscription is completely ended
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId);
+    
+  if (updateError) {
+    console.error('Error updating subscription status to inactive:', updateError);
+    return false;
+  }
+  
+  console.log(`Successfully removed subscription plan for user ${userId}`);
+  return true;
+}
+
+// Handle payment failure
+async function handlePaymentFailed(invoice) {
+  const subscriptionId = invoice.subscription;
+  
+  if (!subscriptionId) {
+    console.error('No subscription ID found in invoice');
+    return false;
+  }
+  
+  // Find the user with this subscription ID
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('subscription_id', subscriptionId)
+    .limit(1);
+    
+  if (error || !profiles || profiles.length === 0) {
+    console.error('Could not find user for subscription:', subscriptionId, error);
+    return false;
+  }
+  
+  const userId = profiles[0].id;
+  console.log(`Payment failed for subscription: ${subscriptionId}, user: ${userId}`);
+  
+  // Update subscription status to past_due
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      subscription_status: 'past_due',
+      updated_at: new Date().toISOString()
+      // Note: Keep subscription_plan to maintain access during grace period
+    })
+    .eq('id', userId);
+    
+  if (updateError) {
+    console.error('Error updating subscription status to past_due:', updateError);
+    return false;
+  }
+  
+  console.log(`Successfully marked subscription as past_due for user ${userId}`);
+  return true;
+}
+
+// Main webhook handler
 Deno.serve(async (req) => {
-  console.log("Webhook request received:", req.method, req.url);
+  // Log webhook execution start to help with debugging
+  console.log(`Webhook request received: ${req.method} ${req.url.toString()}`);
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log("Handling CORS preflight request");
+    console.log('Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Validate environment variables first
-  const envIssues = validateEnvironment();
-  if (envIssues.length > 0) {
-    console.error("Environment validation failed:", envIssues);
-    return new Response(
-      JSON.stringify({ 
-        error: 'Webhook configuration error', 
-        details: envIssues.join(', ')
-      }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+  // Validate environment variables
+  if (!stripeSecretKey) {
+    return errorResponse('STRIPE_SECRET_KEY is not configured', 500);
   }
-
-  const signature = req.headers.get('stripe-signature');
   
-  if (!signature) {
-    console.error('Missing Stripe signature header');
-    return new Response(JSON.stringify({ error: 'Missing Stripe signature header' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+  if (!webhookSecret) {
+    return errorResponse('STRIPE_WEBHOOK_SECRET is not configured', 500);
+  }
+  
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return errorResponse('Supabase connection configuration is missing', 500);
   }
 
-  console.log("Stripe signature received:", signature.substring(0, 20) + "...");
+  // Check for Stripe signature header
+  const signature = req.headers.get('stripe-signature');
+  if (!signature) {
+    return errorResponse('Missing Stripe signature header');
+  }
+  
+  console.log(`Stripe signature received: ${signature.substring(0, 10)}...`);
 
   try {
-    // Get the webhook secret from environment variables
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
-    const body = await req.text();
+    // Get the raw request body
+    const rawBody = await req.text();
+    console.log(`Request body received (${rawBody.length} bytes)`);
     
-    console.log("Request body length:", body.length);
-    
+    // Construct and verify the Stripe event
     let event;
-    
     try {
-      // Always verify the event with Stripe when we have a webhook secret
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
       console.log(`✅ Stripe signature verified for event: ${event.type}`);
     } catch (err) {
       console.error(`⚠️ Webhook signature verification failed: ${err.message}`);
-      // Print more diagnostic info
-      console.error(`Webhook secret length: ${webhookSecret.length}`);
-      console.error(`Signature starts with: ${signature.substring(0, 20)}...`);
-      
-      return new Response(JSON.stringify({ error: `Webhook Error: ${err.message}` }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      console.error(`Webhook secret length: ${webhookSecret.length} characters`);
+      console.error(`First 50 chars of raw body: "${rawBody.substring(0, 50)}..."`);
+      return errorResponse(`Webhook signature verification failed: ${err.message}`);
     }
 
     // Process the event
-    console.log(`Processing Stripe event: ${event.type}`);
+    console.log(`Processing Stripe event: ${event.type} (${event.id})`);
+    let handlerResult = false;
     
-    // Handle specific events
     switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object;
-        
-        // Get user ID from session metadata
-        const userId = session.metadata?.userId || session.client_reference_id;
-        const planType = session.metadata?.planType;
-        
-        console.log(`Checkout session completed: ${JSON.stringify({
-          sessionId: session.id,
-          userId,
-          planType,
-          hasSubscriptionId: !!session.subscription
-        })}`);
-        
-        if (!userId) {
-          console.error('No user ID found in session metadata or client_reference_id');
-          break;
-        }
-        
-        console.log(`Payment successful for user ${userId} - Plan: ${planType}`);
-        
-        // Update user profile with subscription info
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            subscription_plan: planType,
-            subscription_status: 'active',
-            subscription_id: session.subscription || session.id,
-            payment_method: 'card',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', userId);
-        
-        if (error) {
-          console.error('Error updating profile:', error);
-        } else {
-          console.log(`Successfully updated subscription for user ${userId}`);
-        }
-        
+      case 'checkout.session.completed':
+        handlerResult = await handleCheckoutSessionCompleted(event.data.object);
         break;
-      }
-      
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        const userId = subscription.metadata?.userId;
         
-        if (!userId) {
-          // Try to find the user by subscription ID
-          const { data: profiles, error } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('subscription_id', subscription.id)
-            .limit(1);
-            
-          if (error || !profiles || profiles.length === 0) {
-            console.error('Could not find user for subscription:', subscription.id);
-            break;
-          }
-          
-          const foundUserId = profiles[0].id;
-          console.log(`Subscription updated: ${subscription.id} for user: ${foundUserId}`);
-          
-          // Update subscription status
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-              subscription_status: subscription.status,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', foundUserId);
-            
-          if (updateError) {
-            console.error('Error updating subscription status:', updateError);
-          }
-        }
+      case 'customer.subscription.updated':
+        handlerResult = await handleSubscriptionUpdated(event.data.object);
         break;
-      }
-      
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object;
         
-        // Find the user with this subscription ID
-        const { data: profiles, error } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('subscription_id', subscription.id)
-          .limit(1);
-          
-        if (error || !profiles || profiles.length === 0) {
-          console.error('Could not find user for subscription:', subscription.id);
-          break;
-        }
-        
-        const userId = profiles[0].id;
-        console.log(`Subscription deleted/ended: ${subscription.id} for user: ${userId}`);
-        
-        // Update subscription status to canceled and remove plan access
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            subscription_status: 'inactive',
-            subscription_plan: null,  // Remove plan when subscription is completely ended
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', userId);
-          
-        if (updateError) {
-          console.error('Error updating subscription status to inactive:', updateError);
-        }
+      case 'customer.subscription.deleted':
+        handlerResult = await handleSubscriptionDeleted(event.data.object);
         break;
-      }
-      
-      case 'customer.subscription.canceled': {
-        // This is different from deleted - canceled means the user has requested to cancel
-        // but they should keep access until the end of their billing period
-        const subscription = event.data.object;
         
-        // Find the user with this subscription ID
-        const { data: profiles, error } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('subscription_id', subscription.id)
-          .limit(1);
-          
-        if (error || !profiles || profiles.length === 0) {
-          console.error('Could not find user for subscription:', subscription.id);
-          break;
-        }
-        
-        const userId = profiles[0].id;
-        console.log(`Subscription canceled: ${subscription.id} for user: ${userId}`);
-        
-        // Mark as canceled but DO NOT remove the plan yet - they keep access until period ends
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            subscription_status: 'canceled',
-            updated_at: new Date().toISOString()
-            // Note: NOT removing subscription_plan here to maintain access
-          })
-          .eq('id', userId);
-          
-        if (updateError) {
-          console.error('Error updating subscription status to canceled:', updateError);
-        }
+      case 'customer.subscription.canceled':
+        handlerResult = await handleSubscriptionCanceled(event.data.object);
         break;
-      }
-      
-      case 'invoice.payment_failed': {
-        const invoice = event.data.object;
-        const subscriptionId = invoice.subscription;
         
-        if (subscriptionId) {
-          // Find the user with this subscription ID
-          const { data: profiles, error } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('subscription_id', subscriptionId)
-            .limit(1);
-            
-          if (error || !profiles || profiles.length === 0) {
-            console.error('Could not find user for subscription:', subscriptionId);
-            break;
-          }
-          
-          const userId = profiles[0].id;
-          console.log(`Payment failed for subscription: ${subscriptionId}, user: ${userId}`);
-          
-          // Update subscription status to past_due
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-              subscription_status: 'past_due',
-              updated_at: new Date().toISOString()
-              // Note: Keep subscription_plan to maintain access during grace period
-            })
-            .eq('id', userId);
-            
-          if (updateError) {
-            console.error('Error updating subscription status to past_due:', updateError);
-          }
-        }
+      case 'invoice.payment_failed':
+        handlerResult = await handlePaymentFailed(event.data.object);
         break;
-      }
-      
+        
       default:
-        // Unexpected event type
         console.log(`Unhandled event type: ${event.type}`);
     }
 
-    return new Response(JSON.stringify({ received: true }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    // Return success or partial failure
+    if (handlerResult === false) {
+      return errorResponse(`Handler for ${event.type} failed to process the event correctly`, 422);
+    }
+    
+    return successResponse({ received: true, event_type: event.type, processed: true });
+    
   } catch (error) {
-    console.error('Error handling webhook:', error);
-    return new Response(JSON.stringify({ error: 'Error processing webhook', details: error.message, stack: error.stack }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    console.error('Unexpected error in webhook handler:', error);
+    return errorResponse(
+      'Unexpected error processing webhook', 
+      500, 
+      { message: error.message, stack: error.stack }
+    );
   }
 });
