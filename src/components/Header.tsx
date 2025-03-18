@@ -37,6 +37,7 @@ export const Header = () => {
               { path: '/features', label: 'Features' },
               { path: '/pricing', label: 'Pricing' },
               { path: '/blog', label: 'Blog' },
+              { path: '/contact', label: 'Contact Us' },
             ].map(({ path, label }) => (
               <Link
                 key={path}
@@ -97,6 +98,13 @@ export const Header = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Blog
+                </Link>
+                <Link
+                  to="/contact"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-4 py-2 rounded-lg hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Contact Us
                 </Link>
                 <div className="pt-4 space-y-2 border-t">
                   <Button variant="ghost" className="w-full hover-lift" asChild>
