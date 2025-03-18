@@ -1,3 +1,4 @@
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
@@ -11,25 +12,24 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Define CORS headers - must be extremely permissive for Stripe webhooks
+// Define extremely permissive CORS headers for Stripe webhooks
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': '*',
   'Access-Control-Allow-Headers': '*',
   'Access-Control-Max-Age': '86400',
 };
 
 Deno.serve(async (req) => {
-  // Log detailed request information
-  console.log('Webhook request received:', {
-    method: req.method,
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-  });
-
+  // Log every single detail about the incoming request
+  console.log('========= NEW WEBHOOK REQUEST =========');
+  console.log('Request URL:', req.url);
+  console.log('Request method:', req.method);
+  console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+  
   // Handle CORS preflight requests with more permissive response
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS request');
+    console.log('Handling OPTIONS request with permissive CORS');
     return new Response(null, {
       status: 204,
       headers: corsHeaders
@@ -37,18 +37,23 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // For POST requests, proceed with webhook handling
     if (req.method === 'POST') {
       const body = await req.text();
-      console.log('Request body received:', body.substring(0, 500) + '...'); // Log first 500 chars for safety
+      console.log('Raw request body:', body.substring(0, 500) + '...');
 
-      // Get the stripe signature from headers
+      // Get and log the stripe signature
       const signature = req.headers.get('stripe-signature');
-      console.log('Stripe signature present:', !!signature);
+      console.log('Stripe signature:', signature);
 
-      // Get the webhook secret
+      // Get and log webhook secret
       const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
       console.log('Webhook secret configured:', !!webhookSecret);
+
+      // Log all headers for debugging
+      console.log('All request headers:');
+      for (const [key, value] of req.headers.entries()) {
+        console.log(`${key}: ${value}`);
+      }
 
       if (!signature || !webhookSecret) {
         const errorResponse = {
@@ -79,7 +84,8 @@ Deno.serve(async (req) => {
         console.error('Webhook signature verification failed:', {
           error: err,
           signature: signature ? 'present' : 'missing',
-          body: body ? 'present' : 'missing'
+          body: body ? 'present' : 'missing',
+          secretConfigured: !!webhookSecret
         });
         
         return new Response(
@@ -88,7 +94,8 @@ Deno.serve(async (req) => {
             details: {
               hasSignature: !!signature,
               hasBody: !!body,
-              errorType: err.type
+              errorType: err.type,
+              secretConfigured: !!webhookSecret
             }
           }),
           { 
