@@ -43,9 +43,15 @@ function validateEnvironment() {
   return issues;
 }
 
+// This will write an initial log entry to test if the function is being invoked at all
+console.log("Stripe webhook function loaded and waiting for events");
+
 Deno.serve(async (req) => {
+  console.log("Webhook request received:", req.method, req.url);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log("Handling CORS preflight request");
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -72,10 +78,14 @@ Deno.serve(async (req) => {
     });
   }
 
+  console.log("Stripe signature received:", signature.substring(0, 20) + "...");
+
   try {
     // Get the webhook secret from environment variables
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
     const body = await req.text();
+    
+    console.log("Request body length:", body.length);
     
     let event;
     
@@ -85,6 +95,10 @@ Deno.serve(async (req) => {
       console.log(`✅ Stripe signature verified for event: ${event.type}`);
     } catch (err) {
       console.error(`⚠️ Webhook signature verification failed: ${err.message}`);
+      // Print more diagnostic info
+      console.error(`Webhook secret length: ${webhookSecret.length}`);
+      console.error(`Signature starts with: ${signature.substring(0, 20)}...`);
+      
       return new Response(JSON.stringify({ error: `Webhook Error: ${err.message}` }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -103,8 +117,15 @@ Deno.serve(async (req) => {
         const userId = session.metadata?.userId || session.client_reference_id;
         const planType = session.metadata?.planType;
         
+        console.log(`Checkout session completed: ${JSON.stringify({
+          sessionId: session.id,
+          userId,
+          planType,
+          hasSubscriptionId: !!session.subscription
+        })}`);
+        
         if (!userId) {
-          console.error('No user ID found in session metadata');
+          console.error('No user ID found in session metadata or client_reference_id');
           break;
         }
         
@@ -285,7 +306,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('Error handling webhook:', error);
-    return new Response(JSON.stringify({ error: 'Error processing webhook', details: error.message }), {
+    return new Response(JSON.stringify({ error: 'Error processing webhook', details: error.message, stack: error.stack }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
