@@ -19,21 +19,32 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  // Log the full request for debugging
+  console.log('Webhook request received:', {
+    method: req.method,
+    headers: Object.fromEntries(req.headers.entries()),
+    url: req.url
+  });
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { 
+      headers: corsHeaders,
+      status: 200
+    });
   }
 
   try {
-    console.log('Received webhook request');
-    
     // Get the stripe signature from headers
     const signature = req.headers.get('stripe-signature');
     
     if (!signature) {
       console.error('No stripe signature found in request headers');
       return new Response(
-        JSON.stringify({ error: 'No Stripe signature found' }), 
+        JSON.stringify({ 
+          error: 'No Stripe signature found',
+          receivedHeaders: Object.fromEntries(req.headers.entries())
+        }), 
         { 
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -41,10 +52,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get the raw body for signature verification
-    const body = await req.text();
-    console.log('Webhook body:', body);
-    
+    // Get the webhook secret from environment variables
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
       console.error('Webhook secret is not configured');
@@ -57,15 +65,33 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Log that we have both signature and secret (without exposing the values)
+    console.log('Found both signature and webhook secret');
+
+    // Get the raw body for signature verification
+    const body = await req.text();
+    console.log('Webhook body:', body);
+
     let event;
     try {
       // Verify the event with Stripe
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
       console.log('Webhook verified successfully, event type:', event.type);
     } catch (err) {
-      console.error(`Webhook signature verification failed:`, err);
+      console.error('Webhook signature verification failed:', {
+        error: err,
+        signature: signature ? 'present' : 'missing',
+        body: body ? 'present' : 'missing'
+      });
       return new Response(
-        JSON.stringify({ error: `Webhook Error: ${err.message}` }),
+        JSON.stringify({ 
+          error: `Webhook Error: ${err.message}`,
+          details: {
+            hasSignature: !!signature,
+            hasBody: !!body,
+            errorType: err.type
+          }
+        }),
         { 
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -84,7 +110,7 @@ Deno.serve(async (req) => {
         const planType = session.metadata?.planType;
         
         if (!userId) {
-          console.error('No user ID found in session metadata');
+          console.error('No user ID found in session metadata', session);
           return new Response(
             JSON.stringify({ error: 'No user ID found in session' }),
             { 
@@ -111,7 +137,7 @@ Deno.serve(async (req) => {
         if (updateError) {
           console.error('Error updating profile:', updateError);
           return new Response(
-            JSON.stringify({ error: 'Failed to update user profile' }),
+            JSON.stringify({ error: 'Failed to update user profile', details: updateError }),
             { 
               status: 500,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -137,7 +163,7 @@ Deno.serve(async (req) => {
         if (lookupError || !profiles || profiles.length === 0) {
           console.error('Could not find user for subscription:', subscription.id);
           return new Response(
-            JSON.stringify({ error: 'User not found for subscription' }),
+            JSON.stringify({ error: 'User not found for subscription', subscriptionId: subscription.id }),
             { 
               status: 404,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -161,7 +187,7 @@ Deno.serve(async (req) => {
         if (updateError) {
           console.error('Error updating subscription status:', updateError);
           return new Response(
-            JSON.stringify({ error: 'Failed to update subscription status' }),
+            JSON.stringify({ error: 'Failed to update subscription status', details: updateError }),
             { 
               status: 500,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -178,7 +204,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ received: true }),
+      JSON.stringify({ received: true, event: event.type }),
       { 
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -187,7 +213,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error handling webhook:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: 'Internal server error',
+        message: error.message,
+        stack: error.stack
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

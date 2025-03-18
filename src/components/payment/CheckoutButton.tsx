@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -63,7 +64,8 @@ export const CheckoutButton = ({
         plan: planType,
         timestamp
       });
-      
+
+      // Make sure we have the authorization header
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
           planType,
