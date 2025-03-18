@@ -6,7 +6,8 @@ import {
   errorResponse, 
   successResponse,
   validateEnvironment,
-  logEnvironmentConfig
+  logEnvironmentConfig,
+  webhookSecret
 } from './utils.ts';
 
 import { 
@@ -20,7 +21,7 @@ import {
   handleSubscriptionDeleted 
 } from './subscription-handlers.ts';
 
-import { handlePaymentFailed } from './payment-handlers.ts';
+import { handlePaymentFailed, handlePaymentSucceeded } from './payment-handlers.ts';
 
 // Log environment configuration at initialization
 logEnvironmentConfig();
@@ -45,17 +46,9 @@ Deno.serve(async (req) => {
   // Validate environment variables
   const envError = validateEnvironment();
   if (envError) {
+    console.error('Environment validation failed:', envError);
     return errorResponse(envError, 500);
   }
-
-  // Check for Stripe signature header
-  const signature = req.headers.get('stripe-signature');
-  if (!signature) {
-    console.error('Missing Stripe signature header. Headers available:', Array.from(req.headers.keys()));
-    return errorResponse('Missing Stripe signature header', 401);
-  }
-  
-  console.log(`Stripe signature received: ${signature.substring(0, 10)}...`);
 
   try {
     // Get the raw request body
@@ -66,18 +59,28 @@ Deno.serve(async (req) => {
     try {
       const bodyObj = JSON.parse(rawBody);
       console.log(`Event type: ${bodyObj.type}, Event ID: ${bodyObj.id}`);
+      console.log(`Event data: ${JSON.stringify(bodyObj.data.object).substring(0, 200)}...`);
     } catch (e) {
-      console.log('Could not parse body for logging');
+      console.log('Could not parse body for logging:', e);
     }
     
+    // Check for Stripe signature header
+    const signature = req.headers.get('stripe-signature');
+    if (!signature) {
+      console.error('Missing Stripe signature header. Headers available:', Array.from(req.headers.keys()));
+      return errorResponse('Missing Stripe signature header', 401);
+    }
+    
+    console.log(`Stripe signature received: ${signature.substring(0, 10)}...`);
+    console.log(`Webhook secret length: ${webhookSecret?.length || 0} characters`);
+
     // Construct and verify the Stripe event
     let event;
     try {
-      event = stripe.webhooks.constructEvent(rawBody, signature, Deno.env.get('STRIPE_WEBHOOK_SECRET') || '');
+      event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret || '');
       console.log(`✅ Stripe signature verified for event: ${event.type}`);
     } catch (err) {
       console.error(`⚠️ Webhook signature verification failed: ${err.message}`);
-      console.error(`Webhook secret length: ${Deno.env.get('STRIPE_WEBHOOK_SECRET')?.length} characters`);
       console.error(`First 50 chars of raw body: "${rawBody.substring(0, 50)}..."`);
       console.error(`Signature header: ${signature?.substring(0, 20)}...`);
       return errorResponse(`Webhook signature verification failed: ${err.message}`, 401);
@@ -89,27 +92,48 @@ Deno.serve(async (req) => {
     
     switch (event.type) {
       case 'checkout.session.completed':
+        console.log('Handling checkout.session.completed event');
         handlerResult = await handleCheckoutSessionCompleted(event.data.object);
         break;
         
       case 'checkout.session.expired':
+        console.log('Handling checkout.session.expired event');
         handlerResult = await handleCheckoutSessionExpired(event.data.object);
         break;
         
       case 'customer.subscription.updated':
+        console.log('Handling customer.subscription.updated event');
         handlerResult = await handleSubscriptionUpdated(event.data.object);
         break;
         
       case 'customer.subscription.deleted':
+        console.log('Handling customer.subscription.deleted event');
         handlerResult = await handleSubscriptionDeleted(event.data.object);
         break;
         
       case 'customer.subscription.canceled':
+        console.log('Handling customer.subscription.canceled event');
         handlerResult = await handleSubscriptionCanceled(event.data.object);
         break;
         
       case 'invoice.payment_failed':
+        console.log('Handling invoice.payment_failed event');
         handlerResult = await handlePaymentFailed(event.data.object);
+        break;
+
+      case 'invoice.payment_succeeded':
+        console.log('Handling invoice.payment_succeeded event');
+        handlerResult = await handlePaymentSucceeded(event.data.object);
+        break;
+
+      case 'payment_intent.succeeded':
+        console.log('Handling payment_intent.succeeded event');
+        handlerResult = true; // We just log this event for now
+        break;
+        
+      case 'charge.succeeded':
+        console.log('Handling charge.succeeded event');
+        handlerResult = true; // We just log this event for now
         break;
         
       default:
@@ -119,9 +143,11 @@ Deno.serve(async (req) => {
 
     // Return success or partial failure
     if (handlerResult === false) {
+      console.error(`Handler for ${event.type} failed to process the event correctly`);
       return errorResponse(`Handler for ${event.type} failed to process the event correctly`, 422);
     }
     
+    console.log(`Successfully processed event: ${event.type}`);
     return successResponse({ received: true, event_type: event.type, processed: true });
     
   } catch (error) {
