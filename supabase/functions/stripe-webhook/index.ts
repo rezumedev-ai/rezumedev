@@ -16,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 };
 
 Deno.serve(async (req) => {
@@ -30,19 +30,32 @@ Deno.serve(async (req) => {
 
   try {
     if (req.method === 'POST') {
+      console.log("Received webhook request");
+      
       // Get the raw request body as text
       const body = await req.text();
       
       // Get the stripe signature header
       const signature = req.headers.get('stripe-signature');
-      const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-
-      if (!signature || !webhookSecret) {
-        console.error('Missing signature or webhook secret');
+      
+      if (!signature) {
+        console.error('Missing stripe-signature header');
         return new Response(
-          JSON.stringify({ error: 'Missing signature or webhook secret' }),
+          JSON.stringify({ error: 'Missing stripe-signature header' }),
           { 
             status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
+      const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+      if (!webhookSecret) {
+        console.error('Missing webhook secret in environment variables');
+        return new Response(
+          JSON.stringify({ error: 'Server configuration error: Missing webhook secret' }),
+          { 
+            status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
@@ -51,10 +64,11 @@ Deno.serve(async (req) => {
       // Verify the event
       let event;
       try {
+        console.log("Verifying webhook signature...");
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-        console.log('Event verified successfully:', event.type);
+        console.log(`Event verified successfully: ${event.type}`);
       } catch (err) {
-        console.error('Error verifying webhook signature:', err.message);
+        console.error(`Webhook signature verification failed: ${err.message}`);
         return new Response(
           JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
           { 
@@ -67,6 +81,9 @@ Deno.serve(async (req) => {
       // Handle the event based on its type
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
+        
+        // Log the entire session for debugging
+        console.log("Checkout session completed:", JSON.stringify(session, null, 2));
         
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
@@ -106,6 +123,9 @@ Deno.serve(async (req) => {
       } 
       else if (event.type === 'customer.subscription.deleted') {
         const subscription = event.data.object;
+        
+        // Log the entire subscription for debugging
+        console.log("Subscription deleted:", JSON.stringify(subscription, null, 2));
         
         // Find user with this subscription ID
         const { data: profiles, error: lookupError } = await supabase

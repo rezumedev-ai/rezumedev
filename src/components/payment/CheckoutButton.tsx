@@ -65,10 +65,11 @@ export const CheckoutButton = ({
         timestamp
       });
 
-      // Make sure we have the authorization header
+      // Make the request to create a checkout session
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
           planType,
+          userId: user.id, // Explicitly include user ID in the request
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
         },
