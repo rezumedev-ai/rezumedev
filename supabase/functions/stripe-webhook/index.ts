@@ -15,25 +15,21 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 // Define extremely permissive CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': '*',
   'Access-Control-Max-Age': '86400',
 };
 
-// This is a public webhook endpoint - NO AUTHORIZATION REQUIRED
+// THIS IS A COMPLETELY PUBLIC ENDPOINT WITH NO AUTHORIZATION CHECKS
 Deno.serve(async (req) => {
   console.log("========== NEW WEBHOOK REQUEST RECEIVED ==========");
   console.log(`Request method: ${req.method}`);
   console.log(`Request URL: ${req.url}`);
   
-  try {
-    // Log all request headers for debugging
-    console.log("All request headers:");
-    for (const [key, value] of req.headers.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-  } catch (e) {
-    console.error("Error logging headers:", e);
+  // Log all request headers for debugging
+  console.log("All request headers:");
+  for (const [key, value] of req.headers.entries()) {
+    console.log(`${key}: ${value}`);
   }
 
   // Handle CORS preflight requests with very permissive settings
@@ -90,7 +86,7 @@ Deno.serve(async (req) => {
           return new Response(
             JSON.stringify({ error: "Could not parse webhook body as JSON" }),
             { 
-              status: 400,
+              status: 200, // Return 200 even on error to prevent Stripe from retrying
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             }
           );
@@ -197,12 +193,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    // If not OPTIONS or POST, return method not allowed
-    console.log(`Unsupported method: ${req.method}`);
+    // For all other HTTP methods, return 200 OK with permissive headers
+    console.log(`Handling ${req.method} request, returning 200 OK`);
     return new Response(
-      JSON.stringify({ error: `Method ${req.method} not allowed` }),
+      JSON.stringify({ status: "ok", message: "Stripe webhook endpoint is active" }),
       { 
-        status: 405,
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
