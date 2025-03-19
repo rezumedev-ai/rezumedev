@@ -20,6 +20,7 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
+// This is a public webhook endpoint - NO AUTHORIZATION REQUIRED
 Deno.serve(async (req) => {
   console.log("========== NEW WEBHOOK REQUEST RECEIVED ==========");
   console.log(`Request method: ${req.method}`);
