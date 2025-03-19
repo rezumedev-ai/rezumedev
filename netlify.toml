@@ -11,7 +11,7 @@
   to = "/index.html"
   status = 200
 
-# Ensure extremely permissive CORS for Stripe webhooks
+# Ensure extremely permissive CORS for all requests, especially Stripe webhooks
 [[headers]]
   for = "/*"
   [headers.values]
@@ -19,3 +19,5 @@
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
     Access-Control-Allow-Headers = "*"
     Access-Control-Max-Age = "86400"
+    # Add explicit headers that Stripe might need
+    Access-Control-Allow-Credentials = "true"
