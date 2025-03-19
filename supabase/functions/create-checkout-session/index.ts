@@ -71,47 +71,73 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { planType, successUrl, cancelUrl } = requestBody;
+    const { planType, successUrl, cancelUrl, userId } = requestBody;
     
     // Log the received request for debugging
-    console.log('Request received:', { planType, successUrl, cancelUrl });
+    console.log('Request received:', { planType, successUrl, cancelUrl, userId });
+
+    // Check if we have a valid userId either from the request body directly or from auth
+    let authenticatedUserId = userId;
     
-    // Get the JWT token from authorization header
-    const authHeader = req.headers.get('Authorization');
-    
-    if (!authHeader) {
-      console.error('No authorization header provided');
-      return new Response(
-        JSON.stringify({ error: 'No authorization header provided' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // If userId wasn't provided directly, get it from authorization
+    if (!authenticatedUserId) {
+      // Get the JWT token from authorization header
+      const authHeader = req.headers.get('Authorization');
+      
+      if (!authHeader) {
+        console.error('No authorization header provided and no userId in request body');
+        return new Response(
+          JSON.stringify({ error: 'Authentication required' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Extract the token from the Authorization header
+      const token = authHeader.replace('Bearer ', '');
+      
+      // Verify the JWT token and get the user
+      const { data: userData, error: authError } = await supabase.auth.getUser(token);
+      
+      if (authError) {
+        console.error('Authentication error:', authError);
+        return new Response(
+          JSON.stringify({ error: 'Authentication failed', details: authError }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      const user = userData?.user;
+      
+      if (!user) {
+        console.error('No user found after authentication');
+        return new Response(
+          JSON.stringify({ error: 'User not found' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      authenticatedUserId = user.id;
+      console.log('User authenticated via token:', { id: user.id, email: user.email });
+    } else {
+      console.log('Using provided userId from request body:', authenticatedUserId);
     }
     
-    // Extract the token from the Authorization header
-    const token = authHeader.replace('Bearer ', '');
-    
-    // Verify the JWT token and get the user
-    const { data: userData, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError) {
-      console.error('Authentication error:', authError);
+    // Fetch user email from database since we need it for Stripe
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', authenticatedUserId)
+      .single();
+      
+    if (profileError || !profileData) {
+      console.error('Error fetching user profile:', profileError);
       return new Response(
-        JSON.stringify({ error: 'Authentication failed', details: authError }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    const user = userData?.user;
-    
-    if (!user) {
-      console.error('No user found after authentication');
-      return new Response(
-        JSON.stringify({ error: 'User not found' }),
+        JSON.stringify({ error: 'Profile not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     
-    console.log('Authenticated user:', { id: user.id, email: user.email });
+    const userEmail = profileData.email;
     
     // Validate plan type
     if (!planType || !['monthly', 'yearly', 'lifetime'].includes(planType)) {
@@ -164,10 +190,10 @@ Deno.serve(async (req) => {
         mode: mode,
         success_url: successUrl || 'https://rezume.dev/payment-success',
         cancel_url: cancelUrl || 'https://rezume.dev/pricing',
-        client_reference_id: user.id,
-        customer_email: user.email,
+        client_reference_id: authenticatedUserId,
+        customer_email: userEmail,
         metadata: {
-          userId: user.id,
+          userId: authenticatedUserId,
           planType: planType,
         },
       };
@@ -176,7 +202,7 @@ Deno.serve(async (req) => {
       const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
-      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}`);
+      console.log(`Checkout session created: ${session.id} for user: ${authenticatedUserId}, plan: ${planType}`);
 
       // Return the session ID and URL to the client
       return new Response(

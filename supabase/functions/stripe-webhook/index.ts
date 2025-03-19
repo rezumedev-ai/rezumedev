@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
 
   try {
     if (req.method === 'POST') {
-      console.log("Received webhook request");
+      console.log("Received webhook request from Stripe");
       
       // Get the raw request body as text
       const body = await req.text();
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       const signature = req.headers.get('stripe-signature');
       
       if (!signature) {
-        console.error('Missing stripe-signature header');
+        console.error('Missing stripe-signature header in webhook request');
         return new Response(
           JSON.stringify({ error: 'Missing stripe-signature header' }),
           { 
@@ -49,6 +49,8 @@ Deno.serve(async (req) => {
         );
       }
 
+      // IMPORTANT: For Stripe webhooks, we don't need the standard authorization header
+      // Stripe uses its own signature verification mechanism
       const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
       if (!webhookSecret) {
         console.error('Missing webhook secret in environment variables');
@@ -64,7 +66,7 @@ Deno.serve(async (req) => {
       // Verify the event
       let event;
       try {
-        console.log("Verifying webhook signature...");
+        console.log("Verifying webhook signature with secret key...");
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
         console.log(`Event verified successfully: ${event.type}`);
       } catch (err) {
@@ -182,7 +184,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error in webhook handler:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
