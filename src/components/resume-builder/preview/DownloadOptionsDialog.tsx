@@ -68,57 +68,155 @@ export function DownloadOptionsDialog({
       const loadingToast = toast.loading("Generating PDF...");
 
       // Wait for dialog to close and any transitions to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
+      // Get device pixel ratio for better quality
+      const pixelRatio = window.devicePixelRatio || 1;
+      
+      // A4 dimensions in pixels (at 96 DPI)
+      const a4Width = 8.27 * 96; // 793.92 pixels
+      const a4Height = 11.69 * 96; // 1122.24 pixels
+
+      // Calculate scale to fit the resume content to A4 size while preserving aspect ratio
+      const contentWidth = resumeElement.offsetWidth;
+      const contentHeight = resumeElement.offsetHeight;
+      const scale = Math.min(a4Width / contentWidth, a4Height / contentHeight);
+      
       // Store original styles
       const originalStyles = {
         transform: resumeElement.style.transform,
         transition: resumeElement.style.transition,
         width: resumeElement.style.width,
         height: resumeElement.style.height,
+        position: resumeElement.style.position,
+        pointerEvents: resumeElement.style.pointerEvents,
+        transformOrigin: resumeElement.style.transformOrigin,
+        visibility: resumeElement.style.visibility
       };
+      
+      // Force the element to be visible and properly sized for capture
+      Object.assign(resumeElement.style, {
+        transform: 'none',
+        transition: 'none',
+        position: resumeElement.style.position || 'relative',
+        pointerEvents: 'none',
+        transformOrigin: 'top left',
+        visibility: 'visible'
+      });
 
-      // Reset styles for capture
-      resumeElement.style.transform = 'none';
-      resumeElement.style.transition = 'none';
+      // Force layout recalculation
+      resumeElement.getBoundingClientRect();
+      
+      // Temporarily disable any transitions or animations
+      const allElements = resumeElement.querySelectorAll('*');
+      const originalTransitions: string[] = [];
+      
+      allElements.forEach((el: Element) => {
+        const htmlEl = el as HTMLElement;
+        originalTransitions.push(htmlEl.style.transition);
+        htmlEl.style.transition = 'none';
+      });
 
-      // Capture with optimal settings
+      // Capture with improved settings
       const canvas = await html2canvas(resumeElement, {
-        scale: 2,
+        scale: pixelRatio * 2, // Double the scale for sharper images
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff",
-        onclone: (clonedDoc, element) => {
-          const clonedElement = element as HTMLDivElement;
+        imageTimeout: 15000, // Increase timeout for complex resumes
+        windowWidth: document.documentElement.offsetWidth,
+        windowHeight: document.documentElement.offsetHeight,
+        onclone: (clonedDocument, element) => {
+          const clonedElement = element as HTMLElement;
+          
+          // Apply exact styling to the cloned element
           clonedElement.style.transform = 'none';
           clonedElement.style.transformOrigin = 'top left';
+          clonedElement.style.width = `${contentWidth}px`;
+          clonedElement.style.height = `${contentHeight}px`;
+          
+          // Ensure fonts are properly loaded in the clone
+          const fontLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+          const head = clonedDocument.head;
+          
+          fontLinks.forEach(link => {
+            if (link.href.includes('fonts.googleapis.com') || link.href.includes('fonts')) {
+              const newLink = clonedDocument.createElement('link');
+              newLink.rel = 'stylesheet';
+              newLink.href = link.href;
+              head.appendChild(newLink);
+            }
+          });
+          
+          // Make sure all fonts have loaded in the clone
+          return new Promise<void>(resolve => {
+            if ((document as any).fonts && (document as any).fonts.ready) {
+              (document as any).fonts.ready.then(() => {
+                setTimeout(resolve, 100); // Small delay to ensure rendering
+              });
+            } else {
+              // Fallback if document.fonts is not available
+              setTimeout(resolve, 200);
+            }
+          });
         }
+      });
+
+      // Restore original transitions
+      allElements.forEach((el: Element, index: number) => {
+        (el as HTMLElement).style.transition = originalTransitions[index];
       });
 
       // Restore original styles
       Object.assign(resumeElement.style, originalStyles);
 
-      // Create PDF
+      // Force browser to repaint
+      resumeElement.getBoundingClientRect();
+
+      // Create PDF with the exact A4 dimensions
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
+      
       const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
         format: 'a4',
+        unit: 'mm',
+        orientation: 'portrait',
+        compress: true,
+        precision: 16 // Higher precision for better positioning
       });
 
-      // Calculate dimensions to maintain aspect ratio
+      // Convert canvas to image
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Add image to PDF
+      // Calculate dimensions to maintain aspect ratio and fit A4
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const a4AspectRatio = pdfWidth / pdfHeight;
+      
+      let imgWidth, imgHeight, offsetX, offsetY;
+      
+      if (canvasAspectRatio > a4AspectRatio) {
+        // Canvas is wider than A4
+        imgWidth = pdfWidth;
+        imgHeight = imgWidth / canvasAspectRatio;
+        offsetX = 0;
+        offsetY = (pdfHeight - imgHeight) / 2;
+      } else {
+        // Canvas is taller than A4 or same ratio
+        imgHeight = pdfHeight;
+        imgWidth = imgHeight * canvasAspectRatio;
+        offsetX = (pdfWidth - imgWidth) / 2;
+        offsetY = 0;
+      }
+      
+      // Add image with precise positioning
       pdf.addImage(
         imgData,
         'JPEG',
-        0,
-        0,
-        pageWidth,
-        pageHeight,
+        offsetX,
+        offsetY,
+        imgWidth,
+        imgHeight,
         undefined,
         'FAST'
       );

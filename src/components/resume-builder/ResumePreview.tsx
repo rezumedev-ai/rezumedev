@@ -146,7 +146,7 @@ export function ResumePreview({
         <div 
           ref={resumeRef}
           id="resume-content"
-          className="bg-white shadow-xl"
+          className="bg-white shadow-xl will-change-transform"
           style={{
             width: `${WIDTH_PX}px`,
             height: `${HEIGHT_PX}px`,
@@ -161,6 +161,10 @@ export function ResumePreview({
             maxWidth: `${WIDTH_PX}px`,
             minHeight: `${HEIGHT_PX}px`,
             maxHeight: `${HEIGHT_PX}px`,
+            fontFeatureSettings: '"kern" 1, "liga" 1',
+            fontSmooth: 'always',
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
           }}
         >
           <div 
@@ -172,6 +176,7 @@ export function ResumePreview({
               left: margins.left,
               overflow: 'hidden',
               boxSizing: 'border-box',
+              pageBreakInside: 'avoid'
             }}
           >
             <div className={selectedTemplate.style.headerStyle}>

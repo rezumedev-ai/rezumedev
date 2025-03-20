@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Edit, LayoutTemplate, Save, Lock } from "lucide-react";
@@ -13,8 +12,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -66,88 +63,7 @@ export function ResumePreviewToolbar({
     profile.subscription_plan && 
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
-  // Handle downloading the resume as PDF
-  const handleDownload = async () => {
-    // If user doesn't have an active subscription, show subscription dialog
-    if (!hasActiveSubscription) {
-      setShowSubscriptionDialog(true);
-      return;
-    }
-    
-    try {
-      setIsDownloading(true);
-      toast.info("Preparing your resume for download...");
-      
-      // Get the resume element
-      const resumeElement = document.querySelector(".w-\\[21cm\\]");
-      
-      if (!resumeElement) {
-        toast.error("Could not find resume element");
-        setIsDownloading(false);
-        return;
-      }
-      
-      // Convert the resume to a canvas with improved settings
-      const canvas = await html2canvas(resumeElement as HTMLElement, {
-        scale: 2, // Higher quality
-        useCORS: true,
-        logging: false,
-        allowTaint: true,
-        height: resumeElement.scrollHeight,
-        windowHeight: resumeElement.scrollHeight
-      });
-      
-      // Create a new PDF document
-      const pdf = new jsPDF({
-        format: "a4",
-        unit: "mm",
-        orientation: "portrait",
-      });
-      
-      // A4 dimensions
-      const pdfWidth = 210; // mm
-      const pdfHeight = 297; // mm
-      
-      // Calculate image dimensions while preserving aspect ratio
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Add padding (in mm)
-      const topPadding = 15;
-      const bottomPadding = 15;
-      
-      // Calculate the necessary scaling to fit content with padding
-      let scaleFactor = 1;
-      if (imgHeight > (pdfHeight - topPadding - bottomPadding)) {
-        scaleFactor = (pdfHeight - topPadding - bottomPadding) / imgHeight;
-      }
-      
-      // Apply scaling
-      const finalImgWidth = imgWidth * scaleFactor;
-      const finalImgHeight = imgHeight * scaleFactor;
-      
-      // Calculate position to center the image horizontally and add top padding
-      const xPosition = (pdfWidth - finalImgWidth) / 2;
-      const yPosition = topPadding;
-      
-      // Get the image data
-      const imgData = canvas.toDataURL("image/png");
-      
-      // Add the image to the PDF
-      pdf.addImage(imgData, "PNG", xPosition, yPosition, finalImgWidth, finalImgHeight);
-      
-      // Save the PDF
-      pdf.save(`resume-${resumeId}.pdf`);
-      
-      toast.success("Resume downloaded successfully!");
-    } catch (error) {
-      console.error("Error downloading resume:", error);
-      toast.error("Failed to download resume");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
+  // Now we'll transfer the download functionality to the DownloadOptionsDialog component
   const handleTemplateChange = (templateId: string) => {
     onTemplateChange(templateId);
     setIsDialogOpen(false);
@@ -232,14 +148,8 @@ export function ResumePreviewToolbar({
             </Dialog>
           )}
           
-          <Button 
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary-hover text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
-          >
-            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>{isDownloading ? "Preparing..." : "Download"}</span>
-          </Button>
+          {/* Use the DownloadOptionsDialog component here */}
+          <DownloadOptionsDialog isDownloading={isDownloading} />
         </div>
       </div>
 
@@ -278,5 +188,18 @@ export function ResumePreviewToolbar({
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function DownloadOptionsDialog({ isDownloading }: { isDownloading: boolean }) {
+  return (
+    <Button 
+      onClick={() => {}}
+      disabled={isDownloading}
+      className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary-hover text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
+    >
+      <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+      <span>{isDownloading ? "Preparing..." : "Download"}</span>
+    </Button>
   );
 }
