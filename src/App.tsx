@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { Toaster } from 'sonner';
 import './App.css';
@@ -35,7 +35,7 @@ import Subscription from './pages/Subscription';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 
-function App() {
+function AppRoutes() {
   const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -89,10 +89,18 @@ function App() {
   );
 }
 
-const AppWithAuth = () => (
-  <AuthProvider>
-    <App />
-  </AuthProvider>
-);
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
 
-export default AppWithAuth;
+export default function AppWithRouter() {
+  return (
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
+}
