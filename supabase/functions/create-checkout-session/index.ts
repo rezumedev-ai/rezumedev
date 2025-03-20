@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { planType, successUrl, cancelUrl, isTestMode = false } = requestBody;
+    const { planType, successUrl, cancelUrl, isTestMode = true } = requestBody;
     
     // Log the received request for debugging
     console.log('Request received:', { planType, successUrl, cancelUrl, isTestMode });
@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Always use the configured secret key
+    // Always use the test secret key
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
     console.log('Using Stripe secret key (first 8 chars):', stripeSecretKey.substring(0, 8) + '...');
     
@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
       apiVersion: '2023-10-16',
     });
     
-    console.log('Using Stripe in LIVE mode');
+    console.log('Using Stripe in TEST mode');
 
     // First, try to find an existing product for this plan type
     let productName;
@@ -157,7 +157,7 @@ Deno.serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: productName,
+              name: `[TEST] ${productName}`,
             },
             unit_amount: unitAmount,
             recurring: mode === 'subscription' ? {
@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
         metadata: {
           userId: user.id,
           planType: planType,
-          isTestMode: 'false',
+          isTestMode: 'true',
         },
       };
       
@@ -182,7 +182,7 @@ Deno.serve(async (req) => {
       const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
-      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}, test mode: false`);
+      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}, test mode: true`);
 
       // Return the session ID and URL to the client
       return new Response(

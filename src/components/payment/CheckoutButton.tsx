@@ -108,7 +108,7 @@ export const CheckoutButton = ({
           userId: user.id, // Explicitly include user ID in the request
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
-          isTestMode: false // Use live mode with the live key
+          isTestMode: true // Always use test mode with the test keys
         },
       });
 
