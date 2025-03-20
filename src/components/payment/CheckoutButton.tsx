@@ -18,7 +18,7 @@ interface CheckoutButtonProps {
 }
 
 // Stripe publishable key - safe to expose in client-side code
-const STRIPE_PUBLISHABLE_KEY = "pk_test_51PW1Bx2ZC1I6S2FKu6GnQMr3DkN0L9ihCJVMG0d2QcDztqFvv1jdCFXkCy5AGnk0fWYR8EeRWG2ajwFuLPsBhTOH00SsptQC1a";
+const STRIPE_PUBLISHABLE_KEY = "pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi";
 
 export const CheckoutButton = ({
   planType,
