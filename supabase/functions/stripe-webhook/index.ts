@@ -7,7 +7,7 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
 });
 
-// Initialize Supabase client
+// Initialize Supabase client with service role for admin access
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -17,46 +17,19 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-  'Access-Control-Allow-Credentials': 'true',
 };
 
-// Log prefixes with emojis for better visibility
+// Log prefixes for better visibility
 const LOG_PREFIX = {
   INFO: "🔵 INFO:",
   ERROR: "🔴 ERROR:",
   SUCCESS: "✅ SUCCESS:",
-  WARNING: "⚠️ WARNING:",
   WEBHOOK: "🪝 WEBHOOK:",
-  AUTH: "🔑 AUTH:",
-  DEBUG: "🐞 DEBUG:",
 };
 
 Deno.serve(async (req) => {
   const url = new URL(req.url);
   console.log(`${LOG_PREFIX.INFO} Webhook received: ${req.method} ${url.pathname}`);
-  
-  // Log all headers for debugging
-  const allHeaders = Object.fromEntries([...req.headers.entries()]);
-  console.log(`${LOG_PREFIX.DEBUG} All request headers:`, JSON.stringify(allHeaders, null, 2));
-  
-  // Check for authorization headers specifically
-  const authHeader = req.headers.get('authorization');
-  if (authHeader) {
-    console.log(`${LOG_PREFIX.AUTH} Authorization header found: ${authHeader.substring(0, 15)}...`);
-  } else {
-    console.log(`${LOG_PREFIX.AUTH} No authorization header found in request`);
-  }
-  
-  // Check for Supabase client auth headers
-  const apiKeyHeader = req.headers.get('apikey');
-  if (apiKeyHeader) {
-    console.log(`${LOG_PREFIX.AUTH} API key header found: ${apiKeyHeader.substring(0, 10)}...`);
-  }
-  
-  const clientInfoHeader = req.headers.get('x-client-info');
-  if (clientInfoHeader) {
-    console.log(`${LOG_PREFIX.AUTH} Client info header found: ${clientInfoHeader}`);
-  }
   
   // Health check endpoint for testing webhook connectivity
   if (req.method === 'GET') {
@@ -64,10 +37,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         status: 'healthy', 
-        message: 'Stripe webhook endpoint is operational',
-        headers: allHeaders,
-        url: req.url,
-        path: url.pathname
+        message: 'Stripe webhook endpoint is operational'
       }),
       { 
         status: 200,
@@ -99,7 +69,7 @@ Deno.serve(async (req) => {
       if (!signature) {
         console.error(`${LOG_PREFIX.ERROR} Missing stripe-signature header`);
         return new Response(
-          JSON.stringify({ error: 'Missing stripe-signature header', headers: allHeaders }),
+          JSON.stringify({ error: 'Missing stripe-signature header' }),
           { 
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -129,11 +99,6 @@ Deno.serve(async (req) => {
         console.log(`${LOG_PREFIX.SUCCESS} Event verified successfully: ${event.type}`);
       } catch (err) {
         console.error(`${LOG_PREFIX.ERROR} Webhook signature verification failed: ${err.message}`);
-        
-        // Log more details about the verification failure
-        console.log(`${LOG_PREFIX.INFO} Webhook Secret (first 4 chars): ${webhookSecret.substring(0, 4)}...`);
-        console.log(`${LOG_PREFIX.INFO} Body preview (first 100 chars): ${body.substring(0, 100)}...`);
-        
         return new Response(
           JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
           { 
@@ -223,8 +188,43 @@ Deno.serve(async (req) => {
         
         console.log(`${LOG_PREFIX.SUCCESS} Successfully deactivated subscription for user ${userId}`);
       }
+      else if (event.type === 'customer.subscription.updated') {
+        const subscription = event.data.object;
+        console.log(`${LOG_PREFIX.WEBHOOK} Subscription updated:`, JSON.stringify(subscription, null, 2));
+        
+        // Find user with this subscription ID
+        const { data: profiles, error: lookupError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('subscription_id', subscription.id)
+          .limit(1);
+          
+        if (lookupError || !profiles || profiles.length === 0) {
+          console.error(`${LOG_PREFIX.ERROR} Could not find user for subscription:`, subscription.id);
+          throw new Error(`User not found for subscription: ${subscription.id}`);
+        }
+        
+        const userId = profiles[0].id;
+        const status = subscription.status;
+        
+        // Update subscription status
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            subscription_status: status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error(`${LOG_PREFIX.ERROR} Error updating subscription status:`, updateError);
+          throw new Error(`Failed to update subscription status: ${updateError.message}`);
+        }
+        
+        console.log(`${LOG_PREFIX.SUCCESS} Successfully updated subscription status to ${status} for user ${userId}`);
+      }
       else {
-        console.log(`${LOG_PREFIX.WARNING} Unhandled event type: ${event.type}`);
+        console.log(`${LOG_PREFIX.INFO} Unhandled event type: ${event.type}`);
       }
 
       // Return a successful response

@@ -27,20 +27,6 @@ export const CheckoutButton = ({
   const [isLoading, setIsLoading] = useState(false);
   const { user, getAuthToken } = useAuth();
   const navigate = useNavigate();
-  const [authToken, setAuthToken] = useState<string | null>(null);
-
-  // Get and store auth token when component mounts
-  useEffect(() => {
-    const fetchToken = async () => {
-      if (user) {
-        const token = await getAuthToken();
-        setAuthToken(token);
-        console.log("🔑 AUTH: CheckoutButton initialized with token:", token ? "Available" : "Not available");
-      }
-    };
-    
-    fetchToken();
-  }, [user, getAuthToken]);
 
   const handleCheckout = async () => {
     if (!user) {
@@ -52,96 +38,51 @@ export const CheckoutButton = ({
     }
 
     setIsLoading(true);
-    toast.info("Preparing checkout...", {
-      description: "Please wait while we connect to Stripe"
-    });
+    toast.info("Preparing checkout...");
 
     try {
       // Get the current session for authentication
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (sessionError) {
-        console.error("🔴 ERROR: Session error:", sessionError);
+      if (sessionError || !session) {
+        console.error("Authentication error:", sessionError || "No session found");
         throw new Error("Authentication error. Please try logging in again.");
       }
       
-      if (!session) {
-        console.error("🔴 ERROR: No session found");
-        throw new Error("Authentication session expired. Please log in again.");
-      }
-      
-      // Log session and token details for debugging
-      console.log("🔑 AUTH: Using session:", {
-        userId: session.user.id,
-        email: session.user.email,
-        expiresAt: new Date(session.expires_at * 1000).toLocaleString(),
-        hasToken: !!session.access_token
-      });
-      
-      // Log token details from current session
-      const currentToken = session.access_token;
-      console.log("🔑 AUTH: Current token:", currentToken ? `${currentToken.substring(0, 15)}...` : "No token");
-      
-      // Add timestamp parameter to avoid caching issues
+      // Get current timestamp for caching prevention
       const timestamp = new Date().getTime();
       
-      // Log the attempt with useful debugging info
-      console.log("🔵 INFO: Initiating checkout for:", {
-        user: user.id,
-        plan: planType,
-        timestamp,
-        authHeader: currentToken ? "Present" : "Missing"
-      });
-
-      // Log headers that will be sent with the request
-      const headers = {
-        Authorization: `Bearer ${currentToken}`,
-        "Content-Type": "application/json"
-      };
-      console.log("🔵 INFO: Request headers:", JSON.stringify(headers, null, 2));
-
       // Make the request to create a checkout session
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
           planType,
-          userId: user.id, // Explicitly include user ID in the request
+          userId: user.id,
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
         },
       });
 
       if (error) {
-        console.error("🔴 ERROR: Function error:", error);
+        console.error("Function error:", error);
         throw new Error(error.message || "Function error");
       }
 
-      if (!sessionData) {
-        console.error("🔴 ERROR: No session data returned");
-        throw new Error("No response from checkout service");
-      }
-
-      // Log checkout details for debugging
-      console.log("✅ SUCCESS: Checkout response:", sessionData);
-
-      // Redirect to Stripe checkout
-      if (sessionData?.url) {
-        toast.success("Redirecting to Stripe", {
-          description: "You'll be redirected to complete your payment"
-        });
-        window.location.href = sessionData.url;
-      } else {
-        console.error("🔴 ERROR: Missing checkout URL in response", sessionData);
+      if (!sessionData?.url) {
+        console.error("No checkout URL returned:", sessionData);
         throw new Error("No checkout URL returned");
       }
+
+      // Redirect to Stripe checkout
+      toast.success("Redirecting to Stripe");
+      window.location.href = sessionData.url;
+      
     } catch (error) {
-      console.error("🔴 ERROR: Error starting checkout:", error);
+      console.error("Checkout error:", error);
       
       let errorMessage = "Failed to start checkout process. Please try again later.";
       
       if (error.message) {
         errorMessage = error.message;
-      } else if (typeof error === 'object' && error !== null) {
-        errorMessage = JSON.stringify(error);
       }
       
       toast.error("Checkout Error", {

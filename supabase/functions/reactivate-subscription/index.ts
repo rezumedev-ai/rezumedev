@@ -14,7 +14,7 @@ const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 });
 
-// Initialize Supabase client
+// Initialize Supabase client with service role for admin access
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
