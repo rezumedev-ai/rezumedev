@@ -83,9 +83,19 @@ Deno.serve(async (req) => {
 
       console.log(`${LOG_PREFIX.INFO} Signature found: ${signature.substring(0, 20)}...`);
 
-      // Determine if this is a live mode webhook based on the signature
-      // Live webhooks from Stripe have a different signature format
-      const isLiveMode = signature.startsWith('whsec_live_');
+      // First try to parse the event body to check if it's livemode
+      let rawEvent;
+      try {
+        rawEvent = JSON.parse(body);
+        console.log(`${LOG_PREFIX.INFO} Raw event livemode:`, rawEvent.livemode);
+      } catch (parseErr) {
+        console.error(`${LOG_PREFIX.ERROR} Failed to parse event JSON for livemode check:`, parseErr);
+        rawEvent = { livemode: false }; // Default to test mode if we can't parse
+      }
+      
+      // Determine if this is a live mode webhook based on the event data
+      const isLiveMode = rawEvent.livemode === true;
+      console.log(`${LOG_PREFIX.INFO} Event is in ${isLiveMode ? 'LIVE' : 'TEST'} mode based on event data`);
       
       // Select the appropriate webhook secret based on mode
       const webhookSecret = isLiveMode 
@@ -102,6 +112,10 @@ Deno.serve(async (req) => {
           }
         );
       }
+      
+      // Log the webhook secret being used (first few characters for debugging only)
+      const secretPrefix = webhookSecret.substring(0, 10);
+      console.log(`${LOG_PREFIX.INFO} Using webhook secret: ${secretPrefix}... for ${isLiveMode ? 'LIVE' : 'TEST'} mode`);
       
       // Get the appropriate Stripe secret key based on mode
       const stripeSecretKey = isLiveMode
@@ -130,19 +144,28 @@ Deno.serve(async (req) => {
       // Verify the event
       let event;
       try {
-        console.log(`${LOG_PREFIX.INFO} Verifying webhook signature asynchronously...`);
+        console.log(`${LOG_PREFIX.INFO} Verifying webhook signature with secret starting with ${secretPrefix}...`);
         // Use the async version as suggested in the error message
         event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
         console.log(`${LOG_PREFIX.SUCCESS} Event verified successfully: ${event.type}`);
       } catch (err) {
         console.error(`${LOG_PREFIX.ERROR} Webhook signature verification failed: ${err.message}`);
         return new Response(
-          JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
+          JSON.stringify({ 
+            error: `Webhook signature verification failed: ${err.message}`,
+            mode: isLiveMode ? 'live' : 'test',
+            secretUsed: secretPrefix + '...'
+          }),
           { 
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
+      }
+
+      // Confirm the event's livemode matches our detection
+      if (event.livemode !== isLiveMode) {
+        console.error(`${LOG_PREFIX.ERROR} Event livemode (${event.livemode}) doesn't match detected mode (${isLiveMode})`);
       }
 
       // Handle the event based on its type
