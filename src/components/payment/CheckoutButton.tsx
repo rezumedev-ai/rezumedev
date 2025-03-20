@@ -17,8 +17,14 @@ interface CheckoutButtonProps {
   children: React.ReactNode;
 }
 
-// Stripe publishable key - safe to expose in client-side code
-const STRIPE_PUBLISHABLE_KEY = "pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi";
+// Environment detection - determines if we're in production or development
+const isProduction = window.location.hostname !== "localhost" && 
+                    !window.location.hostname.includes("127.0.0.1") &&
+                    !window.location.hostname.includes(".netlify.app");
+
+// Stripe publishable keys - safe to expose in client-side code
+const STRIPE_TEST_PUBLISHABLE_KEY = "pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi";
+const STRIPE_LIVE_PUBLISHABLE_KEY = "pk_live_51R0coQHK7YurnN3DQgm2RmqaJSXZs7bllvHjZyEGpGXaISvABbT59vNxwZ8fqwYe6VHsj5Eoe7lm1G3cq9ZsJ9I100RcqmMbkH";
 
 export const CheckoutButton = ({
   planType,
@@ -62,6 +68,7 @@ export const CheckoutButton = ({
           userId: user.id,
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
+          mode: isProduction ? "live" : "test" // Pass the mode to the edge function
         },
       });
 

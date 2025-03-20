@@ -8,12 +8,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Initialize Stripe with the secret key from environment variable
-const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2023-10-16',
-});
-
 // Initialize Supabase client with service role for admin access
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -39,10 +33,29 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { planType, userId, successUrl, cancelUrl } = requestBody;
+    const { planType, userId, successUrl, cancelUrl, mode = 'test' } = requestBody;
+    
+    // Determine which Stripe key to use based on mode
+    const isLiveMode = mode === 'live';
+    const stripeSecretKey = isLiveMode 
+      ? Deno.env.get('STRIPE_LIVE_SECRET_KEY') || ''
+      : Deno.env.get('STRIPE_SECRET_KEY') || '';
+    
+    if (!stripeSecretKey) {
+      console.error(`Missing Stripe ${isLiveMode ? 'live' : 'test'} secret key`);
+      return new Response(
+        JSON.stringify({ error: `Stripe ${isLiveMode ? 'live' : 'test'} secret key not configured` }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Initialize Stripe with the appropriate secret key
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2023-10-16',
+    });
     
     // Log the received request for debugging
-    console.log('Request received:', { planType, userId, successUrl, cancelUrl });
+    console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Request received:`, { planType, userId, successUrl, cancelUrl });
     
     // Validate request data
     if (!planType || !userId) {
@@ -97,8 +110,8 @@ Deno.serve(async (req) => {
     }
     
     // Determine checkout mode based on plan type
-    const mode = planType === 'lifetime' ? 'payment' : 'subscription';
-    console.log('Checkout mode:', mode);
+    const checkoutMode = planType === 'lifetime' ? 'payment' : 'subscription';
+    console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Checkout mode:`, checkoutMode);
     
     try {
       // Create a checkout session with dynamic product data
@@ -111,13 +124,13 @@ Deno.serve(async (req) => {
               name: productName,
             },
             unit_amount: unitAmount,
-            recurring: mode === 'subscription' ? {
+            recurring: checkoutMode === 'subscription' ? {
               interval: planType === 'monthly' ? 'month' : 'year',
             } : undefined,
           },
           quantity: 1,
         }],
-        mode: mode,
+        mode: checkoutMode,
         success_url: successUrl || `${Deno.env.get('PUBLIC_SITE_URL') || 'https://rezume.dev'}/payment-success`,
         cancel_url: cancelUrl || `${Deno.env.get('PUBLIC_SITE_URL') || 'https://rezume.dev'}/pricing`,
         client_reference_id: userId,
@@ -125,14 +138,15 @@ Deno.serve(async (req) => {
         metadata: {
           userId: userId,
           planType: planType,
+          mode: isLiveMode ? 'live' : 'test',
         },
       };
       
-      console.log('Creating checkout session with data:', JSON.stringify(sessionData, null, 2));
+      console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Creating checkout session with data:`, JSON.stringify(sessionData, null, 2));
       const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
-      console.log(`Checkout session created: ${session.id} for user: ${userId}, plan: ${planType}`);
+      console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Checkout session created: ${session.id} for user: ${userId}, plan: ${planType}`);
 
       // Return the session ID and URL to the client
       return new Response(
@@ -141,7 +155,7 @@ Deno.serve(async (req) => {
       );
     } catch (stripeError) {
       // Handle Stripe-specific errors
-      console.error('Stripe error:', stripeError);
+      console.error(`[${isLiveMode ? 'LIVE' : 'TEST'}] Stripe error:`, stripeError);
       
       return new Response(
         JSON.stringify({ 

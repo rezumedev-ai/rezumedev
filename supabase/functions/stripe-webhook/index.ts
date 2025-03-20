@@ -2,16 +2,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
-// Initialize Stripe with the secret key from environment variable
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-  apiVersion: '2023-10-16',
-});
-
-// Initialize Supabase client with service role for admin access
-const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 // Define permissive CORS headers - this is crucial for Stripe webhooks
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,12 +9,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 };
 
+// Initialize Supabase client with service role for admin access
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
 // Log prefixes for better visibility
 const LOG_PREFIX = {
   INFO: "🔵 INFO:",
   ERROR: "🔴 ERROR:",
   SUCCESS: "✅ SUCCESS:",
   WEBHOOK: "🪝 WEBHOOK:",
+  LIVE: "🔴 LIVE:",
+  TEST: "🟡 TEST:",
 };
 
 Deno.serve(async (req) => {
@@ -86,19 +83,51 @@ Deno.serve(async (req) => {
 
       console.log(`${LOG_PREFIX.INFO} Signature found: ${signature.substring(0, 20)}...`);
 
-      const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+      // Determine if this is a live mode webhook based on the signature
+      // Live webhooks from Stripe have a different signature format
+      const isLiveMode = signature.startsWith('whsec_live_');
+      
+      // Select the appropriate webhook secret based on mode
+      const webhookSecret = isLiveMode 
+        ? Deno.env.get('STRIPE_LIVE_WEBHOOK_SECRET')
+        : Deno.env.get('STRIPE_WEBHOOK_SECRET');
+      
       if (!webhookSecret) {
-        console.error(`${LOG_PREFIX.ERROR} Missing webhook secret in environment variables`);
+        console.error(`${LOG_PREFIX.ERROR} Missing ${isLiveMode ? 'live' : 'test'} webhook secret in environment variables`);
         return new Response(
-          JSON.stringify({ error: 'Server configuration error: Missing webhook secret' }),
+          JSON.stringify({ error: `Server configuration error: Missing ${isLiveMode ? 'live' : 'test'} webhook secret` }),
           { 
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
       }
+      
+      // Get the appropriate Stripe secret key based on mode
+      const stripeSecretKey = isLiveMode
+        ? Deno.env.get('STRIPE_LIVE_SECRET_KEY')
+        : Deno.env.get('STRIPE_SECRET_KEY');
+        
+      if (!stripeSecretKey) {
+        console.error(`${LOG_PREFIX.ERROR} Missing ${isLiveMode ? 'live' : 'test'} Stripe secret key`);
+        return new Response(
+          JSON.stringify({ error: `Server configuration error: Missing ${isLiveMode ? 'live' : 'test'} Stripe secret key` }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      
+      // Initialize Stripe with the appropriate secret key
+      const stripe = new Stripe(stripeSecretKey, {
+        apiVersion: '2023-10-16',
+      });
 
-      // Verify the event - USING ASYNC METHOD INSTEAD
+      // Log mode for debugging
+      console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Processing webhook in ${isLiveMode ? 'LIVE' : 'TEST'} mode`);
+
+      // Verify the event
       let event;
       try {
         console.log(`${LOG_PREFIX.INFO} Verifying webhook signature asynchronously...`);
@@ -121,7 +150,7 @@ Deno.serve(async (req) => {
         const session = event.data.object;
         
         // Log the entire session for debugging
-        console.log(`${LOG_PREFIX.WEBHOOK} Checkout session completed:`, JSON.stringify(session, null, 2));
+        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Checkout session completed:`, JSON.stringify(session, null, 2));
         
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
@@ -138,7 +167,7 @@ Deno.serve(async (req) => {
           );
         }
         
-        console.log(`${LOG_PREFIX.INFO} Updating subscription for user ${userId} with plan ${planType}`);
+        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Updating subscription for user ${userId} with plan ${planType}`);
         
         // Update user profile with subscription info
         const { error: updateError } = await supabase
@@ -148,6 +177,7 @@ Deno.serve(async (req) => {
             subscription_status: 'active',
             subscription_id: session.subscription || session.id,
             payment_method: 'card',
+            subscription_mode: isLiveMode ? 'live' : 'test', // Store the mode
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
@@ -163,7 +193,7 @@ Deno.serve(async (req) => {
         const subscription = event.data.object;
         
         // Log the entire subscription for debugging
-        console.log(`${LOG_PREFIX.WEBHOOK} Subscription deleted:`, JSON.stringify(subscription, null, 2));
+        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Subscription deleted:`, JSON.stringify(subscription, null, 2));
         
         // Find user with this subscription ID
         const { data: profiles, error: lookupError } = await supabase
@@ -198,7 +228,7 @@ Deno.serve(async (req) => {
       }
       else if (event.type === 'customer.subscription.updated') {
         const subscription = event.data.object;
-        console.log(`${LOG_PREFIX.WEBHOOK} Subscription updated:`, JSON.stringify(subscription, null, 2));
+        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Subscription updated:`, JSON.stringify(subscription, null, 2));
         
         // Find user with this subscription ID
         const { data: profiles, error: lookupError } = await supabase
@@ -237,7 +267,7 @@ Deno.serve(async (req) => {
 
       // Return a successful response
       return new Response(
-        JSON.stringify({ received: true, event: event.type }),
+        JSON.stringify({ received: true, event: event.type, mode: isLiveMode ? 'live' : 'test' }),
         { 
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
