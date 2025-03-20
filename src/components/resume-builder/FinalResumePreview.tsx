@@ -100,6 +100,7 @@ export function FinalResumePreview({
       />
       
       <motion.div 
+        id="resume-content" 
         className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-6 relative overflow-hidden"
         style={{
           ...pageStyle,

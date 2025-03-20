@@ -1,13 +1,10 @@
-
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { resumeTemplates } from "./templates";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ZoomIn, ZoomOut, File, Briefcase, GraduationCap, Award, Lightbulb } from "lucide-react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { resumeTemplates } from "./templates";
 
 interface ResumePreviewProps {
   personalInfo: {
@@ -145,7 +142,6 @@ export function ResumePreview({
       >
         <div 
           ref={resumeRef}
-          id="resume-content"
           className="bg-white shadow-xl will-change-transform"
           style={{
             width: `${WIDTH_PX}px`,

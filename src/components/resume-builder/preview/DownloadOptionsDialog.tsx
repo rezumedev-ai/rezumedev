@@ -60,7 +60,8 @@ export function DownloadOptionsDialog({
       // Updated selector to match the resume content div
       const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
-        toast.error("Could not find resume content");
+        console.error("Could not find element with id 'resume-content'");
+        toast.error("Could not find resume content. Please try again later.");
         return;
       }
 
@@ -94,9 +95,12 @@ export function DownloadOptionsDialog({
         visibility: resumeElement.style.visibility
       };
       
+      // Temporarily disable scale transform for capture
+      const originalTransform = resumeElement.style.transform;
+      resumeElement.style.transform = 'none';
+      
       // Force the element to be visible and properly sized for capture
       Object.assign(resumeElement.style, {
-        transform: 'none',
         transition: 'none',
         position: resumeElement.style.position || 'relative',
         pointerEvents: 'none',
@@ -117,12 +121,18 @@ export function DownloadOptionsDialog({
         htmlEl.style.transition = 'none';
       });
 
+      console.log("Attempting to capture resume content with dimensions:", {
+        width: contentWidth,
+        height: contentHeight,
+        element: resumeElement
+      });
+
       // Capture with improved settings
       const canvas = await html2canvas(resumeElement, {
         scale: pixelRatio * 2, // Double the scale for sharper images
         useCORS: true,
         allowTaint: true,
-        logging: false,
+        logging: true, // Enable logging for debugging
         backgroundColor: "#ffffff",
         imageTimeout: 15000, // Increase timeout for complex resumes
         windowWidth: document.documentElement.offsetWidth,
@@ -137,7 +147,7 @@ export function DownloadOptionsDialog({
           clonedElement.style.height = `${contentHeight}px`;
           
           // Ensure fonts are properly loaded in the clone
-          const fontLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+          const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
           const head = clonedDocument.head;
           
           fontLinks.forEach(link => {
@@ -170,7 +180,8 @@ export function DownloadOptionsDialog({
         (el as HTMLElement).style.transition = originalTransitions[index];
       });
 
-      // Restore original styles
+      // Restore original transform and other styles
+      resumeElement.style.transform = originalTransform;
       Object.assign(resumeElement.style, originalStyles);
 
       // Force browser to repaint
@@ -244,13 +255,14 @@ export function DownloadOptionsDialog({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <Button 
-          variant="outline" 
+          variant="primary" 
           size="sm"
           onClick={() => setOpen(true)}
           disabled={isDownloading}
+          className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary-hover text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
         >
-          <FileDown className="w-4 h-4 mr-2" />
-          Download
+          <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span>{isDownloading ? "Preparing..." : "Download"}</span>
         </Button>
         <DialogContent>
           <DialogHeader>
