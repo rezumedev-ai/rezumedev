@@ -12,16 +12,41 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Define permissive CORS headers
+// Define permissive CORS headers - this is crucial for Stripe webhooks
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Access-Control-Allow-Headers': '*',
+  'Access-Control-Allow-Credentials': 'true',
+};
+
+// Log prefixes with emojis for better visibility
+const LOG_PREFIX = {
+  INFO: "🔵 INFO:",
+  ERROR: "🔴 ERROR:",
+  SUCCESS: "✅ SUCCESS:",
+  WARNING: "⚠️ WARNING:",
+  WEBHOOK: "🪝 WEBHOOK:",
 };
 
 Deno.serve(async (req) => {
+  console.log(`${LOG_PREFIX.INFO} Webhook received: ${req.method} ${new URL(req.url).pathname}`);
+  
+  // Health check endpoint for testing webhook connectivity
+  if (req.method === 'GET') {
+    console.log(`${LOG_PREFIX.INFO} Health check requested`);
+    return new Response(
+      JSON.stringify({ status: 'healthy', message: 'Stripe webhook endpoint is operational' }),
+      { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log(`${LOG_PREFIX.INFO} CORS preflight request`);
     return new Response(null, {
       status: 204,
       headers: corsHeaders
@@ -30,16 +55,18 @@ Deno.serve(async (req) => {
 
   try {
     if (req.method === 'POST') {
-      console.log("Received webhook request");
+      console.log(`${LOG_PREFIX.WEBHOOK} Processing webhook request`);
       
       // Get the raw request body as text
       const body = await req.text();
+      console.log(`${LOG_PREFIX.INFO} Request body length: ${body.length} characters`);
       
       // Get the stripe signature header
       const signature = req.headers.get('stripe-signature');
       
       if (!signature) {
-        console.error('Missing stripe-signature header');
+        console.error(`${LOG_PREFIX.ERROR} Missing stripe-signature header`);
+        console.log(`${LOG_PREFIX.INFO} Available headers:`, Object.fromEntries([...req.headers.entries()]));
         return new Response(
           JSON.stringify({ error: 'Missing stripe-signature header' }),
           { 
@@ -49,9 +76,11 @@ Deno.serve(async (req) => {
         );
       }
 
+      console.log(`${LOG_PREFIX.INFO} Signature found: ${signature.substring(0, 20)}...`);
+
       const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
       if (!webhookSecret) {
-        console.error('Missing webhook secret in environment variables');
+        console.error(`${LOG_PREFIX.ERROR} Missing webhook secret in environment variables`);
         return new Response(
           JSON.stringify({ error: 'Server configuration error: Missing webhook secret' }),
           { 
@@ -64,11 +93,16 @@ Deno.serve(async (req) => {
       // Verify the event
       let event;
       try {
-        console.log("Verifying webhook signature...");
+        console.log(`${LOG_PREFIX.INFO} Verifying webhook signature...`);
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-        console.log(`Event verified successfully: ${event.type}`);
+        console.log(`${LOG_PREFIX.SUCCESS} Event verified successfully: ${event.type}`);
       } catch (err) {
-        console.error(`Webhook signature verification failed: ${err.message}`);
+        console.error(`${LOG_PREFIX.ERROR} Webhook signature verification failed: ${err.message}`);
+        
+        // Log more details about the verification failure
+        console.log(`${LOG_PREFIX.INFO} Webhook Secret (first 4 chars): ${webhookSecret.substring(0, 4)}...`);
+        console.log(`${LOG_PREFIX.INFO} Body preview (first 100 chars): ${body.substring(0, 100)}...`);
+        
         return new Response(
           JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
           { 
@@ -83,14 +117,14 @@ Deno.serve(async (req) => {
         const session = event.data.object;
         
         // Log the entire session for debugging
-        console.log("Checkout session completed:", JSON.stringify(session, null, 2));
+        console.log(`${LOG_PREFIX.WEBHOOK} Checkout session completed:`, JSON.stringify(session, null, 2));
         
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
         const planType = session.metadata?.planType;
         
         if (!userId) {
-          console.error('No user ID found in session:', session.id);
+          console.error(`${LOG_PREFIX.ERROR} No user ID found in session:`, session.id);
           return new Response(
             JSON.stringify({ error: 'No user ID found in session' }),
             { 
@@ -100,7 +134,7 @@ Deno.serve(async (req) => {
           );
         }
         
-        console.log(`Updating subscription for user ${userId} with plan ${planType}`);
+        console.log(`${LOG_PREFIX.INFO} Updating subscription for user ${userId} with plan ${planType}`);
         
         // Update user profile with subscription info
         const { error: updateError } = await supabase
@@ -115,17 +149,17 @@ Deno.serve(async (req) => {
           .eq('id', userId);
         
         if (updateError) {
-          console.error('Error updating profile:', updateError);
+          console.error(`${LOG_PREFIX.ERROR} Error updating profile:`, updateError);
           throw new Error(`Failed to update user profile: ${updateError.message}`);
         }
         
-        console.log(`Successfully updated subscription for user ${userId}`);
+        console.log(`${LOG_PREFIX.SUCCESS} Successfully updated subscription for user ${userId}`);
       } 
       else if (event.type === 'customer.subscription.deleted') {
         const subscription = event.data.object;
         
         // Log the entire subscription for debugging
-        console.log("Subscription deleted:", JSON.stringify(subscription, null, 2));
+        console.log(`${LOG_PREFIX.WEBHOOK} Subscription deleted:`, JSON.stringify(subscription, null, 2));
         
         // Find user with this subscription ID
         const { data: profiles, error: lookupError } = await supabase
@@ -135,7 +169,7 @@ Deno.serve(async (req) => {
           .limit(1);
           
         if (lookupError || !profiles || profiles.length === 0) {
-          console.error('Could not find user for subscription:', subscription.id);
+          console.error(`${LOG_PREFIX.ERROR} Could not find user for subscription:`, subscription.id);
           throw new Error(`User not found for subscription: ${subscription.id}`);
         }
         
@@ -152,14 +186,14 @@ Deno.serve(async (req) => {
           .eq('id', userId);
           
         if (updateError) {
-          console.error('Error updating subscription status:', updateError);
+          console.error(`${LOG_PREFIX.ERROR} Error updating subscription status:`, updateError);
           throw new Error(`Failed to update subscription status: ${updateError.message}`);
         }
         
-        console.log(`Successfully deactivated subscription for user ${userId}`);
+        console.log(`${LOG_PREFIX.SUCCESS} Successfully deactivated subscription for user ${userId}`);
       }
       else {
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`${LOG_PREFIX.WARNING} Unhandled event type: ${event.type}`);
       }
 
       // Return a successful response
@@ -172,7 +206,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // If not OPTIONS or POST, return method not allowed
+    // If not OPTIONS, GET or POST, return method not allowed
     return new Response(
       JSON.stringify({ error: `Method ${req.method} not allowed` }),
       { 
@@ -182,7 +216,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error(`${LOG_PREFIX.ERROR} Unexpected error:`, error);
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
