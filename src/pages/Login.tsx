@@ -4,15 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Mail, Lock, RefreshCw } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { clearAuthTokens } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,6 +33,9 @@ const Login = () => {
         description: "You have successfully logged in",
       });
       
+      // Clear any stale tokens from localStorage
+      localStorage.removeItem('supabase.auth.token');
+      
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -45,10 +46,6 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleClearTokens = () => {
-    clearAuthTokens();
   };
 
   return (
@@ -112,23 +109,11 @@ const Login = () => {
               </Button>
             </div>
 
-            <div className="flex flex-col space-y-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleClearTokens}
-                className="w-full flex items-center justify-center"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Clear Auth Tokens
-              </Button>
-              
-              <div className="text-center text-sm">
-                <span className="text-gray-600">Don't have an account? </span>
-                <Link to="/signup" className="font-medium text-primary hover:text-primary-hover">
-                  Sign up
-                </Link>
-              </div>
+            <div className="text-center text-sm">
+              <span className="text-gray-600">Don't have an account? </span>
+              <Link to="/signup" className="font-medium text-primary hover:text-primary-hover">
+                Sign up
+              </Link>
             </div>
           </form>
         </div>
