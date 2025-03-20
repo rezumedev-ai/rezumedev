@@ -3,23 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
+  FileText,
+  PlusCircle,
   Settings,
   HelpCircle,
   LogOut,
+  Menu,
   X,
-  CreditCard,
-  Badge,
-  Crown,
-  ShieldCheck,
-  Calendar,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  CreditCard as CreditCardIcon,
-  Sparkles,
-  ArrowUpCircle,
-  Gift,
-  Loader2
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -57,13 +48,12 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-// Helper function to format plan names
 const formatPlanName = (plan: string | null) => {
   if (!plan) return 'Free';
   return plan.charAt(0).toUpperCase() + plan.slice(1);
 };
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
   const location = useLocation();
@@ -651,3 +641,4 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     </>
   );
 }
+
