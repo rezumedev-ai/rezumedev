@@ -28,36 +28,43 @@ const LOG_PREFIX = {
 };
 
 Deno.serve(async (req) => {
-  const url = new URL(req.url);
-  console.log(`${LOG_PREFIX.INFO} Webhook received: ${req.method} ${url.pathname}`);
-  
-  // Health check endpoint for testing webhook connectivity
-  if (req.method === 'GET') {
-    console.log(`${LOG_PREFIX.INFO} Health check requested`);
-    return new Response(
-      JSON.stringify({ 
-        status: 'healthy', 
-        message: 'Stripe webhook endpoint is operational'
-      }),
-      { 
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
-  }
-  
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    console.log(`${LOG_PREFIX.INFO} CORS preflight request`);
-    return new Response(null, {
-      status: 204,
-      headers: corsHeaders
-    });
-  }
-
   try {
+    const url = new URL(req.url);
+    console.log(`${LOG_PREFIX.INFO} Webhook received: ${req.method} ${url.pathname}`);
+    
+    // Handle CORS preflight requests first
+    if (req.method === 'OPTIONS') {
+      console.log(`${LOG_PREFIX.INFO} CORS preflight request`);
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders
+      });
+    }
+    
+    // Health check endpoint for testing webhook connectivity
+    if (req.method === 'GET') {
+      console.log(`${LOG_PREFIX.INFO} Health check requested`);
+      return new Response(
+        JSON.stringify({ 
+          status: 'healthy', 
+          message: 'Stripe webhook endpoint is operational'
+        }),
+        { 
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     if (req.method === 'POST') {
       console.log(`${LOG_PREFIX.WEBHOOK} Processing webhook request`);
+      
+      // Log all request headers for debugging
+      const headersObj = {};
+      req.headers.forEach((value, key) => {
+        headersObj[key] = value;
+      });
+      console.log(`${LOG_PREFIX.INFO} Request headers:`, JSON.stringify(headersObj, null, 2));
       
       // Get the raw request body as text
       const body = await req.text();
