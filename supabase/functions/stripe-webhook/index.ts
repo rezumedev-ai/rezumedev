@@ -12,29 +12,16 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Define very permissive CORS headers
+// Define permissive CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-  'Access-Control-Allow-Headers': '*',
-  'Access-Control-Max-Age': '86400',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 };
 
 Deno.serve(async (req) => {
-  // Log every request
-  console.log("WEBHOOK REQUEST RECEIVED:");
-  console.log("Method:", req.method);
-  console.log("URL:", req.url);
-  
-  // Log all headers
-  console.log("Headers:");
-  for (const [key, value] of req.headers.entries()) {
-    console.log(`${key}: ${value}`);
-  }
-  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log("Responding to OPTIONS request");
     return new Response(null, {
       status: 204,
       headers: corsHeaders
@@ -43,23 +30,20 @@ Deno.serve(async (req) => {
 
   try {
     if (req.method === 'POST') {
-      console.log("Processing POST request");
+      console.log("Received webhook request");
       
       // Get the raw request body as text
       const body = await req.text();
-      console.log("Request body length:", body.length);
       
       // Get the stripe signature header
       const signature = req.headers.get('stripe-signature');
-      console.log("Stripe signature present:", !!signature);
       
       if (!signature) {
         console.error('Missing stripe-signature header');
-        // Still return 200 to avoid Stripe retries
         return new Response(
           JSON.stringify({ error: 'Missing stripe-signature header' }),
           { 
-            status: 200,
+            status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
@@ -71,7 +55,7 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({ error: 'Server configuration error: Missing webhook secret' }),
           { 
-            status: 200,
+            status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
@@ -88,7 +72,7 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
           { 
-            status: 200,
+            status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
@@ -188,24 +172,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    // For GET requests, return a simple success message
-    if (req.method === 'GET') {
-      console.log("Responding to GET request");
-      return new Response(
-        JSON.stringify({ status: "Webhook endpoint is working" }),
-        { 
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // If not OPTIONS, POST or GET, return method not allowed but with 200 status
-    console.log(`Method ${req.method} not supported but returning 200`);
+    // If not OPTIONS or POST, return method not allowed
     return new Response(
-      JSON.stringify({ error: `Method ${req.method} not allowed`, status: "ok" }),
+      JSON.stringify({ error: `Method ${req.method} not allowed` }),
       { 
-        status: 200,
+        status: 405,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
@@ -215,7 +186,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
-        status: 200, // Still return 200 to avoid Stripe retries
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );

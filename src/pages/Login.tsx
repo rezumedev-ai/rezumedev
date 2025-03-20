@@ -4,13 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Mail, Lock, RefreshCw } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,35 +45,6 @@ const Login = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const clearAuthTokens = () => {
-    setIsClearing(true);
-    try {
-      // Clear all supabase related items from localStorage
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('supabase.')) {
-          localStorage.removeItem(key);
-        }
-      });
-      
-      // Also try to sign out from supabase
-      supabase.auth.signOut();
-      
-      toast({
-        title: "Auth tokens cleared",
-        description: "All authentication tokens have been removed from local storage",
-      });
-    } catch (error) {
-      console.error('Error clearing tokens:', error);
-      toast({
-        variant: "destructive",
-        title: "Error clearing tokens",
-        description: error instanceof Error ? error.message : "Failed to clear tokens",
-      });
-    } finally {
-      setIsClearing(false);
     }
   };
 
@@ -136,19 +106,6 @@ const Login = () => {
             <div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
-            </div>
-
-            <div className="flex justify-center">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={clearAuthTokens} 
-                disabled={isClearing}
-                className="flex items-center gap-2 text-xs"
-              >
-                <RefreshCw className={`h-3 w-3 ${isClearing ? 'animate-spin' : ''}`} />
-                {isClearing ? "Clearing..." : "Clear Auth Tokens"}
               </Button>
             </div>
 
