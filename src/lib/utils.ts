@@ -1,5 +1,5 @@
 
-import { type ClassValue, clsx } from "clsx";
+import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -7,56 +7,27 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(dateString: string): string {
-  if (!dateString) return '';
-  
-  // Handle special cases like "Present" or "Current"
-  if (dateString === 'Present' || dateString === 'Current') {
-    return dateString;
-  }
-  
-  try {
-    const date = new Date(dateString);
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      // If not a valid date, return the original string
-      return dateString;
-    }
-    
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  } catch (error) {
-    // If there's an error parsing the date, return the original string
-    return dateString;
-  }
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
+// Function to check if a route is public
 export function isPublicRoute(path: string): boolean {
-  const publicRoutes = [
-    '/',
-    '/login',
-    '/signup',
-    '/about',
-    '/features',
-    '/pricing',
-    '/blog',
-    '/contact',
-    '/help',
-    '/guides',
-    '/terms',
-    '/privacy',
-    '/cookies',
-    '/careers',
-    '/payment-success'
+  const PUBLIC_ROUTES = [
+    '/', '/login', '/signup', '/features', '/pricing', '/blog', 
+    '/privacy', '/terms', '/cookies', '/about', '/contact', '/careers', '/guides',
+    // Explicitly add blog post routes as public
+    '/blog/'
   ];
   
-  // Check if the path exactly matches a public route
-  if (publicRoutes.includes(path)) {
-    return true;
-  }
-  
-  // Check for blog posts that have the pattern /blog/something
-  if (path.startsWith('/blog/')) {
-    return true;
-  }
-  
-  return false;
+  return PUBLIC_ROUTES.some(route => {
+    // For exact routes
+    if (path === route) return true;
+    
+    // For blog and other paths with subpages
+    if (route.endsWith('/') && path.startsWith(route)) return true;
+    
+    // For paths that start with a specific route
+    return path.startsWith(`${route}/`);
+  });
 }

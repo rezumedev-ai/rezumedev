@@ -2,7 +2,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle, CreditCard } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -47,13 +47,6 @@ const PaymentSuccess = () => {
               <Button asChild>
                 <Link to="/new-resume">
                   Create a Resume
-                </Link>
-              </Button>
-              
-              <Button asChild variant="secondary">
-                <Link to="/subscription">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Manage Subscription
                 </Link>
               </Button>
             </div>
