@@ -1,4 +1,3 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
@@ -192,7 +191,7 @@ Deno.serve(async (req) => {
         
         console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Updating subscription for user ${userId} with plan ${planType}`);
         
-        // Update user profile with subscription info
+        // Update user profile with subscription info - REMOVED subscription_mode field
         const { error: updateError } = await supabase
           .from('profiles')
           .update({
@@ -200,7 +199,6 @@ Deno.serve(async (req) => {
             subscription_status: 'active',
             subscription_id: session.subscription || session.id,
             payment_method: 'card',
-            subscription_mode: isLiveMode ? 'live' : 'test', // Store the mode
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
