@@ -20,4 +20,6 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Add this to ensure environment variables are properly loaded
+  envPrefix: "VITE_",
 }));
