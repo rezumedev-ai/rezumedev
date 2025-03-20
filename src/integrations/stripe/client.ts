@@ -21,5 +21,5 @@ export const getStripeInstance = async () => {
 console.log('🔵 INFO: Stripe publishable key availability:', 
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? 'Available' : 'Not available');
 
-// Set test mode flag to true to indicate we're using test keys
-export const STRIPE_TEST_MODE = true;
+// Set test mode flag to false since we're using a live key
+export const STRIPE_TEST_MODE = false;
