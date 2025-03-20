@@ -25,7 +25,6 @@ const LOG_PREFIX = {
   ERROR: "🔴 ERROR:",
   SUCCESS: "✅ SUCCESS:",
   WEBHOOK: "🪝 WEBHOOK:",
-  LIVE: "🔴 LIVE:",
 };
 
 Deno.serve(async (req) => {
@@ -87,18 +86,7 @@ Deno.serve(async (req) => {
 
       console.log(`${LOG_PREFIX.INFO} Signature found: ${signature.substring(0, 20)}...`);
 
-      // Determine which webhook secret to use - live or test
-      let webhookSecret;
-      const isLiveMode = req.headers.get('stripe-live-mode') === 'true' || url.pathname.includes('/live');
-      
-      if (isLiveMode) {
-        console.log(`${LOG_PREFIX.LIVE} Using LIVE webhook secret`);
-        webhookSecret = Deno.env.get('STRIPE_LIVE_WEBHOOK_SECRET');
-      } else {
-        console.log(`${LOG_PREFIX.INFO} Using TEST webhook secret`);
-        webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-      }
-      
+      const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
       if (!webhookSecret) {
         console.error(`${LOG_PREFIX.ERROR} Missing webhook secret in environment variables`);
         return new Response(
@@ -110,11 +98,11 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Verify the event - USING ASYNC METHOD
+      // Verify the event - USING ASYNC METHOD INSTEAD
       let event;
       try {
         console.log(`${LOG_PREFIX.INFO} Verifying webhook signature asynchronously...`);
-        // Use the async version
+        // Use the async version as suggested in the error message
         event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
         console.log(`${LOG_PREFIX.SUCCESS} Event verified successfully: ${event.type}`);
       } catch (err) {
@@ -126,11 +114,6 @@ Deno.serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
-      }
-
-      // Log live mode events with additional visibility
-      if (event.livemode) {
-        console.log(`${LOG_PREFIX.LIVE} Processing LIVE mode event: ${event.type}`);
       }
 
       // Handle the event based on its type
@@ -254,11 +237,7 @@ Deno.serve(async (req) => {
 
       // Return a successful response
       return new Response(
-        JSON.stringify({ 
-          received: true, 
-          event: event.type,
-          livemode: event.livemode
-        }),
+        JSON.stringify({ received: true, event: event.type }),
         { 
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }

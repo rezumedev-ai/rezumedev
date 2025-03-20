@@ -19,14 +19,6 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Log prefixes for better visibility
-const LOG_PREFIX = {
-  INFO: "🔵 INFO:",
-  ERROR: "🔴 ERROR:",
-  SUCCESS: "✅ SUCCESS:",
-  LIVE: "🔴 LIVE:",
-};
-
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -39,7 +31,7 @@ Deno.serve(async (req) => {
     try {
       requestBody = await req.json();
     } catch (e) {
-      console.error(`${LOG_PREFIX.ERROR} Error parsing request body:`, e);
+      console.error('Error parsing request body:', e);
       return new Response(
         JSON.stringify({ error: 'Invalid request body' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -47,7 +39,7 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { userId, mode = 'test' } = requestBody;
+    const { userId } = requestBody;
     
     if (!userId) {
       return new Response(
@@ -56,7 +48,7 @@ Deno.serve(async (req) => {
       );
     }
     
-    console.log(`${LOG_PREFIX.INFO} Reactivating subscription for user: ${userId} in ${mode.toUpperCase()} mode`);
+    console.log(`Reactivating subscription for user: ${userId}`);
     
     // Get the user's subscription information
     const { data: profile, error: profileError } = await supabase
@@ -66,7 +58,7 @@ Deno.serve(async (req) => {
       .single();
       
     if (profileError) {
-      console.error(`${LOG_PREFIX.ERROR} Error fetching profile:`, profileError);
+      console.error('Error fetching profile:', profileError);
       return new Response(
         JSON.stringify({ error: 'Error fetching user profile', details: profileError }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -76,25 +68,20 @@ Deno.serve(async (req) => {
     const subscriptionId = profile?.subscription_id;
     
     if (!subscriptionId) {
-      console.error(`${LOG_PREFIX.ERROR} No subscription ID found for user:`, userId);
+      console.error('No subscription ID found for user:', userId);
       return new Response(
         JSON.stringify({ error: 'No subscription found for this user' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     
-    console.log(`${LOG_PREFIX.INFO} Found subscription ID: ${subscriptionId}`);
-    
-    // Check if we're in live mode
-    if (mode === 'live') {
-      console.log(`${LOG_PREFIX.LIVE} Operating in LIVE mode for subscription: ${subscriptionId}`);
-    }
+    console.log(`Found subscription ID: ${subscriptionId}`);
     
     // Retrieve the subscription from Stripe
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     
     if (!subscription) {
-      console.error(`${LOG_PREFIX.ERROR} Subscription not found in Stripe:`, subscriptionId);
+      console.error('Subscription not found in Stripe:', subscriptionId);
       return new Response(
         JSON.stringify({ error: 'Subscription not found in payment provider' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -103,7 +90,7 @@ Deno.serve(async (req) => {
     
     // Check if the subscription is canceled
     if (subscription.status !== 'canceled' && subscription.cancel_at_period_end !== true) {
-      console.warn(`${LOG_PREFIX.INFO} Subscription is not canceled:`, subscriptionId);
+      console.warn('Subscription is not canceled:', subscriptionId);
       return new Response(
         JSON.stringify({ message: 'Subscription is already active' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -115,13 +102,13 @@ Deno.serve(async (req) => {
     
     if (subscription.cancel_at_period_end) {
       // If set to cancel at period end, just remove the cancellation
-      console.log(`${LOG_PREFIX.INFO} Removing cancellation at period end for subscription: ${subscriptionId}`);
+      console.log(`Removing cancellation at period end for subscription: ${subscriptionId}`);
       reactivatedSubscription = await stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: false,
       });
     } else {
       // If already canceled, create a new subscription with the same plan
-      console.log(`${LOG_PREFIX.INFO} Creating new subscription for user: ${userId}`);
+      console.log(`Creating new subscription for user: ${userId}`);
       
       // Get the customer ID from the canceled subscription
       const customerId = subscription.customer as string;
@@ -130,7 +117,7 @@ Deno.serve(async (req) => {
       const priceId = subscription.items.data[0]?.price.id;
       
       if (!priceId) {
-        console.error(`${LOG_PREFIX.ERROR} Could not determine price ID from canceled subscription`);
+        console.error('Could not determine price ID from canceled subscription');
         return new Response(
           JSON.stringify({ error: 'Could not determine subscription price' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -141,7 +128,7 @@ Deno.serve(async (req) => {
       reactivatedSubscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{ price: priceId }],
-        metadata: { userId, environment: mode },
+        metadata: { userId },
       });
     }
     
@@ -149,7 +136,7 @@ Deno.serve(async (req) => {
       throw new Error('Failed to reactivate subscription');
     }
     
-    console.log(`${LOG_PREFIX.SUCCESS} Successfully reactivated subscription: ${reactivatedSubscription.id}`);
+    console.log(`Successfully reactivated subscription: ${reactivatedSubscription.id}`);
     
     // Update the profile in Supabase
     const { error: updateError } = await supabase
@@ -162,7 +149,7 @@ Deno.serve(async (req) => {
       .eq('id', userId);
       
     if (updateError) {
-      console.error(`${LOG_PREFIX.ERROR} Error updating profile:`, updateError);
+      console.error('Error updating profile:', updateError);
       return new Response(
         JSON.stringify({ error: 'Error updating user profile', details: updateError }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -175,15 +162,14 @@ Deno.serve(async (req) => {
         message: 'Subscription reactivated successfully',
         subscription: { 
           id: reactivatedSubscription.id,
-          status: reactivatedSubscription.status,
-          liveMode: mode === 'live'
+          status: reactivatedSubscription.status
         }
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
     
   } catch (error) {
-    console.error(`${LOG_PREFIX.ERROR} Error reactivating subscription:`, error);
+    console.error('Error reactivating subscription:', error);
     
     return new Response(
       JSON.stringify({ 

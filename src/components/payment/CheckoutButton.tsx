@@ -17,10 +17,8 @@ interface CheckoutButtonProps {
   children: React.ReactNode;
 }
 
-// Stripe publishable key - updated to live mode key
-// When testing, use: pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi
-// For production, use: pk_live_YOUR_LIVE_KEY
-const STRIPE_PUBLISHABLE_KEY = "pk_live_51R0coQHK7YurnN3DwWFnCKyZnhk1MfgDuXp0lRnrEGV6FavGamoKIqPG1PEmXDY2S1bqqFkuW7S7H9bCIoePOsZA005xE2hpX4";
+// Stripe publishable key - safe to expose in client-side code
+const STRIPE_PUBLISHABLE_KEY = "pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi";
 
 export const CheckoutButton = ({
   planType,
@@ -64,7 +62,6 @@ export const CheckoutButton = ({
           userId: user.id,
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
-          mode: "live" // Add mode parameter to indicate live mode
         },
       });
 
