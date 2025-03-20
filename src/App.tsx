@@ -72,15 +72,13 @@ function App() {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           
           {/* Protected routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/new-resume" element={<NewResume />} />
-            <Route path="/resume-builder/:id" element={<ResumeBuilder />} />
-            <Route path="/resume-preview/:id" element={<ResumePreview />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/subscription" element={<Subscription />} />
-          </Route>
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/new-resume" element={<ProtectedRoute><NewResume /></ProtectedRoute>} />
+          <Route path="/resume-builder/:id" element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
+          <Route path="/resume-preview/:id" element={<ProtectedRoute><ResumePreview /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+          <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
           
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />
