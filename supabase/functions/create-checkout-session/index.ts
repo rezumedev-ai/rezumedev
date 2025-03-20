@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { planType, successUrl, cancelUrl, isTestMode = false } = requestBody;
+    const { planType, successUrl, cancelUrl, isTestMode = true } = requestBody;
     
     // Log the received request for debugging
     console.log('Request received:', { planType, successUrl, cancelUrl, isTestMode });
@@ -116,15 +116,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Use the appropriate Stripe key based on test mode
+    // Always use the test secret key that was just added
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+    console.log('Using Stripe secret key (first 8 chars):', stripeSecretKey.substring(0, 8) + '...');
     
     // Initialize Stripe with the selected key
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
     });
     
-    console.log('Using Stripe in', isTestMode ? 'TEST' : 'PRODUCTION', 'mode');
+    console.log('Using Stripe in TEST mode');
 
     // First, try to find an existing product for this plan type
     let productName;
@@ -156,7 +157,7 @@ Deno.serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: isTestMode ? `[TEST] ${productName}` : productName,
+              name: `[TEST] ${productName}`,
             },
             unit_amount: unitAmount,
             recurring: mode === 'subscription' ? {
@@ -173,7 +174,7 @@ Deno.serve(async (req) => {
         metadata: {
           userId: user.id,
           planType: planType,
-          isTestMode: isTestMode ? 'true' : 'false',
+          isTestMode: 'true',
         },
       };
       
@@ -181,7 +182,7 @@ Deno.serve(async (req) => {
       const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
-      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}, test mode: ${isTestMode}`);
+      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}, test mode: true`);
 
       // Return the session ID and URL to the client
       return new Response(

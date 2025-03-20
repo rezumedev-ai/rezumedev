@@ -3,7 +3,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
 // Initialize Stripe with the secret key from environment variable
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+console.log('Using Stripe secret key (first 8 chars):', stripeSecretKey.substring(0, 8) + '...');
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 });
 
