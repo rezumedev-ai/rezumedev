@@ -255,11 +255,11 @@ export function DownloadOptionsDialog({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <Button 
-          variant="primary" 
+          variant="default" 
           size="sm"
           onClick={() => setOpen(true)}
           disabled={isDownloading}
-          className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary-hover text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
+          className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary/90 text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
         >
           <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span>{isDownloading ? "Preparing..." : "Download"}</span>
