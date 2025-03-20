@@ -4,13 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Mail, Lock, RefreshCw } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,34 +45,6 @@ const Login = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const clearAuthTokens = () => {
-    setIsClearing(true);
-    try {
-      // Clear any data that might be causing auth issues
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Clear cookies
-      document.cookie.split(";").forEach(function(c) {
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
-      
-      toast({
-        title: "Auth data cleared",
-        description: "All authentication data has been cleared from your browser",
-      });
-    } catch (error) {
-      console.error('Error clearing auth data:', error);
-      toast({
-        variant: "destructive",
-        title: "Error clearing auth data",
-        description: error instanceof Error ? error.message : "An error occurred",
-      });
-    } finally {
-      setIsClearing(false);
     }
   };
 
@@ -138,32 +109,7 @@ const Login = () => {
               </Button>
             </div>
 
-            <div className="text-center">
-              <Button 
-                type="button" 
-                variant="outline"
-                className="w-full mt-2"
-                onClick={clearAuthTokens}
-                disabled={isClearing}
-              >
-                {isClearing ? (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Clearing...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Clear Auth Tokens
-                  </>
-                )}
-              </Button>
-              <p className="mt-2 text-xs text-gray-500">
-                Try this if you're experiencing authentication issues
-              </p>
-            </div>
-
-            <div className="text-center text-sm mt-4">
+            <div className="text-center text-sm">
               <span className="text-gray-600">Don't have an account? </span>
               <Link to="/signup" className="font-medium text-primary hover:text-primary-hover">
                 Sign up

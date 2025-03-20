@@ -12,21 +12,16 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Define extremely permissive CORS headers
+// Define permissive CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
-  'Access-Control-Allow-Headers': '*',
-  'Access-Control-Max-Age': '86400',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 };
 
 Deno.serve(async (req) => {
-  console.log("Webhook request received:", req.method, req.url);
-  console.log("Headers:", JSON.stringify(Object.fromEntries([...req.headers]), null, 2));
-  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log("Responding to OPTIONS request with CORS headers");
     return new Response(null, {
       status: 204,
       headers: corsHeaders
@@ -34,99 +29,48 @@ Deno.serve(async (req) => {
   }
 
   try {
-    if (req.method === 'GET') {
-      console.log("Received GET request - responding with success for testing");
-      return new Response(
-        JSON.stringify({ success: true, message: "Webhook endpoint reachable" }),
-        { 
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-    
     if (req.method === 'POST') {
-      console.log("Processing POST webhook request");
+      console.log("Received webhook request");
       
       // Get the raw request body as text
       const body = await req.text();
-      console.log("Request body:", body.substring(0, 500) + (body.length > 500 ? "..." : ""));
       
       // Get the stripe signature header
       const signature = req.headers.get('stripe-signature');
-      console.log("Stripe signature present:", !!signature);
       
-      let event;
-      
-      // Try verification if signature is present
-      if (signature) {
-        const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-        console.log("Webhook secret present:", !!webhookSecret);
-        
-        if (webhookSecret) {
-          try {
-            console.log("Verifying webhook signature...");
-            event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-            console.log("Event verified successfully:", event.type);
-          } catch (err) {
-            console.error(`Webhook signature verification failed: ${err.message}`);
-            
-            // Instead of returning an error, try to parse the body as JSON
-            console.log("Attempting to parse raw body as JSON");
-            try {
-              event = JSON.parse(body);
-              console.log("Successfully parsed body as JSON:", event.type);
-            } catch (parseErr) {
-              console.error("Failed to parse body as JSON:", parseErr.message);
-              return new Response(
-                JSON.stringify({ error: `Invalid payload: ${parseErr.message}` }),
-                { 
-                  status: 400,
-                  headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-                }
-              );
-            }
-          }
-        } else {
-          // No webhook secret, try to parse the body as JSON
-          console.log("No webhook secret found - attempting to parse raw body as JSON");
-          try {
-            event = JSON.parse(body);
-            console.log("Successfully parsed body as JSON without verification");
-          } catch (parseErr) {
-            console.error("Failed to parse body as JSON:", parseErr.message);
-            return new Response(
-              JSON.stringify({ error: `Invalid payload: ${parseErr.message}` }),
-              { 
-                status: 400,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-              }
-            );
-          }
-        }
-      } else {
-        // No signature, try to parse the body as JSON
-        console.log("No signature found - attempting to parse raw body as JSON");
-        try {
-          event = JSON.parse(body);
-          console.log("Successfully parsed body as JSON without signature");
-        } catch (parseErr) {
-          console.error("Failed to parse body as JSON:", parseErr.message);
-          return new Response(
-            JSON.stringify({ error: `Invalid payload: ${parseErr.message}` }),
-            { 
-              status: 400,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
-        }
-      }
-      
-      // Ensure we have an event to process
-      if (!event) {
-        console.error("No event could be constructed from the request");
+      if (!signature) {
+        console.error('Missing stripe-signature header');
         return new Response(
-          JSON.stringify({ error: "Failed to construct event from request" }),
+          JSON.stringify({ error: 'Missing stripe-signature header' }),
+          { 
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
+      const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+      if (!webhookSecret) {
+        console.error('Missing webhook secret in environment variables');
+        return new Response(
+          JSON.stringify({ error: 'Server configuration error: Missing webhook secret' }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
+      // Verify the event
+      let event;
+      try {
+        console.log("Verifying webhook signature...");
+        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+        console.log(`Event verified successfully: ${event.type}`);
+      } catch (err) {
+        console.error(`Webhook signature verification failed: ${err.message}`);
+        return new Response(
+          JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
           { 
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -135,7 +79,6 @@ Deno.serve(async (req) => {
       }
 
       // Handle the event based on its type
-      console.log("Processing event type:", event.type);
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         
@@ -229,8 +172,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // If not OPTIONS, GET or POST, return method not allowed
-    console.log(`Method not allowed: ${req.method}`);
+    // If not OPTIONS or POST, return method not allowed
     return new Response(
       JSON.stringify({ error: `Method ${req.method} not allowed` }),
       { 
@@ -242,7 +184,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message, stack: error.stack }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
