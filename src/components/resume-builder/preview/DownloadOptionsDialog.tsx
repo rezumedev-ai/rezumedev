@@ -141,10 +141,12 @@ export function DownloadOptionsDialog({
           const head = clonedDocument.head;
           
           fontLinks.forEach(link => {
-            if (link.href.includes('fonts.googleapis.com') || link.href.includes('fonts')) {
+            // Fixed TypeScript error by properly casting to HTMLLinkElement
+            const linkEl = link as HTMLLinkElement;
+            if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
               const newLink = clonedDocument.createElement('link');
               newLink.rel = 'stylesheet';
-              newLink.href = link.href;
+              newLink.href = linkEl.href;
               head.appendChild(newLink);
             }
           });

@@ -30,4 +30,42 @@ export function formatDate(dateString: string): string {
   }
 }
 
+// Public routes that don't require authentication
+const PUBLIC_ROUTES = [
+  "/",
+  "/login",
+  "/signup",
+  "/pricing",
+  "/about",
+  "/features",
+  "/contact",
+  "/privacy",
+  "/terms",
+  "/cookies",
+  "/help",
+  "/blog",
+  "/guides",
+  "/careers"
+];
+
+// Checks if a route is public and doesn't require authentication
+export function isPublicRoute(path: string): boolean {
+  // Exact match for defined public routes
+  if (PUBLIC_ROUTES.includes(path)) {
+    return true;
+  }
+  
+  // Check for blog post routes
+  if (path.startsWith("/blog/")) {
+    return true;
+  }
+  
+  // Check for guide routes
+  if (path.startsWith("/guides/")) {
+    return true;
+  }
+  
+  return false;
+}
+
 // Add any other utility functions here
