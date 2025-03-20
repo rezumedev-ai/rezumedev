@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -17,15 +17,6 @@ interface CheckoutButtonProps {
   children: React.ReactNode;
 }
 
-// Environment detection - determines if we're in production or development
-const isProduction = window.location.hostname !== "localhost" && 
-                    !window.location.hostname.includes("127.0.0.1") &&
-                    !window.location.hostname.includes(".netlify.app");
-
-// Stripe publishable keys - safe to expose in client-side code
-const STRIPE_TEST_PUBLISHABLE_KEY = "pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi";
-const STRIPE_LIVE_PUBLISHABLE_KEY = "pk_live_51R0coQHK7YurnN3DQgm2RmqaJSXZs7bllvHjZyEGpGXaISvABbT59vNxwZ8fqwYe6VHsj5Eoe7lm1G3cq9ZsJ9I100RcqmMbkH";
-
 export const CheckoutButton = ({
   planType,
   disabled = false,
@@ -34,7 +25,7 @@ export const CheckoutButton = ({
   children
 }: CheckoutButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { user, getAuthToken } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleCheckout = async () => {
@@ -50,14 +41,6 @@ export const CheckoutButton = ({
     toast.info("Preparing checkout...");
 
     try {
-      // Get the current session for authentication
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.error("Authentication error:", sessionError || "No session found");
-        throw new Error("Authentication error. Please try logging in again.");
-      }
-      
       // Get current timestamp for caching prevention
       const timestamp = new Date().getTime();
       
@@ -68,7 +51,6 @@ export const CheckoutButton = ({
           userId: user.id,
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
-          mode: isProduction ? "live" : "test" // Pass the mode to the edge function
         },
       });
 
