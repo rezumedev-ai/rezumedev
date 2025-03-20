@@ -19,6 +19,14 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+// Log prefixes for better visibility
+const LOG_PREFIX = {
+  INFO: "🔵 INFO:",
+  ERROR: "🔴 ERROR:",
+  SUCCESS: "✅ SUCCESS:",
+  CHECKOUT: "🛒 CHECKOUT:",
+};
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -31,7 +39,7 @@ Deno.serve(async (req) => {
     try {
       requestBody = await req.json();
     } catch (e) {
-      console.error('Error parsing request body:', e);
+      console.error(`${LOG_PREFIX.ERROR} Error parsing request body:`, e);
       return new Response(
         JSON.stringify({ error: 'Invalid request body' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -39,14 +47,14 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { planType, userId, successUrl, cancelUrl } = requestBody;
+    const { planType, userId, successUrl, cancelUrl, mode = 'test' } = requestBody;
     
     // Log the received request for debugging
-    console.log('Request received:', { planType, userId, successUrl, cancelUrl });
+    console.log(`${LOG_PREFIX.INFO} Request received:`, { planType, userId, successUrl, cancelUrl, mode });
     
     // Validate request data
     if (!planType || !userId) {
-      console.error('Missing required fields:', { planType, userId });
+      console.error(`${LOG_PREFIX.ERROR} Missing required fields:`, { planType, userId });
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -55,12 +63,15 @@ Deno.serve(async (req) => {
     
     // Validate plan type
     if (!['monthly', 'yearly', 'lifetime'].includes(planType)) {
-      console.error('Invalid plan type:', planType);
+      console.error(`${LOG_PREFIX.ERROR} Invalid plan type:`, planType);
       return new Response(
         JSON.stringify({ error: 'Invalid plan type' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Log mode being used
+    console.log(`${LOG_PREFIX.INFO} Operating in ${mode.toUpperCase()} mode`);
 
     // Verify user exists
     const { data: userData, error: userError } = await supabase
@@ -70,7 +81,7 @@ Deno.serve(async (req) => {
       .single();
       
     if (userError || !userData) {
-      console.error('User not found:', userError || userId);
+      console.error(`${LOG_PREFIX.ERROR} User not found:`, userError || userId);
       return new Response(
         JSON.stringify({ error: 'User not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -97,8 +108,8 @@ Deno.serve(async (req) => {
     }
     
     // Determine checkout mode based on plan type
-    const mode = planType === 'lifetime' ? 'payment' : 'subscription';
-    console.log('Checkout mode:', mode);
+    const checkoutMode = planType === 'lifetime' ? 'payment' : 'subscription';
+    console.log(`${LOG_PREFIX.INFO} Checkout mode:`, checkoutMode);
     
     try {
       // Create a checkout session with dynamic product data
@@ -111,13 +122,13 @@ Deno.serve(async (req) => {
               name: productName,
             },
             unit_amount: unitAmount,
-            recurring: mode === 'subscription' ? {
+            recurring: checkoutMode === 'subscription' ? {
               interval: planType === 'monthly' ? 'month' : 'year',
             } : undefined,
           },
           quantity: 1,
         }],
-        mode: mode,
+        mode: checkoutMode,
         success_url: successUrl || `${Deno.env.get('PUBLIC_SITE_URL') || 'https://rezume.dev'}/payment-success`,
         cancel_url: cancelUrl || `${Deno.env.get('PUBLIC_SITE_URL') || 'https://rezume.dev'}/pricing`,
         client_reference_id: userId,
@@ -125,23 +136,28 @@ Deno.serve(async (req) => {
         metadata: {
           userId: userId,
           planType: planType,
+          environment: mode,
         },
       };
       
-      console.log('Creating checkout session with data:', JSON.stringify(sessionData, null, 2));
+      console.log(`${LOG_PREFIX.CHECKOUT} Creating checkout session with data:`, JSON.stringify(sessionData, null, 2));
       const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
-      console.log(`Checkout session created: ${session.id} for user: ${userId}, plan: ${planType}`);
+      console.log(`${LOG_PREFIX.SUCCESS} Checkout session created: ${session.id} for user: ${userId}, plan: ${planType}, mode: ${mode}`);
 
       // Return the session ID and URL to the client
       return new Response(
-        JSON.stringify({ sessionId: session.id, url: session.url }),
+        JSON.stringify({ 
+          sessionId: session.id, 
+          url: session.url,
+          liveMode: mode === 'live'
+        }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (stripeError) {
       // Handle Stripe-specific errors
-      console.error('Stripe error:', stripeError);
+      console.error(`${LOG_PREFIX.ERROR} Stripe error:`, stripeError);
       
       return new Response(
         JSON.stringify({ 
@@ -155,7 +171,7 @@ Deno.serve(async (req) => {
     }
   } catch (error) {
     // Log the general error
-    console.error('General error in function:', error);
+    console.error(`${LOG_PREFIX.ERROR} General error in function:`, error);
     
     // Return error response with additional details
     return new Response(
