@@ -107,6 +107,7 @@ export const CheckoutButton = ({
           userId: user.id, // Explicitly include user ID in the request
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
+          isTestMode: true // Add this flag to indicate test mode
         },
       });
 

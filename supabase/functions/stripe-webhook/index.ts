@@ -153,6 +153,7 @@ Deno.serve(async (req) => {
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
         const planType = session.metadata?.planType;
+        const isTestMode = session.metadata?.isTestMode === 'true';
         
         if (!userId) {
           console.error(`${LOG_PREFIX.ERROR} No user ID found in session:`, session.id);
@@ -165,7 +166,7 @@ Deno.serve(async (req) => {
           );
         }
         
-        console.log(`${LOG_PREFIX.INFO} Updating subscription for user ${userId} with plan ${planType}`);
+        console.log(`${LOG_PREFIX.INFO} Updating subscription for user ${userId} with plan ${planType} (Test mode: ${isTestMode})`);
         
         // Update user profile with subscription info
         const { error: updateError } = await supabase
@@ -175,6 +176,7 @@ Deno.serve(async (req) => {
             subscription_status: 'active',
             subscription_id: session.subscription || session.id,
             payment_method: 'card',
+            is_test_subscription: isTestMode,
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
@@ -212,6 +214,7 @@ Deno.serve(async (req) => {
           .update({
             subscription_status: 'inactive',
             subscription_plan: null,
+            is_test_subscription: false,
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
