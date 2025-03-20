@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
@@ -32,63 +33,68 @@ import Subscription from './pages/Subscription';
 
 // Import custom components
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
-  const { isLoggedIn, loading } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   useEffect(() => {
     // Redirect to onboarding if it's the first load and user is logged in
-    if (isLoggedIn && isFirstLoad && location.pathname !== '/onboarding') {
+    if (user && isFirstLoad && location.pathname !== '/onboarding') {
       navigate('/onboarding');
       setIsFirstLoad(false); // Prevent further redirects
     }
-  }, [isLoggedIn, isFirstLoad, location.pathname, navigate]);
+  }, [user, isFirstLoad, location.pathname, navigate]);
 
   return (
     <div className="app">
-      <AuthContext.Provider value={useAuth()}>
-        <div className="app-wrapper">
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/features" element={<Features />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/guides" element={<Guides />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/cookies" element={<Cookies />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-            
-            {/* Protected routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/new-resume" element={<NewResume />} />
-              <Route path="/resume-builder/:id" element={<ResumeBuilder />} />
-              <Route path="/resume-preview/:id" element={<ResumePreview />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/subscription" element={<Subscription />} />
-            </Route>
-            
-            {/* 404 route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </AuthContext.Provider>
+      <div className="app-wrapper">
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/guides" element={<Guides />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/cookies" element={<Cookies />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/new-resume" element={<NewResume />} />
+            <Route path="/resume-builder/:id" element={<ResumeBuilder />} />
+            <Route path="/resume-preview/:id" element={<ResumePreview />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/subscription" element={<Subscription />} />
+          </Route>
+          
+          {/* 404 route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
       <Toaster richColors closeButton />
     </div>
   );
 }
 
-export default App;
+const AppWithAuth = () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);
+
+export default AppWithAuth;

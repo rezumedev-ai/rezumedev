@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,22 @@ import { STRIPE_TEST_MODE } from "@/integrations/stripe/client";
 import { motion } from "framer-motion";
 
 export type SubscriptionStatus = "active" | "canceled" | "inactive" | null;
+
+interface ExtendedProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  created_at: string;
+  updated_at: string;
+  email_notifications: boolean;
+  desktop_notifications: boolean;
+  resume_preferences: any;
+  subscription_id: string;
+  subscription_status: string;
+  subscription_plan: string;
+  payment_method: string;
+  is_test_subscription?: boolean;
+}
 
 export const SubscriptionManager = () => {
   const { user } = useAuth();
@@ -48,7 +63,7 @@ export const SubscriptionManager = () => {
   const hasSubscription = !!profile.subscription_id;
   const subscriptionStatus = profile.subscription_status as SubscriptionStatus || "inactive";
   const planType = profile.subscription_plan;
-  const isTestSubscription = profile.is_test_subscription;
+  const isTestSubscription = (profile as ExtendedProfile).is_test_subscription || false;
 
   const getPlanLabel = (plan: string | null) => {
     if (!plan) return "None";

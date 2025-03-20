@@ -10,7 +10,16 @@ import {
   LogOut,
   Menu,
   X,
-  CreditCard
+  CreditCard,
+  Crown,
+  Gift,
+  Sparkles,
+  Calendar,
+  Clock,
+  CreditCard as CreditCardIcon,
+  CheckCircle2,
+  ArrowUpCircle,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -641,4 +650,3 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     </>
   );
 }
-
