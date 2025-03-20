@@ -3,9 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
 // Initialize Stripe with the secret key from environment variable
-const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
-console.log('Using Stripe secret key (first 8 chars):', stripeSecretKey.substring(0, 8) + '...');
-const stripe = new Stripe(stripeSecretKey, {
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
 });
 
@@ -155,7 +153,6 @@ Deno.serve(async (req) => {
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
         const planType = session.metadata?.planType;
-        const isTestMode = session.metadata?.isTestMode === 'true';
         
         if (!userId) {
           console.error(`${LOG_PREFIX.ERROR} No user ID found in session:`, session.id);
@@ -168,7 +165,7 @@ Deno.serve(async (req) => {
           );
         }
         
-        console.log(`${LOG_PREFIX.INFO} Updating subscription for user ${userId} with plan ${planType} (Test mode: ${isTestMode})`);
+        console.log(`${LOG_PREFIX.INFO} Updating subscription for user ${userId} with plan ${planType}`);
         
         // Update user profile with subscription info
         const { error: updateError } = await supabase
@@ -178,7 +175,6 @@ Deno.serve(async (req) => {
             subscription_status: 'active',
             subscription_id: session.subscription || session.id,
             payment_method: 'card',
-            is_test_subscription: isTestMode,
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
@@ -216,7 +212,6 @@ Deno.serve(async (req) => {
           .update({
             subscription_status: 'inactive',
             subscription_plan: null,
-            is_test_subscription: false,
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);

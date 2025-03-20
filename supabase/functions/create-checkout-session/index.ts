@@ -8,6 +8,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Initialize Stripe with the secret key from environment variable
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2023-10-16',
+});
+
 // Initialize Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
@@ -17,7 +23,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 function validateEnvironment() {
   const issues = [];
   
-  if (!Deno.env.get('STRIPE_SECRET_KEY')) {
+  if (!stripeSecretKey) {
     issues.push("STRIPE_SECRET_KEY is not set");
   }
   
@@ -65,10 +71,10 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { planType, successUrl, cancelUrl, isTestMode = true } = requestBody;
+    const { planType, successUrl, cancelUrl } = requestBody;
     
     // Log the received request for debugging
-    console.log('Request received:', { planType, successUrl, cancelUrl, isTestMode });
+    console.log('Request received:', { planType, successUrl, cancelUrl });
     
     // Get the JWT token from authorization header
     const authHeader = req.headers.get('Authorization');
@@ -116,17 +122,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Always use the test secret key
-    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
-    console.log('Using Stripe secret key (first 8 chars):', stripeSecretKey.substring(0, 8) + '...');
-    
-    // Initialize Stripe with the selected key
-    const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2023-10-16',
-    });
-    
-    console.log('Using Stripe in TEST mode');
-
     // First, try to find an existing product for this plan type
     let productName;
     let unitAmount;
@@ -157,7 +152,7 @@ Deno.serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `[TEST] ${productName}`,
+              name: productName,
             },
             unit_amount: unitAmount,
             recurring: mode === 'subscription' ? {
@@ -174,7 +169,6 @@ Deno.serve(async (req) => {
         metadata: {
           userId: user.id,
           planType: planType,
-          isTestMode: 'true',
         },
       };
       
@@ -182,7 +176,7 @@ Deno.serve(async (req) => {
       const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
-      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}, test mode: true`);
+      console.log(`Checkout session created: ${session.id} for user: ${user.id}, plan: ${planType}`);
 
       // Return the session ID and URL to the client
       return new Response(

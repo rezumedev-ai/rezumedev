@@ -5,8 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, AlertCircle } from "lucide-react";
-import { STRIPE_TEST_MODE } from "@/integrations/stripe/client";
+import { Loader2 } from "lucide-react";
 
 export type PlanType = "monthly" | "yearly" | "lifetime";
 
@@ -108,7 +107,6 @@ export const CheckoutButton = ({
           userId: user.id, // Explicitly include user ID in the request
           successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
           cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
-          isTestMode: true // Always use test mode with the test keys
         },
       });
 
@@ -167,15 +165,7 @@ export const CheckoutButton = ({
           <Loader2 className="h-4 w-4 animate-spin" />
         </div>
       ) : (
-        <>
-          {STRIPE_TEST_MODE && (
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 px-2 py-0.5 rounded-md text-xs font-medium text-white flex items-center gap-1">
-              <AlertCircle className="h-3 w-3" />
-              Test Mode
-            </div>
-          )}
-          {children}
-        </>
+        children
       )}
     </Button>
   );
