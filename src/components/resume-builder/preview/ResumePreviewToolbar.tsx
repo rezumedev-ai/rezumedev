@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Edit, LayoutTemplate, Save, Lock } from "lucide-react";
+import { ArrowLeft, Edit, LayoutTemplate, Save, Lock } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { TemplateSelectionGrid } from "./TemplateSelectionGrid";
@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { DownloadOptionsDialog } from "./DownloadOptionsDialog";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -39,7 +40,6 @@ export function ResumePreviewToolbar({
   const { user } = useAuth();
   const navigate = useNavigate();
   
-  // Fetch user profile to check subscription status
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
@@ -63,7 +63,6 @@ export function ResumePreviewToolbar({
     profile.subscription_plan && 
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
-  // Now we'll transfer the download functionality to the DownloadOptionsDialog component
   const handleTemplateChange = (templateId: string) => {
     onTemplateChange(templateId);
     setIsDialogOpen(false);
@@ -148,12 +147,10 @@ export function ResumePreviewToolbar({
             </Dialog>
           )}
           
-          {/* Use the DownloadOptionsDialog component here */}
           <DownloadOptionsDialog isDownloading={isDownloading} />
         </div>
       </div>
 
-      {/* Subscription Required Dialog */}
       <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -188,18 +185,5 @@ export function ResumePreviewToolbar({
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-function DownloadOptionsDialog({ isDownloading }: { isDownloading: boolean }) {
-  return (
-    <Button 
-      onClick={() => {}}
-      disabled={isDownloading}
-      className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary-hover text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
-    >
-      <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-      <span>{isDownloading ? "Preparing..." : "Download"}</span>
-    </Button>
   );
 }
