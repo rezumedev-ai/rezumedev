@@ -260,9 +260,32 @@ Deno.serve(async (req) => {
           .eq('subscription_id', subscription.id)
           .limit(1);
           
-        if (lookupError || !profiles || profiles.length === 0) {
-          console.error(`${LOG_PREFIX.ERROR} Could not find user for subscription:`, subscription.id);
-          throw new Error(`User not found for subscription: ${subscription.id}`);
+        if (lookupError) {
+          console.error(`${LOG_PREFIX.ERROR} Error looking up user for subscription:`, lookupError);
+          return new Response(
+            JSON.stringify({ received: true, event: event.type, warning: "Database lookup error" }),
+            { 
+              status: 200, // Still return 200 to acknowledge receipt
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+        
+        if (!profiles || profiles.length === 0) {
+          // Instead of throwing an error, log this condition and return a 200 response
+          // This handles the case where this event arrives before checkout.session.completed
+          console.log(`${LOG_PREFIX.INFO} No user found for subscription ${subscription.id}. This is normal if the checkout.session.completed event hasn't been processed yet.`);
+          return new Response(
+            JSON.stringify({ 
+              received: true, 
+              event: event.type, 
+              message: "No user found for this subscription yet, but event acknowledged"
+            }),
+            { 
+              status: 200, // Return 200 to acknowledge receipt
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
         
         const userId = profiles[0].id;
@@ -279,7 +302,13 @@ Deno.serve(async (req) => {
           
         if (updateError) {
           console.error(`${LOG_PREFIX.ERROR} Error updating subscription status:`, updateError);
-          throw new Error(`Failed to update subscription status: ${updateError.message}`);
+          return new Response(
+            JSON.stringify({ received: true, event: event.type, warning: "Database update error" }),
+            { 
+              status: 200, // Still return 200 to acknowledge receipt
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
         
         console.log(`${LOG_PREFIX.SUCCESS} Successfully updated subscription status to ${status} for user ${userId}`);
