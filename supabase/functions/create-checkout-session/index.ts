@@ -33,29 +33,26 @@ Deno.serve(async (req) => {
     }
 
     // Extract parameters from request body
-    const { planType, userId, successUrl, cancelUrl, mode = 'test' } = requestBody;
+    const { planType, userId, successUrl, cancelUrl } = requestBody;
     
-    // Determine which Stripe key to use based on mode
-    const isLiveMode = mode === 'live';
-    const stripeSecretKey = isLiveMode 
-      ? Deno.env.get('STRIPE_LIVE_SECRET_KEY') || ''
-      : Deno.env.get('STRIPE_SECRET_KEY') || '';
+    // Get the Stripe secret key
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
     
     if (!stripeSecretKey) {
-      console.error(`Missing Stripe ${isLiveMode ? 'live' : 'test'} secret key`);
+      console.error(`Missing Stripe secret key`);
       return new Response(
-        JSON.stringify({ error: `Stripe ${isLiveMode ? 'live' : 'test'} secret key not configured` }),
+        JSON.stringify({ error: `Stripe secret key not configured` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     
-    // Initialize Stripe with the appropriate secret key
+    // Initialize Stripe
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
     });
     
     // Log the received request for debugging
-    console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Request received:`, { planType, userId, successUrl, cancelUrl });
+    console.log(`Request received:`, { planType, userId, successUrl, cancelUrl });
     
     // Validate request data
     if (!planType || !userId) {
@@ -111,7 +108,7 @@ Deno.serve(async (req) => {
     
     // Determine checkout mode based on plan type
     const checkoutMode = planType === 'lifetime' ? 'payment' : 'subscription';
-    console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Checkout mode:`, checkoutMode);
+    console.log(`Checkout mode:`, checkoutMode);
     
     try {
       // Create a checkout session with dynamic product data
@@ -138,15 +135,14 @@ Deno.serve(async (req) => {
         metadata: {
           userId: userId,
           planType: planType,
-          mode: isLiveMode ? 'live' : 'test',
         },
       };
       
-      console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Creating checkout session with data:`, JSON.stringify(sessionData, null, 2));
+      console.log(`Creating checkout session with data:`, JSON.stringify(sessionData, null, 2));
       const session = await stripe.checkout.sessions.create(sessionData);
 
       // Log the session creation
-      console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Checkout session created: ${session.id} for user: ${userId}, plan: ${planType}`);
+      console.log(`Checkout session created: ${session.id} for user: ${userId}, plan: ${planType}`);
 
       // Return the session ID and URL to the client
       return new Response(
@@ -155,7 +151,7 @@ Deno.serve(async (req) => {
       );
     } catch (stripeError) {
       // Handle Stripe-specific errors
-      console.error(`[${isLiveMode ? 'LIVE' : 'TEST'}] Stripe error:`, stripeError);
+      console.error(`Stripe error:`, stripeError);
       
       return new Response(
         JSON.stringify({ 

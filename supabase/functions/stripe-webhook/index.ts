@@ -56,13 +56,6 @@ Deno.serve(async (req) => {
     if (req.method === 'POST') {
       console.log(`${LOG_PREFIX.WEBHOOK} Processing webhook request`);
       
-      // Log all request headers for debugging
-      const headersObj = {};
-      req.headers.forEach((value, key) => {
-        headersObj[key] = value;
-      });
-      console.log(`${LOG_PREFIX.INFO} Request headers:`, JSON.stringify(headersObj, null, 2));
-      
       // Get the raw request body as text
       const body = await req.text();
       console.log(`${LOG_PREFIX.INFO} Request body length: ${body.length} characters`);
@@ -83,78 +76,46 @@ Deno.serve(async (req) => {
 
       console.log(`${LOG_PREFIX.INFO} Signature found: ${signature.substring(0, 20)}...`);
 
-      // First try to parse the event body to check if it's livemode
+      // Check if this is a live mode webhook
       let rawEvent;
       try {
         rawEvent = JSON.parse(body);
-        console.log(`${LOG_PREFIX.INFO} Raw event livemode:`, rawEvent.livemode);
+        console.log(`${LOG_PREFIX.INFO} Event mode:`, rawEvent.livemode ? 'LIVE' : 'TEST');
       } catch (parseErr) {
-        console.error(`${LOG_PREFIX.ERROR} Failed to parse event JSON for livemode check:`, parseErr);
-        rawEvent = { livemode: false }; // Default to test mode if we can't parse
+        console.error(`${LOG_PREFIX.ERROR} Failed to parse event JSON:`, parseErr);
+        rawEvent = { livemode: false }; // Default if we can't parse
       }
       
-      // Determine if this is a live mode webhook based on the event data
-      const isLiveMode = rawEvent.livemode === true;
-      console.log(`${LOG_PREFIX.INFO} Event is in ${isLiveMode ? 'LIVE' : 'TEST'} mode based on event data`);
+      // Get the appropriate webhook secret and Stripe key
+      const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
+      const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
       
-      // Select the appropriate webhook secret based on mode
-      const webhookSecret = isLiveMode 
-        ? Deno.env.get('STRIPE_LIVE_WEBHOOK_SECRET')
-        : Deno.env.get('STRIPE_WEBHOOK_SECRET');
-      
-      if (!webhookSecret) {
-        console.error(`${LOG_PREFIX.ERROR} Missing ${isLiveMode ? 'live' : 'test'} webhook secret in environment variables`);
+      if (!webhookSecret || !stripeSecretKey) {
+        console.error(`${LOG_PREFIX.ERROR} Missing webhook secret or Stripe secret key`);
         return new Response(
-          JSON.stringify({ error: `Server configuration error: Missing ${isLiveMode ? 'live' : 'test'} webhook secret` }),
+          JSON.stringify({ error: 'Server configuration error: Missing webhook secret or Stripe secret key' }),
           { 
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
       }
-      
-      // Log the webhook secret being used (first few characters for debugging only)
-      const secretPrefix = webhookSecret.substring(0, 10);
-      console.log(`${LOG_PREFIX.INFO} Using webhook secret: ${secretPrefix}... for ${isLiveMode ? 'LIVE' : 'TEST'} mode`);
-      
-      // Get the appropriate Stripe secret key based on mode
-      const stripeSecretKey = isLiveMode
-        ? Deno.env.get('STRIPE_LIVE_SECRET_KEY')
-        : Deno.env.get('STRIPE_SECRET_KEY');
-        
-      if (!stripeSecretKey) {
-        console.error(`${LOG_PREFIX.ERROR} Missing ${isLiveMode ? 'live' : 'test'} Stripe secret key`);
-        return new Response(
-          JSON.stringify({ error: `Server configuration error: Missing ${isLiveMode ? 'live' : 'test'} Stripe secret key` }),
-          { 
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
-      
-      // Initialize Stripe with the appropriate secret key
+
+      // Initialize Stripe
       const stripe = new Stripe(stripeSecretKey, {
         apiVersion: '2023-10-16',
       });
 
-      // Log mode for debugging
-      console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Processing webhook in ${isLiveMode ? 'LIVE' : 'TEST'} mode`);
-
       // Verify the event
       let event;
       try {
-        console.log(`${LOG_PREFIX.INFO} Verifying webhook signature with secret starting with ${secretPrefix}...`);
-        // Use the async version as suggested in the error message
         event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
         console.log(`${LOG_PREFIX.SUCCESS} Event verified successfully: ${event.type}`);
       } catch (err) {
         console.error(`${LOG_PREFIX.ERROR} Webhook signature verification failed: ${err.message}`);
         return new Response(
           JSON.stringify({ 
-            error: `Webhook signature verification failed: ${err.message}`,
-            mode: isLiveMode ? 'live' : 'test',
-            secretUsed: secretPrefix + '...'
+            error: `Webhook signature verification failed: ${err.message}`
           }),
           { 
             status: 400,
@@ -163,17 +124,12 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Confirm the event's livemode matches our detection
-      if (event.livemode !== isLiveMode) {
-        console.error(`${LOG_PREFIX.ERROR} Event livemode (${event.livemode}) doesn't match detected mode (${isLiveMode})`);
-      }
-
       // Handle the event based on its type
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         
         // Log the entire session for debugging
-        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Checkout session completed:`, JSON.stringify(session, null, 2));
+        console.log(`${LOG_PREFIX.INFO} Checkout session completed:`, JSON.stringify(session, null, 2));
         
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
@@ -190,7 +146,7 @@ Deno.serve(async (req) => {
           );
         }
         
-        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Updating subscription for user ${userId} with plan ${planType}`);
+        console.log(`${LOG_PREFIX.INFO} Updating subscription for user ${userId} with plan ${planType}`);
         
         // Update user profile with subscription info
         const { error: updateError } = await supabase
@@ -200,7 +156,6 @@ Deno.serve(async (req) => {
             subscription_status: 'active',
             subscription_id: session.subscription || session.id,
             payment_method: 'card',
-            subscription_mode: isLiveMode ? 'live' : 'test', // Store the mode
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
@@ -216,7 +171,7 @@ Deno.serve(async (req) => {
         const subscription = event.data.object;
         
         // Log the entire subscription for debugging
-        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Subscription deleted:`, JSON.stringify(subscription, null, 2));
+        console.log(`${LOG_PREFIX.INFO} Subscription deleted:`, JSON.stringify(subscription, null, 2));
         
         // Find user with this subscription ID
         const { data: profiles, error: lookupError } = await supabase
@@ -227,7 +182,17 @@ Deno.serve(async (req) => {
           
         if (lookupError || !profiles || profiles.length === 0) {
           console.error(`${LOG_PREFIX.ERROR} Could not find user for subscription:`, subscription.id);
-          throw new Error(`User not found for subscription: ${subscription.id}`);
+          return new Response(
+            JSON.stringify({ 
+              status: 'warning',
+              message: `User not found for subscription: ${subscription.id}`,
+              note: 'This is likely because the subscription was deleted before it was associated with a user'
+            }),
+            { 
+              status: 200, // Return 200 to acknowledge receipt
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
         
         const userId = profiles[0].id;
@@ -251,7 +216,7 @@ Deno.serve(async (req) => {
       }
       else if (event.type === 'customer.subscription.updated') {
         const subscription = event.data.object;
-        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Subscription updated:`, JSON.stringify(subscription, null, 2));
+        console.log(`${LOG_PREFIX.INFO} Subscription updated:`, JSON.stringify(subscription, null, 2));
         
         // Find user with this subscription ID
         const { data: profiles, error: lookupError } = await supabase
@@ -262,7 +227,20 @@ Deno.serve(async (req) => {
           
         if (lookupError || !profiles || profiles.length === 0) {
           console.error(`${LOG_PREFIX.ERROR} Could not find user for subscription:`, subscription.id);
-          throw new Error(`User not found for subscription: ${subscription.id}`);
+          
+          // Instead of throwing an error, log it and return a success response
+          // This handles race conditions when subscription is updated before checkout.session.completed
+          return new Response(
+            JSON.stringify({ 
+              status: 'pending',
+              message: `User not found for subscription: ${subscription.id}`,
+              note: 'This is likely because the subscription update event arrived before checkout.session.completed'
+            }),
+            { 
+              status: 200, // Return 200 to acknowledge receipt
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
         }
         
         const userId = profiles[0].id;
@@ -290,7 +268,11 @@ Deno.serve(async (req) => {
 
       // Return a successful response
       return new Response(
-        JSON.stringify({ received: true, event: event.type, mode: isLiveMode ? 'live' : 'test' }),
+        JSON.stringify({ 
+          received: true, 
+          event: event.type,
+          mode: rawEvent.livemode ? 'live' : 'test' 
+        }),
         { 
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
