@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -25,8 +25,22 @@ export const CheckoutButton = ({
   children
 }: CheckoutButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
+  const { user, getAuthToken } = useAuth();
   const navigate = useNavigate();
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
+  // Get and store auth token when component mounts
+  useEffect(() => {
+    const fetchToken = async () => {
+      if (user) {
+        const token = await getAuthToken();
+        setAuthToken(token);
+        console.log("🔑 AUTH: CheckoutButton initialized with token:", token ? "Available" : "Not available");
+      }
+    };
+    
+    fetchToken();
+  }, [user, getAuthToken]);
 
   const handleCheckout = async () => {
     if (!user) {
@@ -47,23 +61,44 @@ export const CheckoutButton = ({
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        console.error("Session error:", sessionError);
+        console.error("🔴 ERROR: Session error:", sessionError);
         throw new Error("Authentication error. Please try logging in again.");
       }
       
       if (!session) {
+        console.error("🔴 ERROR: No session found");
         throw new Error("Authentication session expired. Please log in again.");
       }
+      
+      // Log session and token details for debugging
+      console.log("🔑 AUTH: Using session:", {
+        userId: session.user.id,
+        email: session.user.email,
+        expiresAt: new Date(session.expires_at * 1000).toLocaleString(),
+        hasToken: !!session.access_token
+      });
+      
+      // Log token details from current session
+      const currentToken = session.access_token;
+      console.log("🔑 AUTH: Current token:", currentToken ? `${currentToken.substring(0, 15)}...` : "No token");
       
       // Add timestamp parameter to avoid caching issues
       const timestamp = new Date().getTime();
       
       // Log the attempt with useful debugging info
-      console.log("Initiating checkout for:", {
+      console.log("🔵 INFO: Initiating checkout for:", {
         user: user.id,
         plan: planType,
-        timestamp
+        timestamp,
+        authHeader: currentToken ? "Present" : "Missing"
       });
+
+      // Log headers that will be sent with the request
+      const headers = {
+        Authorization: `Bearer ${currentToken}`,
+        "Content-Type": "application/json"
+      };
+      console.log("🔵 INFO: Request headers:", JSON.stringify(headers, null, 2));
 
       // Make the request to create a checkout session
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
@@ -76,17 +111,17 @@ export const CheckoutButton = ({
       });
 
       if (error) {
-        console.error("Function error:", error);
+        console.error("🔴 ERROR: Function error:", error);
         throw new Error(error.message || "Function error");
       }
 
       if (!sessionData) {
-        console.error("No session data returned");
+        console.error("🔴 ERROR: No session data returned");
         throw new Error("No response from checkout service");
       }
 
       // Log checkout details for debugging
-      console.log("Checkout response:", sessionData);
+      console.log("✅ SUCCESS: Checkout response:", sessionData);
 
       // Redirect to Stripe checkout
       if (sessionData?.url) {
@@ -95,11 +130,11 @@ export const CheckoutButton = ({
         });
         window.location.href = sessionData.url;
       } else {
-        console.error("Missing checkout URL in response", sessionData);
+        console.error("🔴 ERROR: Missing checkout URL in response", sessionData);
         throw new Error("No checkout URL returned");
       }
     } catch (error) {
-      console.error("Error starting checkout:", error);
+      console.error("🔴 ERROR: Error starting checkout:", error);
       
       let errorMessage = "Failed to start checkout process. Please try again later.";
       

@@ -16,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-  'Access-Control-Allow-Headers': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
   'Access-Control-Allow-Credentials': 'true',
 };
 
@@ -27,16 +27,48 @@ const LOG_PREFIX = {
   SUCCESS: "✅ SUCCESS:",
   WARNING: "⚠️ WARNING:",
   WEBHOOK: "🪝 WEBHOOK:",
+  AUTH: "🔑 AUTH:",
+  DEBUG: "🐞 DEBUG:",
 };
 
 Deno.serve(async (req) => {
-  console.log(`${LOG_PREFIX.INFO} Webhook received: ${req.method} ${new URL(req.url).pathname}`);
+  const url = new URL(req.url);
+  console.log(`${LOG_PREFIX.INFO} Webhook received: ${req.method} ${url.pathname}`);
+  
+  // Log all headers for debugging
+  const allHeaders = Object.fromEntries([...req.headers.entries()]);
+  console.log(`${LOG_PREFIX.DEBUG} All request headers:`, JSON.stringify(allHeaders, null, 2));
+  
+  // Check for authorization headers specifically
+  const authHeader = req.headers.get('authorization');
+  if (authHeader) {
+    console.log(`${LOG_PREFIX.AUTH} Authorization header found: ${authHeader.substring(0, 15)}...`);
+  } else {
+    console.log(`${LOG_PREFIX.AUTH} No authorization header found in request`);
+  }
+  
+  // Check for Supabase client auth headers
+  const apiKeyHeader = req.headers.get('apikey');
+  if (apiKeyHeader) {
+    console.log(`${LOG_PREFIX.AUTH} API key header found: ${apiKeyHeader.substring(0, 10)}...`);
+  }
+  
+  const clientInfoHeader = req.headers.get('x-client-info');
+  if (clientInfoHeader) {
+    console.log(`${LOG_PREFIX.AUTH} Client info header found: ${clientInfoHeader}`);
+  }
   
   // Health check endpoint for testing webhook connectivity
   if (req.method === 'GET') {
     console.log(`${LOG_PREFIX.INFO} Health check requested`);
     return new Response(
-      JSON.stringify({ status: 'healthy', message: 'Stripe webhook endpoint is operational' }),
+      JSON.stringify({ 
+        status: 'healthy', 
+        message: 'Stripe webhook endpoint is operational',
+        headers: allHeaders,
+        url: req.url,
+        path: url.pathname
+      }),
       { 
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -66,9 +98,8 @@ Deno.serve(async (req) => {
       
       if (!signature) {
         console.error(`${LOG_PREFIX.ERROR} Missing stripe-signature header`);
-        console.log(`${LOG_PREFIX.INFO} Available headers:`, Object.fromEntries([...req.headers.entries()]));
         return new Response(
-          JSON.stringify({ error: 'Missing stripe-signature header' }),
+          JSON.stringify({ error: 'Missing stripe-signature header', headers: allHeaders }),
           { 
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
