@@ -98,11 +98,12 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Verify the event
+      // Verify the event - USING ASYNC METHOD INSTEAD
       let event;
       try {
-        console.log(`${LOG_PREFIX.INFO} Verifying webhook signature...`);
-        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+        console.log(`${LOG_PREFIX.INFO} Verifying webhook signature asynchronously...`);
+        // Use the async version as suggested in the error message
+        event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
         console.log(`${LOG_PREFIX.SUCCESS} Event verified successfully: ${event.type}`);
       } catch (err) {
         console.error(`${LOG_PREFIX.ERROR} Webhook signature verification failed: ${err.message}`);
