@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -10,12 +10,14 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  clearAuthTokens: () => void;
 };
 
 const AuthContext = createContext<AuthContextType>({ 
   user: null, 
   loading: true,
   signOut: async () => {},
+  clearAuthTokens: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -92,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       // Clear any persisted tokens
-      localStorage.removeItem('supabase.auth.token');
+      clearAuthTokens();
       
       // Ensure user is set to null
       setUser(null);
@@ -109,8 +111,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Add a new function to clear authentication tokens
+  const clearAuthTokens = () => {
+    // Remove all Supabase-related tokens from localStorage
+    localStorage.removeItem('supabase.auth.token');
+    localStorage.removeItem('sb-xqkzmcudulutohnskcwt-auth-token');
+    
+    // Clear other potential storage locations
+    sessionStorage.removeItem('supabase.auth.token');
+    sessionStorage.removeItem('sb-xqkzmcudulutohnskcwt-auth-token');
+    
+    // Remove any cookies related to authentication
+    document.cookie.split(';').forEach(cookie => {
+      const [name] = cookie.trim().split('=');
+      if (name.includes('supabase') || name.includes('sb-')) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      }
+    });
+    
+    toast({
+      title: "Auth tokens cleared",
+      description: "All authentication tokens have been removed",
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signOut, clearAuthTokens }}>
       {children}
     </AuthContext.Provider>
   );
