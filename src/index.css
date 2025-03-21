@@ -152,6 +152,36 @@
     flex-shrink: 0 !important;
   }
   
+  /* Professional Navy template specific fixes */
+  #resume-content .professional-navy-contact-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    vertical-align: middle !important;
+  }
+  
+  #resume-content .professional-navy-bullet {
+    display: inline-flex !important;
+    align-items: center !important; 
+    justify-content: center !important;
+    min-width: 6px !important;
+    min-height: 6px !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    margin-right: 8px !important;
+    background-color: #0F2B5B !important;
+    flex-shrink: 0 !important;
+    margin-top: 0.55em !important;
+  }
+  
+  #resume-content .professional-navy-work-item li {
+    display: flex !important;
+    align-items: flex-start !important;
+    margin-bottom: 6px !important;
+  }
+  
   .prose {
     @apply max-w-none;
   }

@@ -14,19 +14,33 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
 
     switch (type) {
       case "experience":
-        return <Briefcase className="w-5 h-5 mr-2 text-emerald-600" />;
+        return template.id === "professional-navy" 
+          ? <Briefcase className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
+          : <Briefcase className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
       case "education":
-        return <GraduationCap className="w-5 h-5 mr-2 text-emerald-600" />;
+        return template.id === "professional-navy"
+          ? <GraduationCap className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
+          : <GraduationCap className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
       case "certifications":
-        return <Award className="w-5 h-5 mr-2 text-emerald-600" />;
+        return template.id === "professional-navy"
+          ? <Award className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
+          : <Award className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
       case "skills":
-        return <Code className="w-5 h-5 mr-2 text-emerald-600" />;
+        return template.id === "professional-navy"
+          ? <Code className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
+          : <Code className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
       case "summary":
-        return <FileText className="w-5 h-5 mr-2 text-emerald-600" />;
+        return template.id === "professional-navy"
+          ? <FileText className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
+          : <FileText className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
       case "profile":
-        return <User className="w-5 h-5 mr-2 text-emerald-600" />;
+        return template.id === "professional-navy"
+          ? <User className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
+          : <User className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
       case "projects":
-        return <FolderKanban className="w-5 h-5 mr-2 text-emerald-600" />;
+        return template.id === "professional-navy"
+          ? <FolderKanban className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
+          : <FolderKanban className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
       default:
         return null;
     }
@@ -36,6 +50,17 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     return (
       <h3 className={template.style.sectionStyle}>
         <div className="flex items-center after:content-[''] after:block after:h-0.5 after:flex-grow after:ml-2 after:bg-emerald-500">
+          {getIcon()}
+          <span>{title}</span>
+        </div>
+      </h3>
+    );
+  }
+
+  if (template.id === "professional-navy") {
+    return (
+      <h3 className={template.style.sectionStyle}>
+        <div className="flex items-center">
           {getIcon()}
           <span>{title}</span>
         </div>

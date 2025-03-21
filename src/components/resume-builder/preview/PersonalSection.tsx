@@ -70,10 +70,119 @@ export function PersonalSection({
       contactContainer: "grid grid-cols-2 gap-2 mt-4 text-sm text-gray-600",
       imageContainer: "col-span-4 flex justify-center items-center",
       infoContainer: "col-span-8"
+    },
+    "professional-navy": {
+      container: "col-span-12",
+      name: "text-3xl font-bold tracking-tight text-white",
+      title: "text-lg text-white mt-1 font-light",
+      contactContainer: "flex flex-wrap gap-4 mt-3 text-sm text-white",
+      imageContainer: "col-span-3 flex justify-center items-center",
+      infoContainer: "col-span-9"
     }
   };
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+
+  // Special rendering for Professional Navy template
+  if (template.id === "professional-navy") {
+    return (
+      <div className={template.style.headerStyle}>
+        <div className={styles["professional-navy"].imageContainer}>
+          <div className="w-32 h-32 rounded-full bg-white border-4 border-white overflow-hidden flex items-center justify-center relative">
+            {profileImageUrl ? (
+              <img 
+                src={profileImageUrl} 
+                alt={`${fullName}'s profile`} 
+                className="w-full h-full object-cover"
+                style={{aspectRatio: "1/1", objectPosition: "center"}}
+              />
+            ) : (
+              <div className="text-4xl text-[#0F2B5B] font-bold">
+                {fullName.split(' ').map(name => name[0]).join('')}
+              </div>
+            )}
+            {isEditing && onImageUpdate && resumeId && (
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+                <ImageUploadButton 
+                  resumeId={resumeId} 
+                  currentImageUrl={profileImageUrl} 
+                  onImageUpdate={onImageUpdate} 
+                />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className={styles["professional-navy"].infoContainer}>
+          <h1 
+            className={`${currentStyle.name} outline-none`}
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("fullName", e)}
+          >
+            {fullName}
+          </h1>
+          <div 
+            className={`${currentStyle.title} outline-none`}
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("title", e)}
+          >
+            {title}
+          </div>
+          <div className={currentStyle.contactContainer}>
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-white professional-navy-contact-icon" />
+              <span 
+                className="outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+              >
+                {email}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-white professional-navy-contact-icon" />
+              <span 
+                className="outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+              >
+                {phone}
+              </span>
+            </div>
+            {linkedin && (
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-white professional-navy-contact-icon" />
+                <span 
+                  className="outline-none"
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                >
+                  {linkedin}
+                </span>
+              </div>
+            )}
+            {website && (
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-white professional-navy-contact-icon" />
+                <span 
+                  className="outline-none"
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                >
+                  {website}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Special rendering for Modern Professional template
   if (template.id === "modern-professional") {

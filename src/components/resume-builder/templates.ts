@@ -242,5 +242,55 @@ export const resumeTemplates: ResumeTemplate[] = [
         circularImage: true
       }
     }
+  },
+  
+  {
+    id: "professional-navy",
+    name: "Professional Navy",
+    description: "Elegant two-column layout with navy header and modern typography",
+    imageUrl: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
+    style: {
+      titleFont: "font-sans text-[30px] font-bold tracking-tight text-white",
+      headerStyle: "bg-[#0F2B5B] text-white pt-6 pb-6 px-8 mb-6 grid grid-cols-12 gap-6",
+      sectionStyle: "text-[16px] font-bold uppercase tracking-wide text-[#0F2B5B] mb-3 pb-1 border-b-2 border-[#0F2B5B] flex items-center",
+      contentStyle: "grid grid-cols-12 gap-6",
+      layout: "creative",
+      colors: {
+        primary: "#0F2B5B",
+        secondary: "#4A6FA5",
+        text: "#333333",
+        border: "#E5E7EB",
+        background: "#FFFFFF",
+        accent: "#0F2B5B"
+      },
+      spacing: {
+        sectionGap: "1.5rem",
+        itemGap: "1rem",
+        contentPadding: "1.75rem",
+        headerHeight: "auto",
+        margins: {
+          top: "0in",
+          right: "0.5in",
+          bottom: "0.5in",
+          left: "0.5in"
+        }
+      },
+      dimensions: {
+        maxWidth: "816px",
+        minHeight: "1056px"
+      },
+      typography: {
+        titleSize: "30px",
+        subtitleSize: "16px",
+        bodySize: "14px",
+        lineHeight: "1.4"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "dot",
+        circularImage: true
+      }
+    }
   }
 ];
