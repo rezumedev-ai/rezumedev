@@ -1,3 +1,4 @@
+
 import { WorkExperience } from "@/types/resume";
 import { formatDate, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
@@ -229,7 +230,7 @@ export function ResumePreview({
                     {workExperience.map((exp, index) => (
                       <div key={index} className={templateId === "modern-split" ? "relative pl-3 border-l border-gray-200" : ""}>
                         {templateId === "modern-split" && (
-                          <div className="absolute top-1 left-[-2px] w-1 h-1 rounded-full bg-gray-400"></div>
+                          <div className="absolute top-1 left-[-2px] w-1 h-1 rounded-full bg-black"></div>
                         )}
                         <div className={templateId === "modern-split" ? "mb-0" : ""}>
                           <div className="flex justify-between items-baseline">
@@ -249,7 +250,7 @@ export function ResumePreview({
                             {exp.responsibilities.map((resp, idx) => (
                               <li key={idx} className={templateId === "modern-split" ? "flex items-start gap-1 leading-tight" : ""}>
                                 {templateId === "modern-split" && (
-                                  <span className="inline-block w-1 h-1 rounded-full bg-gray-400 mt-1.5 shrink-0"></span>
+                                  <span className="inline-block w-1 h-1 rounded-full bg-black mt-1.5 shrink-0"></span>
                                 )}
                                 {resp}
                               </li>

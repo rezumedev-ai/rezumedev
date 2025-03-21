@@ -255,7 +255,7 @@ export function ExperienceSection({
               <ul className="mt-2 text-sm text-gray-600 list-none pl-0 space-y-1">
                 {exp.responsibilities.map((resp, respIndex) => (
                   <li key={respIndex} className="flex items-center ml-1">
-                    <span className="inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-gray-400 mr-2 shrink-0"></span>
+                    <span className="inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-black mr-2 shrink-0"></span>
                     <span className="leading-snug">{resp}</span>
                   </li>
                 ))}
