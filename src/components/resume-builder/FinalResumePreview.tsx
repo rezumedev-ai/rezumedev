@@ -7,10 +7,9 @@ import { useResumePreview } from "@/hooks/use-resume-preview";
 import { ResumeContent } from "./ResumeContent";
 import { toast } from "sonner";
 import { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ZoomIn, ZoomOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -24,7 +23,7 @@ export function FinalResumePreview({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [resumeScale, setResumeScale] = useState(1);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const {
@@ -55,9 +54,17 @@ export function FinalResumePreview({
     toast.success(`Template updated to ${resumeTemplates.find(t => t.id === templateId)?.name || 'new template'}`);
   };
 
-  const toggleZoom = () => {
-    setIsZoomed(!isZoomed);
-  };
+  useEffect(() => {
+    // Show overlay message for mobile users only when the component mounts
+    if (isMobile) {
+      setShowOverlay(true);
+      const timer = setTimeout(() => {
+        setShowOverlay(false);
+      }, 3000); // Show overlay for 3 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     const updateScale = () => {
@@ -81,18 +88,13 @@ export function FinalResumePreview({
         const widthScale = availableWidth / pageWidth;
         const heightScale = availableHeight / pageHeight;
         
-        if (isZoomed) {
-          // When zoomed, prioritize readability over seeing the whole page
-          setResumeScale(Math.min(0.8, widthScale * 1.5));
-        } else {
-          // When not zoomed, prioritize seeing the whole page
-          const baseScale = Math.min(widthScale, heightScale);
-          // Set a maximum scale factor for portrait mode to ensure users can see more context
-          const maxScale = isPortrait ? 0.45 : 0.65;
-          // Set a minimum scale to ensure the resume is not too small
-          const minScale = 0.35;
-          setResumeScale(Math.max(Math.min(baseScale, maxScale), minScale));
-        }
+        // When not zoomed, prioritize seeing the whole page
+        const baseScale = Math.min(widthScale, heightScale);
+        // Set a maximum scale factor for portrait mode to ensure users can see more context
+        const maxScale = isPortrait ? 0.45 : 0.65;
+        // Set a minimum scale to ensure the resume is not too small
+        const minScale = 0.35;
+        setResumeScale(Math.max(Math.min(baseScale, maxScale), minScale));
       } else {
         // For desktop, optimize the scale to use more space
         const availableWidth = containerWidth - 48; // 48px padding
@@ -118,7 +120,7 @@ export function FinalResumePreview({
       window.removeEventListener('resize', updateScale);
       window.removeEventListener('orientationchange', updateScale);
     };
-  }, [isMobile, isZoomed]);
+  }, [isMobile]);
   
   return (
     <motion.div 
@@ -140,17 +142,33 @@ export function FinalResumePreview({
         currentProfileImageUrl={resumeState.personal_info.profileImageUrl}
       />
       
-      {isMobile && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleZoom}
-          className="absolute top-16 right-4 z-10 shadow-sm"
-        >
-          {isZoomed ? <ZoomOut className="h-4 w-4 mr-1" /> : <ZoomIn className="h-4 w-4 mr-1" />}
-          {isZoomed ? "Zoom Out" : "Zoom In"}
-        </Button>
-      )}
+      <AnimatePresence>
+        {showOverlay && isMobile && (
+          <motion.div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="bg-white rounded-lg p-5 max-w-xs w-full text-center shadow-xl"
+              initial={{ scale: 0.8, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", damping: 25 }}
+            >
+              <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                <Eye className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-1 text-gray-900">Best View Tip</h3>
+              <p className="text-gray-600 text-sm">
+                Pinch to zoom out for the best experience and to view the complete resume
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <motion.div 
         id="resume-content" 
@@ -184,7 +202,7 @@ export function FinalResumePreview({
       
       {isMobile && (
         <div className="text-center text-xs text-gray-500 mb-4 px-4">
-          <p>Pinch to zoom or use the zoom button to adjust view</p>
+          <p>Pinch to zoom or adjust view as needed</p>
         </div>
       )}
     </motion.div>
