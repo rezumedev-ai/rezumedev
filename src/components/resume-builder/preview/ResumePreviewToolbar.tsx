@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, LayoutTemplate, Save, Lock } from "lucide-react";
+import { ArrowLeft, Edit, LayoutTemplate, Save, Lock, ImageIcon } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { TemplateSelectionGrid } from "./TemplateSelectionGrid";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { DownloadOptionsDialog } from "./DownloadOptionsDialog";
+import { ProfileImageButton } from "./ProfileImageButton";
 
 interface ResumePreviewToolbarProps {
   currentTemplateId: string;
@@ -22,6 +23,8 @@ interface ResumePreviewToolbarProps {
   onBackToDashboard: () => void;
   isEditing?: boolean;
   onToggleEdit?: () => void;
+  onProfileImageUpdate?: (imageUrl: string | null) => void;
+  currentProfileImageUrl?: string;
 }
 
 export function ResumePreviewToolbar({
@@ -32,6 +35,8 @@ export function ResumePreviewToolbar({
   onBackToDashboard,
   isEditing = false,
   onToggleEdit,
+  onProfileImageUpdate,
+  currentProfileImageUrl,
 }: ResumePreviewToolbarProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,6 +44,9 @@ export function ResumePreviewToolbar({
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const navigate = useNavigate();
+  
+  const currentTemplate = templates.find(t => t.id === currentTemplateId);
+  const supportsProfileImage = currentTemplate?.style.icons.circularImage;
   
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -105,6 +113,14 @@ export function ResumePreviewToolbar({
                 </>
               )}
             </Button>
+          )}
+          
+          {supportsProfileImage && onProfileImageUpdate && (
+            <ProfileImageButton
+              resumeId={resumeId}
+              currentImageUrl={currentProfileImageUrl}
+              onImageUpdate={onProfileImageUpdate}
+            />
           )}
           
           {isMobile ? (

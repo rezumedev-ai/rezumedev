@@ -50,6 +50,7 @@ export function useResumePersonalInfo(
   };
 
   const handleProfileImageUpdate = (imageUrl: string | null) => {
+    // Allow profile image updates regardless of edit mode
     setPersonalInfo(prev => {
       const updated = {
         ...prev,

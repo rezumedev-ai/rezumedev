@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
@@ -98,6 +97,8 @@ export function FinalResumePreview({
         onBackToDashboard={() => navigate("/dashboard")}
         isEditing={isEditing}
         onToggleEdit={toggleEditMode}
+        onProfileImageUpdate={handleProfileImageUpdate}
+        currentProfileImageUrl={resumeState.personal_info.profileImageUrl}
       />
       
       <motion.div 
