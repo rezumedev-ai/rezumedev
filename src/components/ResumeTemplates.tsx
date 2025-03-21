@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ArrowLeftCircle, ArrowRightCircle, Sparkles, ExternalLink } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
@@ -36,13 +35,13 @@ export const ResumeTemplates = () => {
     },
     {
       name: "Professional Navy",
-      image: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
+      image: "/lovable-uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
       description: "Elegant two-column layout with navy header and modern typography, perfect for corporate professionals",
       color: "from-blue-700 to-indigo-900"
     },
     {
       name: "Modern Professional",
-      image: "/lovable-uploads/489267dd-1129-466d-b30b-dd43b3cbe0e8.png",
+      image: "/lovable-uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
       description: "Contemporary design with creative accents, ideal for forward-thinking professionals in modern industries",
       color: "from-teal-500 to-teal-700"
     }

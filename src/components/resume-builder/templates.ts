@@ -1,4 +1,3 @@
-
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -198,7 +197,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "modern-professional",
     name: "Modern Professional",
     description: "Contemporary two-column design with circular profile image and accent colors",
-    imageUrl: "/lovable-uploads/489267dd-1129-466d-b30b-dd43b3cbe0e8.png",
+    imageUrl: "/lovable-uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
     style: {
       titleFont: "font-sans text-[32px] font-bold tracking-tight text-gray-900",
       headerStyle: "grid grid-cols-12 gap-6",
@@ -248,7 +247,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "professional-navy",
     name: "Professional Navy",
     description: "Elegant two-column layout with navy header and modern typography",
-    imageUrl: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
+    imageUrl: "/lovable-uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
     style: {
       titleFont: "font-sans text-[30px] font-bold tracking-tight text-white",
       headerStyle: "bg-[#0F2B5B] text-white pt-6 pb-6 px-8 mb-6 grid grid-cols-12 gap-6",
