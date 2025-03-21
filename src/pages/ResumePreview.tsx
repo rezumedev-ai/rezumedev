@@ -38,8 +38,12 @@ export default function ResumePreview() {
 
   // Set showIntro to true once we confirm the user is on mobile and we have the resume data
   useEffect(() => {
-    if (isMobile !== undefined && resume && !isLoading) {
-      setShowIntro(isMobile);
+    if (isMobile === true && resume && !isLoading) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        setShowIntro(true);
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [isMobile, resume, isLoading]);
 
