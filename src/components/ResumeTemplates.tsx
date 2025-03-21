@@ -4,12 +4,17 @@ import { ArrowLeftCircle, ArrowRightCircle, Sparkles, ExternalLink } from 'lucid
 import { GradientHeading } from './ui/gradient-heading';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const ResumeTemplates = () => {
-  const [currentTemplate, setCurrentTemplate] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
-
   const resumeTemplates = [
     {
       name: "Executive Clean",
@@ -43,58 +48,8 @@ export const ResumeTemplates = () => {
     }
   ];
 
-  const nextTemplate = () => {
-    setCurrentTemplate((prev) => (prev + 1) % resumeTemplates.length);
-  };
-
-  const prevTemplate = () => {
-    setCurrentTemplate((prev) => (prev - 1 + resumeTemplates.length) % resumeTemplates.length);
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isHovering) {
-        nextTemplate();
-      }
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [isHovering]);
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { 
-      opacity: 1, 
-      scale: 1,
-      transition: { 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 24 
-      }
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.9,
-      transition: {
-        duration: 0.3
-      }
-    }
-  };
-
-  const decorationVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: 0.3,
-        duration: 0.5
-      }
-    }
-  };
-
   return (
-    <section className="py-24 bg-gradient-to-br from-background via-background/90 to-background/80 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-background via-background/90 to-background/80 relative overflow-hidden">
       {/* Decorative elements */}
       <motion.div
         className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20"
@@ -111,7 +66,7 @@ export const ResumeTemplates = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <GradientHeading 
             variant="professional" 
@@ -121,202 +76,129 @@ export const ResumeTemplates = () => {
           >
             Professional Resume Templates
           </GradientHeading>
-          <p className="text-lg text-muted-foreground mb-4 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             Each template is expertly crafted to pass ATS systems while presenting your experience in the most professional light
           </p>
         </motion.div>
 
-        <div className="relative max-w-5xl mx-auto">
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="max-w-7xl mx-auto"
+        >
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
           >
-            {/* Template Preview */}
-            <div className="md:col-span-7 relative">
-              <motion.button 
-                onClick={prevTemplate}
-                className="absolute left-0 z-10 p-2 text-primary bg-background rounded-full shadow-lg hover:scale-110 hover:text-primary-hover transition-all -translate-x-1/2 top-1/2 -translate-y-1/2"
-                aria-label="Previous template"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <ArrowLeftCircle className="w-10 h-10" />
-              </motion.button>
-
-              <div 
-                className="relative aspect-[1/1.294] w-full max-w-md mx-auto bg-card rounded-xl shadow-2xl overflow-hidden"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentTemplate}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="w-full h-full"
-                  >
-                    <motion.div 
-                      className="absolute top-2 right-2 z-20"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.5, type: "spring" }}
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {resumeTemplates.map((template, index) => (
+                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <div className="p-1">
+                    <motion.div
+                      whileHover={{ 
+                        scale: 1.03, 
+                        y: -5,
+                        transition: { duration: 0.2 } 
+                      }}
+                      className="h-full"
                     >
-                      <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="text-xs font-medium text-white">Premium</span>
-                      </div>
-                    </motion.div>
-
-                    <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800">
-                      <motion.img
-                        src={resumeTemplates[currentTemplate].image}
-                        alt={`${resumeTemplates[currentTemplate].name} Resume Template`}
-                        className="object-cover w-full h-full"
-                        initial={{ scale: 1.05 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.8 }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
-                        <Link to="/signup">
-                          <Button variant="secondary" size="sm" className="font-medium gap-2">
-                            Use Template <ExternalLink className="w-3.5 h-3.5" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-              
-              <motion.button 
-                onClick={nextTemplate}
-                className="absolute right-0 z-10 p-2 text-primary bg-background rounded-full shadow-lg hover:scale-110 hover:text-primary-hover transition-all translate-x-1/2 top-1/2 -translate-y-1/2"
-                aria-label="Next template"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <ArrowRightCircle className="w-10 h-10" />
-              </motion.button>
-
-              <div className="flex justify-center gap-2 mt-6">
-                {resumeTemplates.map((_, index) => (
-                  <motion.button
-                    key={index}
-                    onClick={() => setCurrentTemplate(index)}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      currentTemplate === index ? 'bg-primary w-6' : 'bg-primary/30'
-                    }`}
-                    aria-label={`Go to template ${index + 1}`}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                    initial={{ opacity: 0.7 }}
-                    animate={{ opacity: currentTemplate === index ? 1 : 0.7 }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Template Details */}
-            <div className="md:col-span-5">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentTemplate}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-card/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-border/50"
-                >
-                  <motion.div 
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-4 text-white bg-gradient-to-r ${resumeTemplates[currentTemplate].color}`}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    Featured Template
-                  </motion.div>
-                  
-                  <motion.h3 
-                    className="text-2xl font-bold mb-3"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    {resumeTemplates[currentTemplate].name}
-                  </motion.h3>
-                  
-                  <motion.p 
-                    className="text-muted-foreground mb-6"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    {resumeTemplates[currentTemplate].description}
-                  </motion.p>
-                  
-                  <motion.ul
-                    className="space-y-3 mb-8"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    {[
-                      "ATS-friendly design",
-                      "Professional typography",
-                      "Balanced content layout",
-                      "Optimized for recruiters",
-                      "PDF & printable formats"
-                    ].map((feature, i) => (
-                      <motion.li 
-                        key={i} 
-                        className="flex items-center gap-2"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.5 + i * 0.1 }}
-                      >
-                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <Sparkles className="w-3 h-3 text-primary" />
+                      <Card className="overflow-hidden h-full border border-border/40 bg-card/60 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+                        <div className="relative aspect-[1/1.294] bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
+                          <div className="absolute top-2 right-2 z-20">
+                            <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                              <span className="text-xs font-medium text-white">Premium</span>
+                            </div>
+                          </div>
+                          
+                          <img
+                            src={template.image}
+                            alt={`${template.name} Resume Template`}
+                            className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-500"
+                          />
+                          
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
+                            <Link to="/signup">
+                              <Button variant="secondary" size="sm" className="font-medium gap-2">
+                                Use Template <ExternalLink className="w-3.5 h-3.5" />
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
-                        <span className="text-sm">{feature}</span>
-                      </motion.li>
-                    ))}
-                  </motion.ul>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
-                  >
-                    <Link to="/signup">
-                      <Button className="w-full gap-2">
-                        Create Your Resume Now
-                        <ArrowRightCircle className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                  </motion.div>
-                </motion.div>
-              </AnimatePresence>
+                        
+                        <CardContent className="p-6">
+                          <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 text-white bg-gradient-to-r ${template.color}`}>
+                            Featured Template
+                          </div>
+                          <h3 className="text-xl font-bold mb-2">{template.name}</h3>
+                          <p className="text-muted-foreground text-sm mb-6">
+                            {template.description}
+                          </p>
+                          <Link to="/signup" className="block mt-auto">
+                            <Button variant="outline" size="sm" className="w-full gap-2 hover:bg-primary/10 transition-colors">
+                              Preview Template
+                              <ArrowRightCircle className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex items-center justify-center mt-8">
+              <CarouselPrevious className="relative mr-2 inset-auto left-0 top-0 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
+              <CarouselNext className="relative ml-2 inset-auto right-0 top-0 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
             </div>
-          </motion.div>
+          </Carousel>
+        </motion.div>
 
-          {/* Decorative graphic elements */}
-          <motion.div 
-            variants={decorationVariants}
-            initial="hidden"
-            animate="visible"
-            className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full bg-primary/5 backdrop-blur-lg border border-primary/10 hidden md:block"
-          ></motion.div>
-          <motion.div 
-            variants={decorationVariants}
-            initial="hidden"
-            animate="visible"
-            className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-primary/5 backdrop-blur-lg border border-primary/10 hidden md:block"
-          ></motion.div>
-        </div>
+        <motion.div
+          initial={{ opacity:.0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="text-center mt-14"
+        >
+          <Link to="/signup">
+            <Button size="lg" className="px-8 py-6 text-base bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-hover transition-all duration-300 shadow-lg hover:shadow-xl">
+              Explore All Templates
+              <ArrowRightCircle className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </motion.div>
+
+        {/* Features list */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto"
+        >
+          {[
+            { title: "ATS Optimized", description: "Pass any applicant tracking system with our perfectly formatted templates" },
+            { title: "Professional Design", description: "Elegant typography and balanced layouts catch recruiters' attention" },
+            { title: "Industry Specific", description: "Templates tailored for your industry and career level requirements" }
+          ].map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 + (index * 0.1), duration: 0.5 }}
+              className="text-center p-6 rounded-lg bg-card/40 backdrop-blur-sm border border-border/30 shadow-sm"
+            >
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+              <p className="text-muted-foreground text-sm">{feature.description}</p>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
