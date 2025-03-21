@@ -9,13 +9,14 @@ export interface ResumeTemplate {
     headerStyle: string;
     sectionStyle: string;
     contentStyle: string;
-    layout: "classic" | "modern" | "minimal" | "executive";
+    layout: "classic" | "modern" | "minimal" | "executive" | "creative";
     colors: {
       primary: string;
       secondary: string;
       text: string;
       border: string;
       background: string;
+      accent?: string;
     };
     spacing: {
       sectionGap: string;
@@ -43,6 +44,7 @@ export interface ResumeTemplate {
       sections: boolean;
       contact: boolean;
       bullets: "dot" | "dash" | "arrow" | "none";
+      circularImage?: boolean;
     };
   };
 }
@@ -188,6 +190,56 @@ export const resumeTemplates: ResumeTemplate[] = [
         sections: false,
         contact: true,
         bullets: "dot"
+      }
+    }
+  },
+  
+  {
+    id: "modern-professional",
+    name: "Modern Professional",
+    description: "Contemporary two-column design with circular profile image and accent colors",
+    imageUrl: "/lovable-uploads/489267dd-1129-466d-b30b-dd43b3cbe0e8.png",
+    style: {
+      titleFont: "font-sans text-[32px] font-bold tracking-tight text-gray-900",
+      headerStyle: "grid grid-cols-12 gap-6",
+      sectionStyle: "text-[16px] font-bold uppercase tracking-wider text-emerald-700 mb-3 flex items-center",
+      contentStyle: "grid grid-cols-12 gap-6",
+      layout: "creative",
+      colors: {
+        primary: "#374151",
+        secondary: "#6B7280",
+        text: "#111827",
+        border: "#E5E7EB",
+        background: "#FFFFFF",
+        accent: "#10B981"
+      },
+      spacing: {
+        sectionGap: "1.25rem",
+        itemGap: "1rem",
+        contentPadding: "1.75rem",
+        headerHeight: "auto",
+        margins: {
+          top: "0.5in",
+          right: "0.5in",
+          bottom: "0.5in",
+          left: "0.5in"
+        }
+      },
+      dimensions: {
+        maxWidth: "816px",
+        minHeight: "1056px"
+      },
+      typography: {
+        titleSize: "32px",
+        subtitleSize: "17px",
+        bodySize: "15px",
+        lineHeight: "1.4"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "arrow",
+        circularImage: true
       }
     }
   }

@@ -1,5 +1,6 @@
+
 import { ResumeTemplate } from "../templates";
-import { Mail, Phone, Linkedin, Globe } from "lucide-react";
+import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
 
 interface PersonalSectionProps {
   fullName: string;
@@ -55,9 +56,100 @@ export function PersonalSection({
       title: "text-xl italic font-light text-gray-600",
       contactContainer: "flex flex-wrap gap-4 mt-2 text-sm text-gray-600"
     },
+    "modern-professional": {
+      container: "mb-6 grid grid-cols-12 gap-6",
+      imageContainer: "col-span-4 flex justify-center items-center",
+      infoContainer: "col-span-8",
+      name: "text-3xl font-bold tracking-tight text-gray-900",
+      title: "text-lg text-emerald-700 mt-1 font-medium",
+      contactContainer: "grid grid-cols-2 gap-2 mt-4 text-sm text-gray-600"
+    }
   };
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+
+  // Special rendering for Modern Professional template
+  if (template.id === "modern-professional") {
+    return (
+      <div className={currentStyle.container}>
+        <div className={currentStyle.imageContainer}>
+          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center">
+            <div className="text-5xl text-emerald-700 font-bold">
+              {fullName.split(' ').map(name => name[0]).join('')}
+            </div>
+          </div>
+        </div>
+        <div className={currentStyle.infoContainer}>
+          <h1 
+            className={`${currentStyle.name} outline-none`}
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("fullName", e)}
+          >
+            {fullName}
+          </h1>
+          <div 
+            className={`${currentStyle.title} outline-none`}
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("title", e)}
+          >
+            {title}
+          </div>
+          <div className={currentStyle.contactContainer}>
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-emerald-600" />
+              <span 
+                className="outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+              >
+                {email}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-emerald-600" />
+              <span 
+                className="outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+              >
+                {phone}
+              </span>
+            </div>
+            {linkedin && (
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-emerald-600" />
+                <span 
+                  className="outline-none"
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                >
+                  {linkedin}
+                </span>
+              </div>
+            )}
+            {website && (
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-emerald-600" />
+                <span 
+                  className="outline-none"
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                >
+                  {website}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (template.id === "modern-split") {
     return (

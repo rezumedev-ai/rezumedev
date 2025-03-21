@@ -1,10 +1,10 @@
 
-import { Briefcase, GraduationCap, Award, Star } from "lucide-react";
+import { Briefcase, GraduationCap, Award, Star, FileText, User, Code } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 
 interface SectionHeaderProps {
   title: string;
-  type?: "experience" | "education" | "skills" | "certifications";
+  type?: "experience" | "education" | "skills" | "certifications" | "summary" | "profile" | "projects";
   template: ResumeTemplate;
 }
 
@@ -14,17 +14,32 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
 
     switch (type) {
       case "experience":
-        return <Briefcase className="w-5 h-5 mr-2" />;
+        return <Briefcase className="w-5 h-5 mr-2 text-emerald-600" />;
       case "education":
-        return <GraduationCap className="w-5 h-5 mr-2" />;
+        return <GraduationCap className="w-5 h-5 mr-2 text-emerald-600" />;
       case "certifications":
-        return <Award className="w-5 h-5 mr-2" />;
+        return <Award className="w-5 h-5 mr-2 text-emerald-600" />;
       case "skills":
-        return <Star className="w-5 h-5 mr-2" />;
+        return <Code className="w-5 h-5 mr-2 text-emerald-600" />;
+      case "summary":
+        return <FileText className="w-5 h-5 mr-2 text-emerald-600" />;
+      case "profile":
+        return <User className="w-5 h-5 mr-2 text-emerald-600" />;
       default:
         return null;
     }
   };
+
+  if (template.id === "modern-professional") {
+    return (
+      <h3 className={template.style.sectionStyle}>
+        <div className="flex items-center after:content-[''] after:block after:h-0.5 after:flex-grow after:ml-2 after:bg-emerald-500">
+          {getIcon()}
+          <span>{title}</span>
+        </div>
+      </h3>
+    );
+  }
 
   return (
     <h3 className={template.style.sectionStyle}>

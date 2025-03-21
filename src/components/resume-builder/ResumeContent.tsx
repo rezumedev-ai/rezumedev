@@ -39,6 +39,69 @@ export function ResumeContent({
     resumeState.work_experience = experiences;
   };
   
+  // Modern Professional layout has a special two-column layout
+  if (template.id === "modern-professional") {
+    return (
+      <>
+        <PersonalSection 
+          fullName={resumeState.personal_info.fullName}
+          title={resumeState.professional_summary.title}
+          email={resumeState.personal_info.email}
+          phone={resumeState.personal_info.phone}
+          linkedin={resumeState.personal_info.linkedin}
+          website={resumeState.personal_info.website}
+          template={template}
+          isEditing={isEditing}
+          onUpdate={onPersonalInfoUpdate}
+        />
+        
+        <ProfessionalSummarySection 
+          summary={resumeState.professional_summary.summary} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={onSummaryUpdate}
+        />
+        
+        <div className="grid grid-cols-12 gap-6">
+          {/* Left column */}
+          <div className="col-span-8">
+            <ExperienceSection 
+              experiences={resumeState.work_experience} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={handleExperienceArrayUpdate}
+            />
+            
+            <EducationSection 
+              education={resumeState.education} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={onEducationUpdate}
+            />
+          </div>
+          
+          {/* Right column */}
+          <div className="col-span-4">
+            <SkillsSection 
+              hardSkills={resumeState.skills.hard_skills} 
+              softSkills={resumeState.skills.soft_skills} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={onSkillsUpdate}
+            />
+            
+            <CertificationsSection 
+              certifications={resumeState.certifications} 
+              template={template}
+              isEditing={isEditing}
+              onUpdate={onCertificationUpdate}
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+  
   return (
     <>
       <PersonalSection 

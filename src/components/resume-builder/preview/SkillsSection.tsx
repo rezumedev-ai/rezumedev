@@ -1,6 +1,7 @@
 
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
+import { SectionHeader } from "./SectionHeader";
 
 interface SkillsSectionProps {
   hardSkills: string[];
@@ -23,7 +24,7 @@ export function SkillsSection({
     if (!isEditing || !onUpdate) return;
     let newSkills: string[] = [];
     
-    if (template.id === "modern-split") {
+    if (template.id === "modern-split" || template.id === "modern-professional") {
       newSkills = Array.from(event.target.querySelectorAll('li')).map(li => li.textContent?.trim() || '');
     } else {
       newSkills = event.target.innerText
@@ -90,13 +91,73 @@ export function SkillsSection({
       title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
       skillType: `font-medium ${dynamicFontSizes.titleFontSize} mb-1`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
+    },
+    "modern-professional": {
+      section: "mb-6",
+      skillType: `font-semibold ${dynamicFontSizes.titleFontSize} text-gray-700 mb-2 border-b border-gray-200 pb-1`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     }
   };
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive" || template.id === "minimal-elegant";
+  const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive" || template.id === "minimal-elegant" || template.id === "modern-professional";
 
+  // Modern Professional template
+  if (template.id === "modern-professional") {
+    return (
+      <div className={currentStyle.section}>
+        <SectionHeader title="Skills" type="skills" template={template} />
+        
+        <div className="space-y-4 mt-3">
+          {hardSkills.length > 0 && (
+            <div>
+              <h4 className={currentStyle.skillType}>Technical Skills</h4>
+              <ul className="space-y-1.5 mt-2">
+                {hardSkills.map((skill, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="inline-block w-3 h-3 text-emerald-600 mt-[3px] mr-2 shrink-0">
+                      ➤
+                    </span>
+                    <span
+                      className={`outline-none ${currentStyle.skillList}`}
+                      contentEditable={isEditing}
+                      suppressContentEditableWarning
+                    >
+                      {skill}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {softSkills.length > 0 && (
+            <div>
+              <h4 className={currentStyle.skillType}>Soft Skills</h4>
+              <ul className="space-y-1.5 mt-2">
+                {softSkills.map((skill, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="inline-block w-3 h-3 text-emerald-600 mt-[3px] mr-2 shrink-0">
+                      ➤
+                    </span>
+                    <span
+                      className={`outline-none ${currentStyle.skillList}`}
+                      contentEditable={isEditing}
+                      suppressContentEditableWarning
+                    >
+                      {skill}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>

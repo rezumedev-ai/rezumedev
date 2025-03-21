@@ -1,6 +1,6 @@
 
 import { ResumeTemplate } from "../templates";
-import { File, Briefcase, Award, GraduationCap, Lightbulb } from "lucide-react";
+import { SectionHeader } from "./SectionHeader";
 
 interface ProfessionalSummarySectionProps {
   summary: string;
@@ -43,21 +43,30 @@ export function ProfessionalSummarySection({
       section: "mb-5",
       title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
       content: "text-[13px] text-gray-700"
+    },
+    "modern-professional": {
+      section: "mb-5 col-span-12",
+      content: "text-[14px] text-gray-700 leading-relaxed mt-2"
     }
   };
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  const getSectionIcon = () => {
-    switch (template.id) {
-      case "minimal-elegant":
-        return <File className="w-4 h-4 mr-2 text-black" />;
-      case "modern-split":
-        return <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>;
-      default:
-        return null;
-    }
-  };
+  if (template.id === "modern-professional") {
+    return (
+      <div className={currentStyle.section}>
+        <SectionHeader title="Professional Summary" type="summary" template={template} />
+        <div 
+          className={`${currentStyle.content} outline-none`}
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSummaryEdit}
+        >
+          {summary}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={currentStyle.section}>
