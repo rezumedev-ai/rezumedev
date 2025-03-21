@@ -24,13 +24,14 @@ export function MobileResumeIntro({ onContinue, resumeName = "Resume" }: MobileR
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-indigo-50 to-white px-4 py-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-indigo-50 to-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      style={{ minHeight: "100svh", width: "100%" }}
     >
       <motion.div 
-        className="w-full max-w-[280px] flex flex-col items-center text-center space-y-5"
+        className="px-4 w-full max-w-[90%] sm:max-w-[280px] flex flex-col items-center text-center space-y-4"
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
@@ -61,7 +62,7 @@ export function MobileResumeIntro({ onContinue, resumeName = "Resume" }: MobileR
           </motion.div>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           <motion.h2 
             className="text-xl font-bold text-gray-900"
             initial={{ opacity: 0, y: 10 }}
@@ -72,7 +73,7 @@ export function MobileResumeIntro({ onContinue, resumeName = "Resume" }: MobileR
           </motion.h2>
           
           <motion.p 
-            className="text-gray-600 text-sm leading-relaxed"
+            className="text-gray-600 text-sm"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -81,7 +82,7 @@ export function MobileResumeIntro({ onContinue, resumeName = "Resume" }: MobileR
           </motion.p>
 
           <motion.div
-            className="flex items-center justify-center mt-3 space-x-1.5"
+            className="flex items-center justify-center mt-2 space-x-1.5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -99,7 +100,7 @@ export function MobileResumeIntro({ onContinue, resumeName = "Resume" }: MobileR
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="w-full"
+          className="w-full mt-2"
         >
           <Button 
             onClick={onContinue} 
