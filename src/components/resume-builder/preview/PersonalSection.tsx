@@ -1,3 +1,4 @@
+
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
 import { ImageUploadButton } from "./ImageUploadButton";
@@ -85,6 +86,7 @@ export function PersonalSection({
                 src={profileImageUrl} 
                 alt={`${fullName}'s profile`} 
                 className="w-full h-full object-cover"
+                style={{aspectRatio: "1/1", objectPosition: "center"}}
               />
             ) : (
               <div className="text-5xl text-emerald-700 font-bold">

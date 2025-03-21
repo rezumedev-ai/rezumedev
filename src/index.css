@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -109,8 +110,46 @@
     -webkit-print-color-adjust: exact;
   }
 
-  #resume-content ul.list-disc li {
+  /* Improved list and bullet point styling */
+  #resume-content ul.list-disc li,
+  #resume-content ul.space-y-1 li,
+  #resume-content ul.space-y-1.5 li {
     page-break-inside: avoid;
+    display: flex !important;
+    align-items: flex-start !important;
+  }
+
+  #resume-content .rounded-full {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+  }
+
+  #resume-content .rounded-full img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    aspect-ratio: 1/1 !important;
+  }
+
+  /* Ensure proper alignment of bullet points */
+  #resume-content li .inline-block,
+  #resume-content li .inline-flex {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: top !important;
+    margin-top: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Fix for arrow bullet points */
+  #resume-content .space-y-1.5 li span:first-child,
+  #resume-content .space-y-1 li span:first-child {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
   }
   
   .prose {

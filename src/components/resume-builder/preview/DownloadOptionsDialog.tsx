@@ -95,6 +95,33 @@ export function DownloadOptionsDialog({
         visibility: resumeElement.style.visibility
       };
       
+      // Fix for profile image and bullet points: add specific CSS class to the cloned content
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+        .pdf-specific-fixes .rounded-full img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
+          border-radius: 50% !important;
+        }
+        .pdf-specific-fixes .flex.items-start {
+          align-items: flex-start !important;
+        }
+        .pdf-specific-fixes li .inline-block {
+          vertical-align: top !important; 
+          margin-top: 4px !important;
+        }
+        .pdf-specific-fixes .space-y-1.5 li {
+          display: flex !important;
+          align-items: flex-start !important;
+        }
+        .pdf-specific-fixes .space-y-1 li {
+          display: flex !important;
+          align-items: flex-start !important;
+        }
+      `;
+      document.head.appendChild(styleElement);
+      
       // Temporarily disable scale transform for capture
       const originalTransform = resumeElement.style.transform;
       resumeElement.style.transform = 'none';
@@ -140,11 +167,31 @@ export function DownloadOptionsDialog({
         onclone: (clonedDocument, element) => {
           const clonedElement = element as HTMLElement;
           
+          // Add the PDF-specific class to the cloned element
+          clonedElement.classList.add('pdf-specific-fixes');
+          
           // Apply exact styling to the cloned element
           clonedElement.style.transform = 'none';
           clonedElement.style.transformOrigin = 'top left';
           clonedElement.style.width = `${contentWidth}px`;
           clonedElement.style.height = `${contentHeight}px`;
+          
+          // Fix alignment of list items in the cloned document
+          const listItems = clonedElement.querySelectorAll('li');
+          listItems.forEach(li => {
+            const bulletPoint = li.querySelector('.inline-block');
+            const textContent = li.querySelector('[contenteditable]') || li.lastChild;
+            
+            if (bulletPoint && textContent) {
+              bulletPoint.classList.add('bullet-point-fix');
+            }
+          });
+          
+          // Fix circular images in the cloned document
+          const profileImages = clonedElement.querySelectorAll('.rounded-full');
+          profileImages.forEach(img => {
+            img.classList.add('profile-image-fix');
+          });
           
           // Ensure fonts are properly loaded in the clone
           const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
@@ -165,15 +212,18 @@ export function DownloadOptionsDialog({
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 100); // Small delay to ensure rendering
+                setTimeout(resolve, 300); // Increased delay to ensure rendering
               });
             } else {
               // Fallback if document.fonts is not available
-              setTimeout(resolve, 200);
+              setTimeout(resolve, 400);
             }
           });
         }
       });
+
+      // Remove the temporary style element
+      document.head.removeChild(styleElement);
 
       // Restore original transitions
       allElements.forEach((el: Element, index: number) => {

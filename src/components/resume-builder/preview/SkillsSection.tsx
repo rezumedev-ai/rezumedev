@@ -116,12 +116,12 @@ export function SkillsSection({
               <h4 className={currentStyle.skillType}>Technical Skills</h4>
               <ul className="space-y-1.5 mt-2">
                 {hardSkills.map((skill, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="inline-block w-3 h-3 text-emerald-600 mt-[3px] mr-2 shrink-0">
+                  <li key={index} className="flex items-center">
+                    <span className="inline-flex items-center justify-center w-3 h-3 text-emerald-600 mr-2 shrink-0">
                       ➤
                     </span>
                     <span
-                      className={`outline-none ${currentStyle.skillList}`}
+                      className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
                       suppressContentEditableWarning
                     >
@@ -138,12 +138,12 @@ export function SkillsSection({
               <h4 className={currentStyle.skillType}>Soft Skills</h4>
               <ul className="space-y-1.5 mt-2">
                 {softSkills.map((skill, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="inline-block w-3 h-3 text-emerald-600 mt-[3px] mr-2 shrink-0">
+                  <li key={index} className="flex items-center">
+                    <span className="inline-flex items-center justify-center w-3 h-3 text-emerald-600 mr-2 shrink-0">
                       ➤
                     </span>
                     <span
-                      className={`outline-none ${currentStyle.skillList}`}
+                      className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
                       suppressContentEditableWarning
                     >
@@ -186,10 +186,10 @@ export function SkillsSection({
             {usesBulletPoints ? (
               <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
                 {hardSkills.map((skill, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
+                  <li key={index} className="flex items-center">
+                    <span className={`inline-flex items-center justify-center w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mr-2 shrink-0`}></span>
                     <span
-                      className={`outline-none ${currentStyle.skillList}`}
+                      className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
                       suppressContentEditableWarning
                     >
@@ -221,10 +221,10 @@ export function SkillsSection({
             {usesBulletPoints ? (
               <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
                 {softSkills.map((skill, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className={`inline-block w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mt-[6px] mr-2 shrink-0`}></span>
+                  <li key={index} className="flex items-center">
+                    <span className={`inline-flex items-center justify-center w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mr-2 shrink-0`}></span>
                     <span
-                      className={`outline-none ${currentStyle.skillList}`}
+                      className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
                       suppressContentEditableWarning
                     >
