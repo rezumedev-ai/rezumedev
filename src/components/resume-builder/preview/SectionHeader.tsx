@@ -11,7 +11,7 @@ interface SectionHeaderProps {
 export function SectionHeader({ title, type, template }: SectionHeaderProps) {
   const getIcon = () => {
     const iconSize = 18;
-    const className = "inline-flex items-center justify-center mr-2 align-middle";
+    const className = "inline-block align-text-bottom mr-2";
     
     switch (type) {
       case "personal":

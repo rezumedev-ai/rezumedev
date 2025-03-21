@@ -48,18 +48,10 @@ export function ResumeContent({
     return (
       <>
         <PersonalSection 
-          fullName={resumeState.personal_info.fullName}
-          title={resumeState.professional_summary.title}
-          email={resumeState.personal_info.email}
-          phone={resumeState.personal_info.phone}
-          linkedin={resumeState.personal_info.linkedin}
-          website={resumeState.personal_info.website}
-          profileImageUrl={resumeState.personal_info.profileImageUrl}
+          personalInfo={resumeState.personal_info}
           template={template}
           isEditing={isEditing}
-          resumeId={resumeId}
           onUpdate={onPersonalInfoUpdate}
-          onImageUpdate={onProfileImageUpdate}
         />
         
         <ProfessionalSummarySection 
@@ -112,18 +104,10 @@ export function ResumeContent({
   return (
     <>
       <PersonalSection 
-        fullName={resumeState.personal_info.fullName}
-        title={resumeState.professional_summary.title}
-        email={resumeState.personal_info.email}
-        phone={resumeState.personal_info.phone}
-        linkedin={resumeState.personal_info.linkedin}
-        website={resumeState.personal_info.website}
-        profileImageUrl={resumeState.personal_info.profileImageUrl}
+        personalInfo={resumeState.personal_info}
         template={template}
         isEditing={isEditing}
-        resumeId={resumeId}
         onUpdate={onPersonalInfoUpdate}
-        onImageUpdate={onProfileImageUpdate}
       />
       
       <ProfessionalSummarySection 
