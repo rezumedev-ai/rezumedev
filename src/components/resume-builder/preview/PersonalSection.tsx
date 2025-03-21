@@ -1,6 +1,6 @@
-
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
+import { ImageUploadButton } from "./ImageUploadButton";
 
 interface PersonalSectionProps {
   fullName: string;
@@ -9,9 +9,12 @@ interface PersonalSectionProps {
   phone: string;
   linkedin?: string;
   website?: string;
+  profileImageUrl?: string;
   template: ResumeTemplate;
   isEditing?: boolean;
+  resumeId?: string;
   onUpdate?: (field: string, value: string) => void;
+  onImageUpdate?: (imageUrl: string | null) => void;
 }
 
 export function PersonalSection({
@@ -21,9 +24,12 @@ export function PersonalSection({
   phone,
   linkedin,
   website,
+  profileImageUrl,
   template,
   isEditing,
-  onUpdate
+  resumeId,
+  onUpdate,
+  onImageUpdate
 }: PersonalSectionProps) {
   const handleContentEdit = (field: string, event: React.FocusEvent<HTMLElement>) => {
     if (!isEditing || !onUpdate) return;
@@ -73,10 +79,27 @@ export function PersonalSection({
     return (
       <div className={currentStyle.container}>
         <div className={styles["modern-professional"].imageContainer}>
-          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center">
-            <div className="text-5xl text-emerald-700 font-bold">
-              {fullName.split(' ').map(name => name[0]).join('')}
-            </div>
+          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center relative">
+            {profileImageUrl ? (
+              <img 
+                src={profileImageUrl} 
+                alt={`${fullName}'s profile`} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="text-5xl text-emerald-700 font-bold">
+                {fullName.split(' ').map(name => name[0]).join('')}
+              </div>
+            )}
+            {isEditing && onImageUpdate && resumeId && (
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+                <ImageUploadButton 
+                  resumeId={resumeId} 
+                  currentImageUrl={profileImageUrl} 
+                  onImageUpdate={onImageUpdate} 
+                />
+              </div>
+            )}
           </div>
         </div>
         <div className={styles["modern-professional"].infoContainer}>

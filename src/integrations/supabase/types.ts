@@ -303,6 +303,7 @@ export type Database = {
           id: string
           personal_info: Json | null
           professional_summary: Json | null
+          profile_image_url: string | null
           skills: Json | null
           style_preference: string | null
           template_id: string | null
@@ -323,6 +324,7 @@ export type Database = {
           id?: string
           personal_info?: Json | null
           professional_summary?: Json | null
+          profile_image_url?: string | null
           skills?: Json | null
           style_preference?: string | null
           template_id?: string | null
@@ -343,6 +345,7 @@ export type Database = {
           id?: string
           personal_info?: Json | null
           professional_summary?: Json | null
+          profile_image_url?: string | null
           skills?: Json | null
           style_preference?: string | null
           template_id?: string | null

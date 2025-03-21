@@ -49,8 +49,38 @@ export function useResumePersonalInfo(
     });
   };
 
+  const handleProfileImageUpdate = (imageUrl: string | null) => {
+    setPersonalInfo(prev => {
+      const updated = {
+        ...prev,
+        profileImageUrl: imageUrl || undefined
+      };
+      
+      const newState = {
+        ...initialResumeData,
+        personal_info: updated
+      };
+      
+      updateResumeData(newState);
+
+      // Also update the profile_image_url directly in the resumes table
+      supabase
+        .from('resumes')
+        .update({ profile_image_url: imageUrl })
+        .eq('id', resumeId)
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error updating profile image URL:", error);
+          }
+        });
+      
+      return updated;
+    });
+  };
+
   return {
     personalInfo,
-    handlePersonalInfoUpdate
+    handlePersonalInfoUpdate,
+    handleProfileImageUpdate
   };
 }

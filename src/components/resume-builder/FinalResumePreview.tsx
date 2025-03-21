@@ -28,6 +28,7 @@ export function FinalResumePreview({
     isEditing,
     toggleEditMode,
     handlePersonalInfoUpdate,
+    handleProfileImageUpdate,
     handleSummaryUpdate,
     handleSkillsUpdate,
     handleEducationUpdate,
@@ -118,7 +119,9 @@ export function FinalResumePreview({
           resumeState={resumeState}
           template={template}
           isEditing={isEditing}
+          resumeId={resumeId}
           onPersonalInfoUpdate={handlePersonalInfoUpdate}
+          onProfileImageUpdate={handleProfileImageUpdate}
           onSummaryUpdate={handleSummaryUpdate}
           onSkillsUpdate={handleSkillsUpdate}
           onEducationUpdate={handleEducationUpdate}

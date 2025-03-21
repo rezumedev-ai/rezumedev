@@ -30,6 +30,7 @@ export interface ResumeData {
     phone: string;
     linkedin?: string;
     website?: string;
+    profileImageUrl?: string;
   };
   professional_summary: {
     title: string;

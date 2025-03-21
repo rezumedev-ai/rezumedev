@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ResumeData } from "@/types/resume";
 import { toast } from "sonner";
@@ -26,7 +25,7 @@ export function useResumePreview(initialResumeData: ResumeData, resumeId: string
   };
   
   // Use all the specialized hooks
-  const { personalInfo, handlePersonalInfoUpdate } = useResumePersonalInfo(
+  const { personalInfo, handlePersonalInfoUpdate, handleProfileImageUpdate } = useResumePersonalInfo(
     resumeState,
     resumeId,
     isEditing
@@ -87,6 +86,7 @@ export function useResumePreview(initialResumeData: ResumeData, resumeId: string
     isChangingTemplate,
     toggleEditMode,
     handlePersonalInfoUpdate,
+    handleProfileImageUpdate,
     handleSummaryUpdate,
     handleSkillsUpdate,
     handleEducationUpdate,

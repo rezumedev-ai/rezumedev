@@ -12,7 +12,9 @@ interface ResumeContentProps {
   resumeState: ResumeData;
   template: ResumeTemplate;
   isEditing: boolean;
+  resumeId: string;
   onPersonalInfoUpdate: (field: string, value: string) => void;
+  onProfileImageUpdate?: (imageUrl: string | null) => void;
   onSummaryUpdate: (summary: string) => void;
   onSkillsUpdate: (type: "hard" | "soft", skills: string[]) => void;
   onEducationUpdate: (index: number, field: keyof Education, value: string) => void;
@@ -24,7 +26,9 @@ export function ResumeContent({
   resumeState,
   template,
   isEditing,
+  resumeId,
   onPersonalInfoUpdate,
+  onProfileImageUpdate,
   onSummaryUpdate,
   onSkillsUpdate,
   onEducationUpdate,
@@ -50,9 +54,12 @@ export function ResumeContent({
           phone={resumeState.personal_info.phone}
           linkedin={resumeState.personal_info.linkedin}
           website={resumeState.personal_info.website}
+          profileImageUrl={resumeState.personal_info.profileImageUrl}
           template={template}
           isEditing={isEditing}
+          resumeId={resumeId}
           onUpdate={onPersonalInfoUpdate}
+          onImageUpdate={onProfileImageUpdate}
         />
         
         <ProfessionalSummarySection 
@@ -111,9 +118,12 @@ export function ResumeContent({
         phone={resumeState.personal_info.phone}
         linkedin={resumeState.personal_info.linkedin}
         website={resumeState.personal_info.website}
+        profileImageUrl={resumeState.personal_info.profileImageUrl}
         template={template}
         isEditing={isEditing}
+        resumeId={resumeId}
         onUpdate={onPersonalInfoUpdate}
+        onImageUpdate={onProfileImageUpdate}
       />
       
       <ProfessionalSummarySection 
