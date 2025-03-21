@@ -21,16 +21,32 @@ export function useIsMobile() {
     
     // Setup listeners
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    mql.addEventListener("change", checkIsMobile);
+    
+    // Use event listener with a handler function (more compatibility)
+    const handleMediaChange = () => checkIsMobile();
+    
+    // Modern browsers use addEventListener, older versions use addListener
+    if (mql.addEventListener) {
+      mql.addEventListener("change", handleMediaChange);
+    } else if (mql.addListener) {
+      // For older browsers
+      mql.addListener(handleMediaChange);
+    }
+    
     window.addEventListener("orientationchange", checkIsMobile);
     window.addEventListener("resize", checkIsMobile);
     
     return () => {
-      mql.removeEventListener("change", checkIsMobile);
+      if (mql.removeEventListener) {
+        mql.removeEventListener("change", handleMediaChange);
+      } else if (mql.removeListener) {
+        // For older browsers
+        mql.removeListener(handleMediaChange);
+      }
       window.removeEventListener("orientationchange", checkIsMobile);
       window.removeEventListener("resize", checkIsMobile);
     };
   }, []);
 
-  return !!isMobile;
+  return isMobile;
 }

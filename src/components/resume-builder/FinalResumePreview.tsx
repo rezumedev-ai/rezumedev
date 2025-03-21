@@ -23,7 +23,6 @@ export function FinalResumePreview({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [resumeScale, setResumeScale] = useState(1);
-  const [showOverlay, setShowOverlay] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const {
@@ -53,18 +52,6 @@ export function FinalResumePreview({
     handleTemplateChange(templateId);
     toast.success(`Template updated to ${resumeTemplates.find(t => t.id === templateId)?.name || 'new template'}`);
   };
-
-  useEffect(() => {
-    // Show overlay message for mobile users only when the component mounts
-    if (isMobile) {
-      setShowOverlay(true);
-      const timer = setTimeout(() => {
-        setShowOverlay(false);
-      }, 3000); // Show overlay for 3 seconds
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isMobile]);
 
   useEffect(() => {
     const updateScale = () => {
@@ -141,34 +128,6 @@ export function FinalResumePreview({
         onProfileImageUpdate={handleProfileImageUpdate}
         currentProfileImageUrl={resumeState.personal_info.profileImageUrl}
       />
-      
-      <AnimatePresence>
-        {showOverlay && isMobile && (
-          <motion.div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div 
-              className="bg-white rounded-lg p-5 max-w-xs w-full text-center shadow-xl"
-              initial={{ scale: 0.8, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: "spring", damping: 25 }}
-            >
-              <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
-                <Eye className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-lg font-semibold mb-1 text-gray-900">Best View Tip</h3>
-              <p className="text-gray-600 text-sm">
-                Pinch to zoom out for the best experience and to view the complete resume
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       
       <motion.div 
         id="resume-content" 

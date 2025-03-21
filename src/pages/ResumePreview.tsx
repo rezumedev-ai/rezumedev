@@ -4,12 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FinalResumePreview } from "@/components/resume-builder/FinalResumePreview";
 import { ResumeData } from "@/types/resume";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet";
 import { isObject, getStringProperty } from "@/utils/type-guards";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useState, useEffect } from "react";
+import { MobileResumeIntro } from "@/components/resume-builder/MobileResumeIntro";
 
 export default function ResumePreview() {
   const { id } = useParams();
+  const isMobile = useIsMobile();
+  const [showIntro, setShowIntro] = useState(false);
 
   const { data: resume, isLoading } = useQuery({
     queryKey: ["resume", id],
@@ -30,6 +35,13 @@ export default function ResumePreview() {
       return data;
     }
   });
+
+  // Set showIntro to true once we confirm the user is on mobile and we have the resume data
+  useEffect(() => {
+    if (isMobile !== undefined && resume && !isLoading) {
+      setShowIntro(isMobile);
+    }
+  }, [isMobile, resume, isLoading]);
 
   if (isLoading) {
     return (
@@ -69,6 +81,9 @@ export default function ResumePreview() {
   // Get summary for meta description
   const summary = getStringProperty(professionalSummary, 'summary', "");
   const metaDescription = summary ? summary.substring(0, 100) + '...' : '';
+  
+  // Generate resume name for intro screen
+  const resumeName = name ? `${name}'s Resume` : "Your Resume";
 
   return (
     <div className="relative bg-white min-h-screen">
@@ -84,6 +99,16 @@ export default function ResumePreview() {
         />
         <link rel="icon" href="/custom-favicon.svg" />
       </Helmet>
+      
+      <AnimatePresence>
+        {showIntro && (
+          <MobileResumeIntro 
+            onContinue={() => setShowIntro(false)} 
+            resumeName={resumeName}
+          />
+        )}
+      </AnimatePresence>
+      
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
