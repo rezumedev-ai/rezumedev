@@ -238,7 +238,6 @@ const Pricing = () => {
                 <PricingFeature text="Save 25% annually" highlight />
                 <PricingFeature text="Priority support" highlight />
                 <PricingFeature text="Early access to new features" highlight />
-                <PricingFeature text="LinkedIn integration" highlight />
               </motion.ul>
               
               {renderSubscriptionButton("yearly")}
@@ -296,8 +295,6 @@ const Pricing = () => {
                 <PricingFeature text="Everything in Yearly" />
                 <PricingFeature text="Lifetime updates" />
                 <PricingFeature text="VIP support" />
-                <PricingFeature text="Custom branding" />
-                <PricingFeature text="API access" />
               </motion.ul>
               
               {renderSubscriptionButton("lifetime")}

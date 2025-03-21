@@ -1,4 +1,3 @@
-
 import { Check, CheckCircle2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -35,8 +34,7 @@ const PricingSection = () => {
         "Everything in Monthly",
         "Save 25% annually",
         "Priority support",
-        "Early access to new features",
-        "LinkedIn integration"
+        "Early access to new features"
       ],
       cta: "Start Yearly",
       link: "/pricing",
@@ -53,9 +51,7 @@ const PricingSection = () => {
       features: [
         "Everything in Yearly",
         "Lifetime updates",
-        "VIP support",
-        "Custom branding",
-        "API access"
+        "VIP support"
       ],
       cta: "Get Lifetime",
       link: "/pricing",
@@ -189,8 +185,6 @@ const PricingSection = () => {
                   repeatType: "reverse"
                 }}
               ></motion.div>
-              
-              {/* Most Popular badge removed */}
               
               <motion.div 
                 className="mb-4 mt-2"
