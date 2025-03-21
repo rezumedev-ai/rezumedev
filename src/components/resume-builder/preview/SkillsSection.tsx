@@ -23,8 +23,7 @@ export function SkillsSection({
     if (!isEditing || !onUpdate) return;
     let newSkills: string[] = [];
     
-    if (template.id === "modern-split" || template.id === "modern-professional" || template.id === "professional-navy" || 
-        template.id === "professional-executive" || template.id === "minimal-elegant") {
+    if (template.id === "modern-split" || template.id === "modern-professional" || template.id === "professional-navy") {
       newSkills = Array.from(event.target.querySelectorAll('li')).map(li => li.textContent?.trim() || '');
     } else {
       newSkills = event.target.innerText
@@ -108,122 +107,9 @@ export function SkillsSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  // Updated to include professional-executive and minimal-elegant templates
-  const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive" || 
-                           template.id === "minimal-elegant" || template.id === "modern-professional" || 
-                           template.id === "professional-navy";
+  const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive" || template.id === "minimal-elegant" || template.id === "modern-professional" || template.id === "professional-navy";
 
-  // Professional Executive template 
-  if (template.id === "professional-executive") {
-    return (
-      <div className={currentStyle.section}>
-        <SectionHeader title="Skills" type="skills" template={template} />
-        
-        <div className="space-y-4 mt-3">
-          {hardSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Core Competencies</h4>
-              <ul className="space-y-1.5 mt-2">
-                {hardSkills.map((skill, index) => (
-                  <li key={index} className="flex items-center">
-                    <span className="inline-flex items-center justify-center w-3 h-3 text-black mr-2 shrink-0">
-                      ➤
-                    </span>
-                    <span
-                      className={`outline-none ${currentStyle.skillList} flex-1`}
-                      contentEditable={isEditing}
-                      suppressContentEditableWarning
-                    >
-                      {skill}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          {softSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Professional Skills</h4>
-              <ul className="space-y-1.5 mt-2">
-                {softSkills.map((skill, index) => (
-                  <li key={index} className="flex items-center">
-                    <span className="inline-flex items-center justify-center w-3 h-3 text-black mr-2 shrink-0">
-                      ➤
-                    </span>
-                    <span
-                      className={`outline-none ${currentStyle.skillList} flex-1`}
-                      contentEditable={isEditing}
-                      suppressContentEditableWarning
-                    >
-                      {skill}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-  
-  // Minimal Elegant template
-  if (template.id === "minimal-elegant") {
-    return (
-      <div className={currentStyle.section}>
-        <SectionHeader title="Skills" type="skills" template={template} />
-        
-        <div className="space-y-4 mt-3">
-          {hardSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Technical Skills</h4>
-              <ul className="space-y-1.5 mt-2">
-                {hardSkills.map((skill, index) => (
-                  <li key={index} className="flex items-center">
-                    <span className="inline-flex items-center justify-center w-3 h-3 text-black mr-2 shrink-0">
-                      ➤
-                    </span>
-                    <span
-                      className={`outline-none ${currentStyle.skillList} flex-1`}
-                      contentEditable={isEditing}
-                      suppressContentEditableWarning
-                    >
-                      {skill}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          {softSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Professional Skills</h4>
-              <ul className="space-y-1.5 mt-2">
-                {softSkills.map((skill, index) => (
-                  <li key={index} className="flex items-center">
-                    <span className="inline-flex items-center justify-center w-3 h-3 text-black mr-2 shrink-0">
-                      ➤
-                    </span>
-                    <span
-                      className={`outline-none ${currentStyle.skillList} flex-1`}
-                      contentEditable={isEditing}
-                      suppressContentEditableWarning
-                    >
-                      {skill}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Professional Navy template
+  // Professional Navy template (now formatted similar to Modern Professional)
   if (template.id === "professional-navy") {
     return (
       <div className={currentStyle.section}>
@@ -333,7 +219,6 @@ export function SkillsSection({
     );
   }
   
-  // Default/Other templates
   return (
     <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
