@@ -4,13 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Mail, Lock, RefreshCw } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,37 +45,6 @@ const Login = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const clearAuthTokens = () => {
-    setIsClearing(true);
-    try {
-      // Clear any auth-related items from localStorage
-      localStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('supabase.auth.expires_at');
-      localStorage.removeItem('supabase.auth.refresh_token');
-      
-      // Clear any auth-related cookies
-      document.cookie.split(';').forEach(c => {
-        document.cookie = c
-          .replace(/^ +/, '')
-          .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
-      });
-      
-      toast({
-        title: "Auth tokens cleared",
-        description: "All authentication tokens have been cleared from your browser",
-      });
-    } catch (error) {
-      console.error('Error clearing tokens:', error);
-      toast({
-        variant: "destructive",
-        title: "Error clearing tokens",
-        description: error instanceof Error ? error.message : "Failed to clear auth tokens",
-      });
-    } finally {
-      setIsClearing(false);
     }
   };
 
@@ -138,20 +106,6 @@ const Login = () => {
             <div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
-            </div>
-
-            <div className="flex justify-center">
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm"
-                className="text-xs"
-                onClick={clearAuthTokens}
-                disabled={isClearing}
-              >
-                {isClearing ? "Clearing..." : "Clear Auth Tokens"}
-                <RefreshCw className="ml-2 h-3 w-3" />
               </Button>
             </div>
 
