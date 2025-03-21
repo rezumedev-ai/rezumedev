@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,39 +22,9 @@ export default function ResumePreview() {
 
       if (error) throw error;
       
-      // Ensure all arrays are initialized
+      // Ensure certifications is always an array, even if null/undefined
       if (!data.certifications) {
         data.certifications = [];
-      }
-      
-      // Add sample languages and projects if they don't exist (for demonstration)
-      // This would normally come from the database, but we're adding it here for the preview
-      if (!data.languages) {
-        data.languages = [
-          { name: "English", proficiency: "Native" },
-          { name: "French", proficiency: "Intermediate" },
-          { name: "Spanish", proficiency: "Beginner" }
-        ];
-      }
-      
-      if (!data.projects) {
-        data.projects = [
-          { 
-            name: "Portfolio Website", 
-            description: "Designed and developed a responsive portfolio website to showcase skills and projects.",
-            startDate: "2022-06", 
-            endDate: "2022-08", 
-            technologies: ["React", "Tailwind CSS", "TypeScript"]
-          },
-          { 
-            name: "E-commerce Platform", 
-            description: "Built a full-stack e-commerce solution with user authentication and payment processing.",
-            startDate: "2021-10", 
-            endDate: "2022-03", 
-            isOngoing: false,
-            technologies: ["Next.js", "Node.js", "MongoDB", "Stripe"]
-          }
-        ];
       }
       
       return data;

@@ -23,21 +23,6 @@ export interface Certification {
   completionDate: string;
 }
 
-export interface Language {
-  name: string;
-  proficiency: "Beginner" | "Intermediate" | "Advanced" | "Fluent" | "Native";
-}
-
-export interface Project {
-  name: string;
-  description: string;
-  startDate: string;
-  endDate?: string;
-  isOngoing?: boolean;
-  technologies?: string[];
-  url?: string;
-}
-
 export interface ResumeData {
   personal_info: {
     fullName: string;
@@ -58,7 +43,5 @@ export interface ResumeData {
     soft_skills: string[];
   };
   certifications: Certification[];
-  languages?: Language[];
-  projects?: Project[];
   template_id?: string;
 }
