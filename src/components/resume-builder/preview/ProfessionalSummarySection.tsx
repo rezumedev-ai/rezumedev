@@ -46,6 +46,7 @@ export function ProfessionalSummarySection({
     },
     "modern-professional": {
       section: "mb-5 col-span-12",
+      title: "text-base font-bold text-emerald-700 uppercase tracking-wide mb-3",
       content: "text-[14px] text-gray-700 leading-relaxed mt-2"
     }
   };

@@ -58,11 +58,11 @@ export function PersonalSection({
     },
     "modern-professional": {
       container: "mb-6 grid grid-cols-12 gap-6",
-      imageContainer: "col-span-4 flex justify-center items-center",
-      infoContainer: "col-span-8",
       name: "text-3xl font-bold tracking-tight text-gray-900",
       title: "text-lg text-emerald-700 mt-1 font-medium",
-      contactContainer: "grid grid-cols-2 gap-2 mt-4 text-sm text-gray-600"
+      contactContainer: "grid grid-cols-2 gap-2 mt-4 text-sm text-gray-600",
+      imageContainer: "col-span-4 flex justify-center items-center",
+      infoContainer: "col-span-8"
     }
   };
 
@@ -72,14 +72,14 @@ export function PersonalSection({
   if (template.id === "modern-professional") {
     return (
       <div className={currentStyle.container}>
-        <div className={currentStyle.imageContainer}>
+        <div className={styles["modern-professional"].imageContainer}>
           <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center">
             <div className="text-5xl text-emerald-700 font-bold">
               {fullName.split(' ').map(name => name[0]).join('')}
             </div>
           </div>
         </div>
-        <div className={currentStyle.infoContainer}>
+        <div className={styles["modern-professional"].infoContainer}>
           <h1 
             className={`${currentStyle.name} outline-none`}
             contentEditable={isEditing}

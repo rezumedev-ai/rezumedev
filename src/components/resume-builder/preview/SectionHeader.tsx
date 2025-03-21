@@ -1,5 +1,5 @@
 
-import { Briefcase, GraduationCap, Award, Star, FileText, User, Code } from "lucide-react";
+import { Briefcase, GraduationCap, Award, Star, FileText, User, Code, FolderKanban } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 
 interface SectionHeaderProps {
@@ -25,6 +25,8 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
         return <FileText className="w-5 h-5 mr-2 text-emerald-600" />;
       case "profile":
         return <User className="w-5 h-5 mr-2 text-emerald-600" />;
+      case "projects":
+        return <FolderKanban className="w-5 h-5 mr-2 text-emerald-600" />;
       default:
         return null;
     }

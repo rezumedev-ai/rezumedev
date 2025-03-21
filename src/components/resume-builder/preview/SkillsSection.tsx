@@ -94,6 +94,7 @@ export function SkillsSection({
     },
     "modern-professional": {
       section: "mb-6",
+      title: "text-base font-bold text-emerald-700 uppercase tracking-wide mb-3",
       skillType: `font-semibold ${dynamicFontSizes.titleFontSize} text-gray-700 mb-2 border-b border-gray-200 pb-1`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     }
