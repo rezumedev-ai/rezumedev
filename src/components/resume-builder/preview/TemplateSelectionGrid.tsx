@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface TemplateSelectionGridProps {
   templates: ResumeTemplate[];
@@ -74,56 +75,58 @@ export function TemplateSelectionGrid({
               )}
               onClick={() => onTemplateChange(template.id)}
             >
-              <div className="relative aspect-[8.5/11] bg-white">
-                <img
-                  src={template.imageUrl}
-                  alt={template.name}
-                  className="object-cover w-full h-full"
-                  loading="lazy"
-                />
-                
-                {currentTemplateId === template.id && (
-                  <motion.div 
-                    className="absolute inset-0 bg-primary/10 flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
+              <div className="bg-white">
+                <AspectRatio ratio={8.5/11}>
+                  <img
+                    src={template.imageUrl}
+                    alt={template.name}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                  
+                  {currentTemplateId === template.id && (
                     <motion.div 
-                      className="bg-primary text-white rounded-full p-2 sm:p-3"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.1 }}
+                      className="absolute inset-0 bg-primary/10 flex items-center justify-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      <Check className="w-5 h-5 sm:w-8 sm:h-8" />
+                      <motion.div 
+                        className="bg-primary text-white rounded-full p-2 sm:p-3"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.1 }}
+                      >
+                        <Check className="w-5 h-5 sm:w-8 sm:h-8" />
+                      </motion.div>
                     </motion.div>
-                  </motion.div>
-                )}
-                
-                {(hoveredTemplateId === template.id && currentTemplateId !== template.id) && (
-                  <motion.div 
-                    className="absolute inset-0 bg-black/5 flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  )}
+                  
+                  {(hoveredTemplateId === template.id && currentTemplateId !== template.id) && (
                     <motion.div 
-                      className="bg-white text-primary rounded-md px-2 py-1 sm:px-4 sm:py-2 shadow-lg font-medium text-xs sm:text-sm"
-                      initial={{ y: 10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
+                      className="absolute inset-0 bg-black/5 flex items-center justify-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      Select This Template
+                      <motion.div 
+                        className="bg-white text-primary rounded-md px-2 py-1 sm:px-4 sm:py-2 shadow-lg font-medium text-xs sm:text-sm"
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        Select This Template
+                      </motion.div>
                     </motion.div>
-                  </motion.div>
-                )}
-                
-                <div className="absolute top-2 right-2">
-                  <div className="flex items-center gap-1 bg-primary/10 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
-                    <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary" />
-                    <span className="text-[10px] sm:text-xs font-medium text-primary">Premium</span>
+                  )}
+                  
+                  <div className="absolute top-2 right-2">
+                    <div className="flex items-center gap-1 bg-primary/10 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
+                      <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary" />
+                      <span className="text-[10px] sm:text-xs font-medium text-primary">Premium</span>
+                    </div>
                   </div>
-                </div>
+                </AspectRatio>
               </div>
               
               <div className={cn(

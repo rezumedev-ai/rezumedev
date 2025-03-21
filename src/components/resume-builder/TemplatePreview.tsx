@@ -3,6 +3,7 @@ import { ResumeTemplate } from "./templates";
 import { cn } from "@/lib/utils";
 import { Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface TemplatePreviewProps {
   template: ResumeTemplate;
@@ -30,38 +31,40 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
       whileHover={{ scale: 1.03, y: -3 }}
       whileTap={{ scale: 0.98 }}
     >
-      <div className="aspect-[8.5/11] relative bg-white flex-grow">
-        <img
-          src={template.imageUrl}
-          alt={`${template.name} Resume Template`}
-          className="object-contain w-full h-full"
-          onError={handleImageError}
-        />
-        
-        {isSelected && (
-          <motion.div 
-            className="absolute top-0 right-0 bottom-0 left-0 bg-primary/10 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div
-              className="absolute top-2 right-2 bg-primary text-white p-1 rounded-full"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 15 }}
+      <div className="bg-white flex-grow">
+        <AspectRatio ratio={8.5/11} className="relative">
+          <img
+            src={template.imageUrl}
+            alt={`${template.name} Resume Template`}
+            className="w-full h-full object-contain"
+            onError={handleImageError}
+          />
+          
+          {isSelected && (
+            <motion.div 
+              className="absolute top-0 right-0 bottom-0 left-0 bg-primary/10 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
             >
-              <Check className="w-4 h-4" />
+              <motion.div
+                className="absolute top-2 right-2 bg-primary text-white p-1 rounded-full"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+              >
+                <Check className="w-4 h-4" />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-        
-        <div className="absolute top-2 left-2">
-          <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
-            <Sparkles className="w-3 h-3 text-primary" />
-            <span className="text-xs font-medium text-primary">Premium</span>
+          )}
+          
+          <div className="absolute top-2 left-2">
+            <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
+              <Sparkles className="w-3 h-3 text-primary" />
+              <span className="text-xs font-medium text-primary">Premium</span>
+            </div>
           </div>
-        </div>
+        </AspectRatio>
       </div>
       
       <motion.div 

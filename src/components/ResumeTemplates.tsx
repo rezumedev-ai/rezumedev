@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ArrowLeftCircle, ArrowRightCircle, Sparkles, ExternalLink } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
@@ -12,6 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export const ResumeTemplates = () => {
   const resumeTemplates = [
@@ -106,27 +108,30 @@ export const ResumeTemplates = () => {
                       className="h-full"
                     >
                       <Card className="overflow-hidden h-full border border-border/40 bg-card/60 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
-                        <div className="relative aspect-[1/1.294] bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
-                          <div className="absolute top-2 right-2 z-20">
-                            <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                              <span className="text-xs font-medium text-white">Premium</span>
+                        <div className="bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
+                          <AspectRatio ratio={8.5/11} className="relative">
+                            <div className="absolute top-2 right-2 z-20">
+                              <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                                <span className="text-xs font-medium text-white">Premium</span>
+                              </div>
                             </div>
-                          </div>
-                          
-                          <img
-                            src={template.image}
-                            alt={`${template.name} Resume Template`}
-                            className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-500"
-                          />
-                          
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
-                            <Link to="/signup">
-                              <Button variant="secondary" size="sm" className="font-medium gap-2">
-                                Use Template <ExternalLink className="w-3.5 h-3.5" />
-                              </Button>
-                            </Link>
-                          </div>
+                            
+                            <img
+                              src={template.image}
+                              alt={`${template.name} Resume Template`}
+                              className="w-full h-full object-contain"
+                              loading="lazy"
+                            />
+                            
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
+                              <Link to="/signup">
+                                <Button variant="secondary" size="sm" className="font-medium gap-2">
+                                  Use Template <ExternalLink className="w-3.5 h-3.5" />
+                                </Button>
+                              </Link>
+                            </div>
+                          </AspectRatio>
                         </div>
                         
                         <CardContent className="p-6">
