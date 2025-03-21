@@ -1,386 +1,349 @@
-
+import { ChangeEvent, useEffect, useState } from "react";
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
-import { ImageUploadButton } from "./ImageUploadButton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { motion } from "framer-motion";
 
 interface PersonalSectionProps {
-  fullName: string;
-  title: string;
-  email: string;
-  phone: string;
-  linkedin?: string;
-  website?: string;
-  profileImageUrl?: string;
+  personalInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+    location?: string;
+    linkedin?: string;
+    website?: string;
+    profileImageUrl?: string;
+  };
+  isEditing: boolean;
   template: ResumeTemplate;
-  isEditing?: boolean;
-  resumeId?: string;
-  onUpdate?: (field: string, value: string) => void;
-  onImageUpdate?: (imageUrl: string | null) => void;
+  onUpdate: (field: string, value: string) => void;
 }
 
 export function PersonalSection({
-  fullName,
-  title,
-  email,
-  phone,
-  linkedin,
-  website,
-  profileImageUrl,
-  template,
+  personalInfo,
   isEditing,
-  resumeId,
+  template,
   onUpdate,
-  onImageUpdate
 }: PersonalSectionProps) {
-  const handleContentEdit = (field: string, event: React.FocusEvent<HTMLElement>) => {
-    if (!isEditing || !onUpdate) return;
-    const newValue = event.target.innerText.trim();
-    onUpdate(field, newValue);
+  const [editableValue, setEditableValue] = useState({
+    fullName: personalInfo.fullName || "",
+    email: personalInfo.email || "",
+    phone: personalInfo.phone || "",
+    location: personalInfo.location || "",
+    linkedin: personalInfo.linkedin || "",
+    website: personalInfo.website || ""
+  });
+  
+  useEffect(() => {
+    setEditableValue({
+      fullName: personalInfo.fullName || "",
+      email: personalInfo.email || "",
+      phone: personalInfo.phone || "",
+      location: personalInfo.location || "",
+      linkedin: personalInfo.linkedin || "",
+      website: personalInfo.website || ""
+    });
+  }, [personalInfo, isEditing]);
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditableValue(prev => ({ ...prev, [name]: value }));
   };
 
-  const styles = {
-    "executive-clean": {
-      container: "mb-10 pb-6 border-b-2 border-gray-800",
-      name: "text-4xl font-bold tracking-tight text-gray-900",
-      title: "text-xl text-gray-600 mt-2",
-      contactContainer: "flex flex-wrap gap-4 mt-3 text-sm text-gray-600"
-    },
-    "modern-split": {
-      container: "mb-4 pb-2 border-b border-gray-300",
-      name: "text-[28px] font-bold text-gray-900 tracking-tight leading-tight",
-      title: "text-base text-gray-700 mt-1 font-medium",
-      contactContainer: "flex flex-wrap gap-3 mt-2 text-xs text-gray-600"
-    },
-    "minimal-elegant": {
-      container: "mb-10 pb-6 border-b border-black",
-      name: "text-[32px] font-semibold tracking-tight text-black",
-      title: "text-lg text-black mt-2 font-medium",
-      contactContainer: "flex flex-wrap justify-center gap-6 mt-4 text-sm text-black"
-    },
-    "professional-executive": {
-      container: "mb-8",
-      name: "text-4xl font-black tracking-wide text-black uppercase mb-2",
-      title: "text-xl italic font-light text-gray-600",
-      contactContainer: "flex flex-wrap gap-4 mt-2 text-sm text-gray-600"
-    },
-    "modern-professional": {
-      container: "mb-6 grid grid-cols-12 gap-6",
-      name: "text-3xl font-bold tracking-tight text-gray-900",
-      title: "text-lg text-emerald-700 mt-1 font-medium",
-      contactContainer: "grid grid-cols-2 gap-2 mt-4 text-sm text-gray-600",
-      imageContainer: "col-span-4 flex justify-center items-center",
-      infoContainer: "col-span-8"
+  const handleBlur = (field: string) => {
+    if (editableValue[field as keyof typeof editableValue] !== personalInfo[field as keyof typeof personalInfo]) {
+      onUpdate(field, editableValue[field as keyof typeof editableValue]);
     }
   };
 
-  const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+  const handleContentEditableBlur = (field: string, e: React.FocusEvent<HTMLSpanElement>) => {
+    const content = e.target.textContent || "";
+    if (content !== String(personalInfo[field as keyof typeof personalInfo] || "")) {
+      onUpdate(field, content);
+    }
+  };
 
-  // Special rendering for Modern Professional template
-  if (template.id === "modern-professional") {
+  // Get styling based on template
+  const getHeaderStyle = () => {
+    const styles = {
+      "executive-clean": "mb-7",
+      "modern-split": "mb-6 flex flex-col items-center text-center",
+      "minimal-elegant": "mb-8 flex flex-col items-center text-center",
+      "professional-executive": "mb-6",
+      "modern-professional": "mb-6 grid grid-cols-12 gap-6 items-center",
+    };
+    
+    return styles[template.id as keyof typeof styles] || styles["executive-clean"];
+  };
+
+  const getNameStyle = () => {
+    const styles = {
+      "executive-clean": "text-[2.5rem] font-bold text-gray-800 leading-tight",
+      "modern-split": "text-[1.8rem] font-bold text-gray-900 leading-tight mt-2",
+      "minimal-elegant": "text-[2rem] font-bold text-black tracking-tight",
+      "professional-executive": "text-[2.5rem] font-black tracking-wide text-black uppercase mt-1 transform -translate-y-1",
+      "modern-professional": "text-[2.2rem] font-bold text-gray-900 leading-tight",
+    };
+    
+    return styles[template.id as keyof typeof styles] || styles["executive-clean"];
+  };
+
+  const getTitleStyle = () => {
+    const styles = {
+      "executive-clean": "text-xl text-gray-600 mt-2",
+      "modern-split": "text-md text-indigo-600 font-medium mt-1 mb-2",
+      "minimal-elegant": "text-base text-gray-700 mt-1 uppercase tracking-wider text-center",
+      "professional-executive": "text-md text-gray-700 mt-1 font-medium uppercase tracking-wider", 
+      "modern-professional": "text-lg text-emerald-600 font-medium",
+    };
+    
+    return styles[template.id as keyof typeof styles] || styles["executive-clean"];
+  };
+
+  const getContactSectionStyle = () => {
+    const styles = {
+      "executive-clean": "flex flex-wrap gap-4 text-sm text-gray-600 mt-3",
+      "modern-split": "flex flex-wrap justify-center gap-3 text-sm text-gray-600 mt-3",
+      "minimal-elegant": "flex flex-wrap justify-center gap-4 text-sm text-gray-600 mt-4",
+      "professional-executive": "flex flex-wrap gap-5 text-sm text-gray-600 mt-3", 
+      "modern-professional": "text-sm text-gray-600 space-y-1.5",
+    };
+    
+    return styles[template.id as keyof typeof styles] || styles["executive-clean"];
+  };
+
+  const getContactItemStyle = () => {
+    return "flex items-center";
+  };
+
+  // Handle the different layouts for the profile image
+  const showCircularImage = template.style.icons.circularImage;
+
+  // Determine if we're using a two-column layout for Modern Professional
+  const isTwoColumnHeader = template.id === "modern-professional";
+  
+  // Common contact info content
+  const contactInfoContent = (
+    <div className={getContactSectionStyle()}>
+      {personalInfo.email && (
+        <div className={getContactItemStyle()}>
+          <Mail size={16} className="text-gray-500 mr-1.5 inline-flex items-center" />
+          {isEditing ? (
+            <input
+              type="email"
+              name="email"
+              value={editableValue.email}
+              onChange={handleInputChange}
+              onBlur={() => handleBlur("email")}
+              className="bg-transparent border-b border-dashed border-gray-300 outline-none px-0.5 w-full"
+            />
+          ) : (
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEditableBlur("email", e)}
+              className="outline-none"
+            >
+              {personalInfo.email}
+            </span>
+          )}
+        </div>
+      )}
+      
+      {personalInfo.phone && (
+        <div className={getContactItemStyle()}>
+          <Phone size={16} className="text-gray-500 mr-1.5 inline-flex items-center" />
+          {isEditing ? (
+            <input
+              type="text"
+              name="phone"
+              value={editableValue.phone}
+              onChange={handleInputChange}
+              onBlur={() => handleBlur("phone")}
+              className="bg-transparent border-b border-dashed border-gray-300 outline-none px-0.5 w-full"
+            />
+          ) : (
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEditableBlur("phone", e)}
+              className="outline-none"
+            >
+              {personalInfo.phone}
+            </span>
+          )}
+        </div>
+      )}
+      
+      {personalInfo.location && (
+        <div className={getContactItemStyle()}>
+          <MapPin size={16} className="text-gray-500 mr-1.5 inline-flex items-center" />
+          {isEditing ? (
+            <input
+              type="text"
+              name="location"
+              value={editableValue.location}
+              onChange={handleInputChange}
+              onBlur={() => handleBlur("location")}
+              className="bg-transparent border-b border-dashed border-gray-300 outline-none px-0.5 w-full"
+            />
+          ) : (
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEditableBlur("location", e)}
+              className="outline-none"
+            >
+              {personalInfo.location}
+            </span>
+          )}
+        </div>
+      )}
+      
+      {personalInfo.linkedin && (
+        <div className={getContactItemStyle()}>
+          <Linkedin size={16} className="text-gray-500 mr-1.5 inline-flex items-center" />
+          {isEditing ? (
+            <input
+              type="text"
+              name="linkedin"
+              value={editableValue.linkedin}
+              onChange={handleInputChange}
+              onBlur={() => handleBlur("linkedin")}
+              className="bg-transparent border-b border-dashed border-gray-300 outline-none px-0.5 w-full"
+            />
+          ) : (
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEditableBlur("linkedin", e)}
+              className="outline-none"
+            >
+              {personalInfo.linkedin}
+            </span>
+          )}
+        </div>
+      )}
+      
+      {personalInfo.website && (
+        <div className={getContactItemStyle()}>
+          <Globe size={16} className="text-gray-500 mr-1.5 inline-flex items-center" />
+          {isEditing ? (
+            <input
+              type="text"
+              name="website"
+              value={editableValue.website}
+              onChange={handleInputChange}
+              onBlur={() => handleBlur("website")}
+              className="bg-transparent border-b border-dashed border-gray-300 outline-none px-0.5 w-full"
+            />
+          ) : (
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEditableBlur("website", e)}
+              className="outline-none"
+            >
+              {personalInfo.website}
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  if (isTwoColumnHeader) {
+    // Modern Professional template layout (two columns)
     return (
-      <div className={currentStyle.container}>
-        <div className={styles["modern-professional"].imageContainer}>
-          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center relative">
-            {profileImageUrl ? (
+      <header className={getHeaderStyle()}>
+        <div className="col-span-4 flex justify-center">
+          {personalInfo.profileImageUrl && (
+            <div className={`rounded-full overflow-hidden w-[140px] h-[140px] border-4 border-emerald-100 ${isEditing ? 'cursor-pointer' : ''}`}>
               <img 
-                src={profileImageUrl} 
-                alt={`${fullName}'s profile`} 
-                className="w-full h-full object-cover"
-                style={{aspectRatio: "1/1", objectPosition: "center"}}
+                src={personalInfo.profileImageUrl} 
+                alt={personalInfo.fullName}
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+          )}
+        </div>
+        
+        <div className="col-span-8">
+          <h1 className={getNameStyle()}>
+            {isEditing ? (
+              <input
+                type="text"
+                name="fullName"
+                value={editableValue.fullName}
+                onChange={handleInputChange}
+                onBlur={() => handleBlur("fullName")}
+                className="bg-transparent border-b border-dashed border-gray-300 outline-none px-0.5 w-full"
               />
             ) : (
-              <div className="text-5xl text-emerald-700 font-bold">
-                {fullName.split(' ').map(name => name[0]).join('')}
-              </div>
+              <span
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEditableBlur("fullName", e)}
+                className="outline-none"
+              >
+                {personalInfo.fullName}
+              </span>
             )}
-            {isEditing && onImageUpdate && resumeId && (
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                <ImageUploadButton 
-                  resumeId={resumeId} 
-                  currentImageUrl={profileImageUrl} 
-                  onImageUpdate={onImageUpdate} 
-                />
-              </div>
-            )}
-          </div>
-        </div>
-        <div className={styles["modern-professional"].infoContainer}>
-          <h1 
-            className={`${currentStyle.name} outline-none`}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("fullName", e)}
-          >
-            {fullName}
           </h1>
-          <div 
-            className={`${currentStyle.title} outline-none`}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("title", e)}
-          >
-            {title}
+          <div className={getTitleStyle()}>
+            <span>Civil Engineer</span>
           </div>
-          <div className={currentStyle.contactContainer}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-emerald-600" />
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("email", e)}
-              >
-                {email}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-emerald-600" />
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("phone", e)}
-              >
-                {phone}
-              </span>
-            </div>
-            {linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-emerald-600" />
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("linkedin", e)}
-                >
-                  {linkedin}
-                </span>
-              </div>
-            )}
-            {website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-emerald-600" />
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("website", e)}
-                >
-                  {website}
-                </span>
-              </div>
-            )}
-          </div>
+          
+          {contactInfoContent}
         </div>
-      </div>
+      </header>
     );
   }
-
-  if (template.id === "modern-split") {
-    return (
-      <div className={currentStyle.container}>
-        <h1 
-          className={`${currentStyle.name} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("fullName", e)}
-        >
-          {fullName}
-        </h1>
-        <div 
-          className={`${currentStyle.title} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("title", e)}
-        >
-          {title}
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-          <div className="flex items-center gap-1">
-            <Mail className="w-3 h-3 text-gray-500" />
-            <span 
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-            >
-              {email}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Phone className="w-3 h-3 text-gray-500" />
-            <span 
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-            >
-              {phone}
-            </span>
-          </div>
-          {linkedin && (
-            <div className="flex items-center gap-1">
-              <Linkedin className="w-3 h-3 text-gray-500" />
-              <span 
-                className="text-xs text-gray-600 outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-              >
-                {linkedin}
-              </span>
-            </div>
-          )}
-          {website && (
-            <div className="flex items-center gap-1">
-              <Globe className="w-3 h-3 text-gray-500" />
-              <span 
-                className="text-xs text-gray-600 outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-              >
-                {website}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  const renderContact = () => {
-    if (template.id === "minimal-elegant") {
-      return (
-        <div className={currentStyle.contactContainer}>
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-black" />
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
-            >
-              {email}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-black" />
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
-            >
-              {phone}
-            </span>
-          </div>
-          {linkedin && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="w-4 h-4 text-black" />
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-                className="outline-none"
-              >
-                {linkedin}
-              </span>
-            </div>
-          )}
-          {website && (
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-black" />
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-                className="outline-none"
-              >
-                {website}
-              </span>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <div className={currentStyle.contactContainer}>
-        <div className="flex items-center gap-1.5">
-          <Mail className="w-4 h-4 text-gray-400" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("email", e)}
-            className="outline-none"
-          >
-            {email}
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Phone className="w-4 h-4 text-gray-400" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("phone", e)}
-            className="outline-none"
-          >
-            {phone}
-          </div>
-        </div>
-        {linkedin && (
-          <div className="flex items-center gap-1.5">
-            <Linkedin className="w-4 h-4 text-gray-400" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("linkedin", e)}
-              className="outline-none"
-            >
-              {linkedin}
-            </div>
-          </div>
-        )}
-        {website && (
-          <div className="flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-gray-400" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("website", e)}
-              className="outline-none"
-            >
-              {website}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
+  
+  // Other templates - standard layout
   return (
-    <div className={currentStyle.container}>
-      <div className={template.id === "minimal-elegant" ? "text-center" : ""}>
-        <h1 
-          className={`${currentStyle.name} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("fullName", e)}
-        >
-          {fullName}
-        </h1>
-        <div 
-          className={`${currentStyle.title} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("title", e)}
-        >
-          {title}
+    <header className={getHeaderStyle()}>
+      {personalInfo.profileImageUrl && (showCircularImage || template.id === "minimal-elegant" || template.id === "modern-split") && (
+        <div className={`rounded-full overflow-hidden ${
+          template.id === "minimal-elegant" ? 'w-[120px] h-[120px] mb-4' : 
+          template.id === "modern-split" ? 'w-[100px] h-[100px] mb-2' : 
+          'w-[140px] h-[140px] mx-auto mb-4'
+        } ${isEditing ? 'cursor-pointer' : ''}`}>
+          <img 
+            src={personalInfo.profileImageUrl} 
+            alt={personalInfo.fullName}
+            className="w-full h-full object-cover object-center"
+          />
         </div>
+      )}
+      
+      <h1 className={getNameStyle()}>
+        {isEditing ? (
+          <input
+            type="text"
+            name="fullName"
+            value={editableValue.fullName}
+            onChange={handleInputChange}
+            onBlur={() => handleBlur("fullName")}
+            className="bg-transparent border-b border-dashed border-gray-300 outline-none px-0.5 w-full"
+          />
+        ) : (
+          <span
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEditableBlur("fullName", e)}
+            className="outline-none"
+          >
+            {personalInfo.fullName}
+          </span>
+        )}
+      </h1>
+      
+      <div className={getTitleStyle()}>
+        <span>Civil Engineer</span>
       </div>
       
-      {renderContact()}
-    </div>
+      {contactInfoContent}
+    </header>
   );
 }
