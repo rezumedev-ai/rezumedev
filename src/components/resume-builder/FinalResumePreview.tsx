@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
@@ -36,6 +35,8 @@ export function FinalResumePreview({
     handleEducationUpdate,
     handleCertificationUpdate,
     handleExperienceUpdate,
+    handleLanguageUpdate,
+    handleProjectUpdate,
     handleTemplateChange
   } = useResumePreview(resumeData, resumeId);
   
@@ -57,41 +58,31 @@ export function FinalResumePreview({
     const updateScale = () => {
       if (!containerRef.current) return;
       
-      // Get container dimensions
       const containerWidth = containerRef.current.clientWidth;
       const containerHeight = containerRef.current.clientHeight;
       
-      // A4 dimensions (in pixels at 96 DPI)
       const pageWidth = 21 * 37.8; // ~793px
       const pageHeight = 29.7 * 37.8; // ~1122px
       
       if (isMobile) {
-        // For mobile, calculate the best scale
         const isPortrait = window.innerHeight > window.innerWidth;
         const availableWidth = containerWidth - 32; // Allow for some padding
         const availableHeight = containerHeight - 120; // Allow for toolbar and some padding
         
-        // Calculate scale based on available dimensions
         const widthScale = availableWidth / pageWidth;
         const heightScale = availableHeight / pageHeight;
         
-        // When not zoomed, prioritize seeing the whole page
         const baseScale = Math.min(widthScale, heightScale);
-        // Set a maximum scale factor for portrait mode to ensure users can see more context
         const maxScale = isPortrait ? 0.45 : 0.65;
-        // Set a minimum scale to ensure the resume is not too small
         const minScale = 0.35;
         setResumeScale(Math.max(Math.min(baseScale, maxScale), minScale));
       } else {
-        // For desktop, optimize the scale to use more space
         const availableWidth = containerWidth - 48; // 48px padding
         const availableHeight = containerHeight - 120; // 120px for toolbar and padding
         
-        // Calculate scale based on available dimensions
         const widthScale = availableWidth / pageWidth;
         const heightScale = availableHeight / pageHeight;
         
-        // Use the smaller scale to ensure the entire resume fits, but give it a minimum scale
         const newScale = Math.max(Math.min(widthScale, heightScale, 1), 0.65);
         setResumeScale(newScale);
       }
@@ -99,7 +90,6 @@ export function FinalResumePreview({
 
     updateScale();
     
-    // Add event listeners for screen rotation and resize
     window.addEventListener('resize', updateScale);
     window.addEventListener('orientationchange', updateScale);
     
@@ -156,6 +146,8 @@ export function FinalResumePreview({
           onEducationUpdate={handleEducationUpdate}
           onCertificationUpdate={handleCertificationUpdate}
           onExperienceUpdate={handleExperienceUpdate}
+          onLanguageUpdate={handleLanguageUpdate}
+          onProjectUpdate={handleProjectUpdate}
         />
       </motion.div>
       

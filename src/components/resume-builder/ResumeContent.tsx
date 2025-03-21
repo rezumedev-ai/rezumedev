@@ -1,12 +1,14 @@
 
 import { ResumeTemplate } from "./templates";
-import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
+import { ResumeData, Education, Certification, WorkExperience, Language, Project } from "@/types/resume";
 import { PersonalSection } from "./preview/PersonalSection";
 import { ProfessionalSummarySection } from "./preview/ProfessionalSummarySection";
 import { ExperienceSection } from "./preview/ExperienceSection";
 import { EducationSection } from "./preview/EducationSection";
 import { SkillsSection } from "./preview/SkillsSection";
 import { CertificationsSection } from "./preview/CertificationsSection";
+import { LanguagesSection } from "./preview/LanguagesSection";
+import { ProjectsSection } from "./preview/ProjectsSection";
 
 interface ResumeContentProps {
   resumeState: ResumeData;
@@ -20,6 +22,8 @@ interface ResumeContentProps {
   onEducationUpdate: (index: number, field: keyof Education, value: string) => void;
   onCertificationUpdate: (index: number, field: keyof Certification, value: string) => void;
   onExperienceUpdate: (index: number, field: keyof WorkExperience, value: string | string[]) => void;
+  onLanguageUpdate?: (index: number, field: keyof Language, value: string) => void;
+  onProjectUpdate?: (index: number, field: keyof Project, value: string | string[]) => void;
 }
 
 export function ResumeContent({
@@ -33,7 +37,9 @@ export function ResumeContent({
   onSkillsUpdate,
   onEducationUpdate,
   onCertificationUpdate,
-  onExperienceUpdate
+  onExperienceUpdate,
+  onLanguageUpdate,
+  onProjectUpdate
 }: ResumeContentProps) {
   
   // Create a function to handle the WorkExperience array updates for the ExperienceSection
@@ -85,6 +91,15 @@ export function ResumeContent({
               isEditing={isEditing}
               onUpdate={onEducationUpdate}
             />
+            
+            {resumeState.projects && resumeState.projects.length > 0 && (
+              <ProjectsSection 
+                projects={resumeState.projects} 
+                template={template}
+                isEditing={isEditing}
+                onUpdate={onProjectUpdate}
+              />
+            )}
           </div>
           
           {/* Right column */}
@@ -96,6 +111,15 @@ export function ResumeContent({
               isEditing={isEditing}
               onUpdate={onSkillsUpdate}
             />
+            
+            {resumeState.languages && resumeState.languages.length > 0 && (
+              <LanguagesSection 
+                languages={resumeState.languages} 
+                template={template}
+                isEditing={isEditing}
+                onUpdate={onLanguageUpdate}
+              />
+            )}
             
             <CertificationsSection 
               certifications={resumeState.certifications} 
@@ -151,6 +175,15 @@ export function ResumeContent({
               isEditing={isEditing}
               onUpdate={onEducationUpdate}
             />
+            
+            {resumeState.projects && resumeState.projects.length > 0 && (
+              <ProjectsSection 
+                projects={resumeState.projects} 
+                template={template}
+                isEditing={isEditing}
+                onUpdate={onProjectUpdate}
+              />
+            )}
           </div>
           
           {/* Right column */}
@@ -162,6 +195,15 @@ export function ResumeContent({
               isEditing={isEditing}
               onUpdate={onSkillsUpdate}
             />
+            
+            {resumeState.languages && resumeState.languages.length > 0 && (
+              <LanguagesSection 
+                languages={resumeState.languages} 
+                template={template}
+                isEditing={isEditing}
+                onUpdate={onLanguageUpdate}
+              />
+            )}
             
             <CertificationsSection 
               certifications={resumeState.certifications} 
@@ -213,6 +255,15 @@ export function ResumeContent({
         onUpdate={onEducationUpdate}
       />
       
+      {resumeState.projects && resumeState.projects.length > 0 && (
+        <ProjectsSection 
+          projects={resumeState.projects} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={onProjectUpdate}
+        />
+      )}
+      
       <SkillsSection 
         hardSkills={resumeState.skills.hard_skills} 
         softSkills={resumeState.skills.soft_skills} 
@@ -220,6 +271,15 @@ export function ResumeContent({
         isEditing={isEditing}
         onUpdate={onSkillsUpdate}
       />
+      
+      {resumeState.languages && resumeState.languages.length > 0 && (
+        <LanguagesSection 
+          languages={resumeState.languages} 
+          template={template}
+          isEditing={isEditing}
+          onUpdate={onLanguageUpdate}
+        />
+      )}
       
       <CertificationsSection 
         certifications={resumeState.certifications} 
