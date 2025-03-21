@@ -18,6 +18,7 @@ const headingVariants = cva(
         resume: "bg-gradient-to-t from-indigo-700 to-indigo-500 dark:from-indigo-300 dark:to-indigo-100",
         elegant: "bg-gradient-to-t from-gray-800 to-gray-600 dark:from-gray-300 dark:to-gray-100",
         professional: "bg-gradient-to-t from-gray-900 to-gray-700 dark:from-gray-200 dark:to-gray-50",
+        primary: "bg-gradient-to-t from-primary to-primary-hover dark:from-primary-foreground dark:to-primary",
       },
       size: {
         default: "text-2xl sm:text-3xl lg:text-4xl",
@@ -87,7 +88,7 @@ const GradientHeading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
 
 GradientHeading.displayName = "GradientHeading"
 
-export type Variant = "default" | "pink" | "light" | "secondary" | "resume" | "elegant" | "professional"
+export type Variant = "default" | "pink" | "light" | "secondary" | "resume" | "elegant" | "professional" | "primary"
 export type Size = "default" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" | "xxxl" | "dynamic" | "dynamicLg" | "dynamicSm" | "dynamicXs" | "compact"
 export type Weight = "default" | "thin" | "light" | "base" | "medium" | "semi" | "bold" | "black"
 export type Spacing = "default" | "tighter" | "tight" | "normal" | "wide" | "wider" | "widest"

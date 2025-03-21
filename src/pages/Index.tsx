@@ -28,12 +28,10 @@ const Index = () => {
           <Process />
           <Features />
           <AnimatedTestimonialsSection />
-          <div className="space-y-0"> {/* Remove space between PricingSection and ComparisonTable */}
-            <PricingSection />
-            <ComparisonTable />
-          </div>
+          <ComparisonTable />
           <ResumeTemplates />
           <FAQ />
+          <PricingSection />
           <CTA />
           <Footer />
         </div>

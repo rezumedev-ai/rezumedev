@@ -69,7 +69,7 @@ export const ResumeTemplates = () => {
           className="text-center mb-12"
         >
           <GradientHeading 
-            variant="professional" 
+            variant="primary" 
             weight="bold" 
             size="lg" 
             className="mb-4"
