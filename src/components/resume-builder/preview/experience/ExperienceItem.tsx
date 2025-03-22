@@ -39,8 +39,8 @@ export function ExperienceItem({
       
       <ul className="mt-2 text-sm text-gray-600 list-none pl-0 space-y-1">
         {experience.responsibilities.map((resp, respIndex) => (
-          <li key={respIndex} className="flex items-center ml-1">
-            <span className="inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-black mr-2 shrink-0"></span>
+          <li key={respIndex} className="flex items-start ml-1">
+            <span className="inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-black mr-2 shrink-0 mt-1.5"></span>
             <span className="leading-snug">{resp}</span>
           </li>
         ))}

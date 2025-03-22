@@ -95,29 +95,114 @@ export function DownloadOptionsDialog({
         visibility: resumeElement.style.visibility
       };
       
-      // Fix for profile image and bullet points: add specific CSS class to the cloned content
+      // Enhanced CSS fixes for PDF generation
       const styleElement = document.createElement('style');
       styleElement.textContent = `
+        /* General fixes for all elements */
+        .pdf-specific-fixes * {
+          box-shadow: none !important;
+          text-shadow: none !important;
+          print-color-adjust: exact !important;
+          -webkit-print-color-adjust: exact !important;
+          page-break-inside: avoid !important;
+        }
+        
+        /* Profile image fixes */
+        .pdf-specific-fixes .rounded-full {
+          border-radius: 50% !important;
+          overflow: hidden !important;
+        }
+        
         .pdf-specific-fixes .rounded-full img {
           width: 100% !important;
           height: 100% !important;
           object-fit: cover !important;
           border-radius: 50% !important;
+          aspect-ratio: 1/1 !important;
         }
-        .pdf-specific-fixes .flex.items-start {
-          align-items: flex-start !important;
+        
+        /* Contact icon fixes */
+        .pdf-specific-fixes .flex.items-center.gap-1,
+        .pdf-specific-fixes .flex.items-center.gap-1\\.5,
+        .pdf-specific-fixes .flex.items-center.gap-2 {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
         }
-        .pdf-specific-fixes li .inline-block {
-          vertical-align: top !important; 
-          margin-top: 4px !important;
+        
+        /* Contact icon alignment */
+        .pdf-specific-fixes svg.w-3,
+        .pdf-specific-fixes svg.w-3\\.5,
+        .pdf-specific-fixes svg.w-4 {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+          vertical-align: middle !important;
+          margin-right: 4px !important;
         }
-        .pdf-specific-fixes .space-y-1.5 li {
+        
+        /* Fix professional-navy contact icons */
+        .pdf-specific-fixes .professional-navy-contact-icon {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+          vertical-align: middle !important;
+          margin-top: 0 !important;
+          margin-bottom: 0 !important;
+        }
+        
+        /* Work experience bullet point fixes */
+        .pdf-specific-fixes ul li {
           display: flex !important;
           align-items: flex-start !important;
+          margin-bottom: 6px !important;
+          page-break-inside: avoid !important;
         }
-        .pdf-specific-fixes .space-y-1 li {
-          display: flex !important;
-          align-items: flex-start !important;
+        
+        /* General bullet point fix */
+        .pdf-specific-fixes li span:first-child,
+        .pdf-specific-fixes .inline-flex,
+        .pdf-specific-fixes .inline-block {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+          margin-right: 6px !important;
+          margin-top: 0.45em !important;
+        }
+        
+        /* Professional navy bullet fix */
+        .pdf-specific-fixes .professional-navy-bullet {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          min-width: 6px !important;
+          min-height: 6px !important;
+          width: 6px !important;
+          height: 6px !important;
+          border-radius: 50% !important;
+          margin-right: 8px !important;
+          background-color: #0F2B5B !important;
+          flex-shrink: 0 !important;
+          margin-top: 0.45em !important;
+        }
+        
+        /* Experience item bullets */
+        .pdf-specific-fixes .w-2.h-2.min-w-2.min-h-2.rounded-full {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          min-width: 6px !important;
+          min-height: 6px !important;
+          width: 6px !important;
+          height: 6px !important;
+          border-radius: 50% !important;
+          margin-right: 8px !important;
+          background-color: #000000 !important;
+          flex-shrink: 0 !important;
+          margin-top: 0.45em !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -156,10 +241,10 @@ export function DownloadOptionsDialog({
 
       // Capture with improved settings
       const canvas = await html2canvas(resumeElement, {
-        scale: pixelRatio * 2, // Double the scale for sharper images
+        scale: pixelRatio * 2.5, // Increased scale for sharper images and better alignment
         useCORS: true,
         allowTaint: true,
-        logging: true, // Enable logging for debugging
+        logging: false, // Disable logging for production
         backgroundColor: "#ffffff",
         imageTimeout: 15000, // Increase timeout for complex resumes
         windowWidth: document.documentElement.offsetWidth,
@@ -176,21 +261,60 @@ export function DownloadOptionsDialog({
           clonedElement.style.width = `${contentWidth}px`;
           clonedElement.style.height = `${contentHeight}px`;
           
-          // Fix alignment of list items in the cloned document
-          const listItems = clonedElement.querySelectorAll('li');
-          listItems.forEach(li => {
-            const bulletPoint = li.querySelector('.inline-block');
-            const textContent = li.querySelector('[contenteditable]') || li.lastChild;
-            
-            if (bulletPoint && textContent) {
-              bulletPoint.classList.add('bullet-point-fix');
+          // Fix alignment of bullet points in work experience
+          const experienceItems = clonedElement.querySelectorAll('ul li');
+          experienceItems.forEach(li => {
+            const bulletPoint = li.querySelector('.inline-block, .inline-flex, span.w-2, span.rounded-full');
+            if (bulletPoint) {
+              const bullet = bulletPoint as HTMLElement;
+              bullet.style.display = 'inline-flex';
+              bullet.style.alignItems = 'center';
+              bullet.style.justifyContent = 'center';
+              bullet.style.flexShrink = '0';
+              bullet.style.marginTop = '0.45em';
+              bullet.style.marginRight = '6px';
             }
           });
           
-          // Fix circular images in the cloned document
-          const profileImages = clonedElement.querySelectorAll('.rounded-full');
-          profileImages.forEach(img => {
-            img.classList.add('profile-image-fix');
+          // Fix contact icons alignment
+          const contactIcons = clonedElement.querySelectorAll('.flex.items-center svg');
+          contactIcons.forEach(icon => {
+            const svgIcon = icon as HTMLElement;
+            svgIcon.style.display = 'inline-flex';
+            svgIcon.style.alignItems = 'center';
+            svgIcon.style.justifyContent = 'center';
+            svgIcon.style.flexShrink = '0';
+            svgIcon.style.verticalAlign = 'middle';
+            svgIcon.style.marginRight = '4px';
+          });
+          
+          // Fix professional navy bullet points
+          const navyBullets = clonedElement.querySelectorAll('.professional-navy-bullet');
+          navyBullets.forEach(bullet => {
+            const navyBullet = bullet as HTMLElement;
+            navyBullet.style.display = 'inline-flex';
+            navyBullet.style.alignItems = 'center';
+            navyBullet.style.justifyContent = 'center';
+            navyBullet.style.minWidth = '6px';
+            navyBullet.style.minHeight = '6px';
+            navyBullet.style.width = '6px';
+            navyBullet.style.height = '6px';
+            navyBullet.style.borderRadius = '50%';
+            navyBullet.style.marginRight = '8px';
+            navyBullet.style.backgroundColor = '#0F2B5B';
+            navyBullet.style.flexShrink = '0';
+            navyBullet.style.marginTop = '0.45em';
+          });
+          
+          // Fix professional navy contact icons
+          const navyContactIcons = clonedElement.querySelectorAll('.professional-navy-contact-icon');
+          navyContactIcons.forEach(icon => {
+            const navyIcon = icon as HTMLElement;
+            navyIcon.style.display = 'inline-flex';
+            navyIcon.style.alignItems = 'center';
+            navyIcon.style.justifyContent = 'center';
+            navyIcon.style.flexShrink = '0';
+            navyIcon.style.verticalAlign = 'middle';
           });
           
           // Ensure fonts are properly loaded in the clone
@@ -198,7 +322,6 @@ export function DownloadOptionsDialog({
           const head = clonedDocument.head;
           
           fontLinks.forEach(link => {
-            // Fixed TypeScript error by properly casting to HTMLLinkElement
             const linkEl = link as HTMLLinkElement;
             if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
               const newLink = clonedDocument.createElement('link');
@@ -212,11 +335,11 @@ export function DownloadOptionsDialog({
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 300); // Increased delay to ensure rendering
+                setTimeout(resolve, 400); // Increased delay to ensure rendering
               });
             } else {
               // Fallback if document.fonts is not available
-              setTimeout(resolve, 400);
+              setTimeout(resolve, 500);
             }
           });
         }
