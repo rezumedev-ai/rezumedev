@@ -109,28 +109,7 @@
     -webkit-print-color-adjust: exact;
   }
 
-  /* Personal info icon alignment */
-  #resume-content .flex.items-center.gap-1.5 svg,
-  #resume-content .flex.items-center.gap-2 svg {
-    margin-top: 2px;
-    align-self: flex-start;
-  }
-  
-  /* Ensuring correct vertical alignment of contact icons */
-  #resume-content .flex.items-start.gap-1.5 svg {
-    min-height: 16px;
-    min-width: 16px;
-    margin-top: 3px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   /* PDF-specific styling */
-  .pdf-mode {
-    padding: 24px 32px !important; /* Increased padding for PDF mode */
-  }
-
   .pdf-mode #resume-content .pdf-bullet-list {
     margin: 0;
     padding: 0;
@@ -175,20 +154,6 @@
     flex-shrink: 0 !important;
     margin-right: 8px !important;
     vertical-align: middle !important;
-  }
-  
-  /* Ensuring section icons display properly */
-  #resume-content .pdf-section-icon svg {
-    min-width: 20px;
-    min-height: 20px;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  /* Contact icons vertical alignment */
-  #resume-content .contact-item svg {
-    margin-bottom: 3px; /* Push icons down slightly to align with text */
   }
 
   /* Profile image fixes */
@@ -326,33 +291,6 @@
 
   .prose blockquote {
     @apply border-l-4 border-primary pl-4 italic my-6;
-  }
-
-  /* Custom styles for PDF output */
-  #pdf-preparation-div {
-    padding: 36px 40px !important; /* Additional padding for PDF generation */
-  }
-
-  /* Ensures the personal contact icons have proper alignment */
-  .pdf-mode .contact-item {
-    display: flex !important;
-    align-items: center !important;
-    margin-bottom: 6px !important;
-  }
-
-  .pdf-mode .contact-item span,
-  .pdf-mode .contact-item svg {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-right: 6px !important;
-    position: relative !important;
-    top: 1px !important;
-  }
-  
-  /* Additional PDF generation styles - properly align bullet points */
-  .pdf-mode .pdf-bullet-item {
-    margin-bottom: 6px !important;
   }
 }
 

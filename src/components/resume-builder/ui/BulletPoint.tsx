@@ -1,7 +1,6 @@
 
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronRight } from "lucide-react"; 
 
 interface BulletPointProps {
   children: ReactNode;
@@ -9,7 +8,6 @@ interface BulletPointProps {
   bulletClassName?: string;
   textClassName?: string;
   template?: string;
-  type?: "default" | "skill";
 }
 
 export function BulletPoint({ 
@@ -17,8 +15,7 @@ export function BulletPoint({
   className,
   bulletClassName,
   textClassName,
-  template = "default",
-  type = "default"
+  template = "default"
 }: BulletPointProps) {
   // Template-specific styling
   const bulletStyle = {
@@ -31,29 +28,6 @@ export function BulletPoint({
     "professional-executive": "w-1.5 h-1.5 rounded-full bg-black"
   };
 
-  // Use the arrow character for skills
-  if (type === "skill") {
-    return (
-      <li className={cn("flex items-start gap-1.5 pdf-bullet-item", className)}>
-        <div 
-          className={cn(
-            "inline-flex items-center justify-center shrink-0 mt-0.5 pdf-bullet-marker",
-            bulletClassName
-          )}
-          aria-hidden="true"
-          data-pdf-bullet="true"
-          data-pdf-bullet-type="skill"
-        >
-          <span className="text-lg text-gray-700">➤</span>
-        </div>
-        <div className={cn("pdf-bullet-text", textClassName)}>
-          {children}
-        </div>
-      </li>
-    );
-  }
-
-  // Default bullet rendering
   return (
     <li className={cn("flex items-start gap-2 pdf-bullet-item", className)}>
       <div 
@@ -64,8 +38,6 @@ export function BulletPoint({
         )}
         aria-hidden="true"
         data-pdf-bullet="true"
-        data-pdf-bullet-type="default"
-        style={{ minWidth: "6px", minHeight: "6px" }}
       ></div>
       <div className={cn("pdf-bullet-text", textClassName)}>
         {children}

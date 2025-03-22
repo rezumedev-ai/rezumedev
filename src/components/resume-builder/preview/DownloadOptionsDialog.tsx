@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -81,52 +82,34 @@ export function DownloadOptionsDialog({
       pdfPreparationDiv.style.overflow = 'hidden';
       pdfPreparationDiv.innerHTML = originalHtml;
       pdfPreparationDiv.className = resumeElement.className + ' pdf-mode';
-      
-      // Add additional padding for professional appearance
-      pdfPreparationDiv.style.padding = '32px 40px';
       document.body.appendChild(pdfPreparationDiv);
 
-      // 2. Pre-process PDF for proper rendering of section icons
+      // 2. Pre-process PDF for proper rendering
+      // Fix all icons - replace SVG icons with simple characters for PDF
       const sectionIcons = pdfPreparationDiv.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
         // Check if contains an SVG
         const svg = iconElement.querySelector('svg');
         if (svg) {
-          // Get the icon type from data attribute or class if possible
-          const iconType = svg.getAttribute('data-pdf-section-icon-type') || '';
+          // Replace SVG with a simple symbol based on the icon type
+          const iconType = svg.getAttribute('data-lucide') || '';
+          let iconSymbol = '•';
           
-          // Create a span with appropriate icon symbol
-          const iconSpan = document.createElement('span');
-          
-          // Map icon types to Unicode symbols
+          // Create a replacement element with the icon symbol
           switch (iconType.toLowerCase()) {
-            case 'briefcase': 
-              iconSpan.textContent = '💼';
-              break;
-            case 'education': 
-              iconSpan.textContent = '🎓';
-              break;
-            case 'certification': 
-              iconSpan.textContent = '🏆';
-              break;
-            case 'skills': 
-              iconSpan.textContent = '💻';
-              break;
-            case 'summary': 
-              iconSpan.textContent = '📄';
-              break;
-            case 'profile': 
-              iconSpan.textContent = '👤';
-              break;
-            case 'projects': 
-              iconSpan.textContent = '📂';
-              break;
-            default:
-              // Default for any unrecognized icon
-              iconSpan.textContent = '•';
+            case 'briefcase': iconSymbol = '💼'; break;
+            case 'graduation-cap': iconSymbol = '🎓'; break;
+            case 'award': iconSymbol = '🏆'; break;
+            case 'code': iconSymbol = '💻'; break;
+            case 'file-text': iconSymbol = '📄'; break;
+            case 'user': iconSymbol = '👤'; break;
+            case 'folder-kanban': iconSymbol = '📂'; break;
           }
           
+          // Create a span with the icon symbol that will render properly in PDF
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
           iconSpan.style.marginRight = '8px';
           iconSpan.style.fontSize = '14px';
@@ -138,32 +121,9 @@ export function DownloadOptionsDialog({
         }
       });
 
-      // 3. Fix bullet points for skills with chevron
-      const skillBullets = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet-type="skill"]');
-      skillBullets.forEach(bullet => {
-        const bulletElement = bullet as HTMLElement;
-        // Replace chevron icon with right arrow symbol for skills
-        const chevronIcon = bulletElement.querySelector('[data-pdf-bullet-icon="chevron"]');
-        if (chevronIcon) {
-          const arrowSpan = document.createElement('span');
-          arrowSpan.textContent = '→';
-          arrowSpan.style.fontSize = '12px';
-          arrowSpan.style.marginRight = '4px';
-          arrowSpan.style.color = '#555';
-          bulletElement.replaceChild(arrowSpan, chevronIcon);
-        } else {
-          // Fallback if chevron element isn't found
-          bulletElement.textContent = '→';
-          bulletElement.style.fontSize = '12px';
-          bulletElement.style.marginRight = '4px';
-          bulletElement.style.marginTop = '2px';
-          bulletElement.style.color = '#555';
-        }
-      });
-
-      // 4. Fix regular bullet points
-      const regularBullets = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet-type="default"]');
-      regularBullets.forEach(bullet => {
+      // 3. Fix bullet point rendering
+      const bulletPoints = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet="true"]');
+      bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
         // Replace div bullet with a text bullet
         bulletElement.textContent = '•';
@@ -177,7 +137,7 @@ export function DownloadOptionsDialog({
         bulletElement.className = 'pdf-bullet-char';
       });
 
-      // 5. Fix bullet lists
+      // 4. Fix bullet lists
       const bulletLists = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
         const listElement = list as HTMLElement;
@@ -186,45 +146,13 @@ export function DownloadOptionsDialog({
         listElement.style.listStyle = 'none';
       });
 
-      // 6. Fix bullet items
+      // 5. Fix bullet items
       const bulletItems = pdfPreparationDiv.querySelectorAll('.pdf-bullet-item');
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
         itemElement.style.display = 'flex';
         itemElement.style.alignItems = 'flex-start';
         itemElement.style.marginBottom = '4px';
-      });
-
-      // 7. Fix contact info alignment in the header 
-      const contactInfo = pdfPreparationDiv.querySelectorAll('.contact-item');
-      contactInfo.forEach(item => {
-        const itemElement = item as HTMLElement;
-        itemElement.style.display = 'flex';
-        itemElement.style.alignItems = 'center';
-        
-        // Find any SVG icon and replace it with appropriate Unicode
-        const svg = itemElement.querySelector('svg');
-        if (svg) {
-          const iconType = svg.getAttribute('data-lucide') || '';
-          const iconSpan = document.createElement('span');
-          
-          switch (iconType.toLowerCase()) {
-            case 'mail': iconSpan.textContent = '✉️'; break;
-            case 'phone': iconSpan.textContent = '📞'; break;
-            case 'linkedin': iconSpan.textContent = 'in'; break;
-            case 'globe': iconSpan.textContent = '🌐'; break;
-            case 'map-pin': iconSpan.textContent = '📍'; break;
-            default: iconSpan.textContent = '•';
-          }
-          
-          iconSpan.style.marginRight = '4px';
-          iconSpan.style.fontSize = '12px';
-          
-          const parentElement = svg.parentElement;
-          if (parentElement) {
-            parentElement.replaceChild(iconSpan, svg);
-          }
-        }
       });
 
       // Get device pixel ratio for better quality
@@ -253,13 +181,13 @@ export function DownloadOptionsDialog({
         }
       };
 
-      // 8. Capture the prepared element
+      // 6. Capture the prepared element
       const canvas = await html2canvas(pdfPreparationDiv, captureSettings);
       
-      // 9. Remove the preparation div
+      // 7. Remove the preparation div
       document.body.removeChild(pdfPreparationDiv);
 
-      // 10. Create PDF with the exact A4 dimensions
+      // 8. Create PDF with the exact A4 dimensions
       const pdfWidth = 210; // A4 width in mm
       const pdfHeight = 297; // A4 height in mm
       
