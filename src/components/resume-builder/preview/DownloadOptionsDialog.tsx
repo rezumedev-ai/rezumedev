@@ -70,175 +70,226 @@ export function DownloadOptionsDialog({
 
       // Wait for dialog to close and any transitions to complete
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
       
-      // Get the exact dimensions of the resume element
-      const resumeBounds = resumeElement.getBoundingClientRect();
-      const resumeWidth = resumeBounds.width;
-      const resumeHeight = resumeBounds.height;
-      
-      console.log("Capturing resume with dimensions:", {
-        width: resumeWidth,
-        height: resumeHeight,
-        pixelRatio: pixelRatio
-      });
+      // A4 dimensions in pixels (at 96 DPI)
+      const a4Width = 8.27 * 96; // 793.92 pixels
+      const a4Height = 11.69 * 96; // 1122.24 pixels
 
-      // Clone the resume element for manipulation
-      const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
+      // Calculate scale to fit the resume content to A4 size while preserving aspect ratio
+      const contentWidth = resumeElement.offsetWidth;
+      const contentHeight = resumeElement.offsetHeight;
+      const scale = Math.min(a4Width / contentWidth, a4Height / contentHeight);
       
-      // Create a style element to ensure proper rendering
+      // Store original styles
+      const originalStyles = {
+        transform: resumeElement.style.transform,
+        transition: resumeElement.style.transition,
+        width: resumeElement.style.width,
+        height: resumeElement.style.height,
+        position: resumeElement.style.position,
+        pointerEvents: resumeElement.style.pointerEvents,
+        transformOrigin: resumeElement.style.transformOrigin,
+        visibility: resumeElement.style.visibility
+      };
+      
+      // Fix for profile image and bullet points: add specific CSS class to the cloned content
       const styleElement = document.createElement('style');
       styleElement.textContent = `
-        * {
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
-        }
-        .bullet-point, .responsibility-list li::before {
-          display: inline-block !important;
-          width: 6px !important;
-          height: 6px !important;
-          background-color: black !important;
+        .pdf-specific-fixes .rounded-full img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
           border-radius: 50% !important;
-          margin-right: 8px !important;
-          margin-top: 6px !important;
-          flex-shrink: 0 !important;
         }
-        .responsibility-list li {
+        .pdf-specific-fixes .flex.items-start {
+          align-items: flex-start !important;
+        }
+        .pdf-specific-fixes li .inline-block {
+          vertical-align: top !important; 
+          margin-top: 4px !important;
+        }
+        .pdf-specific-fixes .space-y-1.5 li {
           display: flex !important;
           align-items: flex-start !important;
-          margin-bottom: 4px !important;
         }
-        .responsibility-text {
-          display: inline-block !important;
-          flex: 1 !important;
-        }
-        .rounded-full {
-          border-radius: 50% !important;
-          overflow: hidden !important;
+        .pdf-specific-fixes .space-y-1 li {
+          display: flex !important;
+          align-items: flex-start !important;
         }
       `;
+      document.head.appendChild(styleElement);
       
-      // Append the clone to a hidden container
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.left = '-9999px';
-      container.style.top = '-9999px';
-      container.style.width = `${resumeWidth}px`;
-      container.style.height = `${resumeHeight}px`;
-      container.style.overflow = 'hidden';
-      container.style.opacity = '0';
-      container.style.pointerEvents = 'none';
+      // Temporarily disable scale transform for capture
+      const originalTransform = resumeElement.style.transform;
+      resumeElement.style.transform = 'none';
       
-      // Append elements to document
-      container.appendChild(styleElement);
-      container.appendChild(clonedResume);
-      document.body.appendChild(container);
+      // Force the element to be visible and properly sized for capture
+      Object.assign(resumeElement.style, {
+        transition: 'none',
+        position: resumeElement.style.position || 'relative',
+        pointerEvents: 'none',
+        transformOrigin: 'top left',
+        visibility: 'visible'
+      });
+
+      // Force layout recalculation
+      resumeElement.getBoundingClientRect();
       
-      // Preserve original styles on the cloned element
-      clonedResume.style.transform = 'none';
-      clonedResume.style.transition = 'none';
-      clonedResume.style.width = `${resumeWidth}px`;
-      clonedResume.style.height = `${resumeHeight}px`;
-      clonedResume.style.position = 'relative';
-      clonedResume.style.margin = '0';
-      clonedResume.style.padding = '0';
+      // Temporarily disable any transitions or animations
+      const allElements = resumeElement.querySelectorAll('*');
+      const originalTransitions: string[] = [];
       
-      try {
-        // Wait for all images to load
-        await Promise.all(
-          Array.from(clonedResume.querySelectorAll('img'))
-            .filter(img => !img.complete)
-            .map(img => new Promise(resolve => {
-              img.onload = resolve;
-              img.onerror = resolve;
-            }))
-        );
-        
-        // Wait for fonts to load
-        if ((document as any).fonts && (document as any).fonts.ready) {
-          await (document as any).fonts.ready;
-        } else {
-          // Fallback if document.fonts is not available
-          await new Promise(resolve => setTimeout(resolve, 500));
+      allElements.forEach((el: Element) => {
+        const htmlEl = el as HTMLElement;
+        originalTransitions.push(htmlEl.style.transition);
+        htmlEl.style.transition = 'none';
+      });
+
+      console.log("Attempting to capture resume content with dimensions:", {
+        width: contentWidth,
+        height: contentHeight,
+        element: resumeElement
+      });
+
+      // Capture with improved settings
+      const canvas = await html2canvas(resumeElement, {
+        scale: pixelRatio * 2, // Double the scale for sharper images
+        useCORS: true,
+        allowTaint: true,
+        logging: true, // Enable logging for debugging
+        backgroundColor: "#ffffff",
+        imageTimeout: 15000, // Increase timeout for complex resumes
+        windowWidth: document.documentElement.offsetWidth,
+        windowHeight: document.documentElement.offsetHeight,
+        onclone: (clonedDocument, element) => {
+          const clonedElement = element as HTMLElement;
+          
+          // Add the PDF-specific class to the cloned element
+          clonedElement.classList.add('pdf-specific-fixes');
+          
+          // Apply exact styling to the cloned element
+          clonedElement.style.transform = 'none';
+          clonedElement.style.transformOrigin = 'top left';
+          clonedElement.style.width = `${contentWidth}px`;
+          clonedElement.style.height = `${contentHeight}px`;
+          
+          // Fix alignment of list items in the cloned document
+          const listItems = clonedElement.querySelectorAll('li');
+          listItems.forEach(li => {
+            const bulletPoint = li.querySelector('.inline-block');
+            const textContent = li.querySelector('[contenteditable]') || li.lastChild;
+            
+            if (bulletPoint && textContent) {
+              bulletPoint.classList.add('bullet-point-fix');
+            }
+          });
+          
+          // Fix circular images in the cloned document
+          const profileImages = clonedElement.querySelectorAll('.rounded-full');
+          profileImages.forEach(img => {
+            img.classList.add('profile-image-fix');
+          });
+          
+          // Ensure fonts are properly loaded in the clone
+          const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
+          const head = clonedDocument.head;
+          
+          fontLinks.forEach(link => {
+            // Fixed TypeScript error by properly casting to HTMLLinkElement
+            const linkEl = link as HTMLLinkElement;
+            if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
+              const newLink = clonedDocument.createElement('link');
+              newLink.rel = 'stylesheet';
+              newLink.href = linkEl.href;
+              head.appendChild(newLink);
+            }
+          });
+          
+          // Make sure all fonts have loaded in the clone
+          return new Promise<void>(resolve => {
+            if ((document as any).fonts && (document as any).fonts.ready) {
+              (document as any).fonts.ready.then(() => {
+                setTimeout(resolve, 300); // Increased delay to ensure rendering
+              });
+            } else {
+              // Fallback if document.fonts is not available
+              setTimeout(resolve, 400);
+            }
+          });
         }
-        
-        // Wait a bit more to ensure rendering is complete
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Capture the resume
-        const canvas = await html2canvas(clonedResume, {
-          scale: 2, // Higher scale for better quality
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: true,
-          imageTimeout: 30000,
-          onclone: (clonedDoc) => {
-            // Additional processing if needed
-            return Promise.resolve();
-          },
-        });
-        
-        // A4 size in mm
-        const pdfWidth = 210;
-        const pdfHeight = 297;
-        
-        // Create PDF
-        const pdf = new jsPDF({
-          format: 'a4',
-          unit: 'mm',
-          orientation: 'portrait',
-        });
-        
-        // Calculate scaling to fit content to A4
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        const canvasAspectRatio = canvas.width / canvas.height;
-        const a4AspectRatio = pdfWidth / pdfHeight;
-        
-        let imgWidth, imgHeight, offsetX, offsetY;
-        
-        if (canvasAspectRatio > a4AspectRatio) {
-          // Canvas is wider than A4
-          imgWidth = pdfWidth;
-          imgHeight = imgWidth / canvasAspectRatio;
-          offsetX = 0;
-          offsetY = (pdfHeight - imgHeight) / 2;
-        } else {
-          // Canvas is taller than A4 or same ratio
-          imgHeight = pdfHeight;
-          imgWidth = imgHeight * canvasAspectRatio;
-          offsetX = (pdfWidth - imgWidth) / 2;
-          offsetY = 0;
-        }
-        
-        // Add image to PDF
-        pdf.addImage(
-          imgData,
-          'JPEG',
-          offsetX,
-          offsetY,
-          imgWidth,
-          imgHeight
-        );
-        
-        // Save PDF
-        pdf.save('resume.pdf');
-        
-        // Success message
-        toast.dismiss(loadingToast);
-        toast.success("PDF downloaded successfully!");
-      } catch (err) {
-        console.error("Error during canvas capture:", err);
-        toast.dismiss(loadingToast);
-        toast.error("Failed to generate PDF. Please try again.");
-      } finally {
-        // Clean up
-        if (container && container.parentNode) {
-          document.body.removeChild(container);
-        }
+      });
+
+      // Remove the temporary style element
+      document.head.removeChild(styleElement);
+
+      // Restore original transitions
+      allElements.forEach((el: Element, index: number) => {
+        (el as HTMLElement).style.transition = originalTransitions[index];
+      });
+
+      // Restore original transform and other styles
+      resumeElement.style.transform = originalTransform;
+      Object.assign(resumeElement.style, originalStyles);
+
+      // Force browser to repaint
+      resumeElement.getBoundingClientRect();
+
+      // Create PDF with the exact A4 dimensions
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
+      
+      const pdf = new jsPDF({
+        format: 'a4',
+        unit: 'mm',
+        orientation: 'portrait',
+        compress: true,
+        precision: 16 // Higher precision for better positioning
+      });
+
+      // Convert canvas to image
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      
+      // Calculate dimensions to maintain aspect ratio and fit A4
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const a4AspectRatio = pdfWidth / pdfHeight;
+      
+      let imgWidth, imgHeight, offsetX, offsetY;
+      
+      if (canvasAspectRatio > a4AspectRatio) {
+        // Canvas is wider than A4
+        imgWidth = pdfWidth;
+        imgHeight = imgWidth / canvasAspectRatio;
+        offsetX = 0;
+        offsetY = (pdfHeight - imgHeight) / 2;
+      } else {
+        // Canvas is taller than A4 or same ratio
+        imgHeight = pdfHeight;
+        imgWidth = imgHeight * canvasAspectRatio;
+        offsetX = (pdfWidth - imgWidth) / 2;
+        offsetY = 0;
       }
+      
+      // Add image with precise positioning
+      pdf.addImage(
+        imgData,
+        'JPEG',
+        offsetX,
+        offsetY,
+        imgWidth,
+        imgHeight,
+        undefined,
+        'FAST'
+      );
+
+      // Save PDF directly
+      pdf.save('resume.pdf');
+      
+      // Clear loading toast and show success
+      toast.dismiss(loadingToast);
+      toast.success("PDF downloaded successfully!");
     } catch (error) {
       console.error('PDF generation error:', error);
       toast.error("Failed to generate PDF. Please try again.");

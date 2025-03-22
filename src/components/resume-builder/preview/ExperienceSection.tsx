@@ -88,6 +88,7 @@ export function ExperienceSection({
             <ExperienceItem 
               key={index}
               experience={exp}
+              index={index}
               isEditing={isEditing}
               onEdit={() => handleEditExperience(index)}
               onDelete={() => handleDeleteExperience(index)}
