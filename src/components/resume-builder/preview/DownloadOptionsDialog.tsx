@@ -83,8 +83,8 @@ export function DownloadOptionsDialog({
       pdfPreparationDiv.innerHTML = originalHtml;
       pdfPreparationDiv.className = resumeElement.className + ' pdf-mode';
       
-      // Add padding to the PDF content container
-      pdfPreparationDiv.style.padding = '20px 20px 0 20px'; // Top, right, bottom, left
+      // Add increased padding to the PDF content container
+      pdfPreparationDiv.style.padding = '32px 32px 0 32px'; // Increased padding: Top, right, bottom, left
       
       document.body.appendChild(pdfPreparationDiv);
 
