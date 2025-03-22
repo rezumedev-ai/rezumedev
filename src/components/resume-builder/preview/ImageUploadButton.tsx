@@ -5,6 +5,7 @@ import { Upload, Trash2, Loader2, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 
 interface ImageUploadButtonProps {
   resumeId: string;
@@ -101,7 +102,7 @@ export function ImageUploadButton({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       {currentImageUrl ? (
         <>
           <Button
@@ -110,7 +111,11 @@ export function ImageUploadButton({
             type="button"
             onClick={handleRemoveImage}
             disabled={isUploading || disabled}
-            className="text-xs flex items-center gap-1.5 h-9 bg-white shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            className={cn(
+              "text-xs flex items-center gap-1.5 h-9",
+              "bg-white shadow-sm border-gray-200",
+              "hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            )}
           >
             {isUploading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -125,7 +130,11 @@ export function ImageUploadButton({
               size="sm"
               type="button"
               disabled={isUploading || disabled}
-              className="text-xs flex items-center gap-1.5 h-9 bg-white shadow-sm hover:bg-primary/5 hover:border-primary/20 transition-colors"
+              className={cn(
+                "text-xs flex items-center gap-1.5 h-9",
+                "bg-white shadow-sm border-gray-200",
+                "hover:bg-primary/5 hover:border-primary/20 transition-colors"
+              )}
             >
               {isUploading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -150,7 +159,10 @@ export function ImageUploadButton({
             size="sm"
             type="button"
             disabled={isUploading || disabled}
-            className="text-xs flex items-center gap-1.5 h-9 bg-primary hover:bg-primary/90 transition-colors"
+            className={cn(
+              "text-xs flex items-center gap-1.5 h-9",
+              "bg-primary hover:bg-primary/90 transition-colors"
+            )}
           >
             {isUploading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
