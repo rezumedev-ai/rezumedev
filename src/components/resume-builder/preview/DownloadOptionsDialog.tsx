@@ -129,30 +129,16 @@ export function DownloadOptionsDialog({
       const bulletPoints = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
-        
-        // Check if it's already an arrow bullet (for modern-professional and professional-navy templates)
-        if (bulletElement.textContent === '➤') {
-          // Just adjust styling
-          bulletElement.style.width = 'auto';
-          bulletElement.style.height = 'auto';
-          bulletElement.style.display = 'inline-block';
-          bulletElement.style.marginRight = '6px';
-          bulletElement.style.marginTop = '0px';
-          bulletElement.style.fontSize = '14px';
-          bulletElement.style.lineHeight = '1';
-          bulletElement.className = 'pdf-bullet-char';
-        } else {
-          // Replace div bullet with a text bullet
-          bulletElement.textContent = '•';
-          bulletElement.style.width = 'auto';
-          bulletElement.style.height = 'auto';
-          bulletElement.style.display = 'inline-block';
-          bulletElement.style.marginRight = '6px';
-          bulletElement.style.marginTop = '0px';
-          bulletElement.style.fontSize = '16px';
-          bulletElement.style.lineHeight = '1';
-          bulletElement.className = 'pdf-bullet-char';
-        }
+        // Replace div bullet with a text bullet
+        bulletElement.textContent = '•';
+        bulletElement.style.width = 'auto';
+        bulletElement.style.height = 'auto';
+        bulletElement.style.display = 'inline-block';
+        bulletElement.style.marginRight = '6px';
+        bulletElement.style.marginTop = '0px';
+        bulletElement.style.fontSize = '16px';
+        bulletElement.style.lineHeight = '1';
+        bulletElement.className = 'pdf-bullet-char';
       });
 
       // 4. Fix bullet lists
@@ -187,13 +173,13 @@ export function DownloadOptionsDialog({
         windowHeight: document.documentElement.offsetHeight,
         onclone: (clonedDoc: Document) => {
           // Additional processing for the cloned document if needed
-          return new Promise<void>((resolve) => {
+          return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(() => resolve(), 500); // Ensure fonts and icons are loaded
+                setTimeout(resolve, 500); // Ensure fonts and icons are loaded
               });
             } else {
-              setTimeout(() => resolve(), 500);
+              setTimeout(resolve, 500);
             }
           });
         }
