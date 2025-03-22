@@ -30,7 +30,7 @@ export function BulletPoint({
 
   return (
     <li className={cn("flex items-start gap-2 pdf-bullet-item", className)}>
-      <span 
+      <div 
         className={cn(
           "inline-flex items-center justify-center shrink-0 mt-1.5 pdf-bullet-marker",
           bulletStyle[template as keyof typeof bulletStyle] || bulletStyle.default,
@@ -38,10 +38,10 @@ export function BulletPoint({
         )}
         aria-hidden="true"
         data-pdf-bullet="true"
-      ></span>
-      <span className={cn("pdf-bullet-text", textClassName)}>
+      ></div>
+      <div className={cn("pdf-bullet-text", textClassName)}>
         {children}
-      </span>
+      </div>
     </li>
   );
 }

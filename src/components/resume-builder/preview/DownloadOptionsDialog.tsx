@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -83,24 +84,57 @@ export function DownloadOptionsDialog({
       pdfPreparationDiv.className = resumeElement.className + ' pdf-mode';
       document.body.appendChild(pdfPreparationDiv);
 
-      // 2. Force all icons to be rendered correctly in the clone
-      const allIcons = pdfPreparationDiv.querySelectorAll('[data-lucide]');
-      allIcons.forEach(icon => {
-        if (icon.parentElement) {
-          const parent = icon.parentElement as HTMLElement;
-          parent.classList.add('pdf-section-icon');
+      // 2. Pre-process PDF for proper rendering
+      // Fix all icons - replace SVG icons with simple characters for PDF
+      const sectionIcons = pdfPreparationDiv.querySelectorAll('[data-pdf-section-icon="true"]');
+      sectionIcons.forEach(icon => {
+        const iconElement = icon as HTMLElement;
+        // Check if contains an SVG
+        const svg = iconElement.querySelector('svg');
+        if (svg) {
+          // Replace SVG with a simple symbol based on the icon type
+          const iconType = svg.getAttribute('data-lucide') || '';
+          let iconSymbol = '•';
+          
+          // Create a replacement element with the icon symbol
+          switch (iconType.toLowerCase()) {
+            case 'briefcase': iconSymbol = '💼'; break;
+            case 'graduation-cap': iconSymbol = '🎓'; break;
+            case 'award': iconSymbol = '🏆'; break;
+            case 'code': iconSymbol = '💻'; break;
+            case 'file-text': iconSymbol = '📄'; break;
+            case 'user': iconSymbol = '👤'; break;
+            case 'folder-kanban': iconSymbol = '📂'; break;
+          }
+          
+          // Create a span with the icon symbol that will render properly in PDF
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = iconSymbol;
+          iconSpan.className = 'pdf-icon-text';
+          iconSpan.style.marginRight = '8px';
+          iconSpan.style.fontSize = '14px';
+          
+          // Replace the SVG with our text representation
+          if (iconElement.contains(svg)) {
+            iconElement.replaceChild(iconSpan, svg);
+          }
         }
       });
 
-      // 3. Fix bullet points rendering
+      // 3. Fix bullet point rendering
       const bulletPoints = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
-        bulletElement.style.display = 'inline-flex';
-        bulletElement.style.alignItems = 'center';
-        bulletElement.style.justifyContent = 'center';
-        bulletElement.style.flexShrink = '0';
-        bulletElement.style.marginTop = '5px';
+        // Replace div bullet with a text bullet
+        bulletElement.textContent = '•';
+        bulletElement.style.width = 'auto';
+        bulletElement.style.height = 'auto';
+        bulletElement.style.display = 'inline-block';
+        bulletElement.style.marginRight = '6px';
+        bulletElement.style.marginTop = '0px';
+        bulletElement.style.fontSize = '16px';
+        bulletElement.style.lineHeight = '1';
+        bulletElement.className = 'pdf-bullet-char';
       });
 
       // 4. Fix bullet lists
@@ -110,6 +144,15 @@ export function DownloadOptionsDialog({
         listElement.style.marginLeft = '0';
         listElement.style.paddingLeft = '0';
         listElement.style.listStyle = 'none';
+      });
+
+      // 5. Fix bullet items
+      const bulletItems = pdfPreparationDiv.querySelectorAll('.pdf-bullet-item');
+      bulletItems.forEach(item => {
+        const itemElement = item as HTMLElement;
+        itemElement.style.display = 'flex';
+        itemElement.style.alignItems = 'flex-start';
+        itemElement.style.marginBottom = '4px';
       });
 
       // Get device pixel ratio for better quality
@@ -125,7 +168,7 @@ export function DownloadOptionsDialog({
         windowWidth: document.documentElement.offsetWidth,
         windowHeight: document.documentElement.offsetHeight,
         onclone: (clonedDoc: Document) => {
-          // Add any additional fixes to the cloned document if needed
+          // Additional processing for the cloned document if needed
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
@@ -138,13 +181,13 @@ export function DownloadOptionsDialog({
         }
       };
 
-      // 5. Capture the prepared element
+      // 6. Capture the prepared element
       const canvas = await html2canvas(pdfPreparationDiv, captureSettings);
       
-      // 6. Remove the preparation div
+      // 7. Remove the preparation div
       document.body.removeChild(pdfPreparationDiv);
 
-      // 7. Create PDF with the exact A4 dimensions
+      // 8. Create PDF with the exact A4 dimensions
       const pdfWidth = 210; // A4 width in mm
       const pdfHeight = 297; // A4 height in mm
       
