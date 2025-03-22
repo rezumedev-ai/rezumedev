@@ -42,7 +42,7 @@ export function PersonalSection({
           <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-white/80">
             {isEditing && onImageUpdate ? (
               <ProfileImageButton
-                profileImageUrl={profileImageUrl || undefined}
+                currentImageUrl={profileImageUrl || undefined}
                 resumeId={resumeId}
                 onImageUpdate={onImageUpdate}
               />
@@ -68,18 +68,18 @@ export function PersonalSection({
         
         <div className="col-span-9 pl-4">
           <EditableContent
-            value={fullName}
+            content={fullName}
             placeholder="Your Full Name"
             isEditing={isEditing}
-            onChange={(value) => onUpdate('fullName', value)}
+            onUpdate={(value) => onUpdate('fullName', value)}
             className={template.style.titleFont}
           />
           
           <EditableContent
-            value={title}
+            content={title}
             placeholder="Your Professional Title"
             isEditing={isEditing}
-            onChange={(value) => onUpdate('title', value)}
+            onUpdate={(value) => onUpdate('title', value)}
             className="text-white text-xl mt-1 font-medium"
           />
           
@@ -89,10 +89,10 @@ export function PersonalSection({
                 <Mail className="w-4 h-4" />
               </span>
               <EditableContent
-                value={email}
+                content={email}
                 placeholder="your.email@example.com"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('email', value)}
+                onUpdate={(value) => onUpdate('email', value)}
                 className="text-white"
               />
             </div>
@@ -102,10 +102,10 @@ export function PersonalSection({
                 <Phone className="w-4 h-4" />
               </span>
               <EditableContent
-                value={phone}
+                content={phone}
                 placeholder="+1 (555) 123-4567"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('phone', value)}
+                onUpdate={(value) => onUpdate('phone', value)}
                 className="text-white"
               />
             </div>
@@ -116,10 +116,10 @@ export function PersonalSection({
                   <Linkedin className="w-4 h-4" />
                 </span>
                 <EditableContent
-                  value={linkedin || ''}
+                  content={linkedin || ''}
                   placeholder="linkedin.com/in/yourprofile"
                   isEditing={isEditing}
-                  onChange={(value) => onUpdate('linkedin', value)}
+                  onUpdate={(value) => onUpdate('linkedin', value)}
                   className="text-white"
                 />
               </div>
@@ -131,10 +131,10 @@ export function PersonalSection({
                   <Globe className="w-4 h-4" />
                 </span>
                 <EditableContent
-                  value={website || ''}
+                  content={website || ''}
                   placeholder="yourwebsite.com"
                   isEditing={isEditing}
-                  onChange={(value) => onUpdate('website', value)}
+                  onUpdate={(value) => onUpdate('website', value)}
                   className="text-white"
                 />
               </div>
@@ -155,7 +155,7 @@ export function PersonalSection({
             <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100">
               {isEditing && onImageUpdate ? (
                 <ProfileImageButton
-                  profileImageUrl={profileImageUrl || undefined}
+                  currentImageUrl={profileImageUrl || undefined}
                   resumeId={resumeId}
                   onImageUpdate={onImageUpdate}
                 />
@@ -182,18 +182,18 @@ export function PersonalSection({
         
         <div className={cn(hasCircularImage ? "col-span-9 pl-4" : "col-span-12")}>
           <EditableContent
-            value={fullName}
+            content={fullName}
             placeholder="Your Full Name"
             isEditing={isEditing}
-            onChange={(value) => onUpdate('fullName', value)}
+            onUpdate={(value) => onUpdate('fullName', value)}
             className={template.style.titleFont}
           />
           
           <EditableContent
-            value={title}
+            content={title}
             placeholder="Your Professional Title"
             isEditing={isEditing}
-            onChange={(value) => onUpdate('title', value)}
+            onUpdate={(value) => onUpdate('title', value)}
             className="text-emerald-700 text-xl mt-1 font-medium"
           />
           
@@ -203,10 +203,10 @@ export function PersonalSection({
                 <Mail className="w-4 h-4" />
               </span>
               <EditableContent
-                value={email}
+                content={email}
                 placeholder="your.email@example.com"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('email', value)}
+                onUpdate={(value) => onUpdate('email', value)}
               />
             </div>
             
@@ -215,10 +215,10 @@ export function PersonalSection({
                 <Phone className="w-4 h-4" />
               </span>
               <EditableContent
-                value={phone}
+                content={phone}
                 placeholder="+1 (555) 123-4567"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('phone', value)}
+                onUpdate={(value) => onUpdate('phone', value)}
               />
             </div>
             
@@ -228,10 +228,10 @@ export function PersonalSection({
                   <Linkedin className="w-4 h-4" />
                 </span>
                 <EditableContent
-                  value={linkedin || ''}
+                  content={linkedin || ''}
                   placeholder="linkedin.com/in/yourprofile"
                   isEditing={isEditing}
-                  onChange={(value) => onUpdate('linkedin', value)}
+                  onUpdate={(value) => onUpdate('linkedin', value)}
                 />
               </div>
             )}
@@ -242,10 +242,10 @@ export function PersonalSection({
                   <Globe className="w-4 h-4" />
                 </span>
                 <EditableContent
-                  value={website || ''}
+                  content={website || ''}
                   placeholder="yourwebsite.com"
                   isEditing={isEditing}
-                  onChange={(value) => onUpdate('website', value)}
+                  onUpdate={(value) => onUpdate('website', value)}
                 />
               </div>
             )}
@@ -265,7 +265,7 @@ export function PersonalSection({
               <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-100">
                 {isEditing && onImageUpdate ? (
                   <ProfileImageButton
-                    profileImageUrl={profileImageUrl || undefined}
+                    currentImageUrl={profileImageUrl || undefined}
                     resumeId={resumeId}
                     onImageUpdate={onImageUpdate}
                   />
@@ -286,18 +286,18 @@ export function PersonalSection({
           
           <div>
             <EditableContent
-              value={fullName}
+              content={fullName}
               placeholder="Your Full Name"
               isEditing={isEditing}
-              onChange={(value) => onUpdate('fullName', value)}
+              onUpdate={(value) => onUpdate('fullName', value)}
               className={template.style.titleFont}
             />
             
             <EditableContent
-              value={title}
+              content={title}
               placeholder="Your Professional Title"
               isEditing={isEditing}
-              onChange={(value) => onUpdate('title', value)}
+              onUpdate={(value) => onUpdate('title', value)}
               className="text-xl text-gray-600 mt-1"
             />
           </div>
@@ -309,10 +309,10 @@ export function PersonalSection({
               <Mail className="w-4 h-4" />
             </span>
             <EditableContent
-              value={email}
+              content={email}
               placeholder="your.email@example.com"
               isEditing={isEditing}
-              onChange={(value) => onUpdate('email', value)}
+              onUpdate={(value) => onUpdate('email', value)}
             />
           </div>
           
@@ -321,10 +321,10 @@ export function PersonalSection({
               <Phone className="w-4 h-4" />
             </span>
             <EditableContent
-              value={phone}
+              content={phone}
               placeholder="+1 (555) 123-4567"
               isEditing={isEditing}
-              onChange={(value) => onUpdate('phone', value)}
+              onUpdate={(value) => onUpdate('phone', value)}
             />
           </div>
           
@@ -334,10 +334,10 @@ export function PersonalSection({
                 <Linkedin className="w-4 h-4" />
               </span>
               <EditableContent
-                value={linkedin || ''}
+                content={linkedin || ''}
                 placeholder="linkedin.com/in/yourprofile"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('linkedin', value)}
+                onUpdate={(value) => onUpdate('linkedin', value)}
               />
             </div>
           )}
@@ -348,10 +348,10 @@ export function PersonalSection({
                 <Globe className="w-4 h-4" />
               </span>
               <EditableContent
-                value={website || ''}
+                content={website || ''}
                 placeholder="yourwebsite.com"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('website', value)}
+                onUpdate={(value) => onUpdate('website', value)}
               />
             </div>
           )}

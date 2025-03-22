@@ -3,7 +3,7 @@ import { formatDate } from "@/lib/utils";
 import { WorkExperience } from "@/types/resume";
 import { ResumeTemplate } from "../../templates";
 import { EditableContent } from "../../ui/EditableContent";
-import { ArrowRight, Circle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface ExperienceItemProps {
   experience: WorkExperience;
@@ -43,10 +43,10 @@ export function ExperienceItem({
           <h4 className="font-bold text-[#0F2B5B]">
             {isEditing && onUpdate ? (
               <EditableContent
-                value={experience.jobTitle}
+                content={experience.jobTitle}
                 placeholder="Job Title"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('jobTitle', value)}
+                onUpdate={(value) => onUpdate('jobTitle', value)}
               />
             ) : (
               experience.jobTitle
@@ -60,10 +60,10 @@ export function ExperienceItem({
         <div className="text-gray-700 mb-2">
           {isEditing && onUpdate ? (
             <EditableContent
-              value={experience.companyName}
+              content={experience.companyName}
               placeholder="Company Name"
               isEditing={isEditing}
-              onChange={(value) => onUpdate('companyName', value)}
+              onUpdate={(value) => onUpdate('companyName', value)}
             />
           ) : (
             experience.companyName
@@ -73,10 +73,10 @@ export function ExperienceItem({
               <span className="mx-1">•</span>
               {isEditing && onUpdate ? (
                 <EditableContent
-                  value={experience.location}
+                  content={experience.location}
                   placeholder="Location"
                   isEditing={isEditing}
-                  onChange={(value) => onUpdate('location', value)}
+                  onUpdate={(value) => onUpdate('location', value)}
                   className="inline"
                 />
               ) : (
@@ -92,10 +92,10 @@ export function ExperienceItem({
               <span className="professional-navy-bullet mt-1.5 mr-2"></span>
               {isEditing && onUpdate ? (
                 <EditableContent
-                  value={responsibility}
+                  content={responsibility}
                   placeholder={`Responsibility ${index + 1}`}
                   isEditing={isEditing}
-                  onChange={(value) => {
+                  onUpdate={(value) => {
                     const newResponsibilities = [...experience.responsibilities];
                     newResponsibilities[index] = value;
                     onUpdate('responsibilities', newResponsibilities);
@@ -137,10 +137,10 @@ export function ExperienceItem({
           <h4 className="font-semibold text-gray-800">
             {isEditing && onUpdate ? (
               <EditableContent
-                value={experience.jobTitle}
+                content={experience.jobTitle}
                 placeholder="Job Title"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('jobTitle', value)}
+                onUpdate={(value) => onUpdate('jobTitle', value)}
               />
             ) : (
               experience.jobTitle
@@ -154,10 +154,10 @@ export function ExperienceItem({
         <div className="text-gray-600 mb-2">
           {isEditing && onUpdate ? (
             <EditableContent
-              value={experience.companyName}
+              content={experience.companyName}
               placeholder="Company Name"
               isEditing={isEditing}
-              onChange={(value) => onUpdate('companyName', value)}
+              onUpdate={(value) => onUpdate('companyName', value)}
             />
           ) : (
             experience.companyName
@@ -167,10 +167,10 @@ export function ExperienceItem({
               <span className="mx-1">•</span>
               {isEditing && onUpdate ? (
                 <EditableContent
-                  value={experience.location}
+                  content={experience.location}
                   placeholder="Location"
                   isEditing={isEditing}
-                  onChange={(value) => onUpdate('location', value)}
+                  onUpdate={(value) => onUpdate('location', value)}
                   className="inline"
                 />
               ) : (
@@ -188,10 +188,10 @@ export function ExperienceItem({
               </span>
               {isEditing && onUpdate ? (
                 <EditableContent
-                  value={responsibility}
+                  content={responsibility}
                   placeholder={`Responsibility ${index + 1}`}
                   isEditing={isEditing}
-                  onChange={(value) => {
+                  onUpdate={(value) => {
                     const newResponsibilities = [...experience.responsibilities];
                     newResponsibilities[index] = value;
                     onUpdate('responsibilities', newResponsibilities);
@@ -232,10 +232,10 @@ export function ExperienceItem({
         <h4 className="font-semibold">
           {isEditing && onUpdate ? (
             <EditableContent
-              value={experience.jobTitle}
+              content={experience.jobTitle}
               placeholder="Job Title"
               isEditing={isEditing}
-              onChange={(value) => onUpdate('jobTitle', value)}
+              onUpdate={(value) => onUpdate('jobTitle', value)}
             />
           ) : (
             experience.jobTitle
@@ -249,10 +249,10 @@ export function ExperienceItem({
       <div className="text-gray-600 mb-2">
         {isEditing && onUpdate ? (
           <EditableContent
-            value={experience.companyName}
+            content={experience.companyName}
             placeholder="Company Name"
             isEditing={isEditing}
-            onChange={(value) => onUpdate('companyName', value)}
+            onUpdate={(value) => onUpdate('companyName', value)}
           />
         ) : (
           experience.companyName
@@ -262,10 +262,10 @@ export function ExperienceItem({
             <span className="mx-1">•</span>
             {isEditing && onUpdate ? (
               <EditableContent
-                value={experience.location}
+                content={experience.location}
                 placeholder="Location"
                 isEditing={isEditing}
-                onChange={(value) => onUpdate('location', value)}
+                onUpdate={(value) => onUpdate('location', value)}
                 className="inline"
               />
             ) : (
@@ -280,10 +280,10 @@ export function ExperienceItem({
           <li key={index} className="flex items-start">
             {isEditing && onUpdate ? (
               <EditableContent
-                value={responsibility}
+                content={responsibility}
                 placeholder={`Responsibility ${index + 1}`}
                 isEditing={isEditing}
-                onChange={(value) => {
+                onUpdate={(value) => {
                   const newResponsibilities = [...experience.responsibilities];
                   newResponsibilities[index] = value;
                   onUpdate('responsibilities', newResponsibilities);

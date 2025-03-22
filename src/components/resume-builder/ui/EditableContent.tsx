@@ -6,13 +6,15 @@ interface EditableContentProps {
   isEditing: boolean;
   className?: string;
   onUpdate: (newContent: string) => void;
+  placeholder?: string;
 }
 
 export function EditableContent({ 
   content, 
   isEditing, 
   className,
-  onUpdate 
+  onUpdate,
+  placeholder = "" 
 }: EditableContentProps) {
   const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     if (isEditing) {
@@ -28,7 +30,7 @@ export function EditableContent({
       suppressContentEditableWarning
       onBlur={handleBlur}
     >
-      {content}
+      {content || (isEditing ? placeholder : "")}
     </div>
   );
 }

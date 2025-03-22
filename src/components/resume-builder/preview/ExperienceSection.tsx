@@ -88,10 +88,18 @@ export function ExperienceSection({
             <ExperienceItem 
               key={index}
               experience={exp}
-              index={index}
+              template={template}
               isEditing={isEditing}
               onEdit={() => handleEditExperience(index)}
               onDelete={() => handleDeleteExperience(index)}
+              onUpdate={(field, value) => {
+                const updatedExperiences = [...experiences];
+                updatedExperiences[index] = {
+                  ...updatedExperiences[index],
+                  [field]: value
+                };
+                onUpdate(updatedExperiences);
+              }}
             />
           ))}
           
