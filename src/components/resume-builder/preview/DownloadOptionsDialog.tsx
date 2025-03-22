@@ -69,7 +69,7 @@ export function DownloadOptionsDialog({
       const loadingToast = toast.loading("Generating PDF...");
 
       // Wait for dialog to close and any transitions to complete
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
@@ -94,7 +94,34 @@ export function DownloadOptionsDialog({
         transformOrigin: resumeElement.style.transformOrigin,
         visibility: resumeElement.style.visibility
       };
-
+      
+      // Fix for profile image and bullet points: add specific CSS class to the cloned content
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+        .pdf-specific-fixes .rounded-full img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
+          border-radius: 50% !important;
+        }
+        .pdf-specific-fixes .flex.items-start {
+          align-items: flex-start !important;
+        }
+        .pdf-specific-fixes li .inline-block {
+          vertical-align: top !important; 
+          margin-top: 4px !important;
+        }
+        .pdf-specific-fixes .space-y-1.5 li {
+          display: flex !important;
+          align-items: flex-start !important;
+        }
+        .pdf-specific-fixes .space-y-1 li {
+          display: flex !important;
+          align-items: flex-start !important;
+        }
+      `;
+      document.head.appendChild(styleElement);
+      
       // Temporarily disable scale transform for capture
       const originalTransform = resumeElement.style.transform;
       resumeElement.style.transform = 'none';
@@ -129,7 +156,7 @@ export function DownloadOptionsDialog({
 
       // Capture with improved settings
       const canvas = await html2canvas(resumeElement, {
-        scale: pixelRatio * 2.5, // Increased scale for sharper images
+        scale: pixelRatio * 2, // Double the scale for sharper images
         useCORS: true,
         allowTaint: true,
         logging: true, // Enable logging for debugging
@@ -140,7 +167,7 @@ export function DownloadOptionsDialog({
         onclone: (clonedDocument, element) => {
           const clonedElement = element as HTMLElement;
           
-          // Add a PDF-specific class to the cloned element
+          // Add the PDF-specific class to the cloned element
           clonedElement.classList.add('pdf-specific-fixes');
           
           // Apply exact styling to the cloned element
@@ -149,108 +176,54 @@ export function DownloadOptionsDialog({
           clonedElement.style.width = `${contentWidth}px`;
           clonedElement.style.height = `${contentHeight}px`;
           
-          // Process all bullet points with data-pdf-bullet-item attribute
-          const bulletItems = clonedElement.querySelectorAll('[data-pdf-bullet-item]');
-          bulletItems.forEach((item) => {
-            const bulletItem = item as HTMLElement;
-            bulletItem.style.display = 'flex';
-            bulletItem.style.alignItems = 'flex-start';
-            bulletItem.style.marginBottom = '4px';
-            bulletItem.style.pageBreakInside = 'avoid';
-            bulletItem.style.breakInside = 'avoid';
-            bulletItem.style.lineHeight = '1.4';
+          // Fix alignment of list items in the cloned document
+          const listItems = clonedElement.querySelectorAll('li');
+          listItems.forEach(li => {
+            const bulletPoint = li.querySelector('.inline-block');
+            const textContent = li.querySelector('[contenteditable]') || li.lastChild;
             
-            // Process bullet container
-            const bulletContainer = bulletItem.querySelector('[data-pdf-bullet-container]');
-            if (bulletContainer) {
-              const container = bulletContainer as HTMLElement;
-              container.style.display = 'flex';
-              container.style.alignItems = 'flex-start';
-              container.style.width = '100%';
-              container.style.position = 'relative';
-            }
-            
-            // Process bullet point
-            const bullet = bulletItem.querySelector('[data-pdf-bullet]');
-            if (bullet) {
-              const bulletEl = bullet as HTMLElement;
-              bulletEl.style.display = 'inline-flex';
-              bulletEl.style.alignItems = 'center';
-              bulletEl.style.justifyContent = 'center';
-              bulletEl.style.flexShrink = '0';
-              bulletEl.style.width = '6px';
-              bulletEl.style.height = '6px';
-              bulletEl.style.minWidth = '6px';
-              bulletEl.style.minHeight = '6px';
-              bulletEl.style.marginRight = '8px';
-              bulletEl.style.marginTop = '7px';
-              bulletEl.style.backgroundColor = '#000000';
-              bulletEl.style.borderRadius = '50%';
-              bulletEl.style.position = 'relative';
-            }
-            
-            // Process bullet text
-            const text = bulletItem.querySelector('[data-pdf-bullet-text]');
-            if (text) {
-              const textEl = text as HTMLElement;
-              textEl.style.display = 'inline-block';
-              textEl.style.verticalAlign = 'top';
-              textEl.style.flexGrow = '1';
-              textEl.style.width = 'calc(100% - 14px)';
-              textEl.style.lineHeight = '1.4';
-              textEl.style.marginTop = '0';
+            if (bulletPoint && textContent) {
+              bulletPoint.classList.add('bullet-point-fix');
             }
           });
           
-          // Process all contact items with data-pdf-contact-item attribute
-          const contactItems = clonedElement.querySelectorAll('[data-pdf-contact-item]');
-          contactItems.forEach((item) => {
-            const contactItem = item as HTMLElement;
-            contactItem.style.display = 'flex';
-            contactItem.style.alignItems = 'center';
-            contactItem.style.justifyContent = 'flex-start';
-            contactItem.style.gap = '4px';
-            contactItem.style.marginBottom = '2px';
-            contactItem.style.height = '24px';
-            contactItem.style.lineHeight = '24px';
-            
-            // Process contact icon
-            const icon = contactItem.querySelector('[data-pdf-contact-icon]');
-            if (icon) {
-              const iconEl = icon as HTMLElement;
-              iconEl.style.display = 'inline-flex';
-              iconEl.style.alignItems = 'center';
-              iconEl.style.justifyContent = 'center';
-              iconEl.style.flexShrink = '0';
-              iconEl.style.width = '16px';
-              iconEl.style.height = '16px';
-              iconEl.style.marginRight = '6px';
-              iconEl.style.margin = '0';
-              iconEl.style.padding = '0';
-              iconEl.style.position = 'relative';
-              iconEl.style.verticalAlign = 'middle';
-            }
-            
-            // Process contact text
-            const text = contactItem.querySelector('[data-pdf-contact-text]');
-            if (text) {
-              const textEl = text as HTMLElement;
-              textEl.style.display = 'inline-block';
-              textEl.style.verticalAlign = 'middle';
-              textEl.style.lineHeight = '24px';
-              textEl.style.height = '24px';
-              textEl.style.margin = '0';
-              textEl.style.padding = '0';
+          // Fix circular images in the cloned document
+          const profileImages = clonedElement.querySelectorAll('.rounded-full');
+          profileImages.forEach(img => {
+            img.classList.add('profile-image-fix');
+          });
+          
+          // Ensure fonts are properly loaded in the clone
+          const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
+          const head = clonedDocument.head;
+          
+          fontLinks.forEach(link => {
+            // Fixed TypeScript error by properly casting to HTMLLinkElement
+            const linkEl = link as HTMLLinkElement;
+            if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
+              const newLink = clonedDocument.createElement('link');
+              newLink.rel = 'stylesheet';
+              newLink.href = linkEl.href;
+              head.appendChild(newLink);
             }
           });
-
+          
           // Make sure all fonts have loaded in the clone
           return new Promise<void>(resolve => {
-            // Increase timeout to ensure everything renders properly
-            setTimeout(resolve, 1500);
+            if ((document as any).fonts && (document as any).fonts.ready) {
+              (document as any).fonts.ready.then(() => {
+                setTimeout(resolve, 300); // Increased delay to ensure rendering
+              });
+            } else {
+              // Fallback if document.fonts is not available
+              setTimeout(resolve, 400);
+            }
           });
         }
       });
+
+      // Remove the temporary style element
+      document.head.removeChild(styleElement);
 
       // Restore original transitions
       allElements.forEach((el: Element, index: number) => {
