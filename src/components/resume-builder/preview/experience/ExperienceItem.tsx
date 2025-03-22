@@ -37,7 +37,7 @@ export function ExperienceItem({
           </div>
         </div>
         <div className="text-sm text-gray-500 whitespace-nowrap">
-          {formatDateRange(experience.startDate, experience.endDate, experience.isCurrentJob)}
+          {formatDateRange(experience.startDate, experience.endDate)}
         </div>
       </div>
       
@@ -47,6 +47,7 @@ export function ExperienceItem({
             key={respIndex}
             template={template}
             className="ml-0 leading-snug"
+            type="experience"
           >
             {resp}
           </BulletPoint>

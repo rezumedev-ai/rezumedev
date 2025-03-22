@@ -2,22 +2,22 @@
 import { cn } from "@/lib/utils";
 
 interface EditableContentProps {
-  value: string;
+  content: string;
   isEditing: boolean;
   className?: string;
-  onChange: (newValue: string) => void;
+  onUpdate: (newContent: string) => void;
 }
 
 export function EditableContent({ 
-  value, 
+  content, 
   isEditing, 
   className,
-  onChange 
+  onUpdate 
 }: EditableContentProps) {
   const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     if (isEditing) {
       const newContent = event.target.innerText.trim();
-      onChange(newContent);
+      onUpdate(newContent);
     }
   };
 
@@ -28,7 +28,7 @@ export function EditableContent({
       suppressContentEditableWarning
       onBlur={handleBlur}
     >
-      {value}
+      {content}
     </div>
   );
 }
