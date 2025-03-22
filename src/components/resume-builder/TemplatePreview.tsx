@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Badge } from "./ui/Badge";
 
 interface TemplatePreviewProps {
   template: ResumeTemplate;
@@ -59,10 +60,13 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
           )}
           
           <div className="absolute top-2 left-2">
-            <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full">
-              <Sparkles className="w-3 h-3 text-primary" />
-              <span className="text-xs font-medium text-primary">Premium</span>
-            </div>
+            <Badge 
+              variant="primary" 
+              size="sm"
+              icon={<Sparkles className="w-3 h-3 text-primary" />}
+            >
+              Premium
+            </Badge>
           </div>
         </AspectRatio>
       </div>
