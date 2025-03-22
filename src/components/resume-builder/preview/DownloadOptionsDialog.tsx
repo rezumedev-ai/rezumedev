@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -68,7 +69,7 @@ export function DownloadOptionsDialog({
       const loadingToast = toast.loading("Generating PDF...");
 
       // Wait for dialog to close and any transitions to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
@@ -93,110 +94,7 @@ export function DownloadOptionsDialog({
         transformOrigin: resumeElement.style.transformOrigin,
         visibility: resumeElement.style.visibility
       };
-      
-      // Enhanced CSS fixes for PDF generation
-      const styleElement = document.createElement('style');
-      styleElement.textContent = `
-        /* General fixes for all elements */
-        .pdf-specific-fixes * {
-          box-shadow: none !important;
-          text-shadow: none !important;
-          print-color-adjust: exact !important;
-          -webkit-print-color-adjust: exact !important;
-          page-break-inside: avoid !important;
-        }
-        
-        /* Profile image fixes */
-        .pdf-specific-fixes .rounded-full {
-          border-radius: 50% !important;
-          overflow: hidden !important;
-        }
-        
-        .pdf-specific-fixes .rounded-full img {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover !important;
-          border-radius: 50% !important;
-          aspect-ratio: 1/1 !important;
-        }
-        
-        /* Improved contact item alignment with data attributes */
-        .pdf-specific-fixes [data-pdf-contact-item] {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: flex-start !important;
-          gap: 4px !important;
-          margin-bottom: 2px !important;
-          height: 24px !important;
-          line-height: 24px !important;
-        }
-        
-        .pdf-specific-fixes [data-pdf-contact-icon] {
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          flex-shrink: 0 !important;
-          vertical-align: middle !important;
-          width: 16px !important;
-          height: 16px !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          position: relative !important;
-          top: 0 !important;
-        }
-        
-        .pdf-specific-fixes [data-pdf-contact-text] {
-          display: inline-block !important;
-          vertical-align: middle !important;
-          line-height: 24px !important;
-          height: 24px !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-        
-        /* Improved bullet point alignment with data attributes */
-        .pdf-specific-fixes [data-pdf-bullet-item] {
-          display: flex !important;
-          align-items: flex-start !important;
-          margin-bottom: 4px !important;
-          page-break-inside: avoid !important;
-          line-height: 1.4 !important;
-        }
-        
-        .pdf-specific-fixes [data-pdf-bullet-container] {
-          display: flex !important;
-          align-items: flex-start !important;
-          width: 100% !important;
-          position: relative !important;
-        }
-        
-        .pdf-specific-fixes [data-pdf-bullet] {
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          flex-shrink: 0 !important;
-          width: 6px !important;
-          height: 6px !important;
-          min-width: 6px !important;
-          min-height: 6px !important;
-          margin-right: 8px !important;
-          margin-top: 7px !important;
-          background-color: #000000 !important;
-          border-radius: 50% !important;
-          position: relative !important;
-          top: 0 !important;
-        }
-        
-        .pdf-specific-fixes [data-pdf-bullet-text] {
-          display: inline-block !important;
-          vertical-align: top !important;
-          flex-grow: 1 !important;
-          line-height: 1.4 !important;
-          margin-top: 0 !important;
-        }
-      `;
-      document.head.appendChild(styleElement);
-      
+
       // Temporarily disable scale transform for capture
       const originalTransform = resumeElement.style.transform;
       resumeElement.style.transform = 'none';
@@ -231,10 +129,10 @@ export function DownloadOptionsDialog({
 
       // Capture with improved settings
       const canvas = await html2canvas(resumeElement, {
-        scale: pixelRatio * 2.5, // Increased scale for sharper images and better alignment
+        scale: pixelRatio * 2.5, // Increased scale for sharper images
         useCORS: true,
         allowTaint: true,
-        logging: false, // Disable logging for production
+        logging: true, // Enable logging for debugging
         backgroundColor: "#ffffff",
         imageTimeout: 15000, // Increase timeout for complex resumes
         windowWidth: document.documentElement.offsetWidth,
@@ -242,7 +140,7 @@ export function DownloadOptionsDialog({
         onclone: (clonedDocument, element) => {
           const clonedElement = element as HTMLElement;
           
-          // Add the PDF-specific class to the cloned element
+          // Add a PDF-specific class to the cloned element
           clonedElement.classList.add('pdf-specific-fixes');
           
           // Apply exact styling to the cloned element
@@ -251,9 +149,62 @@ export function DownloadOptionsDialog({
           clonedElement.style.width = `${contentWidth}px`;
           clonedElement.style.height = `${contentHeight}px`;
           
-          // Enhanced styling for contact items using data attributes
+          // Process all bullet points with data-pdf-bullet-item attribute
+          const bulletItems = clonedElement.querySelectorAll('[data-pdf-bullet-item]');
+          bulletItems.forEach((item) => {
+            const bulletItem = item as HTMLElement;
+            bulletItem.style.display = 'flex';
+            bulletItem.style.alignItems = 'flex-start';
+            bulletItem.style.marginBottom = '4px';
+            bulletItem.style.pageBreakInside = 'avoid';
+            bulletItem.style.breakInside = 'avoid';
+            bulletItem.style.lineHeight = '1.4';
+            
+            // Process bullet container
+            const bulletContainer = bulletItem.querySelector('[data-pdf-bullet-container]');
+            if (bulletContainer) {
+              const container = bulletContainer as HTMLElement;
+              container.style.display = 'flex';
+              container.style.alignItems = 'flex-start';
+              container.style.width = '100%';
+              container.style.position = 'relative';
+            }
+            
+            // Process bullet point
+            const bullet = bulletItem.querySelector('[data-pdf-bullet]');
+            if (bullet) {
+              const bulletEl = bullet as HTMLElement;
+              bulletEl.style.display = 'inline-flex';
+              bulletEl.style.alignItems = 'center';
+              bulletEl.style.justifyContent = 'center';
+              bulletEl.style.flexShrink = '0';
+              bulletEl.style.width = '6px';
+              bulletEl.style.height = '6px';
+              bulletEl.style.minWidth = '6px';
+              bulletEl.style.minHeight = '6px';
+              bulletEl.style.marginRight = '8px';
+              bulletEl.style.marginTop = '7px';
+              bulletEl.style.backgroundColor = '#000000';
+              bulletEl.style.borderRadius = '50%';
+              bulletEl.style.position = 'relative';
+            }
+            
+            // Process bullet text
+            const text = bulletItem.querySelector('[data-pdf-bullet-text]');
+            if (text) {
+              const textEl = text as HTMLElement;
+              textEl.style.display = 'inline-block';
+              textEl.style.verticalAlign = 'top';
+              textEl.style.flexGrow = '1';
+              textEl.style.width = 'calc(100% - 14px)';
+              textEl.style.lineHeight = '1.4';
+              textEl.style.marginTop = '0';
+            }
+          });
+          
+          // Process all contact items with data-pdf-contact-item attribute
           const contactItems = clonedElement.querySelectorAll('[data-pdf-contact-item]');
-          contactItems.forEach(item => {
+          contactItems.forEach((item) => {
             const contactItem = item as HTMLElement;
             contactItem.style.display = 'flex';
             contactItem.style.alignItems = 'center';
@@ -263,7 +214,7 @@ export function DownloadOptionsDialog({
             contactItem.style.height = '24px';
             contactItem.style.lineHeight = '24px';
             
-            // Style the icon
+            // Process contact icon
             const icon = contactItem.querySelector('[data-pdf-contact-icon]');
             if (icon) {
               const iconEl = icon as HTMLElement;
@@ -273,14 +224,14 @@ export function DownloadOptionsDialog({
               iconEl.style.flexShrink = '0';
               iconEl.style.width = '16px';
               iconEl.style.height = '16px';
+              iconEl.style.marginRight = '6px';
               iconEl.style.margin = '0';
               iconEl.style.padding = '0';
               iconEl.style.position = 'relative';
-              iconEl.style.top = '0';
               iconEl.style.verticalAlign = 'middle';
             }
             
-            // Style the text
+            // Process contact text
             const text = contactItem.querySelector('[data-pdf-contact-text]');
             if (text) {
               const textEl = text as HTMLElement;
@@ -292,89 +243,14 @@ export function DownloadOptionsDialog({
               textEl.style.padding = '0';
             }
           });
-          
-          // Enhanced styling for bullet points using data attributes
-          const bulletItems = clonedElement.querySelectorAll('[data-pdf-bullet-item]');
-          bulletItems.forEach(item => {
-            const bulletItem = item as HTMLElement;
-            bulletItem.style.display = 'flex';
-            bulletItem.style.alignItems = 'flex-start';
-            bulletItem.style.marginBottom = '4px';
-            bulletItem.style.pageBreakInside = 'avoid';
-            bulletItem.style.lineHeight = '1.4';
-            
-            // Style the bullet container
-            const bulletContainer = bulletItem.querySelector('[data-pdf-bullet-container]');
-            if (bulletContainer) {
-              const container = bulletContainer as HTMLElement;
-              container.style.display = 'flex';
-              container.style.alignItems = 'flex-start';
-              container.style.width = '100%';
-              container.style.position = 'relative';
-              
-              // Style the bullet point
-              const bullet = container.querySelector('[data-pdf-bullet]');
-              if (bullet) {
-                const bulletEl = bullet as HTMLElement;
-                bulletEl.style.display = 'inline-flex';
-                bulletEl.style.alignItems = 'center';
-                bulletEl.style.justifyContent = 'center';
-                bulletEl.style.flexShrink = '0';
-                bulletEl.style.width = '6px';
-                bulletEl.style.height = '6px';
-                bulletEl.style.minWidth = '6px';
-                bulletEl.style.minHeight = '6px';
-                bulletEl.style.marginRight = '8px';
-                bulletEl.style.marginTop = '7px';
-                bulletEl.style.backgroundColor = '#000000';
-                bulletEl.style.borderRadius = '50%';
-                bulletEl.style.position = 'relative';
-                bulletEl.style.top = '0';
-              }
-              
-              // Style the text
-              const text = container.querySelector('[data-pdf-bullet-text]');
-              if (text) {
-                const textEl = text as HTMLElement;
-                textEl.style.display = 'inline-block';
-                textEl.style.verticalAlign = 'top';
-                textEl.style.flexGrow = '1';
-                textEl.style.lineHeight = '1.4';
-                textEl.style.marginTop = '0';
-              }
-            }
-          });
-          
-          // Ensure fonts are properly loaded in the clone
-          const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
-          const head = clonedDocument.head;
-          
-          fontLinks.forEach(link => {
-            const linkEl = link as HTMLLinkElement;
-            if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
-              const newLink = clonedDocument.createElement('link');
-              newLink.rel = 'stylesheet';
-              newLink.href = linkEl.href;
-              head.appendChild(newLink);
-            }
-          });
-          
+
           // Make sure all fonts have loaded in the clone
           return new Promise<void>(resolve => {
-            if ((document as any).fonts && (document as any).fonts.ready) {
-              (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 800); // Increased delay to ensure rendering
-              });
-            } else {
-              // Fallback if document.fonts is not available
-              setTimeout(resolve, 1000);
-            }
+            // Increase timeout to ensure everything renders properly
+            setTimeout(resolve, 1500);
           });
         }
       });
-
-      // Remove the temporary style element
-      document.head.removeChild(styleElement);
 
       // Restore original transitions
       allElements.forEach((el: Element, index: number) => {
