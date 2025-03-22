@@ -109,6 +109,13 @@
     -webkit-print-color-adjust: exact;
   }
 
+  /* Personal info icon alignment */
+  #resume-content .flex.items-center.gap-1.5 svg,
+  #resume-content .flex.items-center.gap-2 svg {
+    margin-top: 2px;
+    align-self: flex-start;
+  }
+
   /* PDF-specific styling */
   .pdf-mode #resume-content .pdf-bullet-list {
     margin: 0;

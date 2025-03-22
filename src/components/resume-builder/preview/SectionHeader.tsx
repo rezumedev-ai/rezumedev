@@ -34,25 +34,25 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     
     switch (type) {
       case "experience":
-        iconElement = <Briefcase className={iconClass} strokeWidth={2} />;
+        iconElement = <Briefcase className={iconClass} strokeWidth={2.5} />;
         break;
       case "education":
-        iconElement = <GraduationCap className={iconClass} strokeWidth={2} />;
+        iconElement = <GraduationCap className={iconClass} strokeWidth={2.5} />;
         break;
       case "certifications":
-        iconElement = <Award className={iconClass} strokeWidth={2} />;
+        iconElement = <Award className={iconClass} strokeWidth={2.5} />;
         break;
       case "skills":
-        iconElement = <Code className={iconClass} strokeWidth={2} />;
+        iconElement = <Code className={iconClass} strokeWidth={2.5} />;
         break;
       case "summary":
-        iconElement = <FileText className={iconClass} strokeWidth={2} />;
+        iconElement = <FileText className={iconClass} strokeWidth={2.5} />;
         break;
       case "profile":
-        iconElement = <User className={iconClass} strokeWidth={2} />;
+        iconElement = <User className={iconClass} strokeWidth={2.5} />;
         break;
       case "projects":
-        iconElement = <FolderKanban className={iconClass} strokeWidth={2} />;
+        iconElement = <FolderKanban className={iconClass} strokeWidth={2.5} />;
         break;
       default:
         return null;

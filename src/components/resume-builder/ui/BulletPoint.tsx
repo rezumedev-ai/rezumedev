@@ -37,19 +37,14 @@ export function BulletPoint({
       <li className={cn("flex items-start gap-1.5 pdf-bullet-item", className)}>
         <div 
           className={cn(
-            "inline-flex items-center justify-center shrink-0 mt-1 pdf-bullet-marker",
+            "inline-flex items-center justify-center shrink-0 mt-0.5 pdf-bullet-marker",
             bulletClassName
           )}
           aria-hidden="true"
           data-pdf-bullet="true"
           data-pdf-bullet-type="skill"
-          style={{ minWidth: "12px", minHeight: "12px" }}
         >
-          <ChevronRight 
-            className="w-3.5 h-3.5 text-gray-700"
-            data-pdf-bullet-icon="chevron"
-            strokeWidth={2.5}
-          />
+          <span className="text-lg text-gray-700">➤</span>
         </div>
         <div className={cn("pdf-bullet-text", textClassName)}>
           {children}
