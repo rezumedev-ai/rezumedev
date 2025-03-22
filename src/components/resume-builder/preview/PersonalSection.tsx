@@ -109,16 +109,16 @@ export function PersonalSection({
             />
           </div>
           
-          {template.style.layout.profileImage && (
+          {template.style.layout?.profileImage && (
             <div 
               className="relative w-16 h-16"
               onMouseEnter={() => setHovering(true)}
               onMouseLeave={() => setHovering(false)}
             >
               <ProfileImageButton
-                imageUrl={profileImageUrl}
+                currentImageUrl={profileImageUrl}
                 isEditing={isEditing}
-                onUpdate={onImageUpdate}
+                onImageUpdate={onImageUpdate}
                 resumeId={resumeId}
                 className="rounded-full overflow-hidden"
               />
@@ -140,16 +140,16 @@ export function PersonalSection({
   if (template.id === "modern-professional") {
     return (
       <div className="flex items-center mb-4 p-6 bg-gray-50 rounded-lg">
-        {template.style.layout.profileImage && (
+        {template.style.layout?.profileImage && (
           <div 
             className="relative w-24 h-24 mr-6"
             onMouseEnter={() => setHovering(true)}
             onMouseLeave={() => setHovering(false)}
           >
             <ProfileImageButton
-              imageUrl={profileImageUrl}
+              currentImageUrl={profileImageUrl}
               isEditing={isEditing}
-              onUpdate={onImageUpdate}
+              onImageUpdate={onImageUpdate}
               resumeId={resumeId}
               className="rounded-full overflow-hidden border-2 border-emerald-500"
             />
@@ -208,16 +208,16 @@ export function PersonalSection({
         </div>
       </div>
       
-      {template.style.layout.profileImage && (
+      {template.style.layout?.profileImage && (
         <div 
           className="relative w-24 h-24 mt-4 md:mt-0"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
         >
           <ProfileImageButton
-            imageUrl={profileImageUrl}
+            currentImageUrl={profileImageUrl}
             isEditing={isEditing}
-            onUpdate={onImageUpdate}
+            onImageUpdate={onImageUpdate}
             resumeId={resumeId}
             className="rounded-full overflow-hidden"
           />
