@@ -146,20 +146,6 @@
     line-height: 1.4 !important;
   }
 
-  /* Special style for arrow bullet markers */
-  .pdf-mode #resume-content .professional-navy .pdf-bullet-marker,
-  .pdf-mode #resume-content .modern-professional .pdf-bullet-marker {
-    background-color: transparent !important;
-    width: auto !important;
-    height: auto !important;
-    min-width: auto !important;
-    min-height: auto !important;
-    border-radius: 0 !important;
-    font-size: 10px !important;
-    margin-right: 6px !important;
-    margin-top: 2px !important;
-  }
-
   /* Section icons */
   .pdf-mode #resume-content .pdf-section-icon {
     display: inline-flex !important;

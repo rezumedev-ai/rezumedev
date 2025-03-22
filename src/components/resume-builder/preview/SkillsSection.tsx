@@ -125,7 +125,6 @@ export function SkillsSection({
                     key={index}
                     template="professional-navy"
                     className="ml-0 leading-snug"
-                    bulletClassName="text-xs mt-1"
                   >
                     {skill}
                   </BulletPoint>
@@ -143,7 +142,6 @@ export function SkillsSection({
                     key={index}
                     template="professional-navy"
                     className="ml-0 leading-snug"
-                    bulletClassName="text-xs mt-1"
                   >
                     {skill}
                   </BulletPoint>
@@ -172,7 +170,6 @@ export function SkillsSection({
                     key={index}
                     template="modern-professional"
                     className="ml-0 leading-snug"
-                    bulletClassName="text-xs mt-1"
                   >
                     {skill}
                   </BulletPoint>
@@ -190,7 +187,6 @@ export function SkillsSection({
                     key={index}
                     template="modern-professional"
                     className="ml-0 leading-snug"
-                    bulletClassName="text-xs mt-1"
                   >
                     {skill}
                   </BulletPoint>
