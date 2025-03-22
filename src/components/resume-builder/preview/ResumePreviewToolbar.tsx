@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, LayoutTemplate, Save, Lock, ImageIcon } from "lucide-react";
+import { ArrowLeft, Edit, LayoutTemplate, Save, Lock, Camera } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { TemplateSelectionGrid } from "./TemplateSelectionGrid";

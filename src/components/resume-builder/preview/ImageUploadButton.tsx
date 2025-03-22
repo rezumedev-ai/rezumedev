@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Trash, Loader2 } from "lucide-react";
+import { Upload, Trash2, Loader2, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -110,14 +110,14 @@ export function ImageUploadButton({
             type="button"
             onClick={handleRemoveImage}
             disabled={isUploading || disabled}
-            className="text-xs flex items-center gap-1 h-8"
+            className="text-xs flex items-center gap-1.5 h-9 bg-white shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
           >
             {isUploading ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Trash className="h-3 w-3" />
+              <Trash2 className="h-3.5 w-3.5" />
             )}
-            <span>Remove Photo</span>
+            <span>Remove</span>
           </Button>
           <label className="relative">
             <Button
@@ -125,14 +125,14 @@ export function ImageUploadButton({
               size="sm"
               type="button"
               disabled={isUploading || disabled}
-              className="text-xs flex items-center gap-1 h-8"
+              className="text-xs flex items-center gap-1.5 h-9 bg-white shadow-sm hover:bg-primary/5 hover:border-primary/20 transition-colors"
             >
               {isUploading ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <Upload className="h-3 w-3" />
+                <Upload className="h-3.5 w-3.5" />
               )}
-              <span>Change Photo</span>
+              <span>Change</span>
             </Button>
             <input
               type="file"
@@ -146,16 +146,16 @@ export function ImageUploadButton({
       ) : (
         <label className="relative">
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
             type="button"
             disabled={isUploading || disabled}
-            className="text-xs flex items-center gap-1 h-8"
+            className="text-xs flex items-center gap-1.5 h-9 bg-primary hover:bg-primary/90 transition-colors"
           >
             {isUploading ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Upload className="h-3 w-3" />
+              <Camera className="h-3.5 w-3.5" />
             )}
             <span>Upload Photo</span>
           </Button>
