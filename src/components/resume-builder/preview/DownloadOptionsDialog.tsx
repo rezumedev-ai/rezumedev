@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -82,6 +81,9 @@ export function DownloadOptionsDialog({
       pdfPreparationDiv.style.overflow = 'hidden';
       pdfPreparationDiv.innerHTML = originalHtml;
       pdfPreparationDiv.className = resumeElement.className + ' pdf-mode';
+      
+      // Add additional padding for professional appearance
+      pdfPreparationDiv.style.padding = '32px 40px';
       document.body.appendChild(pdfPreparationDiv);
 
       // 2. Pre-process PDF for proper rendering of section icons
