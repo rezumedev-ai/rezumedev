@@ -39,11 +39,10 @@ export function ExperienceItem({
       
       <ul className="mt-2 text-sm text-gray-600 list-none pl-0 space-y-1">
         {experience.responsibilities.map((resp, respIndex) => (
-          <li key={respIndex} className="flex items-start ml-1">
-            {/* Wrap the bullet point and text in a container div for better PDF alignment */}
-            <div className="experience-bullet-container flex items-start w-full">
-              <span className="inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-black mr-2 shrink-0 mt-1.5 experience-bullet"></span>
-              <span className="leading-snug experience-text">{resp}</span>
+          <li key={respIndex} className="flex items-start ml-1" data-pdf-bullet-item>
+            <div className="flex items-start w-full" data-pdf-bullet-container>
+              <span className="inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-black mr-2 shrink-0 mt-1.5" data-pdf-bullet></span>
+              <span className="leading-snug" data-pdf-bullet-text>{resp}</span>
             </div>
           </li>
         ))}

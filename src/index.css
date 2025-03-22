@@ -110,13 +110,48 @@
     -webkit-print-color-adjust: exact;
   }
 
-  /* Improved list and bullet point styling */
-  #resume-content ul.list-disc li,
-  #resume-content ul.space-y-1 li,
-  #resume-content ul.space-y-1.5 li {
+  /* PDF-specific styles for bullet points using data attributes */
+  #resume-content [data-pdf-bullet-item] {
     page-break-inside: avoid;
     display: flex !important;
     align-items: flex-start !important;
+  }
+
+  #resume-content [data-pdf-bullet-container] {
+    display: flex !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+  }
+
+  #resume-content [data-pdf-bullet] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  #resume-content [data-pdf-bullet-text] {
+    display: inline-block !important;
+    flex-grow: 1 !important;
+  }
+
+  /* PDF-specific styles for contact items using data attributes */
+  #resume-content [data-pdf-contact-item] {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  #resume-content [data-pdf-contact-icon] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    vertical-align: middle !important;
+  }
+
+  #resume-content [data-pdf-contact-text] {
+    display: inline-block !important;
+    vertical-align: middle !important;
   }
 
   #resume-content .rounded-full {
@@ -130,17 +165,6 @@
     object-fit: cover !important;
     object-position: center !important;
     aspect-ratio: 1/1 !important;
-  }
-
-  /* Ensure proper alignment of bullet points */
-  #resume-content li .inline-block,
-  #resume-content li .inline-flex {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    vertical-align: top !important;
-    margin-top: 4px !important;
-    flex-shrink: 0 !important;
   }
 
   /* Fix for arrow bullet points */
@@ -186,6 +210,7 @@
     @apply max-w-none;
   }
 
+  /* ... keep existing code (prose styles and animation keyframes) */
   .prose p {
     @apply text-base md:text-lg text-muted-foreground leading-relaxed mb-4;
   }

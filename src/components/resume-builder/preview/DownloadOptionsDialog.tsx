@@ -120,16 +120,18 @@ export function DownloadOptionsDialog({
           aspect-ratio: 1/1 !important;
         }
         
-        /* Improve contact info alignment with icons */
-        .pdf-specific-fixes .contact-item {
+        /* Improved contact item alignment with data attributes */
+        .pdf-specific-fixes [data-pdf-contact-item] {
           display: flex !important;
           align-items: center !important;
           justify-content: flex-start !important;
           gap: 4px !important;
           margin-bottom: 2px !important;
+          height: 24px !important;
+          line-height: 24px !important;
         }
         
-        .pdf-specific-fixes .contact-icon {
+        .pdf-specific-fixes [data-pdf-contact-icon] {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
@@ -137,24 +139,38 @@ export function DownloadOptionsDialog({
           vertical-align: middle !important;
           width: 16px !important;
           height: 16px !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          position: relative !important;
+          top: 0 !important;
         }
         
-        .pdf-specific-fixes .contact-text {
+        .pdf-specific-fixes [data-pdf-contact-text] {
           display: inline-block !important;
           vertical-align: middle !important;
-          line-height: 1.5 !important;
+          line-height: 24px !important;
+          height: 24px !important;
+          margin: 0 !important;
+          padding: 0 !important;
         }
         
-        /* Fix for experience bullet points */
-        .pdf-specific-fixes .experience-bullet-container {
+        /* Improved bullet point alignment with data attributes */
+        .pdf-specific-fixes [data-pdf-bullet-item] {
           display: flex !important;
           align-items: flex-start !important;
           margin-bottom: 4px !important;
           page-break-inside: avoid !important;
-          width: 100% !important;
+          line-height: 1.4 !important;
         }
         
-        .pdf-specific-fixes .experience-bullet {
+        .pdf-specific-fixes [data-pdf-bullet-container] {
+          display: flex !important;
+          align-items: flex-start !important;
+          width: 100% !important;
+          position: relative !important;
+        }
+        
+        .pdf-specific-fixes [data-pdf-bullet] {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
@@ -163,32 +179,20 @@ export function DownloadOptionsDialog({
           height: 6px !important;
           min-width: 6px !important;
           min-height: 6px !important;
-          margin-right: 6px !important;
-          margin-top: 6px !important;
+          margin-right: 8px !important;
+          margin-top: 7px !important;
           background-color: #000000 !important;
           border-radius: 50% !important;
+          position: relative !important;
+          top: 0 !important;
         }
         
-        .pdf-specific-fixes .experience-text {
+        .pdf-specific-fixes [data-pdf-bullet-text] {
           display: inline-block !important;
           vertical-align: top !important;
           flex-grow: 1 !important;
-        }
-        
-        /* Fix professional navy bullet fix */
-        .pdf-specific-fixes .professional-navy-bullet {
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          min-width: 6px !important;
-          min-height: 6px !important;
-          width: 6px !important;
-          height: 6px !important;
-          border-radius: 50% !important;
-          margin-right: 8px !important;
-          background-color: #0F2B5B !important;
-          flex-shrink: 0 !important;
-          margin-top: 6px !important;
+          line-height: 1.4 !important;
+          margin-top: 0 !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -247,57 +251,20 @@ export function DownloadOptionsDialog({
           clonedElement.style.width = `${contentWidth}px`;
           clonedElement.style.height = `${contentHeight}px`;
           
-          // Fix alignment of bullet points in work experience
-          const experienceItems = clonedElement.querySelectorAll('ul li');
-          experienceItems.forEach(li => {
-            // Make sure the container is properly styled
-            const bulletContainer = li.querySelector('.experience-bullet-container');
-            if (bulletContainer) {
-              const container = bulletContainer as HTMLElement;
-              container.style.display = 'flex';
-              container.style.alignItems = 'flex-start';
-              container.style.width = '100%';
-              container.style.marginBottom = '4px';
-              
-              // Style the bullet point
-              const bullet = container.querySelector('.experience-bullet');
-              if (bullet) {
-                const bulletEl = bullet as HTMLElement;
-                bulletEl.style.display = 'inline-flex';
-                bulletEl.style.alignItems = 'center';
-                bulletEl.style.justifyContent = 'center';
-                bulletEl.style.width = '6px';
-                bulletEl.style.height = '6px';
-                bulletEl.style.minWidth = '6px';
-                bulletEl.style.minHeight = '6px';
-                bulletEl.style.borderRadius = '50%';
-                bulletEl.style.marginRight = '6px';
-                bulletEl.style.marginTop = '6px';
-                bulletEl.style.backgroundColor = '#000000';
-                bulletEl.style.flexShrink = '0';
-              }
-              
-              // Style the text
-              const text = container.querySelector('.experience-text');
-              if (text) {
-                const textEl = text as HTMLElement;
-                textEl.style.display = 'inline-block';
-                textEl.style.verticalAlign = 'top';
-                textEl.style.flexGrow = '1';
-              }
-            }
-          });
-          
-          // Fix contact icons alignment
-          const contactItems = clonedElement.querySelectorAll('.contact-item');
+          // Enhanced styling for contact items using data attributes
+          const contactItems = clonedElement.querySelectorAll('[data-pdf-contact-item]');
           contactItems.forEach(item => {
             const contactItem = item as HTMLElement;
             contactItem.style.display = 'flex';
             contactItem.style.alignItems = 'center';
+            contactItem.style.justifyContent = 'flex-start';
+            contactItem.style.gap = '4px';
             contactItem.style.marginBottom = '2px';
+            contactItem.style.height = '24px';
+            contactItem.style.lineHeight = '24px';
             
             // Style the icon
-            const icon = contactItem.querySelector('.contact-icon');
+            const icon = contactItem.querySelector('[data-pdf-contact-icon]');
             if (icon) {
               const iconEl = icon as HTMLElement;
               iconEl.style.display = 'inline-flex';
@@ -306,28 +273,76 @@ export function DownloadOptionsDialog({
               iconEl.style.flexShrink = '0';
               iconEl.style.width = '16px';
               iconEl.style.height = '16px';
+              iconEl.style.margin = '0';
+              iconEl.style.padding = '0';
+              iconEl.style.position = 'relative';
+              iconEl.style.top = '0';
+              iconEl.style.verticalAlign = 'middle';
             }
             
             // Style the text
-            const text = contactItem.querySelector('.contact-text');
+            const text = contactItem.querySelector('[data-pdf-contact-text]');
             if (text) {
               const textEl = text as HTMLElement;
               textEl.style.display = 'inline-block';
               textEl.style.verticalAlign = 'middle';
+              textEl.style.lineHeight = '24px';
+              textEl.style.height = '24px';
+              textEl.style.margin = '0';
+              textEl.style.padding = '0';
             }
           });
           
-          // Fix professional navy contact icons
-          const navyContactIcons = clonedElement.querySelectorAll('.professional-navy-contact-icon');
-          navyContactIcons.forEach(icon => {
-            const navyIcon = icon as HTMLElement;
-            navyIcon.style.display = 'inline-flex';
-            navyIcon.style.alignItems = 'center';
-            navyIcon.style.justifyContent = 'center';
-            navyIcon.style.flexShrink = '0';
-            navyIcon.style.verticalAlign = 'middle';
-            navyIcon.style.width = '16px';
-            navyIcon.style.height = '16px';
+          // Enhanced styling for bullet points using data attributes
+          const bulletItems = clonedElement.querySelectorAll('[data-pdf-bullet-item]');
+          bulletItems.forEach(item => {
+            const bulletItem = item as HTMLElement;
+            bulletItem.style.display = 'flex';
+            bulletItem.style.alignItems = 'flex-start';
+            bulletItem.style.marginBottom = '4px';
+            bulletItem.style.pageBreakInside = 'avoid';
+            bulletItem.style.lineHeight = '1.4';
+            
+            // Style the bullet container
+            const bulletContainer = bulletItem.querySelector('[data-pdf-bullet-container]');
+            if (bulletContainer) {
+              const container = bulletContainer as HTMLElement;
+              container.style.display = 'flex';
+              container.style.alignItems = 'flex-start';
+              container.style.width = '100%';
+              container.style.position = 'relative';
+              
+              // Style the bullet point
+              const bullet = container.querySelector('[data-pdf-bullet]');
+              if (bullet) {
+                const bulletEl = bullet as HTMLElement;
+                bulletEl.style.display = 'inline-flex';
+                bulletEl.style.alignItems = 'center';
+                bulletEl.style.justifyContent = 'center';
+                bulletEl.style.flexShrink = '0';
+                bulletEl.style.width = '6px';
+                bulletEl.style.height = '6px';
+                bulletEl.style.minWidth = '6px';
+                bulletEl.style.minHeight = '6px';
+                bulletEl.style.marginRight = '8px';
+                bulletEl.style.marginTop = '7px';
+                bulletEl.style.backgroundColor = '#000000';
+                bulletEl.style.borderRadius = '50%';
+                bulletEl.style.position = 'relative';
+                bulletEl.style.top = '0';
+              }
+              
+              // Style the text
+              const text = container.querySelector('[data-pdf-bullet-text]');
+              if (text) {
+                const textEl = text as HTMLElement;
+                textEl.style.display = 'inline-block';
+                textEl.style.verticalAlign = 'top';
+                textEl.style.flexGrow = '1';
+                textEl.style.lineHeight = '1.4';
+                textEl.style.marginTop = '0';
+              }
+            }
           });
           
           // Ensure fonts are properly loaded in the clone
@@ -348,11 +363,11 @@ export function DownloadOptionsDialog({
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 400); // Increased delay to ensure rendering
+                setTimeout(resolve, 800); // Increased delay to ensure rendering
               });
             } else {
               // Fallback if document.fonts is not available
-              setTimeout(resolve, 500);
+              setTimeout(resolve, 1000);
             }
           });
         }
