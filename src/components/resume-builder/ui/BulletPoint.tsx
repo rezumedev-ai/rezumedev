@@ -31,7 +31,7 @@ export function BulletPoint({
     "professional-executive": "w-1.5 h-1.5 rounded-full bg-black"
   };
 
-  // Use chevron for skills if appropriate
+  // Use the arrow character for skills
   if (type === "skill") {
     return (
       <li className={cn("flex items-start gap-1.5 pdf-bullet-item", className)}>
@@ -70,6 +70,6 @@ export function BulletPoint({
       <div className={cn("pdf-bullet-text", textClassName)}>
         {children}
       </div>
-    </li>
+    </div>
   );
 }

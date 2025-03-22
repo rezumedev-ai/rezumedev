@@ -115,6 +115,16 @@
     margin-top: 2px;
     align-self: flex-start;
   }
+  
+  /* Ensuring correct vertical alignment of contact icons */
+  #resume-content .flex.items-start.gap-1.5 svg {
+    min-height: 16px;
+    min-width: 16px;
+    margin-top: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   /* PDF-specific styling */
   .pdf-mode #resume-content .pdf-bullet-list {
@@ -161,6 +171,15 @@
     flex-shrink: 0 !important;
     margin-right: 8px !important;
     vertical-align: middle !important;
+  }
+  
+  /* Ensuring section icons display properly */
+  #resume-content .pdf-section-icon svg {
+    min-width: 20px;
+    min-height: 20px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* Profile image fixes */

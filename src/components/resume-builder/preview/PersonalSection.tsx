@@ -131,7 +131,7 @@ export function PersonalSection({
           </div>
           <div className={currentStyle.contactContainer}>
             <div className="flex items-start gap-1.5">
-              <Mail className="w-4 h-4 text-white flex-shrink-0 mt-1" />
+              <Mail className="w-4 h-4 text-white flex-shrink-0 mt-1.5" />
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -142,7 +142,7 @@ export function PersonalSection({
               </span>
             </div>
             <div className="flex items-start gap-1.5">
-              <Phone className="w-4 h-4 text-white flex-shrink-0 mt-1" />
+              <Phone className="w-4 h-4 text-white flex-shrink-0 mt-1.5" />
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -154,7 +154,7 @@ export function PersonalSection({
             </div>
             {linkedin && (
               <div className="flex items-start gap-1.5">
-                <Linkedin className="w-4 h-4 text-white flex-shrink-0 mt-1" />
+                <Linkedin className="w-4 h-4 text-white flex-shrink-0 mt-1.5" />
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
@@ -167,7 +167,7 @@ export function PersonalSection({
             )}
             {website && (
               <div className="flex items-start gap-1.5">
-                <Globe className="w-4 h-4 text-white flex-shrink-0 mt-1" />
+                <Globe className="w-4 h-4 text-white flex-shrink-0 mt-1.5" />
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
@@ -232,7 +232,7 @@ export function PersonalSection({
           </div>
           <div className={currentStyle.contactContainer}>
             <div className="flex items-start gap-1.5">
-              <Mail className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1" />
+              <Mail className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1.5" />
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -243,7 +243,7 @@ export function PersonalSection({
               </span>
             </div>
             <div className="flex items-start gap-1.5">
-              <Phone className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1" />
+              <Phone className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1.5" />
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -255,7 +255,7 @@ export function PersonalSection({
             </div>
             {linkedin && (
               <div className="flex items-start gap-1.5">
-                <Linkedin className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1" />
+                <Linkedin className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1.5" />
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
@@ -268,7 +268,7 @@ export function PersonalSection({
             )}
             {website && (
               <div className="flex items-start gap-1.5">
-                <Globe className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1" />
+                <Globe className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-1.5" />
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
@@ -306,7 +306,7 @@ export function PersonalSection({
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
           <div className="flex items-start gap-1.5">
-            <Mail className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1" />
+            <Mail className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1.5" />
             <span 
               className="text-xs text-gray-600 outline-none"
               contentEditable={isEditing}
@@ -317,7 +317,7 @@ export function PersonalSection({
             </span>
           </div>
           <div className="flex items-start gap-1.5">
-            <Phone className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1" />
+            <Phone className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1.5" />
             <span 
               className="text-xs text-gray-600 outline-none"
               contentEditable={isEditing}
@@ -329,7 +329,7 @@ export function PersonalSection({
           </div>
           {linkedin && (
             <div className="flex items-start gap-1.5">
-              <Linkedin className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1" />
+              <Linkedin className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1.5" />
               <span 
                 className="text-xs text-gray-600 outline-none"
                 contentEditable={isEditing}
@@ -342,7 +342,7 @@ export function PersonalSection({
           )}
           {website && (
             <div className="flex items-start gap-1.5">
-              <Globe className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1" />
+              <Globe className="w-3 h-3 text-gray-500 flex-shrink-0 mt-1.5" />
               <span 
                 className="text-xs text-gray-600 outline-none"
                 contentEditable={isEditing}
@@ -363,7 +363,7 @@ export function PersonalSection({
       return (
         <div className={currentStyle.contactContainer}>
           <div className="flex items-start gap-1.5">
-            <Mail className="w-4 h-4 text-black flex-shrink-0 mt-1" />
+            <Mail className="w-4 h-4 text-black flex-shrink-0 mt-1.5" />
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -374,7 +374,7 @@ export function PersonalSection({
             </span>
           </div>
           <div className="flex items-start gap-1.5">
-            <Phone className="w-4 h-4 text-black flex-shrink-0 mt-1" />
+            <Phone className="w-4 h-4 text-black flex-shrink-0 mt-1.5" />
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -386,7 +386,7 @@ export function PersonalSection({
           </div>
           {linkedin && (
             <div className="flex items-start gap-1.5">
-              <Linkedin className="w-4 h-4 text-black flex-shrink-0 mt-1" />
+              <Linkedin className="w-4 h-4 text-black flex-shrink-0 mt-1.5" />
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
@@ -399,7 +399,7 @@ export function PersonalSection({
           )}
           {website && (
             <div className="flex items-start gap-1.5">
-              <Globe className="w-4 h-4 text-black flex-shrink-0 mt-1" />
+              <Globe className="w-4 h-4 text-black flex-shrink-0 mt-1.5" />
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
@@ -417,7 +417,7 @@ export function PersonalSection({
     return (
       <div className={currentStyle.contactContainer}>
         <div className="flex items-start gap-1.5">
-          <Mail className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1" />
+          <Mail className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1.5" />
           <div
             contentEditable={isEditing}
             suppressContentEditableWarning
@@ -428,7 +428,7 @@ export function PersonalSection({
           </div>
         </div>
         <div className="flex items-start gap-1.5">
-          <Phone className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1" />
+          <Phone className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1.5" />
           <div
             contentEditable={isEditing}
             suppressContentEditableWarning
@@ -440,7 +440,7 @@ export function PersonalSection({
         </div>
         {linkedin && (
           <div className="flex items-start gap-1.5">
-            <Linkedin className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1" />
+            <Linkedin className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1.5" />
             <div
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -453,7 +453,7 @@ export function PersonalSection({
         )}
         {website && (
           <div className="flex items-start gap-1.5">
-            <Globe className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1" />
+            <Globe className="w-4 h-4 text-gray-500 flex-shrink-0 mt-1.5" />
             <div
               contentEditable={isEditing}
               suppressContentEditableWarning
