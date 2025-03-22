@@ -86,22 +86,60 @@ export function DownloadOptionsDialog({
       htmlEl.style.transition = 'none';
     });
     
-    // Special handling for bullet points and icons
-    const bulletPoints = resumeElement.querySelectorAll('.space-y-1 li, .space-y-1\\.5 li');
-    bulletPoints.forEach((bullet) => {
-      const icon = bullet.querySelector('span:first-child');
-      if (icon) {
-        (icon as HTMLElement).style.display = 'inline-flex';
-        (icon as HTMLElement).style.alignItems = 'center';
-        (icon as HTMLElement).style.justifyContent = 'center';
-        (icon as HTMLElement).style.flexShrink = '0';
-      }
+    // Enhance bullet point containers and icons
+    const bulletPointContainers = resumeElement.querySelectorAll('.bullet-point-container');
+    bulletPointContainers.forEach((container) => {
+      (container as HTMLElement).style.display = 'flex';
+      (container as HTMLElement).style.alignItems = 'flex-start';
+      (container as HTMLElement).style.pageBreakInside = 'avoid';
+      (container as HTMLElement).style.breakInside = 'avoid';
+      (container as HTMLElement).style.marginBottom = '0.25rem';
+    });
+    
+    const bulletPointIcons = resumeElement.querySelectorAll('.bullet-point-icon');
+    bulletPointIcons.forEach((icon) => {
+      (icon as HTMLElement).style.display = 'inline-flex';
+      (icon as HTMLElement).style.alignItems = 'center';
+      (icon as HTMLElement).style.justifyContent = 'center';
+      (icon as HTMLElement).style.flexShrink = '0';
+      (icon as HTMLElement).style.marginRight = '0.5rem';
+      (icon as HTMLElement).style.position = 'relative';
+      (icon as HTMLElement).style.top = '0.25rem';
+    });
+    
+    const bulletPointTexts = resumeElement.querySelectorAll('.bullet-point-text');
+    bulletPointTexts.forEach((text) => {
+      (text as HTMLElement).style.flex = '1 1 auto';
+      (text as HTMLElement).style.lineHeight = '1.5';
+    });
+    
+    // Special handling for section icons
+    const sectionIcons = resumeElement.querySelectorAll('.section-icon-container');
+    sectionIcons.forEach((icon) => {
+      (icon as HTMLElement).style.display = 'inline-flex';
+      (icon as HTMLElement).style.alignItems = 'center';
+      (icon as HTMLElement).style.justifyContent = 'center';
+      (icon as HTMLElement).style.flexShrink = '0';
+      (icon as HTMLElement).style.marginRight = '0.5rem';
+    });
+    
+    // Special handling for template-specific bullet points
+    const templateBullets = resumeElement.querySelectorAll(
+      '.executive-clean-bullet, .modern-split-bullet, .minimal-elegant-bullet, ' + 
+      '.professional-executive-bullet, .modern-professional-bullet, .professional-navy-bullet'
+    );
+    
+    templateBullets.forEach((bullet) => {
+      (bullet as HTMLElement).style.display = 'inline-flex';
+      (bullet as HTMLElement).style.alignItems = 'center';
+      (bullet as HTMLElement).style.justifyContent = 'center';
     });
     
     // Special handling for profile images
     const profileImages = resumeElement.querySelectorAll('.rounded-full');
     profileImages.forEach(img => {
       (img as HTMLElement).style.overflow = 'hidden';
+      (img as HTMLElement).style.borderRadius = '50%';
       const imageElement = img.querySelector('img');
       if (imageElement) {
         imageElement.style.objectFit = 'cover';
@@ -177,40 +215,58 @@ export function DownloadOptionsDialog({
       // Add a temporary style element for capture-specific fixes
       const styleElement = document.createElement('style');
       styleElement.textContent = `
-        .pdf-generation-mode .rounded-full img {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover !important;
-          border-radius: 50% !important;
+        .pdf-generation-mode {
+          transform: none !important;
+          transition: none !important;
         }
-        .pdf-generation-mode li {
+        .pdf-generation-mode * {
+          transition: none !important;
+          animation: none !important;
+        }
+        .pdf-generation-mode .bullet-point-container {
           display: flex !important;
           align-items: flex-start !important;
           page-break-inside: avoid !important;
+          break-inside: avoid !important;
+          margin-bottom: 0.25rem !important;
+          position: relative !important;
         }
-        .pdf-generation-mode li > span:first-child {
+        .pdf-generation-mode .bullet-point-icon {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
           flex-shrink: 0 !important;
-          margin-top: 0 !important;
-          transform: translateY(0) !important;
+          margin-right: 0.5rem !important;
+          position: relative !important;
+          top: 0.25rem !important;
         }
-        .pdf-generation-mode .professional-navy-bullet,
-        .pdf-generation-mode .inline-block {
+        .pdf-generation-mode .bullet-point-text {
+          flex: 1 1 auto !important;
+          display: inline-block !important;
+          line-height: 1.5 !important;
+        }
+        .pdf-generation-mode .section-icon-container {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
-          vertical-align: middle !important;
-          margin-top: 0 !important;
           flex-shrink: 0 !important;
+          margin-right: 0.5rem !important;
+        }
+        .pdf-generation-mode .rounded-full {
+          overflow: hidden !important;
+          border-radius: 50% !important;
+        }
+        .pdf-generation-mode .rounded-full img {
+          object-fit: cover !important;
+          width: 100% !important;
+          height: 100% !important;
         }
       `;
       document.head.appendChild(styleElement);
 
       // Capture with enhanced settings
       const canvas = await html2canvas(resumeElement, {
-        scale: pixelRatio * 3, // Triple the scale for razor-sharp images
+        scale: pixelRatio * 4, // Quadruple the scale for razor-sharp images
         useCORS: true,
         allowTaint: true,
         logging: false,
@@ -230,15 +286,42 @@ export function DownloadOptionsDialog({
           clonedElement.style.width = `${contentWidth}px`;
           clonedElement.style.height = `${contentHeight}px`;
           
+          // Enhance all bullet points in the clone
+          const bulletPointContainers = clonedElement.querySelectorAll('.bullet-point-container');
+          bulletPointContainers.forEach((container) => {
+            (container as HTMLElement).style.display = 'flex';
+            (container as HTMLElement).style.alignItems = 'flex-start';
+            (container as HTMLElement).style.pageBreakInside = 'avoid';
+            (container as HTMLElement).style.breakInside = 'avoid';
+            (container as HTMLElement).style.marginBottom = '0.25rem';
+          });
+          
+          const bulletPointIcons = clonedElement.querySelectorAll('.bullet-point-icon');
+          bulletPointIcons.forEach((icon) => {
+            (icon as HTMLElement).style.display = 'inline-flex';
+            (icon as HTMLElement).style.alignItems = 'center';
+            (icon as HTMLElement).style.justifyContent = 'center';
+            (icon as HTMLElement).style.flexShrink = '0';
+            (icon as HTMLElement).style.marginRight = '0.5rem';
+            (icon as HTMLElement).style.position = 'relative';
+            (icon as HTMLElement).style.top = '0.25rem';
+          });
+          
+          const bulletPointTexts = clonedElement.querySelectorAll('.bullet-point-text');
+          bulletPointTexts.forEach((text) => {
+            (text as HTMLElement).style.flex = '1 1 auto';
+            (text as HTMLElement).style.lineHeight = '1.5';
+          });
+          
           // Wait for fonts to load in the clone
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 500); // Increased delay to ensure rendering
+                setTimeout(resolve, 600); // Increased delay to ensure rendering
               });
             } else {
               // Fallback if document.fonts is not available
-              setTimeout(resolve, 600);
+              setTimeout(resolve, 700);
             }
           });
         }
