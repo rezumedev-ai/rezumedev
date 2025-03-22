@@ -15,38 +15,44 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
 
     let iconClass = "";
     
-    // Set colors based on template
+    // Set colors based on template with more visible colors
     if (template.id === "professional-navy") {
-      iconClass = "w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0";
+      iconClass = "w-5 h-5 mr-2 text-[#0F2B5B] flex-shrink-0";
     } else if (template.id === "modern-professional") {
-      iconClass = "w-4 h-4 mr-2 text-emerald-500 flex-shrink-0";
+      iconClass = "w-5 h-5 mr-2 text-emerald-600 flex-shrink-0";
+    } else if (template.id === "executive-clean") {
+      iconClass = "w-5 h-5 mr-2 text-gray-800 flex-shrink-0"; 
+    } else if (template.id === "minimal-elegant") {
+      iconClass = "w-5 h-5 mr-2 text-gray-700 flex-shrink-0";
+    } else if (template.id === "professional-executive") {
+      iconClass = "w-5 h-5 mr-2 text-black flex-shrink-0";
     } else {
-      iconClass = "w-4 h-4 mr-2 text-gray-600 flex-shrink-0";
+      iconClass = "w-5 h-5 mr-2 text-gray-800 flex-shrink-0";
     }
 
     let iconElement = null;
     
     switch (type) {
       case "experience":
-        iconElement = <Briefcase className={iconClass} />;
+        iconElement = <Briefcase className={iconClass} strokeWidth={2} />;
         break;
       case "education":
-        iconElement = <GraduationCap className={iconClass} />;
+        iconElement = <GraduationCap className={iconClass} strokeWidth={2} />;
         break;
       case "certifications":
-        iconElement = <Award className={iconClass} />;
+        iconElement = <Award className={iconClass} strokeWidth={2} />;
         break;
       case "skills":
-        iconElement = <Code className={iconClass} />;
+        iconElement = <Code className={iconClass} strokeWidth={2} />;
         break;
       case "summary":
-        iconElement = <FileText className={iconClass} />;
+        iconElement = <FileText className={iconClass} strokeWidth={2} />;
         break;
       case "profile":
-        iconElement = <User className={iconClass} />;
+        iconElement = <User className={iconClass} strokeWidth={2} />;
         break;
       case "projects":
-        iconElement = <FolderKanban className={iconClass} />;
+        iconElement = <FolderKanban className={iconClass} strokeWidth={2} />;
         break;
       default:
         return null;
@@ -54,7 +60,12 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
 
     // For PDF rendering, we add data attributes to identify icons for potential PDF conversion
     return (
-      <div className="pdf-section-icon inline-flex items-center justify-center" data-pdf-section-icon="true" data-pdf-icon-type={type}>
+      <div 
+        className="pdf-section-icon inline-flex items-center justify-center" 
+        data-pdf-section-icon="true" 
+        data-pdf-icon-type={type}
+        style={{ minWidth: "24px", minHeight: "24px" }}
+      >
         {iconElement}
       </div>
     );

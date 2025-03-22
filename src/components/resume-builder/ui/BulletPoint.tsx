@@ -43,10 +43,12 @@ export function BulletPoint({
           aria-hidden="true"
           data-pdf-bullet="true"
           data-pdf-bullet-type="skill"
+          style={{ minWidth: "12px", minHeight: "12px" }}
         >
           <ChevronRight 
-            className="w-3 h-3 text-gray-600"
+            className="w-3.5 h-3.5 text-gray-700"
             data-pdf-bullet-icon="chevron"
+            strokeWidth={2.5}
           />
         </div>
         <div className={cn("pdf-bullet-text", textClassName)}>
@@ -68,6 +70,7 @@ export function BulletPoint({
         aria-hidden="true"
         data-pdf-bullet="true"
         data-pdf-bullet-type="default"
+        style={{ minWidth: "6px", minHeight: "6px" }}
       ></div>
       <div className={cn("pdf-bullet-text", textClassName)}>
         {children}
