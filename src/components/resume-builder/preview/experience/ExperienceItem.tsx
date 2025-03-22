@@ -47,6 +47,7 @@ export function ExperienceItem({
             key={respIndex}
             template={template}
             className="ml-0 leading-snug"
+            type="experience"
           >
             {resp}
           </BulletPoint>

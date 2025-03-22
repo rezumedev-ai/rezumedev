@@ -8,6 +8,7 @@ interface BulletPointProps {
   bulletClassName?: string;
   textClassName?: string;
   template?: string;
+  type?: "skills" | "experience";
 }
 
 export function BulletPoint({ 
@@ -15,21 +16,22 @@ export function BulletPoint({
   className,
   bulletClassName,
   textClassName,
-  template = "default"
+  template = "default",
+  type = "experience"
 }: BulletPointProps) {
   // Template-specific styling
   const bulletStyle = {
     default: "w-1.5 h-1.5 rounded-full bg-black",
     "modern-split": "w-1 h-1 rounded-full bg-black",
-    "professional-navy": "inline-block text-[#0F2B5B] text-sm", // Navy arrow bullet
-    "modern-professional": "inline-block text-emerald-600 text-sm", // Emerald arrow bullet
+    "professional-navy": type === "skills" ? "inline-block text-[#0F2B5B] text-sm" : "w-1.5 h-1.5 rounded-full bg-black", 
+    "modern-professional": type === "skills" ? "inline-block text-emerald-600 text-sm" : "w-1.5 h-1.5 rounded-full bg-black",
     "executive-clean": "w-1.5 h-1.5 rounded-full bg-gray-800",
     "minimal-elegant": "w-1 h-1 rounded-full bg-gray-700",
     "professional-executive": "w-1.5 h-1.5 rounded-full bg-black"
   };
 
-  // Special bullet content for arrow templates
-  const isArrowBullet = template === "modern-professional" || template === "professional-navy";
+  // Special bullet content for arrow templates in skills sections only
+  const isArrowBullet = (template === "modern-professional" || template === "professional-navy") && type === "skills";
 
   return (
     <li className={cn("flex items-start gap-2 pdf-bullet-item", className)}>
@@ -42,6 +44,7 @@ export function BulletPoint({
           )}
           aria-hidden="true"
           data-pdf-bullet="true"
+          data-bullet-type="skills"
         >
           ➤
         </div>
@@ -54,6 +57,7 @@ export function BulletPoint({
           )}
           aria-hidden="true"
           data-pdf-bullet="true"
+          data-bullet-type="experience"
         ></div>
       )}
       <div className={cn("pdf-bullet-text", textClassName)}>

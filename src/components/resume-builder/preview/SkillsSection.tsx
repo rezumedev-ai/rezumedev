@@ -126,6 +126,7 @@ export function SkillsSection({
                     template="professional-navy"
                     className="ml-0 leading-snug"
                     bulletClassName="mr-1.5 ml-0.5"
+                    type="skills"
                   >
                     {skill}
                   </BulletPoint>
@@ -144,6 +145,7 @@ export function SkillsSection({
                     template="professional-navy"
                     className="ml-0 leading-snug"
                     bulletClassName="mr-1.5 ml-0.5"
+                    type="skills"
                   >
                     {skill}
                   </BulletPoint>
@@ -173,6 +175,7 @@ export function SkillsSection({
                     template="modern-professional"
                     className="ml-0 leading-snug"
                     bulletClassName="mr-1.5 ml-0.5"
+                    type="skills"
                   >
                     {skill}
                   </BulletPoint>
@@ -191,6 +194,7 @@ export function SkillsSection({
                     template="modern-professional"
                     className="ml-0 leading-snug"
                     bulletClassName="mr-1.5 ml-0.5"
+                    type="skills"
                   >
                     {skill}
                   </BulletPoint>
@@ -222,6 +226,7 @@ export function SkillsSection({
                   key={index}
                   template={template.id}
                   className="ml-0 leading-snug"
+                  type="skills"
                 >
                   {skill}
                 </BulletPoint>
@@ -243,6 +248,7 @@ export function SkillsSection({
                   key={index}
                   template={template.id}
                   className="ml-0 leading-snug"
+                  type="skills"
                 >
                   {skill}
                 </BulletPoint>
