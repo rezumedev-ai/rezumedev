@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Check, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Badge } from "../../ui/Badge";
 
 interface TemplateItemProps {
   template: ResumeTemplate;
@@ -35,7 +34,7 @@ export function TemplateItem({
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
-      <div className="bg-slate-900 rounded-t-xl overflow-hidden">
+      <div className="bg-white">
         <AspectRatio ratio={8.5/11}>
           <img
             src={template.imageUrl}
@@ -64,7 +63,7 @@ export function TemplateItem({
           
           {(isHovered && !isSelected) && (
             <motion.div 
-              className="absolute inset-0 bg-black/40 flex items-center justify-center"
+              className="absolute inset-0 bg-black/5 flex items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.2 }}
@@ -81,13 +80,10 @@ export function TemplateItem({
           )}
           
           <div className="absolute top-2 right-2">
-            <Badge 
-              variant="warning" 
-              size="sm"
-              icon={<Sparkles className="w-3 h-3 text-amber-300" />}
-            >
-              Premium
-            </Badge>
+            <div className="flex items-center gap-1 bg-primary/10 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
+              <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary" />
+              <span className="text-[10px] sm:text-xs font-medium text-primary">Premium</span>
+            </div>
           </div>
         </AspectRatio>
       </div>

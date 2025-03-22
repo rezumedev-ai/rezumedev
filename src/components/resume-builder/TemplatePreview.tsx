@@ -32,7 +32,7 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
       whileHover={{ scale: 1.03, y: -3 }}
       whileTap={{ scale: 0.98 }}
     >
-      <div className="bg-slate-900 flex-grow rounded-t-xl overflow-hidden">
+      <div className="bg-white flex-grow">
         <AspectRatio ratio={8.5/11} className="relative">
           <img
             src={template.imageUrl}
@@ -43,7 +43,7 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
           
           {isSelected && (
             <motion.div 
-              className="absolute inset-0 bg-primary/10 flex items-center justify-center"
+              className="absolute top-0 right-0 bottom-0 left-0 bg-primary/10 flex items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
@@ -61,9 +61,9 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
           
           <div className="absolute top-2 left-2">
             <Badge 
-              variant="warning" 
+              variant="primary" 
               size="sm"
-              icon={<Sparkles className="w-3 h-3 text-amber-300" />}
+              icon={<Sparkles className="w-3 h-3 text-primary" />}
             >
               Premium
             </Badge>

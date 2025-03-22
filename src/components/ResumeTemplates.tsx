@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { ArrowLeftCircle, ArrowRightCircle, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeftCircle, ArrowRightCircle, Sparkles, ExternalLink } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
@@ -12,85 +12,54 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { TemplateCard } from './resume-builder/ui/TemplateCard';
-
-const featuredTemplates = [
-  {
-    name: "Executive Clean",
-    image: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
-    description: "Commanding resume design for senior executives highlighting strategic achievements",
-    category: "Executive",
-    color: "bg-gradient-to-r from-blue-600 to-blue-800"
-  },
-  {
-    name: "Minimal Elegant",
-    image: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
-    description: "Clean, sophisticated design with perfect typography for creative professionals",
-    category: "Creative",
-    color: "bg-gradient-to-r from-emerald-600 to-emerald-800"
-  },
-  {
-    name: "Professional Executive",
-    image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
-    description: "Bold modern layout with clean typography, perfect for senior managers",
-    category: "Corporate",
-    color: "bg-gradient-to-r from-violet-600 to-violet-900"
-  },
-  {
-    name: "Professional Navy",
-    image: "/lovable-uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
-    description: "Elegant two-column layout with navy header and modern typography",
-    category: "Corporate",
-    color: "bg-gradient-to-r from-indigo-700 to-indigo-900"
-  },
-  {
-    name: "Modern Professional",
-    image: "/lovable-uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
-    description: "Contemporary design with creative accents for forward-thinking professionals",
-    category: "Modern",
-    color: "bg-gradient-to-r from-teal-600 to-teal-800"
-  },
-  {
-    name: "Simple Classic",
-    image: "/lovable-uploads/946c34ac-a462-4649-b919-24aa01a04f02.png",
-    description: "Traditional single-column layout preferred by Fortune 500 companies",
-    category: "Classic",
-    color: "bg-gradient-to-r from-gray-700 to-gray-900"
-  }
-];
+import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export const ResumeTemplates = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  
-  const categories = [
-    { name: "All", value: null },
-    { name: "Executive", value: "Executive" },
-    { name: "Creative", value: "Creative" },
-    { name: "Corporate", value: "Corporate" },
-    { name: "Modern", value: "Modern" },
-    { name: "Classic", value: "Classic" }
+  const resumeTemplates = [
+    {
+      name: "Executive Clean",
+      image: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
+      description: "Commanding resume design for C-suite executives and senior leaders, highlighting strategic achievements and board experience",
+      color: "from-blue-500 to-blue-700"
+    },
+    {
+      name: "Minimal Elegant",
+      image: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
+      description: "Clean and sophisticated design with perfect typography, optimized for creative professionals",
+      color: "from-emerald-500 to-emerald-700"
+    },
+    {
+      name: "Professional Executive",
+      image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
+      description: "Bold modern layout with clean typography, perfect for senior managers and directors",
+      color: "from-purple-500 to-purple-700"
+    },
+    {
+      name: "Professional Navy",
+      image: "/lovable-uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
+      description: "Elegant two-column layout with navy header and modern typography, perfect for corporate professionals",
+      color: "from-blue-700 to-indigo-900"
+    },
+    {
+      name: "Modern Professional",
+      image: "/lovable-uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
+      description: "Contemporary design with creative accents, ideal for forward-thinking professionals in modern industries",
+      color: "from-teal-500 to-teal-700"
+    }
   ];
 
-  const filteredTemplates = selectedCategory 
-    ? featuredTemplates.filter(t => t.category === selectedCategory)
-    : featuredTemplates;
-
   return (
-    <section className="py-20 relative overflow-hidden">
-      {/* Background styling */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-50/50 -z-10" />
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white to-transparent -z-10" />
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent -z-10" />
-      
+    <section className="py-20 bg-gradient-to-br from-background via-background/90 to-background/80 relative overflow-hidden">
       {/* Decorative elements */}
       <motion.div
-        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+        className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.7 }}
+        animate={{ opacity: 0.05 }}
         transition={{ duration: 1 }}
       >
-        <div className="absolute top-12 left-[10%] w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-12 right-[10%] w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
+        <div className="absolute top-12 left-[10%] w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-12 right-[10%] w-64 h-64 bg-secondary/20 rounded-full blur-3xl"></div>
       </motion.div>
 
       <div className="container relative z-10">
@@ -108,79 +77,93 @@ export const ResumeTemplates = () => {
           >
             Professional Resume Templates
           </GradientHeading>
-          <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             Each template is expertly crafted to pass ATS systems while presenting your experience in the most professional light
           </p>
-          
-          {/* Category filters */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-            {categories.map((category) => (
-              <button
-                key={category.name}
-                onClick={() => setSelectedCategory(category.value)}
-                className={`
-                  px-4 py-2 rounded-full text-sm font-medium transition-all
-                  ${selectedCategory === category.value 
-                    ? 'bg-primary text-white shadow-md' 
-                    : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
-                  }
-                `}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
         </motion.div>
 
-        {/* Desktop view - Grid layout */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
-        >
-          {filteredTemplates.slice(0, 6).map((template, index) => (
-            <motion.div
-              key={template.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index, duration: 0.5 }}
-            >
-              <TemplateCard template={template} />
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Mobile view - Carousel */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="md:hidden max-w-md mx-auto"
+          className="max-w-7xl mx-auto"
         >
           <Carousel
             opts={{
-              align: "center",
+              align: "start",
               loop: true,
             }}
             className="w-full"
           >
-            <CarouselContent>
-              {filteredTemplates.map((template, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 p-1">
-                  <TemplateCard template={template} />
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {resumeTemplates.map((template, index) => (
+                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <div className="p-1">
+                    <motion.div
+                      whileHover={{ 
+                        scale: 1.03, 
+                        y: -5,
+                        transition: { duration: 0.2 } 
+                      }}
+                      className="h-full"
+                    >
+                      <Card className="overflow-hidden h-full border border-border/40 bg-card/60 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+                        <div className="bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
+                          <AspectRatio ratio={8.5/11} className="relative">
+                            <div className="absolute top-2 right-2 z-20">
+                              <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                                <span className="text-xs font-medium text-white">Premium</span>
+                              </div>
+                            </div>
+                            
+                            <img
+                              src={template.image}
+                              alt={`${template.name} Resume Template`}
+                              className="w-full h-full object-contain"
+                              loading="lazy"
+                            />
+                            
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
+                              <Link to="/signup">
+                                <Button variant="secondary" size="sm" className="font-medium gap-2">
+                                  Use Template <ExternalLink className="w-3.5 h-3.5" />
+                                </Button>
+                              </Link>
+                            </div>
+                          </AspectRatio>
+                        </div>
+                        
+                        <CardContent className="p-6">
+                          <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 text-white bg-gradient-to-r ${template.color}`}>
+                            Featured Template
+                          </div>
+                          <h3 className="text-xl font-bold mb-2">{template.name}</h3>
+                          <p className="text-muted-foreground text-sm mb-6">
+                            {template.description}
+                          </p>
+                          <Link to="/signup" className="block mt-auto">
+                            <Button variant="outline" size="sm" className="w-full gap-2 hover:bg-primary/10 transition-colors">
+                              Preview Template
+                              <ArrowRightCircle className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
             <div className="flex items-center justify-center mt-8">
-              <CarouselPrevious className="relative mr-2 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
-              <CarouselNext className="relative ml-2 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
+              <CarouselPrevious className="relative mr-2 inset-auto left-0 top-0 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
+              <CarouselNext className="relative ml-2 inset-auto right-0 top-0 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
             </div>
           </Carousel>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity:.0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.6 }}
           className="text-center mt-14"
@@ -193,7 +176,7 @@ export const ResumeTemplates = () => {
           </Link>
         </motion.div>
 
-        {/* Features grid */}
+        {/* Features list */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -201,18 +184,9 @@ export const ResumeTemplates = () => {
           className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto"
         >
           {[
-            { 
-              title: "ATS Optimized", 
-              description: "Pass any applicant tracking system with our perfectly formatted templates" 
-            },
-            { 
-              title: "Professional Design", 
-              description: "Elegant typography and balanced layouts catch recruiters' attention" 
-            },
-            { 
-              title: "Industry Specific", 
-              description: "Templates tailored for your industry and career level requirements" 
-            }
+            { title: "ATS Optimized", description: "Pass any applicant tracking system with our perfectly formatted templates" },
+            { title: "Professional Design", description: "Elegant typography and balanced layouts catch recruiters' attention" },
+            { title: "Industry Specific", description: "Templates tailored for your industry and career level requirements" }
           ].map((feature, index) => (
             <motion.div
               key={index}
@@ -222,7 +196,7 @@ export const ResumeTemplates = () => {
               className="text-center p-6 rounded-lg bg-card/40 backdrop-blur-sm border border-border/30 shadow-sm"
             >
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ExternalLink className="h-6 w-6 text-primary" />
+                <Sparkles className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
               <p className="text-muted-foreground text-sm">{feature.description}</p>
