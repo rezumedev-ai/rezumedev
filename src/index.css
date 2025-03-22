@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -160,7 +159,7 @@
     margin-top: 0 !important;
   }
 
-  /* Section icons - UPDATED to preserve SVG icons */
+  /* Section icons */
   .pdf-mode #resume-content .pdf-section-icon {
     display: inline-flex !important;
     align-items: center !important;
@@ -168,15 +167,6 @@
     flex-shrink: 0 !important;
     margin-right: 8px !important;
     vertical-align: middle !important;
-  }
-  
-  /* Ensure SVG icons are visible in PDF */
-  .pdf-mode #resume-content .pdf-section-icon svg {
-    display: inline-block !important;
-    width: 16px !important;
-    height: 16px !important;
-    margin-right: 4px !important;
-    vertical-align: text-bottom !important;
   }
 
   /* Profile image fixes */
@@ -423,3 +413,4 @@
 .animate-rainbow {
   animation: rainbow var(--speed, 2s) infinite linear;
 }
+

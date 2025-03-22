@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -89,9 +90,16 @@ export function DownloadOptionsDialog({
       const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
-        // Preserve bullet styling but adjust alignment
-        bulletElement.style.marginTop = '5px';
-        bulletElement.style.alignSelf = 'flex-start';
+        // Replace the bullet element with a text character
+        bulletElement.textContent = '•';
+        bulletElement.style.width = 'auto';
+        bulletElement.style.height = 'auto';
+        bulletElement.style.display = 'inline-block';
+        bulletElement.style.marginRight = '6px';
+        bulletElement.style.marginTop = '3px'; // Move bullet down to align properly
+        bulletElement.style.fontSize = '16px';
+        bulletElement.style.lineHeight = '1';
+        bulletElement.className = 'pdf-bullet-char';
       });
 
       // 3. Fix bullet lists
@@ -112,16 +120,40 @@ export function DownloadOptionsDialog({
         itemElement.style.marginBottom = '4px';
       });
 
-      // 5. Preserve section icons - MODIFIED: Don't replace the SVG icons
+      // 5. Fix section icons as well
       const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
-        // Preserve the SVG but adjust its alignment
-        iconElement.style.display = 'inline-flex';
-        iconElement.style.alignItems = 'center';
-        iconElement.style.justifyContent = 'center';
-        iconElement.style.marginRight = '8px';
-        iconElement.style.verticalAlign = 'middle';
+        // Check if contains an SVG
+        const svg = iconElement.querySelector('svg');
+        if (svg) {
+          // Replace SVG with a simple symbol based on the icon type
+          const iconType = svg.getAttribute('data-lucide') || '';
+          let iconSymbol = '•';
+          
+          // Create a replacement element with the icon symbol
+          switch (iconType.toLowerCase()) {
+            case 'briefcase': iconSymbol = '💼'; break;
+            case 'graduation-cap': iconSymbol = '🎓'; break;
+            case 'award': iconSymbol = '🏆'; break;
+            case 'code': iconSymbol = '💻'; break;
+            case 'file-text': iconSymbol = '📄'; break;
+            case 'user': iconSymbol = '👤'; break;
+            case 'folder-kanban': iconSymbol = '📂'; break;
+          }
+          
+          // Create a span with the icon symbol that will render properly in PDF
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = iconSymbol;
+          iconSpan.className = 'pdf-icon-text';
+          iconSpan.style.marginRight = '8px';
+          iconSpan.style.fontSize = '14px';
+          
+          // Replace the SVG with our text representation
+          if (iconElement.contains(svg)) {
+            iconElement.replaceChild(iconSpan, svg);
+          }
+        }
       });
 
       // Get device pixel ratio for better quality
