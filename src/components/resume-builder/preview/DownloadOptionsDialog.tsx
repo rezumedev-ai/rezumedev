@@ -74,15 +74,10 @@ export function DownloadOptionsDialog({
       // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
       
-      // A4 dimensions in pixels (at 96 DPI)
-      const a4Width = 8.27 * 96; // 793.92 pixels
-      const a4Height = 11.69 * 96; // 1122.24 pixels
+      // A4 dimensions in pixels (at 300 DPI for high-quality print)
+      const a4Width = 8.27 * 300; // 2481 pixels
+      const a4Height = 11.69 * 300; // 3507 pixels
 
-      // Calculate scale to fit the resume content to A4 size while preserving aspect ratio
-      const contentWidth = resumeElement.offsetWidth;
-      const contentHeight = resumeElement.offsetHeight;
-      const scale = Math.min(a4Width / contentWidth, a4Height / contentHeight);
-      
       // Store original styles
       const originalStyles = {
         transform: resumeElement.style.transform,
@@ -95,176 +90,158 @@ export function DownloadOptionsDialog({
         visibility: resumeElement.style.visibility
       };
       
+      // Create a deep clone of the resume element to avoid modifying the original
+      const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
+      
       // Fix for profile image and bullet points: add specific CSS class to the cloned content
+      clonedResume.classList.add('pdf-specific-fixes');
+      
+      // Set styles for exact capture
+      clonedResume.style.position = 'absolute';
+      clonedResume.style.top = '-9999px';
+      clonedResume.style.left = '-9999px';
+      clonedResume.style.transform = 'none';
+      clonedResume.style.width = `${resumeElement.offsetWidth}px`;
+      clonedResume.style.height = `${resumeElement.offsetHeight}px`;
+      clonedResume.style.margin = '0';
+      clonedResume.style.padding = '0';
+      clonedResume.style.visibility = 'hidden';
+      
+      // Fix all bullet points in the clone
+      const bulletPoints = clonedResume.querySelectorAll('.bullet-point');
+      bulletPoints.forEach((bullet) => {
+        const bulletElement = bullet as HTMLElement;
+        bulletElement.style.display = 'inline-flex';
+        bulletElement.style.alignItems = 'center';
+        bulletElement.style.justifyContent = 'center';
+        bulletElement.style.width = '6px';
+        bulletElement.style.height = '6px';
+        bulletElement.style.minWidth = '6px';
+        bulletElement.style.minHeight = '6px';
+        bulletElement.style.borderRadius = '50%';
+        bulletElement.style.marginRight = '8px';
+        bulletElement.style.marginTop = '6px';
+        bulletElement.style.flexShrink = '0';
+        bulletElement.style.backgroundColor = '#000';
+      });
+      
+      // Fix all responsibility items
+      const responsibilityItems = clonedResume.querySelectorAll('.responsibility-list li');
+      responsibilityItems.forEach((item) => {
+        const itemElement = item as HTMLElement;
+        itemElement.style.display = 'flex';
+        itemElement.style.alignItems = 'flex-start';
+        itemElement.style.marginBottom = '4px';
+        
+        const responsibilityText = itemElement.querySelector('.responsibility-text');
+        if (responsibilityText) {
+          (responsibilityText as HTMLElement).style.display = 'inline-block';
+          (responsibilityText as HTMLElement).style.flex = '1';
+          (responsibilityText as HTMLElement).style.lineHeight = '1.4';
+        }
+      });
+      
+      // Fix rounded profile images
+      const roundedImages = clonedResume.querySelectorAll('.rounded-full');
+      roundedImages.forEach((img) => {
+        const imgElement = img as HTMLElement;
+        imgElement.style.borderRadius = '50%';
+        imgElement.style.overflow = 'hidden';
+        
+        const imageTag = imgElement.querySelector('img');
+        if (imageTag) {
+          imageTag.style.width = '100%';
+          imageTag.style.height = '100%';
+          imageTag.style.objectFit = 'cover';
+        }
+      });
+      
+      // Apply specific style to ensure exact rendering
       const styleElement = document.createElement('style');
       styleElement.textContent = `
-        .pdf-specific-fixes .rounded-full img {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover !important;
-          border-radius: 50% !important;
+        .pdf-specific-fixes * {
+          box-shadow: none !important;
+          text-shadow: none !important;
+          print-color-adjust: exact !important;
+          -webkit-print-color-adjust: exact !important;
         }
-        .pdf-specific-fixes .flex.items-start {
-          align-items: flex-start !important;
-        }
-        .pdf-specific-fixes li .inline-block,
-        .pdf-specific-fixes li .inline-flex,
-        .pdf-specific-fixes li .bullet-point {
-          vertical-align: top !important; 
-          margin-top: 6px !important;
+        .pdf-specific-fixes .bullet-point {
           display: inline-flex !important;
-          flex-shrink: 0 !important;
+          align-items: center !important;
+          justify-content: center !important;
+          width: 6px !important;
+          height: 6px !important;
           min-width: 6px !important;
           min-height: 6px !important;
+          border-radius: 50% !important;
+          margin-right: 8px !important;
+          margin-top: 6px !important;
+          flex-shrink: 0 !important;
+          background-color: #000 !important;
+        }
+        .pdf-specific-fixes .responsibility-list li {
+          display: flex !important;
+          align-items: flex-start !important;
+          margin-bottom: 4px !important;
+          page-break-inside: avoid !important;
         }
         .pdf-specific-fixes .responsibility-text {
           display: inline-block !important;
           flex: 1 !important;
           line-height: 1.4 !important;
         }
-        .pdf-specific-fixes .space-y-1.5 li,
-        .pdf-specific-fixes .space-y-1 li,
-        .pdf-specific-fixes .responsibility-list li {
-          display: flex !important;
-          align-items: flex-start !important;
-          margin-bottom: 4px !important;
-          position: relative !important;
+        .pdf-specific-fixes .rounded-full {
+          border-radius: 50% !important;
+          overflow: hidden !important;
+        }
+        .pdf-specific-fixes .rounded-full img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
         }
       `;
-      document.head.appendChild(styleElement);
       
-      // Temporarily disable scale transform for capture
-      const originalTransform = resumeElement.style.transform;
-      resumeElement.style.transform = 'none';
+      // Append the clone and styles to the document
+      document.body.appendChild(styleElement);
+      document.body.appendChild(clonedResume);
       
-      // Force the element to be visible and properly sized for capture
-      Object.assign(resumeElement.style, {
-        transition: 'none',
-        position: resumeElement.style.position || 'relative',
-        pointerEvents: 'none',
-        transformOrigin: 'top left',
-        visibility: 'visible'
-      });
-
-      // Force layout recalculation
-      resumeElement.getBoundingClientRect();
+      // Wait a moment for the DOM to update
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Temporarily disable any transitions or animations
-      const allElements = resumeElement.querySelectorAll('*');
-      const originalTransitions: string[] = [];
-      
-      allElements.forEach((el: Element) => {
-        const htmlEl = el as HTMLElement;
-        originalTransitions.push(htmlEl.style.transition);
-        htmlEl.style.transition = 'none';
-      });
-
-      console.log("Attempting to capture resume content with dimensions:", {
-        width: contentWidth,
-        height: contentHeight,
-        element: resumeElement
+      console.log("Attempting to capture cloned resume content with dimensions:", {
+        width: clonedResume.offsetWidth,
+        height: clonedResume.offsetHeight,
+        element: clonedResume
       });
 
       // Capture with improved settings
-      const canvas = await html2canvas(resumeElement, {
-        scale: pixelRatio * 2, // Double the scale for sharper images
+      const canvas = await html2canvas(clonedResume, {
+        scale: pixelRatio * 3, // Triple the scale for ultra-sharp images
         useCORS: true,
         allowTaint: true,
         logging: true, // Enable logging for debugging
         backgroundColor: "#ffffff",
-        imageTimeout: 15000, // Increase timeout for complex resumes
-        windowWidth: document.documentElement.offsetWidth,
-        windowHeight: document.documentElement.offsetHeight,
-        onclone: (clonedDocument, element) => {
-          const clonedElement = element as HTMLElement;
-          
-          // Add the PDF-specific class to the cloned element
-          clonedElement.classList.add('pdf-specific-fixes');
-          
-          // Apply exact styling to the cloned element
-          clonedElement.style.transform = 'none';
-          clonedElement.style.transformOrigin = 'top left';
-          clonedElement.style.width = `${contentWidth}px`;
-          clonedElement.style.height = `${contentHeight}px`;
-          
-          // Fix alignment of list items in the cloned document
-          const listItems = clonedElement.querySelectorAll('li');
-          listItems.forEach(li => {
-            const bulletPoint = li.querySelector('.bullet-point') || li.querySelector('.inline-block') || li.querySelector('.inline-flex');
-            
-            if (bulletPoint) {
-              bulletPoint.classList.add('bullet-point-fix');
-              (bulletPoint as HTMLElement).style.marginTop = '6px';
-              (bulletPoint as HTMLElement).style.minWidth = '6px';
-              (bulletPoint as HTMLElement).style.minHeight = '6px';
-              (bulletPoint as HTMLElement).style.display = 'inline-flex';
-              (bulletPoint as HTMLElement).style.flexShrink = '0';
-            }
-            
-            // Ensure the text content has proper styling
-            const textContent = li.querySelector('.responsibility-text') || li.lastElementChild;
-            if (textContent) {
-              (textContent as HTMLElement).style.display = 'inline-block';
-              (textContent as HTMLElement).style.flex = '1';
-              (textContent as HTMLElement).style.lineHeight = '1.4';
-            }
-            
-            // Ensure the li itself has proper styling
-            li.style.display = 'flex';
-            li.style.alignItems = 'flex-start';
-            li.style.marginBottom = '4px';
-            li.style.position = 'relative';
-          });
-          
-          // Fix circular images in the cloned document
-          const profileImages = clonedElement.querySelectorAll('.rounded-full');
-          profileImages.forEach(img => {
-            img.classList.add('profile-image-fix');
-          });
-          
-          // Ensure fonts are properly loaded in the clone
-          const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
-          const head = clonedDocument.head;
-          
-          fontLinks.forEach(link => {
-            // Fixed TypeScript error by properly casting to HTMLLinkElement
-            const linkEl = link as HTMLLinkElement;
-            if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
-              const newLink = clonedDocument.createElement('link');
-              newLink.rel = 'stylesheet';
-              newLink.href = linkEl.href;
-              head.appendChild(newLink);
-            }
-          });
-          
+        imageTimeout: 30000, // Increase timeout for complex resumes
+        foreignObjectRendering: false, // Sometimes disabling can yield better results
+        letterRendering: true, // Improves text rendering
+        onclone: (clonedDoc) => {
           // Make sure all fonts have loaded in the clone
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 300); // Increased delay to ensure rendering
+                setTimeout(resolve, 500); // Increased delay to ensure rendering
               });
             } else {
               // Fallback if document.fonts is not available
-              setTimeout(resolve, 400);
+              setTimeout(resolve, 600);
             }
           });
         }
       });
 
-      // Remove the temporary style element
-      document.head.removeChild(styleElement);
-
-      // Restore original transitions
-      allElements.forEach((el: Element, index: number) => {
-        (el as HTMLElement).style.transition = originalTransitions[index];
-      });
-
-      // Restore original transform and other styles
-      resumeElement.style.transform = originalTransform;
-      Object.assign(resumeElement.style, originalStyles);
-
-      // Force browser to repaint
-      resumeElement.getBoundingClientRect();
+      // Remove the temporary elements
+      document.body.removeChild(styleElement);
+      document.body.removeChild(clonedResume);
 
       // Create PDF with the exact A4 dimensions
       const pdfWidth = 210; // A4 width in mm
@@ -278,7 +255,7 @@ export function DownloadOptionsDialog({
         precision: 16 // Higher precision for better positioning
       });
 
-      // Convert canvas to image
+      // Convert canvas to image with high quality
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
       // Calculate dimensions to maintain aspect ratio and fit A4
