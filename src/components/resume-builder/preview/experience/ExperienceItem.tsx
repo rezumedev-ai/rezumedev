@@ -37,7 +37,7 @@ export function ExperienceItem({
           </div>
         </div>
         <div className="text-sm text-gray-500 whitespace-nowrap">
-          {formatDateRange(experience.startDate, experience.endDate)}
+          {formatDateRange(experience.startDate, experience.endDate, experience.isCurrentJob)}
         </div>
       </div>
       

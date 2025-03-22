@@ -45,9 +45,9 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     }
 
     return (
-      <div className="pdf-section-icon inline-flex items-center justify-center" data-pdf-section-icon="true">
+      <span className="pdf-section-icon inline-flex items-center justify-center" data-pdf-section-icon="true">
         {iconElement}
-      </div>
+      </span>
     );
   };
 
