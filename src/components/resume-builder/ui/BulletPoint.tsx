@@ -70,6 +70,6 @@ export function BulletPoint({
       <div className={cn("pdf-bullet-text", textClassName)}>
         {children}
       </div>
-    </div>
+    </li>
   );
 }
