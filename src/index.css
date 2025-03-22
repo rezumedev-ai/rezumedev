@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -169,6 +170,16 @@
     vertical-align: middle !important;
   }
 
+  /* Personal info icons - NEW FIX */
+  .pdf-mode #resume-content .pdf-contact-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    vertical-align: middle !important;
+    transform: translateY(5px) !important;
+  }
+
   /* Profile image fixes */
   .pdf-mode #resume-content .rounded-full {
     border-radius: 50% !important;
@@ -259,6 +270,7 @@
     flex-shrink: 0 !important;
     vertical-align: middle !important;
     margin-top: 0 !important;
+    transform: translateY(5px) !important;
   }
   
   #resume-content .professional-navy-bullet {
