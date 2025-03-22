@@ -87,26 +87,29 @@ export function DownloadOptionsDialog({
       const allIcons = pdfPreparationDiv.querySelectorAll('[data-lucide]');
       allIcons.forEach(icon => {
         if (icon.parentElement) {
-          icon.parentElement.classList.add('pdf-section-icon');
+          const parent = icon.parentElement as HTMLElement;
+          parent.classList.add('pdf-section-icon');
         }
       });
 
       // 3. Fix bullet points rendering
       const bulletPoints = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
-        bullet.style.display = 'inline-flex';
-        bullet.style.alignItems = 'center';
-        bullet.style.justifyContent = 'center';
-        bullet.style.flexShrink = '0';
-        bullet.style.marginTop = '5px';
+        const bulletElement = bullet as HTMLElement;
+        bulletElement.style.display = 'inline-flex';
+        bulletElement.style.alignItems = 'center';
+        bulletElement.style.justifyContent = 'center';
+        bulletElement.style.flexShrink = '0';
+        bulletElement.style.marginTop = '5px';
       });
 
       // 4. Fix bullet lists
       const bulletLists = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
-        list.style.marginLeft = '0';
-        list.style.paddingLeft = '0';
-        list.style.listStyle = 'none';
+        const listElement = list as HTMLElement;
+        listElement.style.marginLeft = '0';
+        listElement.style.paddingLeft = '0';
+        listElement.style.listStyle = 'none';
       });
 
       // Get device pixel ratio for better quality

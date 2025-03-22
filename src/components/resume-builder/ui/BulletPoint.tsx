@@ -22,7 +22,10 @@ export function BulletPoint({
     default: "w-1.5 h-1.5 rounded-full bg-black",
     "modern-split": "w-1 h-1 rounded-full bg-black",
     "professional-navy": "w-1.5 h-1.5 rounded-full bg-[#0F2B5B]",
-    "modern-professional": "w-1.5 h-1.5 rounded-full bg-emerald-600"
+    "modern-professional": "w-1.5 h-1.5 rounded-full bg-emerald-600",
+    "executive-clean": "w-1.5 h-1.5 rounded-full bg-gray-800",
+    "minimal-elegant": "w-1 h-1 rounded-full bg-gray-700",
+    "professional-executive": "w-1.5 h-1.5 rounded-full bg-black"
   };
 
   return (
