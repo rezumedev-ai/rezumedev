@@ -110,16 +110,21 @@
   }
 
   /* PDF-specific styling */
+  .pdf-mode {
+    padding: 32px 32px 0 32px !important; /* Increased padding: Top, right, bottom, left padding for PDF export */
+    box-sizing: border-box !important;
+  }
+  
   .pdf-mode #resume-content .pdf-bullet-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
   }
 
   .pdf-mode #resume-content .pdf-bullet-item {
     display: flex !important;
     align-items: flex-start !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 6px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
@@ -138,12 +143,20 @@
     border-radius: 50% !important;
     background-color: currentColor !important;
     vertical-align: top !important;
+    transform: translateY(2px) !important;
   }
 
   .pdf-mode #resume-content .pdf-bullet-text {
     display: inline-block !important;
     flex: 1 !important;
     line-height: 1.4 !important;
+  }
+
+  .pdf-mode #resume-content .pdf-bullet-char {
+    transform: translateY(0) !important;
+    display: inline-block !important;
+    margin-right: 6px !important; 
+    margin-top: 0 !important;
   }
 
   /* Section icons */
@@ -400,3 +413,4 @@
 .animate-rainbow {
   animation: rainbow var(--speed, 2s) infinite linear;
 }
+

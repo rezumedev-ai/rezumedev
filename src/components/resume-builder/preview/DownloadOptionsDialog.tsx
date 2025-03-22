@@ -72,25 +72,56 @@ export function DownloadOptionsDialog({
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // 1. Clone the resume content to avoid modifying the original
-      const originalHtml = resumeElement.innerHTML;
-      const pdfPreparationDiv = document.createElement('div');
-      pdfPreparationDiv.id = 'pdf-preparation-div';
-      pdfPreparationDiv.style.position = 'absolute';
-      pdfPreparationDiv.style.left = '-9999px';
-      pdfPreparationDiv.style.width = `${resumeElement.offsetWidth}px`;
-      pdfPreparationDiv.style.height = `${resumeElement.offsetHeight}px`;
-      pdfPreparationDiv.style.overflow = 'hidden';
-      pdfPreparationDiv.innerHTML = originalHtml;
-      pdfPreparationDiv.className = resumeElement.className + ' pdf-mode';
+      const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
+      clonedResume.id = 'pdf-preparation-div';
+      clonedResume.style.position = 'absolute';
+      clonedResume.style.left = '-9999px';
+      clonedResume.style.width = `${resumeElement.offsetWidth}px`;
+      clonedResume.style.height = `${resumeElement.offsetHeight}px`;
+      clonedResume.style.overflow = 'hidden';
+      clonedResume.className = resumeElement.className + ' pdf-mode';
       
       // Add increased padding to the PDF content container
-      pdfPreparationDiv.style.padding = '32px 32px 0 32px'; // Increased padding: Top, right, bottom, left
+      clonedResume.style.padding = '32px 32px 0 32px'; 
       
-      document.body.appendChild(pdfPreparationDiv);
+      document.body.appendChild(clonedResume);
 
-      // 2. Pre-process PDF for proper rendering
-      // Fix all icons - replace SVG icons with simple characters for PDF
-      const sectionIcons = pdfPreparationDiv.querySelectorAll('[data-pdf-section-icon="true"]');
+      // 2. Adjust bullet points in the cloned content
+      const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
+      bulletPoints.forEach(bullet => {
+        const bulletElement = bullet as HTMLElement;
+        // Replace the bullet element with a text character
+        bulletElement.textContent = '•';
+        bulletElement.style.width = 'auto';
+        bulletElement.style.height = 'auto';
+        bulletElement.style.display = 'inline-block';
+        bulletElement.style.marginRight = '6px';
+        bulletElement.style.marginTop = '3px'; // Move bullet down to align properly
+        bulletElement.style.fontSize = '16px';
+        bulletElement.style.lineHeight = '1';
+        bulletElement.className = 'pdf-bullet-char';
+      });
+
+      // 3. Fix bullet lists
+      const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
+      bulletLists.forEach(list => {
+        const listElement = list as HTMLElement;
+        listElement.style.marginLeft = '0';
+        listElement.style.paddingLeft = '0';
+        listElement.style.listStyle = 'none';
+      });
+
+      // 4. Fix bullet items
+      const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
+      bulletItems.forEach(item => {
+        const itemElement = item as HTMLElement;
+        itemElement.style.display = 'flex';
+        itemElement.style.alignItems = 'flex-start';
+        itemElement.style.marginBottom = '4px';
+      });
+
+      // 5. Fix section icons as well
+      const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
         // Check if contains an SVG
@@ -125,40 +156,6 @@ export function DownloadOptionsDialog({
         }
       });
 
-      // 3. Fix bullet point rendering
-      const bulletPoints = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet="true"]');
-      bulletPoints.forEach(bullet => {
-        const bulletElement = bullet as HTMLElement;
-        // Replace div bullet with a text bullet
-        bulletElement.textContent = '•';
-        bulletElement.style.width = 'auto';
-        bulletElement.style.height = 'auto';
-        bulletElement.style.display = 'inline-block';
-        bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '0px';
-        bulletElement.style.fontSize = '16px';
-        bulletElement.style.lineHeight = '1';
-        bulletElement.className = 'pdf-bullet-char';
-      });
-
-      // 4. Fix bullet lists
-      const bulletLists = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet-list="true"]');
-      bulletLists.forEach(list => {
-        const listElement = list as HTMLElement;
-        listElement.style.marginLeft = '0';
-        listElement.style.paddingLeft = '0';
-        listElement.style.listStyle = 'none';
-      });
-
-      // 5. Fix bullet items
-      const bulletItems = pdfPreparationDiv.querySelectorAll('.pdf-bullet-item');
-      bulletItems.forEach(item => {
-        const itemElement = item as HTMLElement;
-        itemElement.style.display = 'flex';
-        itemElement.style.alignItems = 'flex-start';
-        itemElement.style.marginBottom = '4px';
-      });
-
       // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
       
@@ -186,10 +183,10 @@ export function DownloadOptionsDialog({
       };
 
       // 6. Capture the prepared element
-      const canvas = await html2canvas(pdfPreparationDiv, captureSettings);
+      const canvas = await html2canvas(clonedResume, captureSettings);
       
       // 7. Remove the preparation div
-      document.body.removeChild(pdfPreparationDiv);
+      document.body.removeChild(clonedResume);
 
       // 8. Create PDF with the exact A4 dimensions
       const pdfWidth = 210; // A4 width in mm
