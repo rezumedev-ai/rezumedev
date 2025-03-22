@@ -1,5 +1,5 @@
 
-import { Briefcase, GraduationCap, Award, Star, FileText, User, Code, FolderKanban } from "lucide-react";
+import { Briefcase, GraduationCap, Award, FileText, User, Code, FolderKanban } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,7 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     let iconElement = null;
     let iconClass = template.id === "professional-navy" 
       ? "w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0"
-      : "w-5 h-5 mr-2 text-emerald-600 flex-shrink-0";
+      : "w-4 h-4 mr-2 text-gray-600 flex-shrink-0";
 
     switch (type) {
       case "experience":
