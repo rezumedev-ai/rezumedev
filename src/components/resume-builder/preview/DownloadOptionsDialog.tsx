@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -99,11 +100,13 @@ export function DownloadOptionsDialog({
         // Make sure SVG is preserved
         const svg = iconElement.querySelector('svg');
         if (svg) {
-          (svg as HTMLElement).style.width = '20px';
-          (svg as HTMLElement).style.height = '20px';
-          (svg as HTMLElement).style.flexShrink = '0';
-          (svg as HTMLElement).style.display = 'inline-block';
-          (svg as HTMLElement).style.verticalAlign = 'middle';
+          // Properly cast the SVG element with type assertion
+          const svgElement = svg as SVGElement;
+          svgElement.style.width = '20px';
+          svgElement.style.height = '20px';
+          svgElement.style.flexShrink = '0';
+          svgElement.style.display = 'inline-block';
+          svgElement.style.verticalAlign = 'middle';
         }
       });
 
@@ -119,7 +122,7 @@ export function DownloadOptionsDialog({
         bulletElement.style.justifyContent = 'center';
         bulletElement.style.alignItems = 'center';
         bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '6px'; // Adjust vertical alignment
+        bulletElement.style.marginTop = '5px'; // Adjust vertical alignment
         bulletElement.style.borderRadius = '50%';
         bulletElement.style.backgroundColor = 'currentColor';
       });
