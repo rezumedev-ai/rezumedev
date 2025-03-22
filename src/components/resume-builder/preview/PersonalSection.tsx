@@ -1,7 +1,9 @@
 
+import { EditableContent } from "../ui/EditableContent";
 import { ResumeTemplate } from "../templates";
-import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
-import { ImageUploadButton } from "./ImageUploadButton";
+import { ProfileImageButton } from "./ProfileImageButton";
+import { Mail, Phone, Globe, Linkedin } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PersonalSectionProps {
   fullName: string;
@@ -10,11 +12,11 @@ interface PersonalSectionProps {
   phone: string;
   linkedin?: string;
   website?: string;
-  profileImageUrl?: string;
+  profileImageUrl?: string | null;
   template: ResumeTemplate;
-  isEditing?: boolean;
-  resumeId?: string;
-  onUpdate?: (field: string, value: string) => void;
+  isEditing: boolean;
+  resumeId: string;
+  onUpdate: (field: string, value: string) => void;
   onImageUpdate?: (imageUrl: string | null) => void;
 }
 
@@ -32,464 +34,338 @@ export function PersonalSection({
   onUpdate,
   onImageUpdate
 }: PersonalSectionProps) {
-  const handleContentEdit = (field: string, event: React.FocusEvent<HTMLElement>) => {
-    if (!isEditing || !onUpdate) return;
-    const newValue = event.target.innerText.trim();
-    onUpdate(field, newValue);
-  };
-
-  const styles = {
-    "executive-clean": {
-      container: "mb-10 pb-6 border-b-2 border-gray-800",
-      name: "text-4xl font-bold tracking-tight text-gray-900",
-      title: "text-xl text-gray-600 mt-2",
-      contactContainer: "flex flex-wrap gap-4 mt-3 text-sm text-gray-600"
-    },
-    "modern-split": {
-      container: "mb-4 pb-2 border-b border-gray-300",
-      name: "text-[28px] font-bold text-gray-900 tracking-tight leading-tight",
-      title: "text-base text-gray-700 mt-1 font-medium",
-      contactContainer: "flex flex-wrap gap-3 mt-2 text-xs text-gray-600"
-    },
-    "minimal-elegant": {
-      container: "mb-10 pb-6 border-b border-black",
-      name: "text-[32px] font-semibold tracking-tight text-black",
-      title: "text-lg text-black mt-2 font-medium",
-      contactContainer: "flex flex-wrap justify-center gap-6 mt-4 text-sm text-black"
-    },
-    "professional-executive": {
-      container: "mb-8",
-      name: "text-4xl font-black tracking-wide text-black uppercase mb-2",
-      title: "text-xl italic font-light text-gray-600",
-      contactContainer: "flex flex-wrap gap-4 mt-2 text-sm text-gray-600"
-    },
-    "modern-professional": {
-      container: "mb-6 grid grid-cols-12 gap-6",
-      name: "text-3xl font-bold tracking-tight text-gray-900",
-      title: "text-lg text-emerald-700 mt-1 font-medium",
-      contactContainer: "grid grid-cols-2 gap-2 mt-4 text-sm text-gray-600",
-      imageContainer: "col-span-4 flex justify-center items-center",
-      infoContainer: "col-span-8"
-    },
-    "professional-navy": {
-      container: "col-span-12",
-      name: "text-3xl font-bold tracking-tight text-white",
-      title: "text-lg text-white mt-1 font-light",
-      contactContainer: "flex flex-wrap gap-4 mt-3 text-sm text-white",
-      imageContainer: "col-span-3 flex justify-center items-center",
-      infoContainer: "col-span-9"
-    }
-  };
-
-  const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
-
-  // Special rendering for Professional Navy template
-  if (template.id === "professional-navy") {
+  
+  const renderProfessionalNavyHeader = () => {
     return (
       <div className={template.style.headerStyle}>
-        <div className={styles["professional-navy"].imageContainer}>
-          <div className="w-32 h-32 rounded-full bg-white border-4 border-white overflow-hidden flex items-center justify-center relative">
-            {profileImageUrl ? (
-              <img 
-                src={profileImageUrl} 
-                alt={`${fullName}'s profile`} 
-                className="w-full h-full object-cover"
-                style={{aspectRatio: "1/1", objectPosition: "center"}}
+        <div className="col-span-3 flex justify-center">
+          <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-white/80">
+            {isEditing && onImageUpdate ? (
+              <ProfileImageButton
+                profileImageUrl={profileImageUrl || undefined}
+                resumeId={resumeId}
+                onImageUpdate={onImageUpdate}
               />
             ) : (
-              <div className="text-4xl text-[#0F2B5B] font-bold">
-                {fullName.split(' ').map(name => name[0]).join('')}
+              profileImageUrl ? (
+                <div className="w-full h-full rounded-full overflow-hidden">
+                  <img 
+                    src={profileImageUrl} 
+                    alt={`${fullName}'s profile`} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-gray-400">
+                  <span className="text-3xl font-light">
+                    {fullName.charAt(0)}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+        
+        <div className="col-span-9 pl-4">
+          <EditableContent
+            value={fullName}
+            placeholder="Your Full Name"
+            isEditing={isEditing}
+            onChange={(value) => onUpdate('fullName', value)}
+            className={template.style.titleFont}
+          />
+          
+          <EditableContent
+            value={title}
+            placeholder="Your Professional Title"
+            isEditing={isEditing}
+            onChange={(value) => onUpdate('title', value)}
+            className="text-white text-xl mt-1 font-medium"
+          />
+          
+          <div className="flex flex-wrap gap-4 mt-4 text-sm text-white/90">
+            <div className="flex items-center gap-2 contact-info-item">
+              <span className="professional-navy-contact-icon">
+                <Mail className="w-4 h-4" />
+              </span>
+              <EditableContent
+                value={email}
+                placeholder="your.email@example.com"
+                isEditing={isEditing}
+                onChange={(value) => onUpdate('email', value)}
+                className="text-white"
+              />
+            </div>
+            
+            <div className="flex items-center gap-2 contact-info-item">
+              <span className="professional-navy-contact-icon">
+                <Phone className="w-4 h-4" />
+              </span>
+              <EditableContent
+                value={phone}
+                placeholder="+1 (555) 123-4567"
+                isEditing={isEditing}
+                onChange={(value) => onUpdate('phone', value)}
+                className="text-white"
+              />
+            </div>
+            
+            {(linkedin || isEditing) && (
+              <div className="flex items-center gap-2 contact-info-item">
+                <span className="professional-navy-contact-icon">
+                  <Linkedin className="w-4 h-4" />
+                </span>
+                <EditableContent
+                  value={linkedin || ''}
+                  placeholder="linkedin.com/in/yourprofile"
+                  isEditing={isEditing}
+                  onChange={(value) => onUpdate('linkedin', value)}
+                  className="text-white"
+                />
               </div>
             )}
-            {isEditing && onImageUpdate && resumeId && (
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                <ImageUploadButton 
-                  resumeId={resumeId} 
-                  currentImageUrl={profileImageUrl} 
-                  onImageUpdate={onImageUpdate} 
+            
+            {(website || isEditing) && (
+              <div className="flex items-center gap-2 contact-info-item">
+                <span className="professional-navy-contact-icon">
+                  <Globe className="w-4 h-4" />
+                </span>
+                <EditableContent
+                  value={website || ''}
+                  placeholder="yourwebsite.com"
+                  isEditing={isEditing}
+                  onChange={(value) => onUpdate('website', value)}
+                  className="text-white"
                 />
               </div>
             )}
           </div>
         </div>
-        <div className={styles["professional-navy"].infoContainer}>
-          <h1 
-            className={`${currentStyle.name} outline-none`}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("fullName", e)}
-          >
-            {fullName}
-          </h1>
-          <div 
-            className={`${currentStyle.title} outline-none`}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("title", e)}
-          >
-            {title}
-          </div>
-          <div className={currentStyle.contactContainer}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-white professional-navy-contact-icon" />
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("email", e)}
-              >
-                {email}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-white professional-navy-contact-icon" />
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("phone", e)}
-              >
-                {phone}
-              </span>
-            </div>
-            {linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-white professional-navy-contact-icon" />
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("linkedin", e)}
-                >
-                  {linkedin}
-                </span>
-              </div>
-            )}
-            {website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-white professional-navy-contact-icon" />
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("website", e)}
-                >
-                  {website}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Special rendering for Modern Professional template
-  if (template.id === "modern-professional") {
-    return (
-      <div className={currentStyle.container}>
-        <div className={styles["modern-professional"].imageContainer}>
-          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center relative">
-            {profileImageUrl ? (
-              <img 
-                src={profileImageUrl} 
-                alt={`${fullName}'s profile`} 
-                className="w-full h-full object-cover"
-                style={{aspectRatio: "1/1", objectPosition: "center"}}
-              />
-            ) : (
-              <div className="text-5xl text-emerald-700 font-bold">
-                {fullName.split(' ').map(name => name[0]).join('')}
-              </div>
-            )}
-            {isEditing && onImageUpdate && resumeId && (
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                <ImageUploadButton 
-                  resumeId={resumeId} 
-                  currentImageUrl={profileImageUrl} 
-                  onImageUpdate={onImageUpdate} 
-                />
-              </div>
-            )}
-          </div>
-        </div>
-        <div className={styles["modern-professional"].infoContainer}>
-          <h1 
-            className={`${currentStyle.name} outline-none`}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("fullName", e)}
-          >
-            {fullName}
-          </h1>
-          <div 
-            className={`${currentStyle.title} outline-none`}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("title", e)}
-          >
-            {title}
-          </div>
-          <div className={currentStyle.contactContainer}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-emerald-600" />
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("email", e)}
-              >
-                {email}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-emerald-600" />
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("phone", e)}
-              >
-                {phone}
-              </span>
-            </div>
-            {linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-emerald-600" />
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("linkedin", e)}
-                >
-                  {linkedin}
-                </span>
-              </div>
-            )}
-            {website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-emerald-600" />
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("website", e)}
-                >
-                  {website}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (template.id === "modern-split") {
-    return (
-      <div className={currentStyle.container}>
-        <h1 
-          className={`${currentStyle.name} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("fullName", e)}
-        >
-          {fullName}
-        </h1>
-        <div 
-          className={`${currentStyle.title} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("title", e)}
-        >
-          {title}
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-          <div className="flex items-center gap-1">
-            <Mail className="w-3 h-3 text-gray-500" />
-            <span 
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-            >
-              {email}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Phone className="w-3 h-3 text-gray-500" />
-            <span 
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-            >
-              {phone}
-            </span>
-          </div>
-          {linkedin && (
-            <div className="flex items-center gap-1">
-              <Linkedin className="w-3 h-3 text-gray-500" />
-              <span 
-                className="text-xs text-gray-600 outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-              >
-                {linkedin}
-              </span>
-            </div>
-          )}
-          {website && (
-            <div className="flex items-center gap-1">
-              <Globe className="w-3 h-3 text-gray-500" />
-              <span 
-                className="text-xs text-gray-600 outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-              >
-                {website}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  const renderContact = () => {
-    if (template.id === "minimal-elegant") {
-      return (
-        <div className={currentStyle.contactContainer}>
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-black" />
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
-            >
-              {email}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-black" />
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
-            >
-              {phone}
-            </span>
-          </div>
-          {linkedin && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="w-4 h-4 text-black" />
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-                className="outline-none"
-              >
-                {linkedin}
-              </span>
-            </div>
-          )}
-          {website && (
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-black" />
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-                className="outline-none"
-              >
-                {website}
-              </span>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <div className={currentStyle.contactContainer}>
-        <div className="flex items-center gap-1.5">
-          <Mail className="w-4 h-4 text-gray-400" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("email", e)}
-            className="outline-none"
-          >
-            {email}
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Phone className="w-4 h-4 text-gray-400" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("phone", e)}
-            className="outline-none"
-          >
-            {phone}
-          </div>
-        </div>
-        {linkedin && (
-          <div className="flex items-center gap-1.5">
-            <Linkedin className="w-4 h-4 text-gray-400" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("linkedin", e)}
-              className="outline-none"
-            >
-              {linkedin}
-            </div>
-          </div>
-        )}
-        {website && (
-          <div className="flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-gray-400" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("website", e)}
-              className="outline-none"
-            >
-              {website}
-            </div>
-          </div>
-        )}
       </div>
     );
   };
-
-  return (
-    <div className={currentStyle.container}>
-      <div className={template.id === "minimal-elegant" ? "text-center" : ""}>
-        <h1 
-          className={`${currentStyle.name} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("fullName", e)}
-        >
-          {fullName}
-        </h1>
-        <div 
-          className={`${currentStyle.title} outline-none`}
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("title", e)}
-        >
-          {title}
+  
+  const renderModernProfessionalHeader = () => {
+    const hasCircularImage = template.style.icons.circularImage;
+    
+    return (
+      <div className={template.style.headerStyle}>
+        {hasCircularImage && (
+          <div className="col-span-3 flex justify-center">
+            <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100">
+              {isEditing && onImageUpdate ? (
+                <ProfileImageButton
+                  profileImageUrl={profileImageUrl || undefined}
+                  resumeId={resumeId}
+                  onImageUpdate={onImageUpdate}
+                />
+              ) : (
+                profileImageUrl ? (
+                  <div className="w-full h-full rounded-full overflow-hidden">
+                    <img 
+                      src={profileImageUrl} 
+                      alt={`${fullName}'s profile`} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-gray-400">
+                    <span className="text-3xl font-light">
+                      {fullName.charAt(0)}
+                    </span>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        )}
+        
+        <div className={cn(hasCircularImage ? "col-span-9 pl-4" : "col-span-12")}>
+          <EditableContent
+            value={fullName}
+            placeholder="Your Full Name"
+            isEditing={isEditing}
+            onChange={(value) => onUpdate('fullName', value)}
+            className={template.style.titleFont}
+          />
+          
+          <EditableContent
+            value={title}
+            placeholder="Your Professional Title"
+            isEditing={isEditing}
+            onChange={(value) => onUpdate('title', value)}
+            className="text-emerald-700 text-xl mt-1 font-medium"
+          />
+          
+          <div className="flex flex-wrap gap-4 mt-3 text-gray-600">
+            <div className="flex items-center gap-2 contact-info-item">
+              <span className="contact-info-icon text-emerald-700">
+                <Mail className="w-4 h-4" />
+              </span>
+              <EditableContent
+                value={email}
+                placeholder="your.email@example.com"
+                isEditing={isEditing}
+                onChange={(value) => onUpdate('email', value)}
+              />
+            </div>
+            
+            <div className="flex items-center gap-2 contact-info-item">
+              <span className="contact-info-icon text-emerald-700">
+                <Phone className="w-4 h-4" />
+              </span>
+              <EditableContent
+                value={phone}
+                placeholder="+1 (555) 123-4567"
+                isEditing={isEditing}
+                onChange={(value) => onUpdate('phone', value)}
+              />
+            </div>
+            
+            {(linkedin || isEditing) && (
+              <div className="flex items-center gap-2 contact-info-item">
+                <span className="contact-info-icon text-emerald-700">
+                  <Linkedin className="w-4 h-4" />
+                </span>
+                <EditableContent
+                  value={linkedin || ''}
+                  placeholder="linkedin.com/in/yourprofile"
+                  isEditing={isEditing}
+                  onChange={(value) => onUpdate('linkedin', value)}
+                />
+              </div>
+            )}
+            
+            {(website || isEditing) && (
+              <div className="flex items-center gap-2 contact-info-item">
+                <span className="contact-info-icon text-emerald-700">
+                  <Globe className="w-4 h-4" />
+                </span>
+                <EditableContent
+                  value={website || ''}
+                  placeholder="yourwebsite.com"
+                  isEditing={isEditing}
+                  onChange={(value) => onUpdate('website', value)}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      
-      {renderContact()}
-    </div>
-  );
+    );
+  };
+  
+  // Standard header for most templates
+  const renderStandardHeader = () => {
+    return (
+      <div className={template.style.headerStyle}>
+        <div className="flex items-center mb-3">
+          {(profileImageUrl || (isEditing && onImageUpdate)) && (
+            <div className="mr-6">
+              <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-100">
+                {isEditing && onImageUpdate ? (
+                  <ProfileImageButton
+                    profileImageUrl={profileImageUrl || undefined}
+                    resumeId={resumeId}
+                    onImageUpdate={onImageUpdate}
+                  />
+                ) : (
+                  profileImageUrl ? (
+                    <div className="w-full h-full rounded-full overflow-hidden">
+                      <img 
+                        src={profileImageUrl} 
+                        alt={`${fullName}'s profile`} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : null
+                )}
+              </div>
+            </div>
+          )}
+          
+          <div>
+            <EditableContent
+              value={fullName}
+              placeholder="Your Full Name"
+              isEditing={isEditing}
+              onChange={(value) => onUpdate('fullName', value)}
+              className={template.style.titleFont}
+            />
+            
+            <EditableContent
+              value={title}
+              placeholder="Your Professional Title"
+              isEditing={isEditing}
+              onChange={(value) => onUpdate('title', value)}
+              className="text-xl text-gray-600 mt-1"
+            />
+          </div>
+        </div>
+        
+        <div className="flex flex-wrap gap-4 text-gray-600">
+          <div className="flex items-center gap-2 contact-info-item">
+            <span className="contact-info-icon">
+              <Mail className="w-4 h-4" />
+            </span>
+            <EditableContent
+              value={email}
+              placeholder="your.email@example.com"
+              isEditing={isEditing}
+              onChange={(value) => onUpdate('email', value)}
+            />
+          </div>
+          
+          <div className="flex items-center gap-2 contact-info-item">
+            <span className="contact-info-icon">
+              <Phone className="w-4 h-4" />
+            </span>
+            <EditableContent
+              value={phone}
+              placeholder="+1 (555) 123-4567"
+              isEditing={isEditing}
+              onChange={(value) => onUpdate('phone', value)}
+            />
+          </div>
+          
+          {(linkedin || isEditing) && (
+            <div className="flex items-center gap-2 contact-info-item">
+              <span className="contact-info-icon">
+                <Linkedin className="w-4 h-4" />
+              </span>
+              <EditableContent
+                value={linkedin || ''}
+                placeholder="linkedin.com/in/yourprofile"
+                isEditing={isEditing}
+                onChange={(value) => onUpdate('linkedin', value)}
+              />
+            </div>
+          )}
+          
+          {(website || isEditing) && (
+            <div className="flex items-center gap-2 contact-info-item">
+              <span className="contact-info-icon">
+                <Globe className="w-4 h-4" />
+              </span>
+              <EditableContent
+                value={website || ''}
+                placeholder="yourwebsite.com"
+                isEditing={isEditing}
+                onChange={(value) => onUpdate('website', value)}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+  
+  // Determine which header template to use
+  if (template.id === "professional-navy") {
+    return renderProfessionalNavyHeader();
+  } else if (template.id === "modern-professional") {
+    return renderModernProfessionalHeader();
+  } else {
+    return renderStandardHeader();
+  }
 }
