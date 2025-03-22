@@ -214,7 +214,7 @@ export function DownloadOptionsDialog({
         element: clonedResume
       });
 
-      // Capture with improved settings
+      // Capture with improved settings - removed letterRendering option as it's not supported
       const canvas = await html2canvas(clonedResume, {
         scale: pixelRatio * 3, // Triple the scale for ultra-sharp images
         useCORS: true,
@@ -223,7 +223,6 @@ export function DownloadOptionsDialog({
         backgroundColor: "#ffffff",
         imageTimeout: 30000, // Increase timeout for complex resumes
         foreignObjectRendering: false, // Sometimes disabling can yield better results
-        letterRendering: true, // Improves text rendering
         onclone: (clonedDoc) => {
           // Make sure all fonts have loaded in the clone
           return new Promise<void>(resolve => {
