@@ -39,8 +39,8 @@ export function ExperienceItem({
       
       <ul className="mt-2 text-sm text-gray-600 list-none pl-0 space-y-1">
         {experience.responsibilities.map((resp, respIndex) => (
-          <li key={respIndex} className="flex items-start ml-1" data-pdf-bullet-item>
-            <div className="flex items-start w-full" data-pdf-bullet-container>
+          <li key={respIndex} className="flex items-center ml-1" data-pdf-bullet-item>
+            <div className="flex items-center w-full" data-pdf-bullet-container>
               <span 
                 className="inline-flex items-center justify-center rounded-full bg-black mr-2 shrink-0" 
                 style={{
@@ -48,7 +48,6 @@ export function ExperienceItem({
                   height: "6px",
                   minWidth: "6px",
                   minHeight: "6px",
-                  marginTop: "7px",
                   flexShrink: 0
                 }}
                 data-pdf-bullet
@@ -57,7 +56,6 @@ export function ExperienceItem({
                 className="leading-snug" 
                 style={{
                   display: "inline-block",
-                  width: "calc(100% - 14px)",
                   lineHeight: "1.4"
                 }}
                 data-pdf-bullet-text

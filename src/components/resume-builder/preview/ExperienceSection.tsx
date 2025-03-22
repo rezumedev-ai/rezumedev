@@ -83,7 +83,7 @@ export function ExperienceSection({
           onCancel={handleCancelEdit} 
         />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4" data-pdf-experience-section>
           {experiences.map((exp, index) => (
             <ExperienceItem 
               key={index}
