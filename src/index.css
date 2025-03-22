@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -114,12 +115,10 @@
   #resume-content ul.space-y-1 li,
   #resume-content ul.space-y-1.5 li,
   #resume-content ul.responsibility-list li {
-    page-break-inside: avoid !important;
+    page-break-inside: avoid;
     display: flex !important;
     align-items: flex-start !important;
     position: relative !important;
-    margin-bottom: 4px !important;
-    break-inside: avoid !important;
   }
 
   #resume-content .rounded-full {
@@ -139,17 +138,14 @@
   #resume-content li .inline-block,
   #resume-content li .inline-flex,
   #resume-content li .bullet-point {
-    display: inline-block !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     vertical-align: top !important;
-    margin-top: 0.375rem !important;
+    margin-top: 6px !important;
     flex-shrink: 0 !important;
-    width: 6px !important;
-    height: 6px !important;
     min-width: 6px !important;
     min-height: 6px !important;
-    border-radius: 50% !important;
-    background-color: #000 !important;
-    margin-right: 8px !important;
   }
 
   /* Specific styles for responsibility text */
@@ -157,7 +153,6 @@
     display: inline-block !important;
     flex: 1 !important;
     line-height: 1.4 !important;
-    vertical-align: top !important;
   }
 
   /* Fix for arrow bullet points */
