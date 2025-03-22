@@ -113,10 +113,12 @@
   /* Improved list and bullet point styling */
   #resume-content ul.list-disc li,
   #resume-content ul.space-y-1 li,
-  #resume-content ul.space-y-1.5 li {
+  #resume-content ul.space-y-1.5 li,
+  #resume-content ul.responsibility-list li {
     page-break-inside: avoid;
     display: flex !important;
     align-items: flex-start !important;
+    position: relative !important;
   }
 
   #resume-content .rounded-full {
@@ -134,13 +136,23 @@
 
   /* Ensure proper alignment of bullet points */
   #resume-content li .inline-block,
-  #resume-content li .inline-flex {
+  #resume-content li .inline-flex,
+  #resume-content li .bullet-point {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     vertical-align: top !important;
-    margin-top: 4px !important;
+    margin-top: 6px !important;
     flex-shrink: 0 !important;
+    min-width: 6px !important;
+    min-height: 6px !important;
+  }
+
+  /* Specific styles for responsibility text */
+  #resume-content .responsibility-text {
+    display: inline-block !important;
+    flex: 1 !important;
+    line-height: 1.4 !important;
   }
 
   /* Fix for arrow bullet points */
