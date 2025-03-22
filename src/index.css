@@ -168,15 +168,6 @@
     margin-right: 8px !important;
     vertical-align: middle !important;
   }
-  
-  /* Ensure SVG icons are preserved properly */
-  .pdf-mode #resume-content .pdf-section-icon svg {
-    width: 20px !important;
-    height: 20px !important;
-    display: inline-block !important;
-    flex-shrink: 0 !important;
-    vertical-align: middle !important;
-  }
 
   /* Profile image fixes */
   .pdf-mode #resume-content .rounded-full {
@@ -422,3 +413,4 @@
 .animate-rainbow {
   animation: rainbow var(--speed, 2s) infinite linear;
 }
+

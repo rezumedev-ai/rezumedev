@@ -15,8 +15,8 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
 
     let iconElement = null;
     let iconClass = template.id === "professional-navy" 
-      ? "w-4 h-4 text-[#0F2B5B] flex-shrink-0"
-      : "w-5 h-5 text-emerald-600 flex-shrink-0";
+      ? "w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0"
+      : "w-5 h-5 mr-2 text-emerald-600 flex-shrink-0";
 
     switch (type) {
       case "experience":
@@ -45,7 +45,7 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     }
 
     return (
-      <div className="pdf-section-icon inline-flex items-center justify-center mr-2" data-pdf-section-icon="true">
+      <div className="pdf-section-icon inline-flex items-center justify-center" data-pdf-section-icon="true">
         {iconElement}
       </div>
     );
