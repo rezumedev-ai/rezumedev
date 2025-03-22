@@ -109,142 +109,41 @@ export function SkillsSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  // Professional Navy template
-  if (template.id === "professional-navy") {
-    return (
-      <div className={currentStyle.section}>
-        <SectionHeader title="Skills" type="skills" template={template} />
-        
-        <div className="space-y-4 mt-3">
-          {hardSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Technical Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {hardSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="professional-navy"
-                    className="ml-0 leading-snug"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          {softSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Soft Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {softSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="professional-navy"
-                    className="ml-0 leading-snug"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-  
-  // Modern Professional template
-  if (template.id === "modern-professional") {
-    return (
-      <div className={currentStyle.section}>
-        <SectionHeader title="Skills" type="skills" template={template} />
-        
-        <div className="space-y-4 mt-3">
-          {hardSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Technical Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {hardSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="modern-professional"
-                    className="ml-0 leading-snug"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          {softSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Soft Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {softSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="modern-professional"
-                    className="ml-0 leading-snug"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-  
-  // Standard templates
+  // Generate skill list with arrow bullets
+  const renderSkillList = (skills: string[], label: string) => (
+    <div>
+      <h4 className={currentStyle.skillType}>{label}</h4>
+      <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true" data-pdf-skill-list="true">
+        {skills.map((skill, index) => (
+          <BulletPoint
+            key={index}
+            template={template.id}
+            className="ml-0 leading-snug"
+            type="skill"
+          >
+            {skill}
+          </BulletPoint>
+        ))}
+      </ul>
+    </div>
+  );
+
   return (
     <div className={currentStyle.section}>
       <SectionHeader title="Skills" type="skills" template={template} />
       
-      <div className="space-y-3 mt-3">
-        {hardSkills.length > 0 && (
-          <div>
-            <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Core Competencies" : 
-               template.id === "minimal-elegant" ? "Technical Skills" : "Technical Skills"}
-            </h4>
-            
-            <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-              {hardSkills.map((skill, index) => (
-                <BulletPoint
-                  key={index}
-                  template={template.id}
-                  className="ml-0 leading-snug"
-                >
-                  {skill}
-                </BulletPoint>
-              ))}
-            </ul>
-          </div>
+      <div className="space-y-4 mt-3">
+        {hardSkills.length > 0 && renderSkillList(
+          hardSkills, 
+          template.id === "professional-executive" ? "Core Competencies" : 
+          "Technical Skills"
         )}
         
-        {softSkills.length > 0 && (
-          <div>
-            <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Professional Skills" : 
-               template.id === "minimal-elegant" ? "Professional Skills" : "Soft Skills"}
-            </h4>
-            
-            <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-              {softSkills.map((skill, index) => (
-                <BulletPoint
-                  key={index}
-                  template={template.id}
-                  className="ml-0 leading-snug"
-                >
-                  {skill}
-                </BulletPoint>
-              ))}
-            </ul>
-          </div>
+        {softSkills.length > 0 && renderSkillList(
+          softSkills,
+          template.id === "professional-executive" ? "Professional Skills" : 
+          template.id === "minimal-elegant" ? "Professional Skills" : 
+          "Soft Skills"
         )}
       </div>
     </div>
