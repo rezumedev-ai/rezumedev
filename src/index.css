@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -186,6 +187,68 @@
     align-items: center !important;
     margin-bottom: 6px !important;
     line-height: 1.4 !important;
+  }
+  
+  /* PDF Generation Mode - Additional specific fixes for pixel-perfect PDF rendering */
+  .pdf-generation-mode {
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  .pdf-generation-mode * {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .pdf-generation-mode li {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .pdf-generation-mode li span:first-child {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    transform: none !important;
+  }
+  
+  .pdf-generation-mode .rounded-full {
+    overflow: hidden !important;
+    border-radius: 50% !important;
+  }
+  
+  .pdf-generation-mode .rounded-full img {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .pdf-generation-mode [contenteditable] {
+    outline: none !important;
+    border: none !important;
+  }
+  
+  /* Fixes for specific templates */
+  .pdf-generation-mode .professional-navy-bullet {
+    min-width: 6px !important;
+    min-height: 6px !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background-color: #0F2B5B !important;
+    margin-right: 8px !important;
+    display: inline-flex !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .pdf-generation-mode [class*="text-xs"],
+  .pdf-generation-mode [class*="text-sm"],
+  .pdf-generation-mode [class*="text-base"] {
+    line-height: 1.5 !important;
   }
   
   .prose {
