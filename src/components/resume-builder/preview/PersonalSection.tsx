@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
 import { ImageUploadButton } from "./ImageUploadButton";
@@ -83,7 +82,6 @@ export function PersonalSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  // Special rendering for Professional Navy template
   if (template.id === "professional-navy") {
     return (
       <div className={template.style.headerStyle}>
@@ -130,10 +128,10 @@ export function PersonalSection({
             {title}
           </div>
           <div className={currentStyle.contactContainer}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-white professional-navy-contact-icon" />
+            <div className="flex items-center gap-2 contact-item">
+              <Mail className="w-4 h-4 text-white professional-navy-contact-icon contact-icon" />
               <span 
-                className="outline-none"
+                className="outline-none contact-text"
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("email", e)}
@@ -141,10 +139,10 @@ export function PersonalSection({
                 {email}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-white professional-navy-contact-icon" />
+            <div className="flex items-center gap-2 contact-item">
+              <Phone className="w-4 h-4 text-white professional-navy-contact-icon contact-icon" />
               <span 
-                className="outline-none"
+                className="outline-none contact-text"
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("phone", e)}
@@ -153,10 +151,10 @@ export function PersonalSection({
               </span>
             </div>
             {linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-white professional-navy-contact-icon" />
+              <div className="flex items-center gap-2 contact-item">
+                <Linkedin className="w-4 h-4 text-white professional-navy-contact-icon contact-icon" />
                 <span 
-                  className="outline-none"
+                  className="outline-none contact-text"
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleContentEdit("linkedin", e)}
@@ -166,10 +164,10 @@ export function PersonalSection({
               </div>
             )}
             {website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-white professional-navy-contact-icon" />
+              <div className="flex items-center gap-2 contact-item">
+                <Globe className="w-4 h-4 text-white professional-navy-contact-icon contact-icon" />
                 <span 
-                  className="outline-none"
+                  className="outline-none contact-text"
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleContentEdit("website", e)}
@@ -184,7 +182,6 @@ export function PersonalSection({
     );
   }
 
-  // Special rendering for Modern Professional template
   if (template.id === "modern-professional") {
     return (
       <div className={currentStyle.container}>
@@ -231,10 +228,10 @@ export function PersonalSection({
             {title}
           </div>
           <div className={currentStyle.contactContainer}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-emerald-600" />
+            <div className="flex items-center gap-2 contact-item">
+              <Mail className="w-4 h-4 text-emerald-600 contact-icon" />
               <span 
-                className="outline-none"
+                className="outline-none contact-text"
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("email", e)}
@@ -242,10 +239,10 @@ export function PersonalSection({
                 {email}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-emerald-600" />
+            <div className="flex items-center gap-2 contact-item">
+              <Phone className="w-4 h-4 text-emerald-600 contact-icon" />
               <span 
-                className="outline-none"
+                className="outline-none contact-text"
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("phone", e)}
@@ -254,10 +251,10 @@ export function PersonalSection({
               </span>
             </div>
             {linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-emerald-600" />
+              <div className="flex items-center gap-2 contact-item">
+                <Linkedin className="w-4 h-4 text-emerald-600 contact-icon" />
                 <span 
-                  className="outline-none"
+                  className="outline-none contact-text"
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleContentEdit("linkedin", e)}
@@ -267,10 +264,10 @@ export function PersonalSection({
               </div>
             )}
             {website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-emerald-600" />
+              <div className="flex items-center gap-2 contact-item">
+                <Globe className="w-4 h-4 text-emerald-600 contact-icon" />
                 <span 
-                  className="outline-none"
+                  className="outline-none contact-text"
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleContentEdit("website", e)}
@@ -305,10 +302,10 @@ export function PersonalSection({
           {title}
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-          <div className="flex items-center gap-1">
-            <Mail className="w-3 h-3 text-gray-500" />
+          <div className="flex items-center gap-1 contact-item">
+            <Mail className="w-3 h-3 text-gray-500 contact-icon" />
             <span 
-              className="text-xs text-gray-600 outline-none"
+              className="text-xs text-gray-600 outline-none contact-text"
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit("email", e)}
@@ -316,10 +313,10 @@ export function PersonalSection({
               {email}
             </span>
           </div>
-          <div className="flex items-center gap-1">
-            <Phone className="w-3 h-3 text-gray-500" />
+          <div className="flex items-center gap-1 contact-item">
+            <Phone className="w-3 h-3 text-gray-500 contact-icon" />
             <span 
-              className="text-xs text-gray-600 outline-none"
+              className="text-xs text-gray-600 outline-none contact-text"
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit("phone", e)}
@@ -328,10 +325,10 @@ export function PersonalSection({
             </span>
           </div>
           {linkedin && (
-            <div className="flex items-center gap-1">
-              <Linkedin className="w-3 h-3 text-gray-500" />
+            <div className="flex items-center gap-1 contact-item">
+              <Linkedin className="w-3 h-3 text-gray-500 contact-icon" />
               <span 
-                className="text-xs text-gray-600 outline-none"
+                className="text-xs text-gray-600 outline-none contact-text"
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("linkedin", e)}
@@ -341,10 +338,10 @@ export function PersonalSection({
             </div>
           )}
           {website && (
-            <div className="flex items-center gap-1">
-              <Globe className="w-3 h-3 text-gray-500" />
+            <div className="flex items-center gap-1 contact-item">
+              <Globe className="w-3 h-3 text-gray-500 contact-icon" />
               <span 
-                className="text-xs text-gray-600 outline-none"
+                className="text-xs text-gray-600 outline-none contact-text"
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("website", e)}
@@ -362,49 +359,49 @@ export function PersonalSection({
     if (template.id === "minimal-elegant") {
       return (
         <div className={currentStyle.contactContainer}>
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-black" />
+          <div className="flex items-center gap-2 contact-item">
+            <Mail className="w-4 h-4 text-black contact-icon" />
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
+              className="outline-none contact-text"
             >
               {email}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-black" />
+          <div className="flex items-center gap-2 contact-item">
+            <Phone className="w-4 h-4 text-black contact-icon" />
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
+              className="outline-none contact-text"
             >
               {phone}
             </span>
           </div>
           {linkedin && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="w-4 h-4 text-black" />
+            <div className="flex items-center gap-2 contact-item">
+              <Linkedin className="w-4 h-4 text-black contact-icon" />
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("linkedin", e)}
-                className="outline-none"
+                className="outline-none contact-text"
               >
                 {linkedin}
               </span>
             </div>
           )}
           {website && (
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-black" />
+            <div className="flex items-center gap-2 contact-item">
+              <Globe className="w-4 h-4 text-black contact-icon" />
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("website", e)}
-                className="outline-none"
+                className="outline-none contact-text"
               >
                 {website}
               </span>
@@ -416,49 +413,49 @@ export function PersonalSection({
 
     return (
       <div className={currentStyle.contactContainer}>
-        <div className="flex items-center gap-1.5">
-          <Mail className="w-4 h-4 text-gray-400" />
+        <div className="flex items-center gap-1.5 contact-item">
+          <Mail className="w-4 h-4 text-gray-400 contact-icon" />
           <div
             contentEditable={isEditing}
             suppressContentEditableWarning
             onBlur={(e) => handleContentEdit("email", e)}
-            className="outline-none"
+            className="outline-none contact-text"
           >
             {email}
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Phone className="w-4 h-4 text-gray-400" />
+        <div className="flex items-center gap-1.5 contact-item">
+          <Phone className="w-4 h-4 text-gray-400 contact-icon" />
           <div
             contentEditable={isEditing}
             suppressContentEditableWarning
             onBlur={(e) => handleContentEdit("phone", e)}
-            className="outline-none"
+            className="outline-none contact-text"
           >
             {phone}
           </div>
         </div>
         {linkedin && (
-          <div className="flex items-center gap-1.5">
-            <Linkedin className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-1.5 contact-item">
+            <Linkedin className="w-4 h-4 text-gray-400 contact-icon" />
             <div
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit("linkedin", e)}
-              className="outline-none"
+              className="outline-none contact-text"
             >
               {linkedin}
             </div>
           </div>
         )}
         {website && (
-          <div className="flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-1.5 contact-item">
+            <Globe className="w-4 h-4 text-gray-400 contact-icon" />
             <div
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleContentEdit("website", e)}
-              className="outline-none"
+              className="outline-none contact-text"
             >
               {website}
             </div>

@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -121,59 +120,62 @@ export function DownloadOptionsDialog({
           aspect-ratio: 1/1 !important;
         }
         
-        /* Contact icon fixes */
-        .pdf-specific-fixes .flex.items-center.gap-1,
-        .pdf-specific-fixes .flex.items-center.gap-1\\.5,
-        .pdf-specific-fixes .flex.items-center.gap-2 {
+        /* Improve contact info alignment with icons */
+        .pdf-specific-fixes .contact-item {
           display: flex !important;
           align-items: center !important;
           justify-content: flex-start !important;
+          gap: 4px !important;
+          margin-bottom: 2px !important;
         }
         
-        /* Contact icon alignment */
-        .pdf-specific-fixes svg.w-3,
-        .pdf-specific-fixes svg.w-3\\.5,
-        .pdf-specific-fixes svg.w-4 {
+        .pdf-specific-fixes .contact-icon {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
           flex-shrink: 0 !important;
           vertical-align: middle !important;
-          margin-right: 4px !important;
+          width: 16px !important;
+          height: 16px !important;
         }
         
-        /* Fix professional-navy contact icons */
-        .pdf-specific-fixes .professional-navy-contact-icon {
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          flex-shrink: 0 !important;
+        .pdf-specific-fixes .contact-text {
+          display: inline-block !important;
           vertical-align: middle !important;
-          margin-top: 0 !important;
-          margin-bottom: 0 !important;
+          line-height: 1.5 !important;
         }
         
-        /* Work experience bullet point fixes */
-        .pdf-specific-fixes ul li {
+        /* Fix for experience bullet points */
+        .pdf-specific-fixes .experience-bullet-container {
           display: flex !important;
           align-items: flex-start !important;
-          margin-bottom: 6px !important;
+          margin-bottom: 4px !important;
           page-break-inside: avoid !important;
+          width: 100% !important;
         }
         
-        /* General bullet point fix */
-        .pdf-specific-fixes li span:first-child,
-        .pdf-specific-fixes .inline-flex,
-        .pdf-specific-fixes .inline-block {
+        .pdf-specific-fixes .experience-bullet {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
           flex-shrink: 0 !important;
+          width: 6px !important;
+          height: 6px !important;
+          min-width: 6px !important;
+          min-height: 6px !important;
           margin-right: 6px !important;
-          margin-top: 0.45em !important;
+          margin-top: 6px !important;
+          background-color: #000000 !important;
+          border-radius: 50% !important;
         }
         
-        /* Professional navy bullet fix */
+        .pdf-specific-fixes .experience-text {
+          display: inline-block !important;
+          vertical-align: top !important;
+          flex-grow: 1 !important;
+        }
+        
+        /* Fix professional navy bullet fix */
         .pdf-specific-fixes .professional-navy-bullet {
           display: inline-flex !important;
           align-items: center !important;
@@ -186,23 +188,7 @@ export function DownloadOptionsDialog({
           margin-right: 8px !important;
           background-color: #0F2B5B !important;
           flex-shrink: 0 !important;
-          margin-top: 0.45em !important;
-        }
-        
-        /* Experience item bullets */
-        .pdf-specific-fixes .w-2.h-2.min-w-2.min-h-2.rounded-full {
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          min-width: 6px !important;
-          min-height: 6px !important;
-          width: 6px !important;
-          height: 6px !important;
-          border-radius: 50% !important;
-          margin-right: 8px !important;
-          background-color: #000000 !important;
-          flex-shrink: 0 !important;
-          margin-top: 0.45em !important;
+          margin-top: 6px !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -264,46 +250,71 @@ export function DownloadOptionsDialog({
           // Fix alignment of bullet points in work experience
           const experienceItems = clonedElement.querySelectorAll('ul li');
           experienceItems.forEach(li => {
-            const bulletPoint = li.querySelector('.inline-block, .inline-flex, span.w-2, span.rounded-full');
-            if (bulletPoint) {
-              const bullet = bulletPoint as HTMLElement;
-              bullet.style.display = 'inline-flex';
-              bullet.style.alignItems = 'center';
-              bullet.style.justifyContent = 'center';
-              bullet.style.flexShrink = '0';
-              bullet.style.marginTop = '0.45em';
-              bullet.style.marginRight = '6px';
+            // Make sure the container is properly styled
+            const bulletContainer = li.querySelector('.experience-bullet-container');
+            if (bulletContainer) {
+              const container = bulletContainer as HTMLElement;
+              container.style.display = 'flex';
+              container.style.alignItems = 'flex-start';
+              container.style.width = '100%';
+              container.style.marginBottom = '4px';
+              
+              // Style the bullet point
+              const bullet = container.querySelector('.experience-bullet');
+              if (bullet) {
+                const bulletEl = bullet as HTMLElement;
+                bulletEl.style.display = 'inline-flex';
+                bulletEl.style.alignItems = 'center';
+                bulletEl.style.justifyContent = 'center';
+                bulletEl.style.width = '6px';
+                bulletEl.style.height = '6px';
+                bulletEl.style.minWidth = '6px';
+                bulletEl.style.minHeight = '6px';
+                bulletEl.style.borderRadius = '50%';
+                bulletEl.style.marginRight = '6px';
+                bulletEl.style.marginTop = '6px';
+                bulletEl.style.backgroundColor = '#000000';
+                bulletEl.style.flexShrink = '0';
+              }
+              
+              // Style the text
+              const text = container.querySelector('.experience-text');
+              if (text) {
+                const textEl = text as HTMLElement;
+                textEl.style.display = 'inline-block';
+                textEl.style.verticalAlign = 'top';
+                textEl.style.flexGrow = '1';
+              }
             }
           });
           
           // Fix contact icons alignment
-          const contactIcons = clonedElement.querySelectorAll('.flex.items-center svg');
-          contactIcons.forEach(icon => {
-            const svgIcon = icon as HTMLElement;
-            svgIcon.style.display = 'inline-flex';
-            svgIcon.style.alignItems = 'center';
-            svgIcon.style.justifyContent = 'center';
-            svgIcon.style.flexShrink = '0';
-            svgIcon.style.verticalAlign = 'middle';
-            svgIcon.style.marginRight = '4px';
-          });
-          
-          // Fix professional navy bullet points
-          const navyBullets = clonedElement.querySelectorAll('.professional-navy-bullet');
-          navyBullets.forEach(bullet => {
-            const navyBullet = bullet as HTMLElement;
-            navyBullet.style.display = 'inline-flex';
-            navyBullet.style.alignItems = 'center';
-            navyBullet.style.justifyContent = 'center';
-            navyBullet.style.minWidth = '6px';
-            navyBullet.style.minHeight = '6px';
-            navyBullet.style.width = '6px';
-            navyBullet.style.height = '6px';
-            navyBullet.style.borderRadius = '50%';
-            navyBullet.style.marginRight = '8px';
-            navyBullet.style.backgroundColor = '#0F2B5B';
-            navyBullet.style.flexShrink = '0';
-            navyBullet.style.marginTop = '0.45em';
+          const contactItems = clonedElement.querySelectorAll('.contact-item');
+          contactItems.forEach(item => {
+            const contactItem = item as HTMLElement;
+            contactItem.style.display = 'flex';
+            contactItem.style.alignItems = 'center';
+            contactItem.style.marginBottom = '2px';
+            
+            // Style the icon
+            const icon = contactItem.querySelector('.contact-icon');
+            if (icon) {
+              const iconEl = icon as HTMLElement;
+              iconEl.style.display = 'inline-flex';
+              iconEl.style.alignItems = 'center';
+              iconEl.style.justifyContent = 'center';
+              iconEl.style.flexShrink = '0';
+              iconEl.style.width = '16px';
+              iconEl.style.height = '16px';
+            }
+            
+            // Style the text
+            const text = contactItem.querySelector('.contact-text');
+            if (text) {
+              const textEl = text as HTMLElement;
+              textEl.style.display = 'inline-block';
+              textEl.style.verticalAlign = 'middle';
+            }
           });
           
           // Fix professional navy contact icons
@@ -315,6 +326,8 @@ export function DownloadOptionsDialog({
             navyIcon.style.justifyContent = 'center';
             navyIcon.style.flexShrink = '0';
             navyIcon.style.verticalAlign = 'middle';
+            navyIcon.style.width = '16px';
+            navyIcon.style.height = '16px';
           });
           
           // Ensure fonts are properly loaded in the clone
