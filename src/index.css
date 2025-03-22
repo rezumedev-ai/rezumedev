@@ -109,6 +109,83 @@
     -webkit-print-color-adjust: exact;
   }
 
+  /* PDF-specific styling */
+  .pdf-mode #resume-content .pdf-bullet-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pdf-mode #resume-content .pdf-bullet-item {
+    display: flex !important;
+    align-items: flex-start !important;
+    margin-bottom: 4px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .pdf-mode #resume-content .pdf-bullet-marker {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    align-self: flex-start !important;
+    margin-top: 5px !important;
+    width: 5px !important;
+    height: 5px !important;
+    min-width: 5px !important;
+    min-height: 5px !important;
+    border-radius: 50% !important;
+    background-color: currentColor !important;
+    vertical-align: top !important;
+  }
+
+  .pdf-mode #resume-content .pdf-bullet-text {
+    display: inline-block !important;
+    flex: 1 !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Section icons */
+  .pdf-mode #resume-content .pdf-section-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin-right: 8px !important;
+    vertical-align: middle !important;
+  }
+
+  /* Profile image fixes */
+  .pdf-mode #resume-content .rounded-full {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+  }
+
+  .pdf-mode #resume-content .rounded-full img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    aspect-ratio: 1/1 !important;
+  }
+
+  /* Other fixes from previous implementation */
+  #resume-content ul.list-disc li,
+  #resume-content ul.space-y-1 li,
+  #resume-content ul.space-y-1.5 li {
+    page-break-inside: avoid;
+    display: flex !important;
+    align-items: flex-start !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Experience item specific fixes */
+  .pdf-mode #resume-content .pdf-experience-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
   /* Improved list and bullet point styling */
   #resume-content ul.list-disc li,
   #resume-content ul.space-y-1 li,

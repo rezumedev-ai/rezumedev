@@ -3,6 +3,7 @@ import { WorkExperience } from "@/types/resume";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { formatDateRange } from "@/utils/format-dates";
+import { BulletPoint } from "../../ui/BulletPoint";
 
 interface ExperienceItemProps {
   experience: WorkExperience;
@@ -10,6 +11,7 @@ interface ExperienceItemProps {
   isEditing: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  template?: string;
 }
 
 export function ExperienceItem({ 
@@ -17,12 +19,14 @@ export function ExperienceItem({
   index, 
   isEditing, 
   onEdit, 
-  onDelete 
+  onDelete,
+  template = "default"
 }: ExperienceItemProps) {
   return (
     <div 
-      className={`pb-3 ${index < 1 ? 'border-b border-gray-200' : ''} cursor-pointer`}
+      className={`pb-3 ${index < 1 ? 'border-b border-gray-200' : ''} cursor-pointer pdf-experience-item`}
       onClick={onEdit}
+      data-pdf-section="experience-item"
     >
       <div className="flex justify-between items-start">
         <div className="space-y-0.5">
@@ -37,12 +41,15 @@ export function ExperienceItem({
         </div>
       </div>
       
-      <ul className="mt-2 text-sm text-gray-600 list-none pl-0 space-y-1">
+      <ul className="mt-2 text-sm text-gray-600 space-y-1 pl-0 pdf-bullet-list" data-pdf-bullet-list="true">
         {experience.responsibilities.map((resp, respIndex) => (
-          <li key={respIndex} className="flex items-center ml-1">
-            <span className="inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-black mr-2 shrink-0"></span>
-            <span className="leading-snug">{resp}</span>
-          </li>
+          <BulletPoint 
+            key={respIndex}
+            template={template}
+            className="ml-1 leading-snug"
+          >
+            {resp}
+          </BulletPoint>
         ))}
       </ul>
       

@@ -1,6 +1,7 @@
 
 import { Briefcase, GraduationCap, Award, Star, FileText, User, Code, FolderKanban } from "lucide-react";
 import { ResumeTemplate } from "../templates";
+import { cn } from "@/lib/utils";
 
 interface SectionHeaderProps {
   title: string;
@@ -12,38 +13,42 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
   const getIcon = () => {
     if (!template.style.icons.sections) return null;
 
+    let iconElement = null;
+    let iconClass = template.id === "professional-navy" 
+      ? "w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0"
+      : "w-5 h-5 mr-2 text-emerald-600 flex-shrink-0";
+
     switch (type) {
       case "experience":
-        return template.id === "professional-navy" 
-          ? <Briefcase className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
-          : <Briefcase className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
+        iconElement = <Briefcase className={iconClass} />;
+        break;
       case "education":
-        return template.id === "professional-navy"
-          ? <GraduationCap className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
-          : <GraduationCap className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
+        iconElement = <GraduationCap className={iconClass} />;
+        break;
       case "certifications":
-        return template.id === "professional-navy"
-          ? <Award className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
-          : <Award className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
+        iconElement = <Award className={iconClass} />;
+        break;
       case "skills":
-        return template.id === "professional-navy"
-          ? <Code className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
-          : <Code className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
+        iconElement = <Code className={iconClass} />;
+        break;
       case "summary":
-        return template.id === "professional-navy"
-          ? <FileText className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
-          : <FileText className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
+        iconElement = <FileText className={iconClass} />;
+        break;
       case "profile":
-        return template.id === "professional-navy"
-          ? <User className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
-          : <User className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
+        iconElement = <User className={iconClass} />;
+        break;
       case "projects":
-        return template.id === "professional-navy"
-          ? <FolderKanban className="w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0" />
-          : <FolderKanban className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />;
+        iconElement = <FolderKanban className={iconClass} />;
+        break;
       default:
         return null;
     }
+
+    return (
+      <span className="pdf-section-icon" data-pdf-section-icon="true">
+        {iconElement}
+      </span>
+    );
   };
 
   if (template.id === "modern-professional") {
@@ -68,8 +73,19 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     );
   }
 
+  if (template.id === "modern-split") {
+    return (
+      <h3 className={template.style.sectionStyle}>
+        <span className="flex items-center">
+          <span className="inline-block w-2 h-0.5 bg-gray-400 mr-1 pdf-section-icon" data-pdf-section-divider="true"></span>
+          <span>{title}</span>
+        </span>
+      </h3>
+    );
+  }
+
   return (
-    <h3 className={template.style.sectionStyle}>
+    <h3 className={cn(template.style.sectionStyle)}>
       <div className="flex items-center">
         {getIcon()}
         <span>{title}</span>

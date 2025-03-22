@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -57,7 +56,7 @@ export function DownloadOptionsDialog({
     }
     
     try {
-      // Updated selector to match the resume content div
+      // Get the resume element
       const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
         console.error("Could not find element with id 'resume-content'");
@@ -71,173 +70,78 @@ export function DownloadOptionsDialog({
       // Wait for dialog to close and any transitions to complete
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      // 1. Clone the resume content to avoid modifying the original
+      const originalHtml = resumeElement.innerHTML;
+      const pdfPreparationDiv = document.createElement('div');
+      pdfPreparationDiv.id = 'pdf-preparation-div';
+      pdfPreparationDiv.style.position = 'absolute';
+      pdfPreparationDiv.style.left = '-9999px';
+      pdfPreparationDiv.style.width = `${resumeElement.offsetWidth}px`;
+      pdfPreparationDiv.style.height = `${resumeElement.offsetHeight}px`;
+      pdfPreparationDiv.style.overflow = 'hidden';
+      pdfPreparationDiv.innerHTML = originalHtml;
+      pdfPreparationDiv.className = resumeElement.className + ' pdf-mode';
+      document.body.appendChild(pdfPreparationDiv);
+
+      // 2. Force all icons to be rendered correctly in the clone
+      const allIcons = pdfPreparationDiv.querySelectorAll('[data-lucide]');
+      allIcons.forEach(icon => {
+        if (icon.parentElement) {
+          icon.parentElement.classList.add('pdf-section-icon');
+        }
+      });
+
+      // 3. Fix bullet points rendering
+      const bulletPoints = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet="true"]');
+      bulletPoints.forEach(bullet => {
+        bullet.style.display = 'inline-flex';
+        bullet.style.alignItems = 'center';
+        bullet.style.justifyContent = 'center';
+        bullet.style.flexShrink = '0';
+        bullet.style.marginTop = '5px';
+      });
+
+      // 4. Fix bullet lists
+      const bulletLists = pdfPreparationDiv.querySelectorAll('[data-pdf-bullet-list="true"]');
+      bulletLists.forEach(list => {
+        list.style.marginLeft = '0';
+        list.style.paddingLeft = '0';
+        list.style.listStyle = 'none';
+      });
+
       // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
       
-      // A4 dimensions in pixels (at 96 DPI)
-      const a4Width = 8.27 * 96; // 793.92 pixels
-      const a4Height = 11.69 * 96; // 1122.24 pixels
-
-      // Calculate scale to fit the resume content to A4 size while preserving aspect ratio
-      const contentWidth = resumeElement.offsetWidth;
-      const contentHeight = resumeElement.offsetHeight;
-      const scale = Math.min(a4Width / contentWidth, a4Height / contentHeight);
-      
-      // Store original styles
-      const originalStyles = {
-        transform: resumeElement.style.transform,
-        transition: resumeElement.style.transition,
-        width: resumeElement.style.width,
-        height: resumeElement.style.height,
-        position: resumeElement.style.position,
-        pointerEvents: resumeElement.style.pointerEvents,
-        transformOrigin: resumeElement.style.transformOrigin,
-        visibility: resumeElement.style.visibility
-      };
-      
-      // Fix for profile image and bullet points: add specific CSS class to the cloned content
-      const styleElement = document.createElement('style');
-      styleElement.textContent = `
-        .pdf-specific-fixes .rounded-full img {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover !important;
-          border-radius: 50% !important;
-        }
-        .pdf-specific-fixes .flex.items-start {
-          align-items: flex-start !important;
-        }
-        .pdf-specific-fixes li .inline-block {
-          vertical-align: top !important; 
-          margin-top: 4px !important;
-        }
-        .pdf-specific-fixes .space-y-1.5 li {
-          display: flex !important;
-          align-items: flex-start !important;
-        }
-        .pdf-specific-fixes .space-y-1 li {
-          display: flex !important;
-          align-items: flex-start !important;
-        }
-      `;
-      document.head.appendChild(styleElement);
-      
-      // Temporarily disable scale transform for capture
-      const originalTransform = resumeElement.style.transform;
-      resumeElement.style.transform = 'none';
-      
-      // Force the element to be visible and properly sized for capture
-      Object.assign(resumeElement.style, {
-        transition: 'none',
-        position: resumeElement.style.position || 'relative',
-        pointerEvents: 'none',
-        transformOrigin: 'top left',
-        visibility: 'visible'
-      });
-
-      // Force layout recalculation
-      resumeElement.getBoundingClientRect();
-      
-      // Temporarily disable any transitions or animations
-      const allElements = resumeElement.querySelectorAll('*');
-      const originalTransitions: string[] = [];
-      
-      allElements.forEach((el: Element) => {
-        const htmlEl = el as HTMLElement;
-        originalTransitions.push(htmlEl.style.transition);
-        htmlEl.style.transition = 'none';
-      });
-
-      console.log("Attempting to capture resume content with dimensions:", {
-        width: contentWidth,
-        height: contentHeight,
-        element: resumeElement
-      });
-
-      // Capture with improved settings
-      const canvas = await html2canvas(resumeElement, {
-        scale: pixelRatio * 2, // Double the scale for sharper images
+      // Capture settings
+      const captureSettings = {
+        scale: pixelRatio * 2.5, // Increase scale for higher quality
         useCORS: true,
         allowTaint: true,
-        logging: true, // Enable logging for debugging
         backgroundColor: "#ffffff",
-        imageTimeout: 15000, // Increase timeout for complex resumes
+        imageTimeout: 15000,
         windowWidth: document.documentElement.offsetWidth,
         windowHeight: document.documentElement.offsetHeight,
-        onclone: (clonedDocument, element) => {
-          const clonedElement = element as HTMLElement;
-          
-          // Add the PDF-specific class to the cloned element
-          clonedElement.classList.add('pdf-specific-fixes');
-          
-          // Apply exact styling to the cloned element
-          clonedElement.style.transform = 'none';
-          clonedElement.style.transformOrigin = 'top left';
-          clonedElement.style.width = `${contentWidth}px`;
-          clonedElement.style.height = `${contentHeight}px`;
-          
-          // Fix alignment of list items in the cloned document
-          const listItems = clonedElement.querySelectorAll('li');
-          listItems.forEach(li => {
-            const bulletPoint = li.querySelector('.inline-block');
-            const textContent = li.querySelector('[contenteditable]') || li.lastChild;
-            
-            if (bulletPoint && textContent) {
-              bulletPoint.classList.add('bullet-point-fix');
-            }
-          });
-          
-          // Fix circular images in the cloned document
-          const profileImages = clonedElement.querySelectorAll('.rounded-full');
-          profileImages.forEach(img => {
-            img.classList.add('profile-image-fix');
-          });
-          
-          // Ensure fonts are properly loaded in the clone
-          const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
-          const head = clonedDocument.head;
-          
-          fontLinks.forEach(link => {
-            // Fixed TypeScript error by properly casting to HTMLLinkElement
-            const linkEl = link as HTMLLinkElement;
-            if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
-              const newLink = clonedDocument.createElement('link');
-              newLink.rel = 'stylesheet';
-              newLink.href = linkEl.href;
-              head.appendChild(newLink);
-            }
-          });
-          
-          // Make sure all fonts have loaded in the clone
+        onclone: (clonedDoc: Document) => {
+          // Add any additional fixes to the cloned document if needed
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 300); // Increased delay to ensure rendering
+                setTimeout(resolve, 500); // Ensure fonts and icons are loaded
               });
             } else {
-              // Fallback if document.fonts is not available
-              setTimeout(resolve, 400);
+              setTimeout(resolve, 500);
             }
           });
         }
-      });
+      };
 
-      // Remove the temporary style element
-      document.head.removeChild(styleElement);
+      // 5. Capture the prepared element
+      const canvas = await html2canvas(pdfPreparationDiv, captureSettings);
+      
+      // 6. Remove the preparation div
+      document.body.removeChild(pdfPreparationDiv);
 
-      // Restore original transitions
-      allElements.forEach((el: Element, index: number) => {
-        (el as HTMLElement).style.transition = originalTransitions[index];
-      });
-
-      // Restore original transform and other styles
-      resumeElement.style.transform = originalTransform;
-      Object.assign(resumeElement.style, originalStyles);
-
-      // Force browser to repaint
-      resumeElement.getBoundingClientRect();
-
-      // Create PDF with the exact A4 dimensions
+      // 7. Create PDF with the exact A4 dimensions
       const pdfWidth = 210; // A4 width in mm
       const pdfHeight = 297; // A4 height in mm
       
@@ -245,14 +149,13 @@ export function DownloadOptionsDialog({
         format: 'a4',
         unit: 'mm',
         orientation: 'portrait',
-        compress: true,
-        precision: 16 // Higher precision for better positioning
+        compress: true
       });
 
       // Convert canvas to image
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
-      // Calculate dimensions to maintain aspect ratio and fit A4
+      // Calculate dimensions to maintain aspect ratio
       const canvasAspectRatio = canvas.width / canvas.height;
       const a4AspectRatio = pdfWidth / pdfHeight;
       

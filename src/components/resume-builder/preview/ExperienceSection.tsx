@@ -92,6 +92,7 @@ export function ExperienceSection({
               isEditing={isEditing}
               onEdit={() => handleEditExperience(index)}
               onDelete={() => handleDeleteExperience(index)}
+              template={template.id}
             />
           ))}
           
