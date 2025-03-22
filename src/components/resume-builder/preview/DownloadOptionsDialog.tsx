@@ -1,8 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { FileDown, Lock, Loader2 } from "lucide-react";
-import { useState, useRef } from "react";
+import { FileDown, Lock } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -20,10 +20,8 @@ export function DownloadOptionsDialog({
 }: DownloadOptionsDialogProps) {
   const [open, setOpen] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
-  const [downloadInProgress, setDownloadInProgress] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const toastIdRef = useRef<string | number | undefined>();
 
   // Fetch user profile to check subscription status
   const { data: profile } = useQuery({
@@ -49,133 +47,6 @@ export function DownloadOptionsDialog({
     profile.subscription_plan && 
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
-  const prepareResumeForCapture = (resumeElement: HTMLElement) => {
-    // Inject PDF-specific CSS class for better styling during capture
-    resumeElement.classList.add('pdf-generation-mode');
-    
-    // Store original styles
-    const originalStyles = {
-      transform: resumeElement.style.transform,
-      transition: resumeElement.style.transition,
-      width: resumeElement.style.width,
-      height: resumeElement.style.height,
-      position: resumeElement.style.position,
-      zoom: resumeElement.style.zoom,
-      transformOrigin: resumeElement.style.transformOrigin,
-      visibility: resumeElement.style.visibility
-    };
-    
-    // Temporarily disable transforms for capture
-    resumeElement.style.transform = 'none';
-    resumeElement.style.transition = 'none';
-    resumeElement.style.zoom = '1';
-    resumeElement.style.position = resumeElement.style.position || 'relative';
-    resumeElement.style.transformOrigin = 'top left';
-    resumeElement.style.visibility = 'visible';
-    
-    // Force layout recalculation
-    resumeElement.getBoundingClientRect();
-    
-    // Temporarily disable any transitions or animations on all elements
-    const allElements = resumeElement.querySelectorAll('*');
-    const originalTransitions: string[] = [];
-    
-    allElements.forEach((el: Element) => {
-      const htmlEl = el as HTMLElement;
-      originalTransitions.push(htmlEl.style.transition);
-      htmlEl.style.transition = 'none';
-    });
-    
-    // Enhance bullet point containers and icons
-    const bulletPointContainers = resumeElement.querySelectorAll('.bullet-point-container');
-    bulletPointContainers.forEach((container) => {
-      (container as HTMLElement).style.display = 'flex';
-      (container as HTMLElement).style.alignItems = 'flex-start';
-      (container as HTMLElement).style.pageBreakInside = 'avoid';
-      (container as HTMLElement).style.breakInside = 'avoid';
-      (container as HTMLElement).style.marginBottom = '0.25rem';
-    });
-    
-    const bulletPointIcons = resumeElement.querySelectorAll('.bullet-point-icon');
-    bulletPointIcons.forEach((icon) => {
-      (icon as HTMLElement).style.display = 'inline-flex';
-      (icon as HTMLElement).style.alignItems = 'center';
-      (icon as HTMLElement).style.justifyContent = 'center';
-      (icon as HTMLElement).style.flexShrink = '0';
-      (icon as HTMLElement).style.marginRight = '0.5rem';
-      (icon as HTMLElement).style.position = 'relative';
-      (icon as HTMLElement).style.top = '0.25rem';
-    });
-    
-    const bulletPointTexts = resumeElement.querySelectorAll('.bullet-point-text');
-    bulletPointTexts.forEach((text) => {
-      (text as HTMLElement).style.flex = '1 1 auto';
-      (text as HTMLElement).style.lineHeight = '1.5';
-    });
-    
-    // Special handling for section icons
-    const sectionIcons = resumeElement.querySelectorAll('.section-icon-container');
-    sectionIcons.forEach((icon) => {
-      (icon as HTMLElement).style.display = 'inline-flex';
-      (icon as HTMLElement).style.alignItems = 'center';
-      (icon as HTMLElement).style.justifyContent = 'center';
-      (icon as HTMLElement).style.flexShrink = '0';
-      (icon as HTMLElement).style.marginRight = '0.5rem';
-    });
-    
-    // Special handling for template-specific bullet points
-    const templateBullets = resumeElement.querySelectorAll(
-      '.executive-clean-bullet, .modern-split-bullet, .minimal-elegant-bullet, ' + 
-      '.professional-executive-bullet, .modern-professional-bullet, .professional-navy-bullet'
-    );
-    
-    templateBullets.forEach((bullet) => {
-      (bullet as HTMLElement).style.display = 'inline-flex';
-      (bullet as HTMLElement).style.alignItems = 'center';
-      (bullet as HTMLElement).style.justifyContent = 'center';
-    });
-    
-    // Special handling for profile images
-    const profileImages = resumeElement.querySelectorAll('.rounded-full');
-    profileImages.forEach(img => {
-      (img as HTMLElement).style.overflow = 'hidden';
-      (img as HTMLElement).style.borderRadius = '50%';
-      const imageElement = img.querySelector('img');
-      if (imageElement) {
-        imageElement.style.objectFit = 'cover';
-        imageElement.style.width = '100%';
-        imageElement.style.height = '100%';
-      }
-    });
-    
-    return {
-      originalStyles,
-      originalTransitions,
-      allElements
-    };
-  };
-  
-  const restoreResumeStyles = (
-    resumeElement: HTMLElement, 
-    originalStyles: Record<string, string>,
-    allElements: NodeListOf<Element>,
-    originalTransitions: string[]
-  ) => {
-    // Remove the PDF-specific class
-    resumeElement.classList.remove('pdf-generation-mode');
-    
-    // Restore original styles
-    Object.assign(resumeElement.style, originalStyles);
-    
-    // Restore original transitions
-    allElements.forEach((el: Element, index: number) => {
-      (el as HTMLElement).style.transition = originalTransitions[index];
-    });
-    
-    // Force browser to repaint
-    resumeElement.getBoundingClientRect();
-  };
-
   const handleDownloadPDF = async () => {
     setOpen(false);
     
@@ -186,90 +57,109 @@ export function DownloadOptionsDialog({
     }
     
     try {
-      // Set download in progress
-      setDownloadInProgress(true);
-      
-      // Show loading toast
-      toastIdRef.current = toast.loading("Preparing your pixel-perfect PDF...");
-      
-      // Get the resume element
+      // Updated selector to match the resume content div
       const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
         console.error("Could not find element with id 'resume-content'");
         toast.error("Could not find resume content. Please try again later.");
-        setDownloadInProgress(false);
         return;
       }
 
-      // Wait for any dialog to close and transitions to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      // Show loading toast
+      const loadingToast = toast.loading("Generating PDF...");
+
+      // Wait for dialog to close and any transitions to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
+      
+      // A4 dimensions in pixels (at 96 DPI)
+      const a4Width = 8.27 * 96; // 793.92 pixels
+      const a4Height = 11.69 * 96; // 1122.24 pixels
+
+      // Calculate scale to fit the resume content to A4 size while preserving aspect ratio
       const contentWidth = resumeElement.offsetWidth;
       const contentHeight = resumeElement.offsetHeight;
-
-      // Prepare the resume element for capture and store original styles
-      const { originalStyles, originalTransitions, allElements } = prepareResumeForCapture(resumeElement);
+      const scale = Math.min(a4Width / contentWidth, a4Height / contentHeight);
       
-      // Add a temporary style element for capture-specific fixes
+      // Store original styles
+      const originalStyles = {
+        transform: resumeElement.style.transform,
+        transition: resumeElement.style.transition,
+        width: resumeElement.style.width,
+        height: resumeElement.style.height,
+        position: resumeElement.style.position,
+        pointerEvents: resumeElement.style.pointerEvents,
+        transformOrigin: resumeElement.style.transformOrigin,
+        visibility: resumeElement.style.visibility
+      };
+      
+      // Fix for profile image and bullet points: add specific CSS class to the cloned content
       const styleElement = document.createElement('style');
       styleElement.textContent = `
-        .pdf-generation-mode {
-          transform: none !important;
-          transition: none !important;
-        }
-        .pdf-generation-mode * {
-          transition: none !important;
-          animation: none !important;
-        }
-        .pdf-generation-mode .bullet-point-container {
-          display: flex !important;
-          align-items: flex-start !important;
-          page-break-inside: avoid !important;
-          break-inside: avoid !important;
-          margin-bottom: 0.25rem !important;
-          position: relative !important;
-        }
-        .pdf-generation-mode .bullet-point-icon {
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          flex-shrink: 0 !important;
-          margin-right: 0.5rem !important;
-          position: relative !important;
-          top: 0.25rem !important;
-        }
-        .pdf-generation-mode .bullet-point-text {
-          flex: 1 1 auto !important;
-          display: inline-block !important;
-          line-height: 1.5 !important;
-        }
-        .pdf-generation-mode .section-icon-container {
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          flex-shrink: 0 !important;
-          margin-right: 0.5rem !important;
-        }
-        .pdf-generation-mode .rounded-full {
-          overflow: hidden !important;
-          border-radius: 50% !important;
-        }
-        .pdf-generation-mode .rounded-full img {
-          object-fit: cover !important;
+        .pdf-specific-fixes .rounded-full img {
           width: 100% !important;
           height: 100% !important;
+          object-fit: cover !important;
+          border-radius: 50% !important;
+        }
+        .pdf-specific-fixes .flex.items-start {
+          align-items: flex-start !important;
+        }
+        .pdf-specific-fixes li .inline-block {
+          vertical-align: top !important; 
+          margin-top: 4px !important;
+        }
+        .pdf-specific-fixes .space-y-1.5 li {
+          display: flex !important;
+          align-items: flex-start !important;
+        }
+        .pdf-specific-fixes .space-y-1 li {
+          display: flex !important;
+          align-items: flex-start !important;
         }
       `;
       document.head.appendChild(styleElement);
+      
+      // Temporarily disable scale transform for capture
+      const originalTransform = resumeElement.style.transform;
+      resumeElement.style.transform = 'none';
+      
+      // Force the element to be visible and properly sized for capture
+      Object.assign(resumeElement.style, {
+        transition: 'none',
+        position: resumeElement.style.position || 'relative',
+        pointerEvents: 'none',
+        transformOrigin: 'top left',
+        visibility: 'visible'
+      });
 
-      // Capture with enhanced settings
+      // Force layout recalculation
+      resumeElement.getBoundingClientRect();
+      
+      // Temporarily disable any transitions or animations
+      const allElements = resumeElement.querySelectorAll('*');
+      const originalTransitions: string[] = [];
+      
+      allElements.forEach((el: Element) => {
+        const htmlEl = el as HTMLElement;
+        originalTransitions.push(htmlEl.style.transition);
+        htmlEl.style.transition = 'none';
+      });
+
+      console.log("Attempting to capture resume content with dimensions:", {
+        width: contentWidth,
+        height: contentHeight,
+        element: resumeElement
+      });
+
+      // Capture with improved settings
       const canvas = await html2canvas(resumeElement, {
-        scale: pixelRatio * 4, // Quadruple the scale for razor-sharp images
+        scale: pixelRatio * 2, // Double the scale for sharper images
         useCORS: true,
         allowTaint: true,
-        logging: false,
+        logging: true, // Enable logging for debugging
         backgroundColor: "#ffffff",
         imageTimeout: 15000, // Increase timeout for complex resumes
         windowWidth: document.documentElement.offsetWidth,
@@ -277,8 +167,8 @@ export function DownloadOptionsDialog({
         onclone: (clonedDocument, element) => {
           const clonedElement = element as HTMLElement;
           
-          // Add PDF-specific class to the cloned element too
-          clonedElement.classList.add('pdf-generation-mode');
+          // Add the PDF-specific class to the cloned element
+          clonedElement.classList.add('pdf-specific-fixes');
           
           // Apply exact styling to the cloned element
           clonedElement.style.transform = 'none';
@@ -286,54 +176,68 @@ export function DownloadOptionsDialog({
           clonedElement.style.width = `${contentWidth}px`;
           clonedElement.style.height = `${contentHeight}px`;
           
-          // Enhance all bullet points in the clone
-          const bulletPointContainers = clonedElement.querySelectorAll('.bullet-point-container');
-          bulletPointContainers.forEach((container) => {
-            (container as HTMLElement).style.display = 'flex';
-            (container as HTMLElement).style.alignItems = 'flex-start';
-            (container as HTMLElement).style.pageBreakInside = 'avoid';
-            (container as HTMLElement).style.breakInside = 'avoid';
-            (container as HTMLElement).style.marginBottom = '0.25rem';
+          // Fix alignment of list items in the cloned document
+          const listItems = clonedElement.querySelectorAll('li');
+          listItems.forEach(li => {
+            const bulletPoint = li.querySelector('.inline-block');
+            const textContent = li.querySelector('[contenteditable]') || li.lastChild;
+            
+            if (bulletPoint && textContent) {
+              bulletPoint.classList.add('bullet-point-fix');
+            }
           });
           
-          const bulletPointIcons = clonedElement.querySelectorAll('.bullet-point-icon');
-          bulletPointIcons.forEach((icon) => {
-            (icon as HTMLElement).style.display = 'inline-flex';
-            (icon as HTMLElement).style.alignItems = 'center';
-            (icon as HTMLElement).style.justifyContent = 'center';
-            (icon as HTMLElement).style.flexShrink = '0';
-            (icon as HTMLElement).style.marginRight = '0.5rem';
-            (icon as HTMLElement).style.position = 'relative';
-            (icon as HTMLElement).style.top = '0.25rem';
+          // Fix circular images in the cloned document
+          const profileImages = clonedElement.querySelectorAll('.rounded-full');
+          profileImages.forEach(img => {
+            img.classList.add('profile-image-fix');
           });
           
-          const bulletPointTexts = clonedElement.querySelectorAll('.bullet-point-text');
-          bulletPointTexts.forEach((text) => {
-            (text as HTMLElement).style.flex = '1 1 auto';
-            (text as HTMLElement).style.lineHeight = '1.5';
+          // Ensure fonts are properly loaded in the clone
+          const fontLinks = Array.from(clonedDocument.querySelectorAll('link[rel="stylesheet"]'));
+          const head = clonedDocument.head;
+          
+          fontLinks.forEach(link => {
+            // Fixed TypeScript error by properly casting to HTMLLinkElement
+            const linkEl = link as HTMLLinkElement;
+            if (linkEl.href.includes('fonts.googleapis.com') || linkEl.href.includes('fonts')) {
+              const newLink = clonedDocument.createElement('link');
+              newLink.rel = 'stylesheet';
+              newLink.href = linkEl.href;
+              head.appendChild(newLink);
+            }
           });
           
-          // Wait for fonts to load in the clone
+          // Make sure all fonts have loaded in the clone
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 600); // Increased delay to ensure rendering
+                setTimeout(resolve, 300); // Increased delay to ensure rendering
               });
             } else {
               // Fallback if document.fonts is not available
-              setTimeout(resolve, 700);
+              setTimeout(resolve, 400);
             }
           });
         }
       });
 
-      // Remove temporary style element
+      // Remove the temporary style element
       document.head.removeChild(styleElement);
-      
-      // Restore resume styles
-      restoreResumeStyles(resumeElement, originalStyles, allElements, originalTransitions);
 
-      // Create PDF with precise A4 dimensions
+      // Restore original transitions
+      allElements.forEach((el: Element, index: number) => {
+        (el as HTMLElement).style.transition = originalTransitions[index];
+      });
+
+      // Restore original transform and other styles
+      resumeElement.style.transform = originalTransform;
+      Object.assign(resumeElement.style, originalStyles);
+
+      // Force browser to repaint
+      resumeElement.getBoundingClientRect();
+
+      // Create PDF with the exact A4 dimensions
       const pdfWidth = 210; // A4 width in mm
       const pdfHeight = 297; // A4 height in mm
       
@@ -345,7 +249,7 @@ export function DownloadOptionsDialog({
         precision: 16 // Higher precision for better positioning
       });
 
-      // Convert canvas to image with highest quality
+      // Convert canvas to image
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
       // Calculate dimensions to maintain aspect ratio and fit A4
@@ -377,30 +281,18 @@ export function DownloadOptionsDialog({
         imgWidth,
         imgHeight,
         undefined,
-        'FAST' // Faster compression
+        'FAST'
       );
 
-      // Add metadata to the PDF
-      pdf.setProperties({
-        title: 'Professional Resume',
-        subject: 'Resume',
-        creator: 'Rezume.dev',
-        keywords: 'resume, professional, career',
-        author: user?.email || 'User'
-      });
-
       // Save PDF directly
-      pdf.save('professional-resume.pdf');
+      pdf.save('resume.pdf');
       
       // Clear loading toast and show success
-      toast.dismiss(toastIdRef.current);
-      toast.success("Pixel-perfect PDF generated successfully!");
+      toast.dismiss(loadingToast);
+      toast.success("PDF downloaded successfully!");
     } catch (error) {
       console.error('PDF generation error:', error);
-      toast.dismiss(toastIdRef.current);
       toast.error("Failed to generate PDF. Please try again.");
-    } finally {
-      setDownloadInProgress(false);
     }
   };
 
@@ -416,42 +308,23 @@ export function DownloadOptionsDialog({
           variant="default" 
           size="sm"
           onClick={() => setOpen(true)}
-          disabled={isDownloading || downloadInProgress}
+          disabled={isDownloading}
           className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary/90 text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
         >
-          {downloadInProgress ? (
-            <>
-              <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
-              <span>Generating...</span>
-            </>
-          ) : (
-            <>
-              <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>{isDownloading ? "Preparing..." : "Download"}</span>
-            </>
-          )}
+          <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span>{isDownloading ? "Preparing..." : "Download"}</span>
         </Button>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Download Resume</DialogTitle>
-            <DialogDescription>
-              Get a pixel-perfect PDF of your resume for printing or sharing
-            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <Button 
               className="w-full" 
               onClick={handleDownloadPDF}
-              disabled={isDownloading || downloadInProgress}
+              disabled={isDownloading}
             >
-              {downloadInProgress ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generating PDF...
-                </>
-              ) : (
-                "Download as PDF"
-              )}
+              Download as PDF
             </Button>
           </div>
         </DialogContent>

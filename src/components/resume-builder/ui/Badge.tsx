@@ -1,46 +1,39 @@
 
-import { ReactNode } from 'react';
 import { cn } from "@/lib/utils";
+import { ReactNode } from "react";
 
 interface BadgeProps {
   children: ReactNode;
-  variant?: 'default' | 'primary' | 'secondary' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "success" | "warning";
+  size?: "sm" | "md";
   icon?: ReactNode;
-  className?: string;
 }
 
 export function Badge({ 
   children, 
-  variant = 'default', 
-  size = 'md',
-  icon,
-  className 
+  variant = "primary", 
+  size = "md", 
+  icon 
 }: BadgeProps) {
-  // Define badge styles based on variant
-  const variantStyles = {
-    default: "bg-gray-100 text-gray-800",
+  const variantClasses = {
     primary: "bg-primary/10 text-primary",
-    secondary: "bg-secondary/80 text-secondary-foreground",
-    outline: "bg-transparent border border-gray-200 text-gray-700"
+    success: "bg-green-100 text-green-800",
+    warning: "bg-amber-100 text-amber-800",
   };
   
-  // Define badge sizes
-  const sizeStyles = {
-    sm: "text-xs px-2 py-0.5 rounded-full",
-    md: "text-xs px-2.5 py-1 rounded-full",
-    lg: "text-sm px-3 py-1 rounded-full"
+  const sizeClasses = {
+    sm: "text-[10px] px-1.5 py-0.5",
+    md: "text-xs px-2 py-1",
   };
   
   return (
     <div className={cn(
-      "inline-flex items-center font-medium", 
-      variantStyles[variant], 
-      sizeStyles[size],
-      className
+      "rounded-full transition-colors duration-300 flex items-center gap-1",
+      variantClasses[variant],
+      sizeClasses[size]
     )}>
-      {icon && <span className="mr-1">{icon}</span>}
-      {children}
+      {icon && icon}
+      <span>{children}</span>
     </div>
   );
 }

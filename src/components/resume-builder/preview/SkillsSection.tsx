@@ -1,8 +1,6 @@
-
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
 import { SectionHeader } from "./SectionHeader";
-import { BulletPoint } from "../ui/BulletPoint";
 
 interface SkillsSectionProps {
   hardSkills: string[];
@@ -108,6 +106,7 @@ export function SkillsSection({
   };
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+
   const usesBulletPoints = template.id === "modern-split" || template.id === "professional-executive" || template.id === "minimal-elegant" || template.id === "modern-professional" || template.id === "professional-navy";
 
   // Professional Navy template (now formatted similar to Modern Professional)
@@ -122,7 +121,10 @@ export function SkillsSection({
               <h4 className={currentStyle.skillType}>Technical Skills</h4>
               <ul className="space-y-1.5 mt-2">
                 {hardSkills.map((skill, index) => (
-                  <BulletPoint key={index} template={template}>
+                  <li key={index} className="flex items-center">
+                    <span className="inline-flex items-center justify-center w-3 h-3 text-[#0F2B5B] mr-2 shrink-0">
+                      ➤
+                    </span>
                     <span
                       className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
@@ -130,7 +132,7 @@ export function SkillsSection({
                     >
                       {skill}
                     </span>
-                  </BulletPoint>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -141,7 +143,10 @@ export function SkillsSection({
               <h4 className={currentStyle.skillType}>Soft Skills</h4>
               <ul className="space-y-1.5 mt-2">
                 {softSkills.map((skill, index) => (
-                  <BulletPoint key={index} template={template}>
+                  <li key={index} className="flex items-center">
+                    <span className="inline-flex items-center justify-center w-3 h-3 text-[#0F2B5B] mr-2 shrink-0">
+                      ➤
+                    </span>
                     <span
                       className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
@@ -149,7 +154,7 @@ export function SkillsSection({
                     >
                       {skill}
                     </span>
-                  </BulletPoint>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -171,7 +176,10 @@ export function SkillsSection({
               <h4 className={currentStyle.skillType}>Technical Skills</h4>
               <ul className="space-y-1.5 mt-2">
                 {hardSkills.map((skill, index) => (
-                  <BulletPoint key={index} template={template}>
+                  <li key={index} className="flex items-center">
+                    <span className="inline-flex items-center justify-center w-3 h-3 text-emerald-600 mr-2 shrink-0">
+                      ➤
+                    </span>
                     <span
                       className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
@@ -179,7 +187,7 @@ export function SkillsSection({
                     >
                       {skill}
                     </span>
-                  </BulletPoint>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -190,7 +198,10 @@ export function SkillsSection({
               <h4 className={currentStyle.skillType}>Soft Skills</h4>
               <ul className="space-y-1.5 mt-2">
                 {softSkills.map((skill, index) => (
-                  <BulletPoint key={index} template={template}>
+                  <li key={index} className="flex items-center">
+                    <span className="inline-flex items-center justify-center w-3 h-3 text-emerald-600 mr-2 shrink-0">
+                      ➤
+                    </span>
                     <span
                       className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
@@ -198,7 +209,7 @@ export function SkillsSection({
                     >
                       {skill}
                     </span>
-                  </BulletPoint>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -235,7 +246,8 @@ export function SkillsSection({
             {usesBulletPoints ? (
               <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
                 {hardSkills.map((skill, index) => (
-                  <BulletPoint key={index} template={template}>
+                  <li key={index} className="flex items-center">
+                    <span className={`inline-flex items-center justify-center w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mr-2 shrink-0`}></span>
                     <span
                       className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
@@ -243,7 +255,7 @@ export function SkillsSection({
                     >
                       {skill}
                     </span>
-                  </BulletPoint>
+                  </li>
                 ))}
               </ul>
             ) : (
@@ -269,7 +281,8 @@ export function SkillsSection({
             {usesBulletPoints ? (
               <ul className={template.id === "modern-split" ? "space-y-1" : "space-y-1"}>
                 {softSkills.map((skill, index) => (
-                  <BulletPoint key={index} template={template}>
+                  <li key={index} className="flex items-center">
+                    <span className={`inline-flex items-center justify-center w-1.5 h-1.5 rounded-full ${template.id === "modern-split" ? "bg-indigo-400" : "bg-black"} mr-2 shrink-0`}></span>
                     <span
                       className={`outline-none ${currentStyle.skillList} flex-1`}
                       contentEditable={isEditing}
@@ -277,7 +290,7 @@ export function SkillsSection({
                     >
                       {skill}
                     </span>
-                  </BulletPoint>
+                  </li>
                 ))}
               </ul>
             ) : (

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Loader2, Camera, Trash2 } from "lucide-react";
@@ -57,15 +58,6 @@ export function ProfileImageButton({
                     src={currentImageUrl} 
                     alt="Profile" 
                     className="object-cover"
-                    onError={(e) => {
-                      // Fallback if image fails to load
-                      const target = e.target as HTMLImageElement;
-                      target.onerror = null; // Prevent infinite error loop
-                      console.error("Failed to load profile image:", currentImageUrl);
-                      // We don't remove the image src because we want to keep trying to load it
-                      // Just make the error less visible
-                      target.style.opacity = "0.5";
-                    }}
                   />
                   <AvatarFallback className="text-2xl bg-primary/10 text-primary">
                     {initials}

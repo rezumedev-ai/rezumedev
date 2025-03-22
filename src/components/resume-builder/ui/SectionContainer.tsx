@@ -1,5 +1,5 @@
 
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface SectionContainerProps {
@@ -9,7 +9,7 @@ interface SectionContainerProps {
 
 export function SectionContainer({ children, className }: SectionContainerProps) {
   return (
-    <div className={cn("mb-6", className)}>
+    <div className={cn("mt-1", className)}>
       {children}
     </div>
   );
