@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -86,23 +85,46 @@ export function DownloadOptionsDialog({
       
       document.body.appendChild(clonedResume);
 
-      // 2. Adjust bullet points in the cloned content
+      // 2. Keep SVG Icons intact for section headers
+      const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
+      sectionIcons.forEach(iconContainer => {
+        const iconElement = iconContainer as HTMLElement;
+        iconElement.style.display = 'inline-flex';
+        iconElement.style.alignItems = 'center';
+        iconElement.style.justifyContent = 'center';
+        iconElement.style.marginRight = '8px';
+        iconElement.style.verticalAlign = 'middle';
+        iconElement.style.flexShrink = '0';
+        
+        // Make sure SVG is preserved
+        const svg = iconElement.querySelector('svg');
+        if (svg) {
+          (svg as HTMLElement).style.width = '20px';
+          (svg as HTMLElement).style.height = '20px';
+          (svg as HTMLElement).style.flexShrink = '0';
+          (svg as HTMLElement).style.display = 'inline-block';
+          (svg as HTMLElement).style.verticalAlign = 'middle';
+        }
+      });
+
+      // 3. Adjust bullet points in the cloned content
       const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
-        // Replace the bullet element with a text character
-        bulletElement.textContent = '•';
-        bulletElement.style.width = 'auto';
-        bulletElement.style.height = 'auto';
-        bulletElement.style.display = 'inline-block';
+        bulletElement.style.width = '5px';
+        bulletElement.style.height = '5px';
+        bulletElement.style.minWidth = '5px';
+        bulletElement.style.minHeight = '5px';
+        bulletElement.style.display = 'inline-flex';
+        bulletElement.style.justifyContent = 'center';
+        bulletElement.style.alignItems = 'center';
         bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '3px'; // Move bullet down to align properly
-        bulletElement.style.fontSize = '16px';
-        bulletElement.style.lineHeight = '1';
-        bulletElement.className = 'pdf-bullet-char';
+        bulletElement.style.marginTop = '6px'; // Adjust vertical alignment
+        bulletElement.style.borderRadius = '50%';
+        bulletElement.style.backgroundColor = 'currentColor';
       });
 
-      // 3. Fix bullet lists
+      // 4. Fix bullet lists
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
         const listElement = list as HTMLElement;
@@ -111,49 +133,13 @@ export function DownloadOptionsDialog({
         listElement.style.listStyle = 'none';
       });
 
-      // 4. Fix bullet items
+      // 5. Fix bullet items
       const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
         itemElement.style.display = 'flex';
         itemElement.style.alignItems = 'flex-start';
         itemElement.style.marginBottom = '4px';
-      });
-
-      // 5. Fix section icons as well
-      const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
-      sectionIcons.forEach(icon => {
-        const iconElement = icon as HTMLElement;
-        // Check if contains an SVG
-        const svg = iconElement.querySelector('svg');
-        if (svg) {
-          // Replace SVG with a simple symbol based on the icon type
-          const iconType = svg.getAttribute('data-lucide') || '';
-          let iconSymbol = '•';
-          
-          // Create a replacement element with the icon symbol
-          switch (iconType.toLowerCase()) {
-            case 'briefcase': iconSymbol = '💼'; break;
-            case 'graduation-cap': iconSymbol = '🎓'; break;
-            case 'award': iconSymbol = '🏆'; break;
-            case 'code': iconSymbol = '💻'; break;
-            case 'file-text': iconSymbol = '📄'; break;
-            case 'user': iconSymbol = '👤'; break;
-            case 'folder-kanban': iconSymbol = '📂'; break;
-          }
-          
-          // Create a span with the icon symbol that will render properly in PDF
-          const iconSpan = document.createElement('span');
-          iconSpan.textContent = iconSymbol;
-          iconSpan.className = 'pdf-icon-text';
-          iconSpan.style.marginRight = '8px';
-          iconSpan.style.fontSize = '14px';
-          
-          // Replace the SVG with our text representation
-          if (iconElement.contains(svg)) {
-            iconElement.replaceChild(iconSpan, svg);
-          }
-        }
       });
 
       // Get device pixel ratio for better quality

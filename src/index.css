@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -166,6 +167,15 @@
     justify-content: center !important;
     flex-shrink: 0 !important;
     margin-right: 8px !important;
+    vertical-align: middle !important;
+  }
+  
+  /* Ensure SVG icons are preserved properly */
+  .pdf-mode #resume-content .pdf-section-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-block !important;
+    flex-shrink: 0 !important;
     vertical-align: middle !important;
   }
 
