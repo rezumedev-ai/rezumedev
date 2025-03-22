@@ -111,16 +111,21 @@ export function DownloadOptionsDialog({
         .pdf-specific-fixes li .inline-flex,
         .pdf-specific-fixes li .bullet-point {
           vertical-align: top !important; 
-          margin-top: 6px !important;
-          display: inline-flex !important;
+          margin-top: 0.375rem !important;
+          display: inline-block !important;
           flex-shrink: 0 !important;
+          width: 6px !important;
+          height: 6px !important;
           min-width: 6px !important;
           min-height: 6px !important;
+          border-radius: 50% !important;
+          background-color: #000 !important;
         }
         .pdf-specific-fixes .responsibility-text {
           display: inline-block !important;
           flex: 1 !important;
           line-height: 1.4 !important;
+          vertical-align: top !important;
         }
         .pdf-specific-fixes .space-y-1.5 li,
         .pdf-specific-fixes .space-y-1 li,
@@ -129,6 +134,8 @@ export function DownloadOptionsDialog({
           align-items: flex-start !important;
           margin-bottom: 4px !important;
           position: relative !important;
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -190,15 +197,28 @@ export function DownloadOptionsDialog({
           // Fix alignment of list items in the cloned document
           const listItems = clonedElement.querySelectorAll('li');
           listItems.forEach(li => {
+            // Ensure proper styling on the li element
+            li.style.display = 'flex';
+            li.style.alignItems = 'flex-start';
+            li.style.marginBottom = '4px';
+            li.style.position = 'relative';
+            li.style.pageBreakInside = 'avoid';
+            li.style.breakInside = 'avoid';
+            
             const bulletPoint = li.querySelector('.bullet-point') || li.querySelector('.inline-block') || li.querySelector('.inline-flex');
             
             if (bulletPoint) {
-              bulletPoint.classList.add('bullet-point-fix');
-              (bulletPoint as HTMLElement).style.marginTop = '6px';
+              (bulletPoint as HTMLElement).style.display = 'inline-block';
+              (bulletPoint as HTMLElement).style.verticalAlign = 'top';
+              (bulletPoint as HTMLElement).style.marginTop = '0.375rem'; // 6px
+              (bulletPoint as HTMLElement).style.flexShrink = '0';
+              (bulletPoint as HTMLElement).style.width = '6px';
+              (bulletPoint as HTMLElement).style.height = '6px';
               (bulletPoint as HTMLElement).style.minWidth = '6px';
               (bulletPoint as HTMLElement).style.minHeight = '6px';
-              (bulletPoint as HTMLElement).style.display = 'inline-flex';
-              (bulletPoint as HTMLElement).style.flexShrink = '0';
+              (bulletPoint as HTMLElement).style.borderRadius = '50%';
+              (bulletPoint as HTMLElement).style.backgroundColor = '#000';
+              (bulletPoint as HTMLElement).style.marginRight = '8px';
             }
             
             // Ensure the text content has proper styling
@@ -207,13 +227,8 @@ export function DownloadOptionsDialog({
               (textContent as HTMLElement).style.display = 'inline-block';
               (textContent as HTMLElement).style.flex = '1';
               (textContent as HTMLElement).style.lineHeight = '1.4';
+              (textContent as HTMLElement).style.verticalAlign = 'top';
             }
-            
-            // Ensure the li itself has proper styling
-            li.style.display = 'flex';
-            li.style.alignItems = 'flex-start';
-            li.style.marginBottom = '4px';
-            li.style.position = 'relative';
           });
           
           // Fix circular images in the cloned document

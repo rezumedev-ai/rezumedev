@@ -38,7 +38,7 @@ export function ExperienceItem({
       <ul className="mt-2 text-sm text-gray-600 space-y-1 responsibility-list">
         {experience.responsibilities.map((resp, respIndex) => (
           <li key={respIndex} className="flex items-start">
-            <span className="bullet-point inline-flex items-center justify-center w-2 h-2 min-w-2 min-h-2 rounded-full bg-black mr-2 mt-1.5 shrink-0"></span>
+            <span className="bullet-point inline-block bg-black rounded-full mr-2 mt-1.5 flex-shrink-0" style={{ width: '6px', height: '6px', minWidth: '6px', minHeight: '6px' }}></span>
             <span className="responsibility-text">{resp}</span>
           </li>
         ))}
