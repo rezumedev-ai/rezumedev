@@ -170,6 +170,12 @@
     aspect-ratio: 1/1 !important;
   }
 
+  /* PDF export padding and spacing */
+  .pdf-mode {
+    padding: 20px 20px 0 20px !important; /* Top, right, bottom, left padding for PDF export */
+    box-sizing: border-box !important;
+  }
+
   /* Other fixes from previous implementation */
   #resume-content ul.list-disc li,
   #resume-content ul.space-y-1 li,

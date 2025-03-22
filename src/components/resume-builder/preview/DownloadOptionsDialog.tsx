@@ -82,6 +82,10 @@ export function DownloadOptionsDialog({
       pdfPreparationDiv.style.overflow = 'hidden';
       pdfPreparationDiv.innerHTML = originalHtml;
       pdfPreparationDiv.className = resumeElement.className + ' pdf-mode';
+      
+      // Add padding to the PDF content container
+      pdfPreparationDiv.style.padding = '20px 20px 0 20px'; // Top, right, bottom, left
+      
       document.body.appendChild(pdfPreparationDiv);
 
       // 2. Pre-process PDF for proper rendering
