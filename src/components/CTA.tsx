@@ -20,24 +20,6 @@ export const CTA = () => {
             Start Building Now
             <ArrowRight className="w-5 h-5" />
           </Link>
-          
-          {/* Product Hunt Badge */}
-          <div className="mt-8">
-            <a 
-              href="https://www.producthunt.com/posts/rezume-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-rezume&#0045;2" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-block hover:opacity-90 transition-opacity"
-            >
-              <img 
-                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=945048&theme=light&t=1742703493381" 
-                alt="Rezume - Resumes That Make Recruiters Say Yes | Product Hunt" 
-                style={{ width: '250px', height: '54px' }} 
-                width="250" 
-                height="54" 
-              />
-            </a>
-          </div>
         </div>
       </div>
     </section>
