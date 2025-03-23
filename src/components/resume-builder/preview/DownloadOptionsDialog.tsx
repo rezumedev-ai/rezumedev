@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -23,7 +22,6 @@ export function DownloadOptionsDialog({
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch user profile to check subscription status
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
@@ -50,14 +48,12 @@ export function DownloadOptionsDialog({
   const handleDownloadPDF = async () => {
     setOpen(false);
     
-    // If no subscription, show subscription dialog
     if (!hasActiveSubscription) {
       setShowSubscriptionDialog(true);
       return;
     }
     
     try {
-      // Get the resume element
       const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
         console.error("Could not find element with id 'resume-content'");
@@ -65,13 +61,10 @@ export function DownloadOptionsDialog({
         return;
       }
 
-      // Show loading toast
       const loadingToast = toast.loading("Generating PDF...");
 
-      // Wait for dialog to close and any transitions to complete
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // 1. Clone the resume content to avoid modifying the original
       const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
       clonedResume.id = 'pdf-preparation-div';
       clonedResume.style.position = 'absolute';
@@ -81,28 +74,24 @@ export function DownloadOptionsDialog({
       clonedResume.style.overflow = 'hidden';
       clonedResume.className = resumeElement.className + ' pdf-mode';
       
-      // Add increased padding to the PDF content container
       clonedResume.style.padding = '32px 32px 0 32px'; 
       
       document.body.appendChild(clonedResume);
 
-      // 2. Adjust bullet points in the cloned content
       const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
-        // Replace the bullet element with a text character
         bulletElement.textContent = '•';
         bulletElement.style.width = 'auto';
         bulletElement.style.height = 'auto';
         bulletElement.style.display = 'inline-block';
         bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '3px'; // Move bullet down to align properly
+        bulletElement.style.marginTop = '3px';
         bulletElement.style.fontSize = '16px';
         bulletElement.style.lineHeight = '1';
         bulletElement.className = 'pdf-bullet-char';
       });
 
-      // 3. Fix bullet lists
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
         const listElement = list as HTMLElement;
@@ -111,7 +100,6 @@ export function DownloadOptionsDialog({
         listElement.style.listStyle = 'none';
       });
 
-      // 4. Fix bullet items
       const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
@@ -120,18 +108,14 @@ export function DownloadOptionsDialog({
         itemElement.style.marginBottom = '4px';
       });
 
-      // 5. Fix section icons as well
       const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
-        // Check if contains an SVG
         const svg = iconElement.querySelector('svg');
         if (svg) {
-          // Replace SVG with a simple symbol based on the icon type
           const iconType = svg.getAttribute('data-lucide') || '';
-          let iconSymbol = '•';
+          let iconSymbol = '';
           
-          // Create a replacement element with the icon symbol
           switch (iconType.toLowerCase()) {
             case 'briefcase': iconSymbol = '💼'; break;
             case 'graduation-cap': iconSymbol = '🎓'; break;
@@ -140,28 +124,25 @@ export function DownloadOptionsDialog({
             case 'file-text': iconSymbol = '📄'; break;
             case 'user': iconSymbol = '👤'; break;
             case 'folder-kanban': iconSymbol = '📂'; break;
+            default: iconSymbol = '•'; break;
           }
           
-          // Create a span with the icon symbol that will render properly in PDF
           const iconSpan = document.createElement('span');
           iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
           iconSpan.style.marginRight = '8px';
           iconSpan.style.fontSize = '14px';
           
-          // Replace the SVG with our text representation
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
           }
         }
       });
 
-      // Get device pixel ratio for better quality
       const pixelRatio = window.devicePixelRatio || 1;
       
-      // Capture settings
       const captureSettings = {
-        scale: pixelRatio * 2.5, // Increase scale for higher quality
+        scale: pixelRatio * 2.5,
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
@@ -169,11 +150,10 @@ export function DownloadOptionsDialog({
         windowWidth: document.documentElement.offsetWidth,
         windowHeight: document.documentElement.offsetHeight,
         onclone: (clonedDoc: Document) => {
-          // Additional processing for the cloned document if needed
           return new Promise<void>(resolve => {
             if ((document as any).fonts && (document as any).fonts.ready) {
               (document as any).fonts.ready.then(() => {
-                setTimeout(resolve, 500); // Ensure fonts and icons are loaded
+                setTimeout(resolve, 500);
               });
             } else {
               setTimeout(resolve, 500);
@@ -182,15 +162,12 @@ export function DownloadOptionsDialog({
         }
       };
 
-      // 6. Capture the prepared element
       const canvas = await html2canvas(clonedResume, captureSettings);
       
-      // 7. Remove the preparation div
       document.body.removeChild(clonedResume);
 
-      // 8. Create PDF with the exact A4 dimensions
-      const pdfWidth = 210; // A4 width in mm
-      const pdfHeight = 297; // A4 height in mm
+      const pdfWidth = 210;
+      const pdfHeight = 297;
       
       const pdf = new jsPDF({
         format: 'a4',
@@ -199,30 +176,25 @@ export function DownloadOptionsDialog({
         compress: true
       });
 
-      // Convert canvas to image
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
-      // Calculate dimensions to maintain aspect ratio
       const canvasAspectRatio = canvas.width / canvas.height;
       const a4AspectRatio = pdfWidth / pdfHeight;
       
       let imgWidth, imgHeight, offsetX, offsetY;
       
       if (canvasAspectRatio > a4AspectRatio) {
-        // Canvas is wider than A4
         imgWidth = pdfWidth;
         imgHeight = imgWidth / canvasAspectRatio;
         offsetX = 0;
         offsetY = (pdfHeight - imgHeight) / 2;
       } else {
-        // Canvas is taller than A4 or same ratio
         imgHeight = pdfHeight;
         imgWidth = imgHeight * canvasAspectRatio;
         offsetX = (pdfWidth - imgWidth) / 2;
         offsetY = 0;
       }
       
-      // Add image with precise positioning
       pdf.addImage(
         imgData,
         'JPEG',
@@ -234,10 +206,8 @@ export function DownloadOptionsDialog({
         'FAST'
       );
 
-      // Save PDF directly
       pdf.save('resume.pdf');
       
-      // Clear loading toast and show success
       toast.dismiss(loadingToast);
       toast.success("PDF downloaded successfully!");
     } catch (error) {
@@ -280,7 +250,6 @@ export function DownloadOptionsDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Subscription Required Dialog */}
       <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

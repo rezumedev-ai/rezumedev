@@ -13,42 +13,39 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
   const getIcon = () => {
     if (!template.style.icons.sections) return null;
 
-    let iconElement = null;
     let iconClass = template.id === "professional-navy" 
       ? "w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0"
       : "w-5 h-5 mr-2 text-emerald-600 flex-shrink-0";
 
+    // Create a container with data attributes for PDF export
+    const iconContainer = (icon: React.ReactNode) => (
+      <div 
+        className="pdf-section-icon inline-flex items-center justify-center" 
+        data-pdf-section-icon="true"
+        data-icon-type={type}
+      >
+        {icon}
+      </div>
+    );
+
     switch (type) {
       case "experience":
-        iconElement = <Briefcase className={iconClass} />;
-        break;
+        return iconContainer(<Briefcase className={iconClass} data-lucide="briefcase" />);
       case "education":
-        iconElement = <GraduationCap className={iconClass} />;
-        break;
+        return iconContainer(<GraduationCap className={iconClass} data-lucide="graduation-cap" />);
       case "certifications":
-        iconElement = <Award className={iconClass} />;
-        break;
+        return iconContainer(<Award className={iconClass} data-lucide="award" />);
       case "skills":
-        iconElement = <Code className={iconClass} />;
-        break;
+        return iconContainer(<Code className={iconClass} data-lucide="code" />);
       case "summary":
-        iconElement = <FileText className={iconClass} />;
-        break;
+        return iconContainer(<FileText className={iconClass} data-lucide="file-text" />);
       case "profile":
-        iconElement = <User className={iconClass} />;
-        break;
+        return iconContainer(<User className={iconClass} data-lucide="user" />);
       case "projects":
-        iconElement = <FolderKanban className={iconClass} />;
-        break;
+        return iconContainer(<FolderKanban className={iconClass} data-lucide="folder-kanban" />);
       default:
         return null;
     }
-
-    return (
-      <div className="pdf-section-icon inline-flex items-center justify-center" data-pdf-section-icon="true">
-        {iconElement}
-      </div>
-    );
   };
 
   if (template.id === "modern-professional") {
