@@ -136,6 +136,23 @@ function AnimatedHero() {
                 Build Your Resume Now <MoveRight className="w-4 h-4" />
               </RainbowButton>
             </Link>
+            
+            {/* Product Hunt Badge */}
+            <a 
+              href="https://www.producthunt.com/posts/rezume-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-rezume&#0045;2" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:opacity-90 transition-opacity mt-2"
+            >
+              <img 
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=945048&theme=light&t=1742703493381" 
+                alt="Rezume - Resumes That Make Recruiters Say Yes | Product Hunt" 
+                style={{ width: '250px', height: '54px' }} 
+                width="250" 
+                height="54" 
+              />
+            </a>
+            
             <div className="pt-8 text-center">
               <GradientHeading variant="secondary" size="xs" weight="semi">
                 Our users got hired at

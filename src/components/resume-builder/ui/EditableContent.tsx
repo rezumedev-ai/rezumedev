@@ -2,22 +2,31 @@
 import { cn } from "@/lib/utils";
 
 interface EditableContentProps {
-  content: string;
+  content?: string;  // Make this optional
+  value?: string;    // Add value as an alternative to content
   isEditing: boolean;
   className?: string;
   onUpdate: (newContent: string) => void;
+  onChange?: (newContent: string) => void; // Add onChange as an alternative
 }
 
 export function EditableContent({ 
   content, 
+  value, 
   isEditing, 
   className,
-  onUpdate 
+  onUpdate,
+  onChange
 }: EditableContentProps) {
+  // Use content or value, prioritizing value if both are provided
+  const displayContent = value !== undefined ? value : content || '';
+  
   const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     if (isEditing) {
       const newContent = event.target.innerText.trim();
-      onUpdate(newContent);
+      // Use both callbacks if provided
+      if (onUpdate) onUpdate(newContent);
+      if (onChange) onChange(newContent);
     }
   };
 
@@ -28,7 +37,7 @@ export function EditableContent({
       suppressContentEditableWarning
       onBlur={handleBlur}
     >
-      {content}
+      {displayContent}
     </div>
   );
 }
