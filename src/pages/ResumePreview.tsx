@@ -82,7 +82,9 @@ export default function ResumePreview() {
           name="viewport" 
           content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" 
         />
-        <link rel="icon" href="/custom-favicon.svg" />
+        <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
+        <link rel="icon" type="image/x-icon" href="/favicon1.ico" />
+        <link rel="apple-touch-icon" href="/custom-favicon.svg" />
       </Helmet>
       
       <FinalResumePreview

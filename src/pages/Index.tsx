@@ -20,7 +20,9 @@ const Index = () => {
         <meta name="description" content="Create stunning, professional, ATS-friendly resumes in minutes with our AI-powered resume builder. Land your dream job faster." />
         <meta name="keywords" content="resume builder, professional resume, AI resume, ATS friendly resume, job application, career advancement, CV maker" />
         <link rel="canonical" href="https://rezume.dev/" />
-        <link rel="icon" href="/custom-favicon.svg" />
+        <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
+        <link rel="icon" type="image/x-icon" href="/favicon1.ico" />
+        <link rel="apple-touch-icon" href="/custom-favicon.svg" />
       </Helmet>
       <main className="min-h-screen bg-white">
         <Header />
