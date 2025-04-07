@@ -8,11 +8,8 @@ const setupFavicons = () => {
   // Update all favicon links
   const links = document.querySelectorAll("link[rel*='icon']") as NodeListOf<HTMLLinkElement>;
   links.forEach(link => {
-    if (link.type === "image/x-icon") {
-      link.href = '/favicon1.ico';
-    } else {
-      link.href = '/custom-favicon.svg';
-    }
+    // Use only the SVG favicon which we know exists and is editable
+    link.href = '/custom-favicon.svg';
   });
 
   // Ensure apple-touch-icon is set
