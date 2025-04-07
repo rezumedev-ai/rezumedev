@@ -8,14 +8,22 @@ const setupFavicons = () => {
   // Update all favicon links
   const links = document.querySelectorAll("link[rel*='icon']") as NodeListOf<HTMLLinkElement>;
   links.forEach(link => {
-    // Use only the SVG favicon which we know exists and is editable
-    link.href = '/custom-favicon.svg';
+    // Use ICO for traditional favicon and SVG for others
+    if (link.rel === 'icon' && !link.type) {
+      link.href = '/custom-favicon.ico';
+    } else if (link.sizes) {
+      // For sized icons, use the ICO
+      link.href = '/custom-favicon.ico';
+    } else {
+      // For SVG specific
+      link.href = '/custom-favicon.svg';
+    }
   });
 
   // Ensure apple-touch-icon is set
   const appleIcon = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;
   if (appleIcon) {
-    appleIcon.href = '/custom-favicon.svg';
+    appleIcon.href = '/custom-favicon.ico';
   }
 };
 
