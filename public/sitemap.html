@@ -4,15 +4,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sitemap | Rezume.dev</title>
-  <meta name="description" content="A complete overview of all pages available on Rezume.dev. Explore our resume builder, career advice, and resources." />
+  <title>Complete Website Directory | Rezume.dev</title>
+  <meta name="description" content="Browse all pages and resources available on Rezume.dev. Our complete website directory helps you find everything from our AI resume builder to career resources." />
+  <meta name="keywords" content="rezume directory, site navigation, resume builder pages, career resources, job search tools, resume templates, professional development" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://rezume.dev/sitemap.html" />
+  
+  <!-- Favicon configuration -->
   <link rel="icon" type="image/x-icon" href="/custom-favicon.ico" />
   <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
   <link rel="shortcut icon" href="/custom-favicon.ico" />
   <link rel="apple-touch-icon" href="/custom-favicon.ico" />
   <meta name="theme-color" content="#9B87F5" />
+  
+  <!-- Open Graph Tags -->
+  <meta property="og:title" content="Complete Website Directory | Rezume.dev" />
+  <meta property="og:description" content="Browse all pages and resources available on Rezume.dev. Find everything from our AI resume builder to career resources." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://rezume.dev/sitemap.html" />
+  <meta property="og:image" content="https://rezume.dev/og-image.png" />
+  
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Complete Website Directory | Rezume.dev" />
+  <meta name="twitter:description" content="Browse all pages and resources available on Rezume.dev" />
+  <meta name="twitter:image" content="https://rezume.dev/og-image.png" />
+  
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -36,27 +53,43 @@
       border-bottom: 2px solid #eaeaea;
       color: #333;
     }
-    ul {
-      padding-left: 1.5rem;
-    }
-    li {
-      margin-bottom: 0.5rem;
-    }
-    a {
-      color: #9B87F5;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    a:hover {
-      color: #6941C6;
-      text-decoration: underline;
-    }
     .section {
       background-color: white;
       padding: 2rem;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       margin-bottom: 2rem;
+    }
+    ul {
+      padding-left: 1.5rem;
+      columns: 2;
+      column-gap: 2rem;
+    }
+    @media (max-width: 768px) {
+      ul {
+        columns: 1;
+      }
+    }
+    li {
+      margin-bottom: 0.75rem;
+      break-inside: avoid;
+    }
+    a {
+      color: #9B87F5;
+      text-decoration: none;
+      transition: color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    a:hover {
+      color: #6941C6;
+      text-decoration: underline;
+    }
+    .meta {
+      font-size: 0.85rem;
+      color: #666;
+      margin-left: 0.5rem;
     }
     .back-home {
       display: block;
@@ -65,62 +98,159 @@
       font-weight: bold;
     }
     .date {
+      text-align: center;
       font-size: 0.85rem;
       color: #666;
       margin-top: 2rem;
     }
+    .description {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.25rem;
+      margin-left: 1.5rem;
+    }
   </style>
+  
+  <!-- Schema.org markup for better search results -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Rezume.dev Directory",
+      "description": "Complete website directory and navigation for Rezume.dev",
+      "url": "https://rezume.dev/sitemap.html",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://rezume.dev/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
 </head>
 <body>
-  <h1>Rezume.dev Sitemap</h1>
+  <h1>Rezume.dev Website Directory</h1>
   
   <div class="section">
-    <h2>Main Pages</h2>
+    <h2>Resume Building Tools</h2>
     <ul>
-      <li><a href="/">Home</a> - AI-powered resume builder homepage</li>
-      <li><a href="/about">About Us</a> - Learn about our mission and team</li>
-      <li><a href="/features">Features</a> - Explore all Rezume.dev features and capabilities</li>
-      <li><a href="/pricing">Pricing</a> - View our subscription plans and pricing</li>
-      <li><a href="/contact">Contact</a> - Get in touch with our team</li>
+      <li>
+        <a href="/resume-builder">Resume Builder</a>
+        <div class="description">Create professional resumes with AI assistance</div>
+      </li>
+      <li>
+        <a href="/resume-preview">Resume Preview</a>
+        <div class="description">Preview and edit your resume in real-time</div>
+      </li>
+      <li>
+        <a href="/templates">Resume Templates</a>
+        <div class="description">Browse our collection of ATS-friendly templates</div>
+      </li>
     </ul>
   </div>
   
   <div class="section">
-    <h2>Resources</h2>
+    <h2>Career Resources</h2>
     <ul>
-      <li><a href="/blog">Blog</a> - Career insights and resume tips</li>
-      <li><a href="/guides">Career Guides</a> - In-depth guides for job seekers</li>
-      <li><a href="/sitemap.xml">XML Sitemap</a> - Technical sitemap for search engines</li>
-      <li><a href="/robots.txt">Robots.txt</a> - Instructions for search engines</li>
-      <li><a href="/rss.xml">RSS Feed</a> - Subscribe to our latest content</li>
+      <li>
+        <a href="/blog">Career Blog</a>
+        <div class="description">Expert advice and industry insights</div>
+      </li>
+      <li>
+        <a href="/guides">Career Guides</a>
+        <div class="description">Comprehensive guides for job seekers</div>
+      </li>
+      <li>
+        <a href="/features">Features Overview</a>
+        <div class="description">Explore our platform's capabilities</div>
+      </li>
     </ul>
   </div>
   
   <div class="section">
-    <h2>Blog Posts</h2>
+    <h2>Latest Blog Posts</h2>
     <ul>
-      <li><a href="/blog/1">10 Essential Tips for Crafting a Winning Resume</a></li>
-      <li><a href="/blog/2">Mastering the Art of Job Search in 2024</a></li>
-      <li><a href="/blog/3">What Hiring Managers Really Look For</a></li>
-      <li><a href="/blog/4">How to Write a Resume for Remote Jobs</a></li>
-      <li><a href="/blog/5">Cover Letter vs Resume: Do You Still Need Both?</a></li>
-      <li><a href="/blog/6">From Zero to Hired: How I Landed My Dream Job with Rezume.dev</a></li>
+      <li>
+        <a href="/blog/1">10 Essential Tips for Crafting a Winning Resume</a>
+        <span class="meta">Updated April 2025</span>
+      </li>
+      <li>
+        <a href="/blog/2">Mastering the Art of Job Search in 2024</a>
+        <span class="meta">Updated April 2025</span>
+      </li>
+      <li>
+        <a href="/blog/3">What Hiring Managers Really Look For</a>
+        <span class="meta">Updated April 2025</span>
+      </li>
+      <li>
+        <a href="/blog/4">How to Write a Resume for Remote Jobs</a>
+        <span class="meta">Updated April 2025</span>
+      </li>
+      <li>
+        <a href="/blog/5">Cover Letter vs Resume: Do You Still Need Both?</a>
+        <span class="meta">Updated April 2025</span>
+      </li>
+      <li>
+        <a href="/blog/6">From Zero to Hired: Success Story</a>
+        <span class="meta">Updated April 2025</span>
+      </li>
     </ul>
   </div>
   
   <div class="section">
-    <h2>Legal Information</h2>
+    <h2>About & Support</h2>
     <ul>
-      <li><a href="/privacy">Privacy Policy</a></li>
-      <li><a href="/terms">Terms of Service</a></li>
-      <li><a href="/cookies">Cookie Policy</a></li>
+      <li>
+        <a href="/about">About Us</a>
+        <div class="description">Learn about our mission and team</div>
+      </li>
+      <li>
+        <a href="/contact">Contact</a>
+        <div class="description">Get in touch with our support team</div>
+      </li>
+      <li>
+        <a href="/help">Help Center</a>
+        <div class="description">FAQs and troubleshooting guides</div>
+      </li>
     </ul>
   </div>
   
   <div class="section">
-    <h2>Career Opportunities</h2>
+    <h2>User Account</h2>
     <ul>
-      <li><a href="/careers">Careers at Rezume.dev</a></li>
+      <li>
+        <a href="/dashboard">Dashboard</a>
+        <div class="description">Access your resume workspace</div>
+      </li>
+      <li>
+        <a href="/settings">Account Settings</a>
+        <div class="description">Manage your profile and preferences</div>
+      </li>
+      <li>
+        <a href="/pricing">Pricing Plans</a>
+        <div class="description">Compare our subscription options</div>
+      </li>
+    </ul>
+  </div>
+  
+  <div class="section">
+    <h2>Company</h2>
+    <ul>
+      <li>
+        <a href="/careers">Careers at Rezume.dev</a>
+        <div class="description">Join our growing team</div>
+      </li>
+      <li>
+        <a href="/privacy">Privacy Policy</a>
+        <div class="description">How we protect your data</div>
+      </li>
+      <li>
+        <a href="/terms">Terms of Service</a>
+        <div class="description">Our user agreement</div>
+      </li>
+      <li>
+        <a href="/cookies">Cookie Policy</a>
+        <div class="description">How we use cookies</div>
+      </li>
     </ul>
   </div>
   
