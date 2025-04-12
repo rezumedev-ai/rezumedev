@@ -1,5 +1,5 @@
 
-import { Github, Linkedin, Twitter } from "lucide-react";
+import { Github, Linkedin, Twitter, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -33,6 +33,17 @@ export const Footer = () => {
               </li>
               <li>
                 <Link to="/guides" className="text-sm text-muted-foreground hover:text-primary transition-colors">Career Guides</Link>
+              </li>
+              <li>
+                <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <FileText className="h-3.5 w-3.5" />
+                  Sitemap
+                </a>
+              </li>
+              <li>
+                <a href="/robots.txt" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Robots.txt
+                </a>
               </li>
             </ul>
           </div>
