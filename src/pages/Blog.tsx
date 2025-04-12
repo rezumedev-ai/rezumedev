@@ -74,23 +74,35 @@ const Blog = () => {
     <>
       <Helmet>
         <title>Career Insights & Resume Tips | Rezume.dev Blog</title>
-        <meta name="description" content="Expert advice on resume writing, job search strategies, remote work applications, and career advancement. Learn how to craft the perfect resume and land your dream job." />
-        <meta name="keywords" content="resume tips, career advice, job search tips, professional resume writing, career blog, job application guides, remote work resume, cover letter tips, success stories" />
+        <meta name="description" content="Expert advice on resume writing, job search strategies, remote work applications, and career advancement. Learn how to craft the perfect resume and land your dream job with our comprehensive guides." />
+        <meta name="keywords" content="resume tips, career advice, job search tips, professional resume writing, career blog, job application guides, remote work resume, cover letter tips, success stories, ATS optimization, career development, interview preparation" />
+        <meta name="author" content="Rezume.dev" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <link rel="canonical" href="https://rezume.dev/blog" />
         <link rel="icon" type="image/x-icon" href="/custom-favicon.ico" />
         <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
         <link rel="shortcut icon" href="/custom-favicon.ico" />
         <link rel="apple-touch-icon" href="/custom-favicon.ico" />
         <meta name="theme-color" content="#9B87F5" />
+        
+        {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://rezume.dev/blog" />
         <meta property="og:title" content="Career Insights & Resume Tips | Rezume.dev Blog" />
         <meta property="og:description" content="Expert advice on resume writing, job search strategies, and career advancement. Learn how to craft the perfect resume and land your dream job." />
-        <meta property="og:image" content="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" />
+        <meta property="og:image" content="https://rezume.dev/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:site_name" content="Rezume.dev" />
+        
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@rezumedev" />
         <meta name="twitter:title" content="Career Insights & Resume Tips | Rezume.dev Blog" />
         <meta name="twitter:description" content="Expert advice on resume writing, job search strategies, and career advancement from Rezume.dev." />
-        <meta name="twitter:image" content="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" />
+        <meta name="twitter:image" content="https://rezume.dev/og-image.png" />
+        
         {/* Blog structured data */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -98,6 +110,9 @@ const Blog = () => {
             "@type": "Blog",
             "headline": "Career Insights & Resume Tips | Rezume.dev Blog",
             "description": "Expert advice on resume writing, job search strategies, and career advancement.",
+            "image": "https://rezume.dev/og-image.png",
+            "datePublished": "2024-03-01",
+            "dateModified": "2025-04-12",
             "publisher": {
               "@type": "Organization",
               "name": "Rezume.dev",
@@ -106,6 +121,15 @@ const Blog = () => {
                 "url": "https://rezume.dev/custom-favicon.svg"
               }
             },
+            "author": {
+              "@type": "Organization",
+              "name": "Rezume.dev Team",
+              "url": "https://rezume.dev/about"
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": "https://rezume.dev/blog"
+            },
             "blogPost": blogPosts.map(post => ({
               "@type": "BlogPosting",
               "headline": post.title,
@@ -113,7 +137,24 @@ const Blog = () => {
               "keywords": post.keywords,
               "url": `https://rezume.dev/blog/${post.id}`,
               "image": post.image,
-              "datePublished": "2024-03-20T08:00:00+08:00"
+              "datePublished": "2024-03-20T08:00:00+08:00",
+              "dateModified": "2025-04-12T10:00:00+08:00",
+              "author": {
+                "@type": "Person",
+                "name": "Rezume.dev Expert"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Rezume.dev",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://rezume.dev/custom-favicon.svg"
+                }
+              },
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": `https://rezume.dev/blog/${post.id}`
+              }
             }))
           })}
         </script>

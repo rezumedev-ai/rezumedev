@@ -1,5 +1,5 @@
 
-import { Github, Linkedin, Twitter } from "lucide-react";
+import { Github, Linkedin, Twitter, FileText, RssIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -8,19 +8,25 @@ export const Footer = () => {
   return (
     <footer className="bg-muted py-12 mt-20 border-t">
       <div className="container px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+          <div className="space-y-4 md:col-span-2">
             <h3 className="font-semibold text-lg text-secondary">Rezume.dev</h3>
-            <p className="text-sm text-muted-foreground">AI-powered resumes, tailored for success.</p>
+            <p className="text-sm text-muted-foreground">AI-powered resumes, tailored for success. Create professional, ATS-friendly resumes that help you land your dream job.</p>
             <div className="flex space-x-4">
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://twitter.com/rezumedev" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter" className="text-muted-foreground hover:text-primary transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://linkedin.com/company/rezume-dev" target="_blank" rel="noopener noreferrer" aria-label="Follow us on LinkedIn" className="text-muted-foreground hover:text-primary transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://github.com/rezume-dev" target="_blank" rel="noopener noreferrer" aria-label="Follow us on GitHub" className="text-muted-foreground hover:text-primary transition-colors">
                 <Github className="h-5 w-5" />
+              </a>
+              <a href="/sitemap.html" aria-label="View our sitemap" className="text-muted-foreground hover:text-primary transition-colors">
+                <FileText className="h-5 w-5" />
+              </a>
+              <a href="/rss.xml" target="_blank" rel="noopener noreferrer" aria-label="Subscribe to our RSS feed" className="text-muted-foreground hover:text-primary transition-colors">
+                <RssIcon className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -33,6 +39,15 @@ export const Footer = () => {
               </li>
               <li>
                 <Link to="/guides" className="text-sm text-muted-foreground hover:text-primary transition-colors">Career Guides</Link>
+              </li>
+              <li>
+                <Link to="/features" className="text-sm text-muted-foreground hover:text-primary transition-colors">Features</Link>
+              </li>
+              <li>
+                <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">Sitemap XML</a>
+              </li>
+              <li>
+                <a href="/robots.txt" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">Robots.txt</a>
               </li>
             </ul>
           </div>
@@ -48,6 +63,9 @@ export const Footer = () => {
               </li>
               <li>
                 <Link to="/careers" className="text-sm text-muted-foreground hover:text-primary transition-colors">Careers</Link>
+              </li>
+              <li>
+                <Link to="/pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors">Pricing</Link>
               </li>
             </ul>
           </div>
@@ -69,9 +87,16 @@ export const Footer = () => {
         </div>
 
         <div className="border-t pt-8">
-          <p className="text-sm text-center text-muted-foreground">
-            © {currentYear} Rezume.dev. All rights reserved.
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground text-center md:text-left">
+              © {currentYear} Rezume.dev. All rights reserved.
+            </p>
+            <div className="text-sm text-muted-foreground">
+              <span className="md:hidden">|</span> 
+              <span className="hidden md:inline">Helping professionals land their dream jobs with </span>
+              <a href="https://rezume.dev" className="text-primary hover:underline">AI-powered resumes</a>.
+            </div>
+          </div>
         </div>
       </div>
     </footer>

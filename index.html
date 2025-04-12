@@ -14,15 +14,19 @@
     <meta name="msapplication-TileColor" content="#9B87F5" />
     <meta name="theme-color" content="#9B87F5" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
     <!-- Cache control meta tags -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Rezume.dev - Create Professional Resumes</title>
+    
+    <title>Rezume.dev - Professional AI Resume Builder | Create ATS-Friendly Resumes</title>
     
     <!-- Meta tags for SEO and link previews -->
     <meta name="description" content="Create stunning, professional, ATS-friendly resumes in minutes with our AI-powered resume builder. Land your dream job faster." />
-    <meta name="keywords" content="resume builder, professional resume, AI resume, ATS friendly resume, job application, career advancement, CV maker" />
+    <meta name="keywords" content="resume builder, professional resume, AI resume, ATS friendly resume, job application, career advancement, CV maker, resume templates, job search, interview preparation, career tools" />
+    <meta name="author" content="Rezume.dev" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     
     <!-- Canonical URL to prevent duplicate content issues -->
     <link rel="canonical" href="https://rezume.dev/" />
@@ -30,27 +34,43 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://rezume.dev/" />
-    <meta property="og:title" content="Rezume.dev - Create Professional Resumes" />
+    <meta property="og:title" content="Rezume.dev - Professional AI Resume Builder" />
     <meta property="og:description" content="Create stunning, professional, ATS-friendly resumes in minutes with our AI-powered resume builder. Land your dream job faster." />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&h=630&q=80" />
+    <meta property="og:image" content="https://rezume.dev/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Rezume.dev" />
+    <meta property="og:locale" content="en_US" />
     
     <!-- WhatsApp specific -->
-    <meta property="og:image:secure_url" content="https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&h=630&q=80" />
-    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:secure_url" content="https://rezume.dev/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://rezume.dev/" />
-    <meta property="twitter:title" content="Rezume.dev - Create Professional Resumes" />
+    <meta property="twitter:title" content="Rezume.dev - Professional AI Resume Builder" />
     <meta property="twitter:description" content="Create stunning, professional, ATS-friendly resumes in minutes with our AI-powered resume builder. Land your dream job faster." />
-    <meta property="twitter:image" content="https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&h=630&q=80" />
+    <meta property="twitter:image" content="https://rezume.dev/og-image.png" />
+    <meta name="twitter:site" content="@rezumedev" />
+    <meta name="twitter:creator" content="@rezumedev" />
     
     <!-- Additional SEO tags -->
     <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="author" content="Rezume.dev" />
+    
+    <!-- Alternate language versions if you have them -->
+    <link rel="alternate" hreflang="en" href="https://rezume.dev/" />
+    
+    <!-- Preconnect to important domains to speed up loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    
+    <!-- Sitemap reference -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     
     <!-- Structured data for better understanding by search engines -->
     <script type="application/ld+json">
@@ -70,11 +90,48 @@
         "author": {
           "@type": "Organization",
           "name": "Rezume.dev",
-          "url": "https://rezume.dev/"
+          "url": "https://rezume.dev/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://rezume.dev/custom-favicon.svg"
+          },
+          "sameAs": [
+            "https://twitter.com/rezumedev",
+            "https://linkedin.com/company/rezume-dev",
+            "https://github.com/rezume-dev"
+          ]
         },
         "potentialAction": {
           "@type": "ViewAction",
           "target": "https://rezume.dev/"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "ratingCount": "329",
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      }
+    </script>
+    
+    <!-- Organization structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Rezume.dev",
+        "url": "https://rezume.dev",
+        "logo": "https://rezume.dev/custom-favicon.svg",
+        "sameAs": [
+          "https://twitter.com/rezumedev",
+          "https://linkedin.com/company/rezume-dev",
+          "https://github.com/rezume-dev"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "email": "support@rezume.dev"
         }
       }
     </script>

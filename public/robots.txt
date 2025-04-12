@@ -1,0 +1,24 @@
+
+User-agent: *
+Allow: /
+
+# Important pages
+Allow: /about
+Allow: /features
+Allow: /blog
+Allow: /guides
+Allow: /pricing
+Allow: /contact
+
+# Sitemaps
+Sitemap: https://rezume.dev/sitemap.xml
+
+# Disallow admin and utility pages
+Disallow: /admin/
+Disallow: /login
+Disallow: /signup
+Disallow: /payment-success
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /resume-builder
+Disallow: /resume-preview
