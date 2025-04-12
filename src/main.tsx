@@ -25,6 +25,18 @@ const setupFavicons = () => {
   if (appleIcon) {
     appleIcon.href = '/custom-favicon.ico';
   }
+
+  // Ensure shortcut icon is set
+  const shortcutIcon = document.querySelector("link[rel='shortcut icon']") as HTMLLinkElement;
+  if (shortcutIcon) {
+    shortcutIcon.href = '/custom-favicon.ico';
+  }
+
+  // Set Microsoft Tile image
+  const msIcon = document.querySelector("meta[name='msapplication-TileImage']") as HTMLMetaElement;
+  if (msIcon) {
+    msIcon.content = '/custom-favicon.svg';
+  }
 };
 
 // Initialize the application

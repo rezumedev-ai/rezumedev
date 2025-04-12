@@ -22,7 +22,9 @@ const Index = () => {
         <link rel="canonical" href="https://rezume.dev/" />
         <link rel="icon" type="image/x-icon" href="/custom-favicon.ico" />
         <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
+        <link rel="shortcut icon" href="/custom-favicon.ico" />
         <link rel="apple-touch-icon" href="/custom-favicon.ico" />
+        <meta name="theme-color" content="#9B87F5" />
       </Helmet>
       <main className="min-h-screen bg-white">
         <Header />

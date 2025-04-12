@@ -77,6 +77,11 @@ const Blog = () => {
         <meta name="description" content="Expert advice on resume writing, job search strategies, remote work applications, and career advancement. Learn how to craft the perfect resume and land your dream job." />
         <meta name="keywords" content="resume tips, career advice, job search tips, professional resume writing, career blog, job application guides, remote work resume, cover letter tips, success stories" />
         <link rel="canonical" href="https://rezume.dev/blog" />
+        <link rel="icon" type="image/x-icon" href="/custom-favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
+        <link rel="shortcut icon" href="/custom-favicon.ico" />
+        <link rel="apple-touch-icon" href="/custom-favicon.ico" />
+        <meta name="theme-color" content="#9B87F5" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://rezume.dev/blog" />
         <meta property="og:title" content="Career Insights & Resume Tips | Rezume.dev Blog" />
