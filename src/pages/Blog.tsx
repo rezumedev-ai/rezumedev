@@ -15,6 +15,8 @@ const Blog = () => {
       category: "Resume Tips",
       image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
       readTime: "5 min read",
+      slug: "essential-resume-tips",
+      keywords: "resume writing, resume tips, professional resume, resume formatting, ATS resume"
     },
     {
       id: 2,
@@ -23,6 +25,8 @@ const Blog = () => {
       category: "Job Search",
       image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
       readTime: "7 min read",
+      slug: "job-search-strategies",
+      keywords: "job search, job application, LinkedIn optimization, networking, career development"
     },
     {
       id: 3,
@@ -31,6 +35,8 @@ const Blog = () => {
       category: "Hiring Tips",
       image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
       readTime: "6 min read",
+      slug: "hiring-manager-insights",
+      keywords: "hiring process, interview tips, recruiter advice, stand out to employers"
     },
     {
       id: 4,
@@ -39,6 +45,8 @@ const Blog = () => {
       category: "Remote Work",
       image: "https://images.unsplash.com/photo-1552960562-daf630e9278b",
       readTime: "8 min read",
+      slug: "remote-job-resume",
+      keywords: "remote work resume, virtual jobs, work from home, remote job application, remote career"
     },
     {
       id: 5,
@@ -47,6 +55,8 @@ const Blog = () => {
       category: "Application Tips",
       image: "https://images.unsplash.com/photo-1586473219010-2ffc57b0d282",
       readTime: "6 min read",
+      slug: "cover-letter-resume-comparison",
+      keywords: "cover letter, resume comparison, job application documents, cover letter tips"
     },
     {
       id: 6,
@@ -55,6 +65,8 @@ const Blog = () => {
       category: "Success Story",
       image: "https://images.unsplash.com/photo-1579389083078-4e7018379f7e",
       readTime: "9 min read",
+      slug: "rezume-success-story",
+      keywords: "success story, job hunting success, resume transformation, career change"
     },
   ];
 
@@ -62,9 +74,44 @@ const Blog = () => {
     <>
       <Helmet>
         <title>Career Insights & Resume Tips | Rezume.dev Blog</title>
-        <meta name="description" content="Expert advice on resume writing, job search strategies, and career advancement. Learn how to craft the perfect resume and land your dream job." />
-        <meta name="keywords" content="resume tips, career advice, job search tips, professional resume writing, career blog, job application guides" />
+        <meta name="description" content="Expert advice on resume writing, job search strategies, remote work applications, and career advancement. Learn how to craft the perfect resume and land your dream job." />
+        <meta name="keywords" content="resume tips, career advice, job search tips, professional resume writing, career blog, job application guides, remote work resume, cover letter tips, success stories" />
         <link rel="canonical" href="https://rezume.dev/blog" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://rezume.dev/blog" />
+        <meta property="og:title" content="Career Insights & Resume Tips | Rezume.dev Blog" />
+        <meta property="og:description" content="Expert advice on resume writing, job search strategies, and career advancement. Learn how to craft the perfect resume and land your dream job." />
+        <meta property="og:image" content="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Career Insights & Resume Tips | Rezume.dev Blog" />
+        <meta name="twitter:description" content="Expert advice on resume writing, job search strategies, and career advancement from Rezume.dev." />
+        <meta name="twitter:image" content="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" />
+        {/* Blog structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "headline": "Career Insights & Resume Tips | Rezume.dev Blog",
+            "description": "Expert advice on resume writing, job search strategies, and career advancement.",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Rezume.dev",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://rezume.dev/custom-favicon.svg"
+              }
+            },
+            "blogPost": blogPosts.map(post => ({
+              "@type": "BlogPosting",
+              "headline": post.title,
+              "description": post.excerpt,
+              "keywords": post.keywords,
+              "url": `https://rezume.dev/blog/${post.id}`,
+              "image": post.image,
+              "datePublished": "2024-03-20T08:00:00+08:00"
+            }))
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-white">
         <Header />
@@ -123,7 +170,7 @@ const Blog = () => {
                         {post.readTime}
                       </span>
                       <Button variant="ghost" className="group" asChild>
-                        <Link to={`/blog/${post.id}`} className="flex items-center gap-2">
+                        <Link to={`/blog/${post.id}`} aria-label={`Read more about ${post.title}`} className="flex items-center gap-2">
                           Read More 
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
                         </Link>
