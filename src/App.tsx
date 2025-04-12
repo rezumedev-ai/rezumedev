@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -27,6 +28,7 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NewResume from "./pages/NewResume";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import Sitemap from "./pages/Sitemap";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -56,6 +58,7 @@ function App() {
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/cookies" element={<Cookies />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/sitemap" element={<Sitemap />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:id" element={<BlogPost />} />
