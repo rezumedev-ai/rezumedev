@@ -35,12 +35,12 @@ export const Footer = () => {
                 <Link to="/guides" className="text-sm text-muted-foreground hover:text-primary transition-colors">Career Guides</Link>
               </li>
               <li>
-                <a href="/sitemap.xml" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <a href="/sitemap.xml" download className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Sitemap
                 </a>
               </li>
               <li>
-                <a href="/robots.txt" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <a href="/robots.txt" download className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Robots.txt
                 </a>
               </li>
