@@ -34,16 +34,6 @@ export const Footer = () => {
               <li>
                 <Link to="/guides" className="text-sm text-muted-foreground hover:text-primary transition-colors">Career Guides</Link>
               </li>
-              <li>
-                <a href="/sitemap.xml" target="_blank" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Sitemap
-                </a>
-              </li>
-              <li>
-                <a href="/robots.txt" target="_blank" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Robots.txt
-                </a>
-              </li>
             </ul>
           </div>
 

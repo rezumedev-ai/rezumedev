@@ -23,7 +23,6 @@ const Index = () => {
         <link rel="icon" type="image/x-icon" href="/custom-favicon.ico" />
         <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
         <link rel="apple-touch-icon" href="/custom-favicon.ico" />
-        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
       </Helmet>
       <main className="min-h-screen bg-white">
         <Header />

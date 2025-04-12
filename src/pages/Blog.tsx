@@ -16,8 +16,7 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
       readTime: "5 min read",
       slug: "essential-resume-tips",
-      keywords: "resume writing, resume tips, professional resume, resume formatting, ATS resume",
-      date: "2025-04-01"
+      keywords: "resume writing, resume tips, professional resume, resume formatting, ATS resume"
     },
     {
       id: 2,
@@ -27,8 +26,7 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
       readTime: "7 min read",
       slug: "job-search-strategies",
-      keywords: "job search, job application, LinkedIn optimization, networking, career development",
-      date: "2025-04-02"
+      keywords: "job search, job application, LinkedIn optimization, networking, career development"
     },
     {
       id: 3,
@@ -38,8 +36,7 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
       readTime: "6 min read",
       slug: "hiring-manager-insights",
-      keywords: "hiring process, interview tips, recruiter advice, stand out to employers",
-      date: "2025-04-03"
+      keywords: "hiring process, interview tips, recruiter advice, stand out to employers"
     },
     {
       id: 4,
@@ -49,8 +46,7 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1552960562-daf630e9278b",
       readTime: "8 min read",
       slug: "remote-job-resume",
-      keywords: "remote work resume, virtual jobs, work from home, remote job application, remote career",
-      date: "2025-04-04"
+      keywords: "remote work resume, virtual jobs, work from home, remote job application, remote career"
     },
     {
       id: 5,
@@ -60,8 +56,7 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1586473219010-2ffc57b0d282",
       readTime: "6 min read",
       slug: "cover-letter-resume-comparison",
-      keywords: "cover letter, resume comparison, job application documents, cover letter tips",
-      date: "2025-04-05"
+      keywords: "cover letter, resume comparison, job application documents, cover letter tips"
     },
     {
       id: 6,
@@ -71,8 +66,7 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1579389083078-4e7018379f7e",
       readTime: "9 min read",
       slug: "rezume-success-story",
-      keywords: "success story, job hunting success, resume transformation, career change",
-      date: "2025-04-06"
+      keywords: "success story, job hunting success, resume transformation, career change"
     },
   ];
 
@@ -92,7 +86,6 @@ const Blog = () => {
         <meta name="twitter:title" content="Career Insights & Resume Tips | Rezume.dev Blog" />
         <meta name="twitter:description" content="Expert advice on resume writing, job search strategies, and career advancement from Rezume.dev." />
         <meta name="twitter:image" content="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" />
-        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         {/* Blog structured data */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -115,7 +108,7 @@ const Blog = () => {
               "keywords": post.keywords,
               "url": `https://rezume.dev/blog/${post.id}`,
               "image": post.image,
-              "datePublished": `${post.date}T08:00:00+08:00`
+              "datePublished": "2024-03-20T08:00:00+08:00"
             }))
           })}
         </script>
