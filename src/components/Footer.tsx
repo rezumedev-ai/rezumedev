@@ -1,4 +1,3 @@
-
 import { Github, Linkedin, Twitter, FileText, RssIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -13,15 +12,6 @@ export const Footer = () => {
             <h3 className="font-semibold text-lg text-secondary">Rezume.dev</h3>
             <p className="text-sm text-muted-foreground">AI-powered resumes, tailored for success. Create professional, ATS-friendly resumes that help you land your dream job.</p>
             <div className="flex space-x-4">
-              <a href="https://twitter.com/rezumedev" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="https://linkedin.com/company/rezume-dev" target="_blank" rel="noopener noreferrer" aria-label="Follow us on LinkedIn" className="text-muted-foreground hover:text-primary transition-colors">
-                <Linkedin className="h-5 w-5" />
-              </a>
-              <a href="https://github.com/rezume-dev" target="_blank" rel="noopener noreferrer" aria-label="Follow us on GitHub" className="text-muted-foreground hover:text-primary transition-colors">
-                <Github className="h-5 w-5" />
-              </a>
               <a href="/sitemap.html" aria-label="View our sitemap" className="text-muted-foreground hover:text-primary transition-colors">
                 <FileText className="h-5 w-5" />
               </a>
