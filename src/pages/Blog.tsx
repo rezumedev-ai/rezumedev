@@ -32,6 +32,30 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
       readTime: "6 min read",
     },
+    {
+      id: 4,
+      title: "How to Write a Resume for Remote Jobs",
+      excerpt: "Specific strategies and resume elements to highlight when applying for remote positions in today's digital workplace.",
+      category: "Remote Work",
+      image: "https://images.unsplash.com/photo-1552960562-daf630e9278b",
+      readTime: "8 min read",
+    },
+    {
+      id: 5,
+      title: "Cover Letter vs Resume: Do You Still Need Both?",
+      excerpt: "Uncover when a cover letter is essential, when it's optional, and how to make both documents work together effectively.",
+      category: "Application Tips",
+      image: "https://images.unsplash.com/photo-1586473219010-2ffc57b0d282",
+      readTime: "6 min read",
+    },
+    {
+      id: 6,
+      title: "From Zero to Hired: How I Landed My Dream Job with Rezume.dev",
+      excerpt: "A customer success story detailing how using Rezume.dev transformed one job seeker's application process and career trajectory.",
+      category: "Success Story",
+      image: "https://images.unsplash.com/photo-1579389083078-4e7018379f7e",
+      readTime: "9 min read",
+    },
   ];
 
   return (
