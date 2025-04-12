@@ -42,6 +42,13 @@ const setupFavicons = () => {
 // Initialize the application
 const initializeApp = () => {
   setupFavicons();
+  
+  // Add performance measurements
+  if (window.performance) {
+    const pageLoadTime = window.performance.timing.domContentLoadedEventEnd - window.performance.timing.navigationStart;
+    console.log(`Page loaded in: ${pageLoadTime}ms`);
+  }
+  
   const rootElement = document.getElementById("root");
   if (rootElement) {
     createRoot(rootElement).render(<App />);
@@ -49,5 +56,10 @@ const initializeApp = () => {
     console.error("Root element not found");
   }
 };
+
+// Add event for page load complete
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM fully loaded');
+});
 
 initializeApp();
