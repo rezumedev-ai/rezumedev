@@ -70,6 +70,9 @@ export default function ResumePreview() {
   const summary = getStringProperty(professionalSummary, 'summary', "");
   const metaDescription = summary ? summary.substring(0, 100) + '...' : '';
 
+  // Create absolute URL for canonical link
+  const canonicalUrl = `https://rezume.dev/resume/${id}`;
+
   return (
     <div className="relative bg-white min-h-screen">
       <Helmet>
@@ -82,9 +85,26 @@ export default function ResumePreview() {
           name="viewport" 
           content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" 
         />
+        <link rel="canonical" href={canonicalUrl} />
         <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
-        <link rel="icon" type="image/x-icon" href="/favicon1.ico" />
+        <link rel="icon" type="image/x-icon" href="/custom-favicon.ico" />
         <link rel="apple-touch-icon" href="/custom-favicon.svg" />
+        
+        {/* Schema.org structured data for Resume */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": `${name}'s ${position} Resume`,
+            "description": `Professional resume for ${name}${metaDescription ? ` - ${metaDescription}` : ''}`,
+            "url": canonicalUrl,
+            "isPartOf": {
+              "@type": "WebSite",
+              "name": "Rezume.dev",
+              "url": "https://rezume.dev/"
+            }
+          })}
+        </script>
       </Helmet>
       
       <FinalResumePreview

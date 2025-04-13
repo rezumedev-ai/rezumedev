@@ -1,0 +1,10 @@
+
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /login/
+Disallow: /signup/
+
+# Sitemaps
+Sitemap: https://rezume.dev/sitemap.xml
