@@ -33,9 +33,6 @@ export const Footer = () => {
               <li>
                 <Link to="/features" className="text-sm text-muted-foreground hover:text-primary transition-colors">Features</Link>
               </li>
-              <li>
-                <a href="/sitemap.xml" className="text-sm text-muted-foreground hover:text-primary transition-colors">XML Sitemap</a>
-              </li>
             </ul>
           </div>
 
