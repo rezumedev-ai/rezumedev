@@ -79,89 +79,55 @@ export function DownloadOptionsDialog({
       
       document.body.appendChild(clonedResume);
 
-      // Enhanced icon handling for PDF export - replaces ALL icons with text symbols
-      const replaceAllIcons = (element: HTMLElement) => {
-        // Replace contact icons
-        const contactIcons = element.querySelectorAll('[data-pdf-contact-icon="true"], [data-lucide]');
-        contactIcons.forEach(icon => {
-          const iconElement = icon as HTMLElement;
-          const svg = iconElement.querySelector('svg');
-          if (svg) {
-            const iconType = svg.getAttribute('data-lucide') || '';
-            let iconSymbol = '•';
-            
-            // Map all possible icon types to appropriate symbols
-            switch (iconType.toLowerCase()) {
-              case 'mail': iconSymbol = '✉'; break;
-              case 'phone': iconSymbol = '☎'; break;
-              case 'linkedin': iconSymbol = 'in'; break;
-              case 'globe': iconSymbol = '🌐'; break;
-              case 'briefcase': iconSymbol = '💼'; break;
-              case 'graduation-cap': iconSymbol = '🎓'; break;
-              case 'award': iconSymbol = '🏆'; break;
-              case 'code': iconSymbol = '💻'; break;
-              case 'file-text': iconSymbol = '📄'; break;
-              case 'user': iconSymbol = '👤'; break;
-              case 'folder-kanban': iconSymbol = '📂'; break;
-              case 'chevron-right': iconSymbol = '›'; break;
-              case 'arrow-right': iconSymbol = '→'; break;
-              default: iconSymbol = '•'; break;
-            }
-            
-            const iconSpan = document.createElement('span');
-            iconSpan.textContent = iconSymbol;
-            iconSpan.className = 'pdf-icon-text';
-            iconSpan.style.display = 'inline-flex';
-            iconSpan.style.alignItems = 'center';
-            iconSpan.style.justifyContent = 'center';
-            iconSpan.style.verticalAlign = 'middle';
-            iconSpan.style.marginRight = '6px';
-            iconSpan.style.fontSize = '14px';
-            iconSpan.style.lineHeight = '1';
-            
-            // For section headers, use different styling
-            if (iconElement.hasAttribute('data-pdf-section-icon')) {
-              iconSpan.style.marginRight = '8px';
-            }
-            
-            if (iconElement.contains(svg)) {
-              iconElement.replaceChild(iconSpan, svg);
-            }
+      // Enhanced icon handling for PDF export
+      // Fix contact icons alignment in PDF
+      const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
+      contactIcons.forEach(icon => {
+        const iconElement = icon as HTMLElement;
+        const svg = iconElement.querySelector('svg');
+        if (svg) {
+          const iconType = svg.getAttribute('data-lucide') || '';
+          let iconSymbol = '';
+          
+          switch (iconType.toLowerCase()) {
+            case 'mail': iconSymbol = '✉'; break;
+            case 'phone': iconSymbol = '☎'; break;
+            case 'linkedin': iconSymbol = 'in'; break;
+            case 'globe': iconSymbol = '🌐'; break;
+            default: iconSymbol = '•'; break;
           }
-        });
-
-        // Fix bullet points
-        const bulletPoints = element.querySelectorAll('[data-pdf-bullet="true"]');
-        bulletPoints.forEach(bullet => {
-          const bulletElement = bullet as HTMLElement;
-          bulletElement.textContent = '•';
-          bulletElement.style.width = 'auto';
-          bulletElement.style.height = 'auto';
-          bulletElement.style.display = 'inline-block';
-          bulletElement.style.marginRight = '6px';
-          bulletElement.style.marginTop = '0';
-          bulletElement.style.fontSize = '16px';
-          bulletElement.style.lineHeight = '1';
-          bulletElement.style.verticalAlign = 'middle';
-          bulletElement.className = 'pdf-bullet-char';
-        });
-      };
-
-      // Apply the icon replacements
-      replaceAllIcons(clonedResume);
-
-      // Ensure all contact wrappers have proper styling
-      const contactWrappers = clonedResume.querySelectorAll('[data-pdf-contact-wrapper="true"]');
-      contactWrappers.forEach(wrapper => {
-        const wrapperElement = wrapper as HTMLElement;
-        wrapperElement.style.display = 'flex';
-        wrapperElement.style.alignItems = 'center';
-        wrapperElement.style.gap = '4px';
-        wrapperElement.style.lineHeight = '1.5';
-        wrapperElement.style.marginBottom = '4px';
+          
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = iconSymbol;
+          iconSpan.className = 'pdf-icon-text';
+          iconSpan.style.marginRight = '6px';
+          iconSpan.style.fontSize = '14px';
+          iconSpan.style.display = 'inline-block';
+          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.lineHeight = '1';
+          
+          if (iconElement.contains(svg)) {
+            iconElement.replaceChild(iconSpan, svg);
+          }
+        }
       });
 
-      // Fix bullet lists
+      // Fix bullet points in PDF
+      const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
+      bulletPoints.forEach(bullet => {
+        const bulletElement = bullet as HTMLElement;
+        bulletElement.textContent = '•';
+        bulletElement.style.width = 'auto';
+        bulletElement.style.height = 'auto';
+        bulletElement.style.display = 'inline-block';
+        bulletElement.style.marginRight = '6px';
+        bulletElement.style.marginTop = '0';
+        bulletElement.style.fontSize = '16px';
+        bulletElement.style.lineHeight = '1';
+        bulletElement.style.verticalAlign = 'middle';
+        bulletElement.className = 'pdf-bullet-char';
+      });
+
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
         const listElement = list as HTMLElement;
@@ -170,28 +136,48 @@ export function DownloadOptionsDialog({
         listElement.style.listStyle = 'none';
       });
 
-      // Fix bullet items
       const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
         itemElement.style.display = 'flex';
-        itemElement.style.alignItems = 'flex-start';
+        itemElement.style.alignItems = 'center';
         itemElement.style.marginBottom = '4px';
-        itemElement.style.pageBreakInside = 'avoid';
       });
 
-      // Add specific template fixes based on class names
-      if (clonedResume.querySelector('.professional-navy-contact-icon')) {
-        const navyIcons = clonedResume.querySelectorAll('.professional-navy-contact-icon');
-        navyIcons.forEach(icon => {
-          const iconElement = icon as HTMLElement;
-          iconElement.style.display = 'inline-flex';
-          iconElement.style.alignItems = 'center';
-          iconElement.style.justifyContent = 'center';
-          iconElement.style.verticalAlign = 'middle';
-          iconElement.style.marginRight = '6px';
-        });
-      }
+      // Fix section icons in PDF
+      const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
+      sectionIcons.forEach(icon => {
+        const iconElement = icon as HTMLElement;
+        const svg = iconElement.querySelector('svg');
+        if (svg) {
+          const iconType = svg.getAttribute('data-lucide') || '';
+          let iconSymbol = '';
+          
+          switch (iconType.toLowerCase()) {
+            case 'briefcase': iconSymbol = '💼'; break;
+            case 'graduation-cap': iconSymbol = '🎓'; break;
+            case 'award': iconSymbol = '🏆'; break;
+            case 'code': iconSymbol = '💻'; break;
+            case 'file-text': iconSymbol = '📄'; break;
+            case 'user': iconSymbol = '👤'; break;
+            case 'folder-kanban': iconSymbol = '📂'; break;
+            default: iconSymbol = '•'; break;
+          }
+          
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = iconSymbol;
+          iconSpan.className = 'pdf-icon-text';
+          iconSpan.style.marginRight = '8px';
+          iconSpan.style.fontSize = '14px';
+          iconSpan.style.display = 'inline-block';
+          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.lineHeight = '1';
+          
+          if (iconElement.contains(svg)) {
+            iconElement.replaceChild(iconSpan, svg);
+          }
+        }
+      });
 
       const pixelRatio = window.devicePixelRatio || 1;
       
