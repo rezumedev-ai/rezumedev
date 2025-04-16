@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -45,10 +44,10 @@ function App() {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          <Toaster />
+          <Sonner />
           <Router>
             <AuthProvider>
-              <Toaster />
-              <Sonner />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/signup" element={<SignUp />} />

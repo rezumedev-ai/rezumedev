@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,12 +51,14 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { useProfileQuery } from "../dashboard/resume-list/useProfileQuery";
 
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
 
+// Helper function to format plan names
 const formatPlanName = (plan: string | null) => {
   if (!plan) return 'Free';
   return plan.charAt(0).toUpperCase() + plan.slice(1);
@@ -64,26 +67,26 @@ const formatPlanName = (plan: string | null) => {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
-  const queryClient = useQueryClient();
   
-  let navigate;
+  // Check if we're in a router context first
   let location;
-  let isRouterAvailable = false;
+  let navigate;
+  let isRouterAvailable = true;
   
   try {
     location = useLocation();
     navigate = useNavigate();
-    isRouterAvailable = true;
   } catch (error) {
-    console.log("Router not available, using fallback navigation");
-    location = { pathname: "/" };
+    // If useLocation or useNavigate fails, we're outside a Router
+    isRouterAvailable = false;
+    location = { pathname: '/' }; // Default value
   }
   
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [isReactivating, setIsReactivating] = useState(false);
-  const [isPortalLoading, setIsPortalLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -172,37 +175,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     }
   });
 
-  const openCustomerPortal = async () => {
-    try {
-      setIsPortalLoading(true);
-      
-      const { data, error } = await supabase.functions.invoke('create-customer-portal');
-      
-      if (error) {
-        console.error("Error creating customer portal session:", error);
-        toast.error("Failed to open subscription management", {
-          description: "There was a problem connecting to the subscription portal. Please try again."
-        });
-        return;
-      }
-      
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        toast.error("Failed to open subscription portal", {
-          description: "No portal URL was returned. Please try again or contact support."
-        });
-      }
-    } catch (error) {
-      console.error("Error opening customer portal:", error);
-      toast.error("Failed to open subscription portal", {
-        description: "An unexpected error occurred. Please try again later."
-      });
-    } finally {
-      setIsPortalLoading(false);
-    }
-  };
-
   const sidebarVariants = {
     open: { 
       x: 0,
@@ -245,11 +217,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     closed: { opacity: 0 }
   };
 
+  const menuItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { 
+      id: 'pricing', 
+      icon: CreditCard, 
+      label: 'Pricing', 
+      path: '/pricing',
+      badge: profile?.subscription_plan && profile?.subscription_status === 'active' ? 
+        `${formatPlanName(profile.subscription_plan)}` : null
+    },
+    { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
+    { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
+  ];
+
   const handleLogout = async () => {
     await signOut();
     if (isRouterAvailable && navigate) {
       navigate("/");
     } else {
+      // Fallback if navigation isn't available
       window.location.href = "/";
     }
   };
@@ -477,24 +464,33 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </Button>
                   
                   {profile.subscription_status === 'active' && (
-                    <Button 
-                      className="w-full sm:w-auto"
-                      variant="outline"
-                      onClick={openCustomerPortal}
-                      disabled={isPortalLoading}
-                    >
-                      {isPortalLoading ? (
-                        <div className="flex items-center">
-                          <span className="mr-2">Loading</span>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        </div>
-                      ) : (
-                        <div className="flex items-center">
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          <span>Manage in Stripe Portal</span>
-                        </div>
-                      )}
-                    </Button>
+                    <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                        >
+                          Cancel Subscription
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleCancelSubscription}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            Yes, Cancel Subscription
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
                   
                   {profile.subscription_status === 'canceled' && (
@@ -534,20 +530,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       </motion.div>
     );
   };
-
-  const menuItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { 
-      id: 'pricing', 
-      icon: CreditCard, 
-      label: 'Pricing', 
-      path: '/pricing',
-      badge: profile?.subscription_plan && profile?.subscription_status === 'active' ? 
-        `${formatPlanName(profile.subscription_plan)}` : null
-    },
-    { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
-    { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
-  ];
 
   return (
     <>
