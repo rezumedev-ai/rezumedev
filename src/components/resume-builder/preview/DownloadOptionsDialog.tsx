@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -78,6 +79,40 @@ export function DownloadOptionsDialog({
       
       document.body.appendChild(clonedResume);
 
+      // Enhanced icon handling for PDF export
+      // Fix contact icons alignment in PDF
+      const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
+      contactIcons.forEach(icon => {
+        const iconElement = icon as HTMLElement;
+        const svg = iconElement.querySelector('svg');
+        if (svg) {
+          const iconType = svg.getAttribute('data-lucide') || '';
+          let iconSymbol = '';
+          
+          switch (iconType.toLowerCase()) {
+            case 'mail': iconSymbol = '✉'; break;
+            case 'phone': iconSymbol = '☎'; break;
+            case 'linkedin': iconSymbol = 'in'; break;
+            case 'globe': iconSymbol = '🌐'; break;
+            default: iconSymbol = '•'; break;
+          }
+          
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = iconSymbol;
+          iconSpan.className = 'pdf-icon-text';
+          iconSpan.style.marginRight = '6px';
+          iconSpan.style.fontSize = '14px';
+          iconSpan.style.display = 'inline-block';
+          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.lineHeight = '1';
+          
+          if (iconElement.contains(svg)) {
+            iconElement.replaceChild(iconSpan, svg);
+          }
+        }
+      });
+
+      // Fix bullet points in PDF
       const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
@@ -86,9 +121,10 @@ export function DownloadOptionsDialog({
         bulletElement.style.height = 'auto';
         bulletElement.style.display = 'inline-block';
         bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '3px';
+        bulletElement.style.marginTop = '0';
         bulletElement.style.fontSize = '16px';
         bulletElement.style.lineHeight = '1';
+        bulletElement.style.verticalAlign = 'middle';
         bulletElement.className = 'pdf-bullet-char';
       });
 
@@ -104,10 +140,11 @@ export function DownloadOptionsDialog({
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
         itemElement.style.display = 'flex';
-        itemElement.style.alignItems = 'flex-start';
+        itemElement.style.alignItems = 'center';
         itemElement.style.marginBottom = '4px';
       });
 
+      // Fix section icons in PDF
       const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
@@ -132,6 +169,9 @@ export function DownloadOptionsDialog({
           iconSpan.className = 'pdf-icon-text';
           iconSpan.style.marginRight = '8px';
           iconSpan.style.fontSize = '14px';
+          iconSpan.style.display = 'inline-block';
+          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.lineHeight = '1';
           
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);

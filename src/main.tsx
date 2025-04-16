@@ -39,9 +39,37 @@ const setupFavicons = () => {
   }
 };
 
+// Add specific PDF rendering optimization
+const setupPdfOptimizations = () => {
+  // Create a style element for PDF-specific CSS
+  const style = document.createElement('style');
+  style.textContent = `
+    @media print {
+      /* Ensure icons align properly in print/PDF */
+      .pdf-contact-icon, [data-pdf-contact-icon="true"] {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        vertical-align: middle !important;
+        transform: translateY(0) !important;
+      }
+      
+      /* Fix for section icons and bullets */
+      .pdf-section-icon, .pdf-bullet-char {
+        display: inline-flex !important;
+        align-items: center !important;
+        vertical-align: middle !important;
+        margin-top: 0 !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+};
+
 // Initialize the application
 const initializeApp = () => {
   setupFavicons();
+  setupPdfOptimizations();
   
   // Add performance measurements
   if (window.performance) {
