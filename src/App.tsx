@@ -50,9 +50,9 @@ function App() {
     <React.StrictMode>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Router>
-              <AuthProvider>
+          <Router>
+            <AuthProvider>
+              <TooltipProvider>
                 <Toaster />
                 <SonnerToaster />
                 <Routes>
@@ -154,9 +154,9 @@ function App() {
                   />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </AuthProvider>
-            </Router>
-          </TooltipProvider>
+              </TooltipProvider>
+            </AuthProvider>
+          </Router>
         </QueryClientProvider>
       </ThemeProvider>
     </React.StrictMode>
