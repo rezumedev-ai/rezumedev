@@ -1,22 +1,27 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-export const ProtectedRoute = () => {
+export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  // The ProtectedRoute doesn't need to be modified since it only checks 
+  // if the user is authenticated, not their subscription status.
+  // The subscription-specific checks are handled in individual components.
+  
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // Wait for authentication to initialize
     if (!loading) {
       if (!user) {
-        // Save the current location for redirect after login
-        const returnPath = location.pathname;
+        // Save current location to redirect back after login
+        const returnPath = location.pathname !== "/login" ? location.pathname : undefined;
         navigate("/login", { 
           replace: true,
-          state: { returnTo: returnPath }
+          state: returnPath ? { returnTo: returnPath } : undefined
         });
       }
       setIsInitialized(true);
@@ -31,5 +36,5 @@ export const ProtectedRoute = () => {
     );
   }
 
-  return user ? <Outlet /> : null;
+  return user ? <>{children}</> : null;
 };

@@ -1,8 +1,11 @@
 
 project_id = "xqkzmcudulutohnskcwt"
 
-[functions.track-affiliate-click]
+[functions.stripe-webhook]
 verify_jwt = false
 
-[functions.track-affiliate-conversion]
+[functions.create-checkout-session]
+verify_jwt = false
+
+[functions.reactivate-subscription]
 verify_jwt = false

@@ -43,18 +43,10 @@ const setupFavicons = () => {
 const initializeApp = () => {
   setupFavicons();
   
-  // Measure page load performance using modern Performance API
+  // Add performance measurements
   if (window.performance) {
-    const navEntries = performance.getEntriesByType('navigation');
-    if (navEntries.length > 0) {
-      const navEntry = navEntries[0] as PerformanceNavigationTiming;
-      const pageLoadTime = navEntry.domContentLoadedEventEnd - navEntry.startTime;
-      console.log(`Page loaded in: ${pageLoadTime}ms`);
-    } else {
-      // Fallback if navigation timing isn't available
-      const pageLoadTime = performance.now();
-      console.log(`Page loaded in approximately: ${pageLoadTime}ms`);
-    }
+    const pageLoadTime = window.performance.timing.domContentLoadedEventEnd - window.performance.timing.navigationStart;
+    console.log(`Page loaded in: ${pageLoadTime}ms`);
   }
   
   const rootElement = document.getElementById("root");
