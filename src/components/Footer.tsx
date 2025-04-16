@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, FileText, RssIcon } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -14,9 +14,6 @@ export const Footer = () => {
             <div className="flex space-x-4">
               <a href="/sitemap.html" aria-label="View our sitemap" className="text-muted-foreground hover:text-primary transition-colors">
                 <FileText className="h-5 w-5" />
-              </a>
-              <a href="/rss.xml" target="_blank" rel="noopener noreferrer" aria-label="Subscribe to our RSS feed" className="text-muted-foreground hover:text-primary transition-colors">
-                <RssIcon className="h-5 w-5" />
               </a>
             </div>
           </div>
