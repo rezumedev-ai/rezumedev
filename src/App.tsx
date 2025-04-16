@@ -49,115 +49,122 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <React.StrictMode>
+      {/* First wrap everything in the Root ErrorBoundary */}
       <ErrorBoundary>
+        {/* ThemeProvider must come before components that use theming */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* Then the query client for data fetching */}
           <QueryClientProvider client={queryClient}>
+            {/* Router for navigation */}
             <Router>
+              {/* Auth provider for user authentication */}
               <AuthProvider>
+                {/* Tooltip provider for UI components */}
                 <TooltipProvider>
+                  {/* Toast notifications come last as they depend on other contexts */}
                   <Toaster />
                   <SonnerToaster />
-                  <ErrorBoundary>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/signup" element={<SignUp />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/privacy" element={<Privacy />} />
-                      <Route path="/terms" element={<Terms />} />
-                      <Route path="/cookies" element={<Cookies />} />
-                      <Route path="/pricing" element={<Pricing />} />
-                      <Route path="/payment-success" element={<PaymentSuccess />} />
-                      <Route path="/blog" element={<Blog />} />
-                      <Route path="/blog/:id" element={<BlogPost />} />
-                      <Route path="/features" element={<Features />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/careers" element={<Careers />} />
-                      <Route path="/guides" element={<Guides />} />
-                      <Route path="/affiliate" element={<AffiliateHome />} />
-                      <Route
-                        path="/affiliate/apply"
-                        element={
-                          <ProtectedRoute>
-                            <AffiliateApplication />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/affiliate/dashboard"
-                        element={
-                          <ProtectedRoute>
-                            <AffiliateDashboard />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/affiliate/payouts"
-                        element={
-                          <ProtectedRoute>
-                            <AffiliatePayouts />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/dashboard"
-                        element={
-                          <ProtectedRoute>
-                            <Dashboard />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/settings"
-                        element={
-                          <ProtectedRoute>
-                            <Settings />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/help"
-                        element={
-                          <ProtectedRoute>
-                            <Help />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/new-resume"
-                        element={
-                          <ProtectedRoute>
-                            <NewResume />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/resume-builder/:id?"
-                        element={
-                          <ProtectedRoute>
-                            <ResumeBuilder />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/resume-preview/:id"
-                        element={
-                          <ProtectedRoute>
-                            <ResumePreview />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/onboarding"
-                        element={
-                          <ProtectedRoute>
-                            <Onboarding />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </ErrorBoundary>
+                  
+                  {/* App routing */}
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/cookies" element={<Cookies />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/payment-success" element={<PaymentSuccess />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:id" element={<BlogPost />} />
+                    <Route path="/features" element={<Features />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/careers" element={<Careers />} />
+                    <Route path="/guides" element={<Guides />} />
+                    <Route path="/affiliate" element={<AffiliateHome />} />
+                    <Route
+                      path="/affiliate/apply"
+                      element={
+                        <ProtectedRoute>
+                          <AffiliateApplication />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/affiliate/dashboard"
+                      element={
+                        <ProtectedRoute>
+                          <AffiliateDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/affiliate/payouts"
+                      element={
+                        <ProtectedRoute>
+                          <AffiliatePayouts />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <ProtectedRoute>
+                          <Dashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings"
+                      element={
+                        <ProtectedRoute>
+                          <Settings />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/help"
+                      element={
+                        <ProtectedRoute>
+                          <Help />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/new-resume"
+                      element={
+                        <ProtectedRoute>
+                          <NewResume />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/resume-builder/:id?"
+                      element={
+                        <ProtectedRoute>
+                          <ResumeBuilder />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/resume-preview/:id"
+                      element={
+                        <ProtectedRoute>
+                          <ResumePreview />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/onboarding"
+                      element={
+                        <ProtectedRoute>
+                          <Onboarding />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
                 </TooltipProvider>
               </AuthProvider>
             </Router>
