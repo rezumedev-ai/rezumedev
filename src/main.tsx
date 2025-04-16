@@ -1,8 +1,8 @@
 
+import React from 'react' // Explicitly import React
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import React from 'react' // Explicitly import React
 
 // Function to ensure all favicon-related elements use the custom favicon
 const setupFavicons = () => {
