@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,6 +86,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [isReactivating, setIsReactivating] = useState(false);
   const queryClient = useQueryClient();
+  
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -174,6 +175,37 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       setIsReactivating(false);
     }
   });
+
+  const openCustomerPortal = async () => {
+    try {
+      setIsPortalLoading(true);
+      
+      const { data, error } = await supabase.functions.invoke('create-customer-portal');
+      
+      if (error) {
+        console.error("Error creating customer portal session:", error);
+        toast.error("Failed to open subscription management", {
+          description: "There was a problem connecting to the subscription portal. Please try again."
+        });
+        return;
+      }
+      
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error("Failed to open subscription portal", {
+          description: "No portal URL was returned. Please try again or contact support."
+        });
+      }
+    } catch (error) {
+      console.error("Error opening customer portal:", error);
+      toast.error("Failed to open subscription portal", {
+        description: "An unexpected error occurred. Please try again later."
+      });
+    } finally {
+      setIsPortalLoading(false);
+    }
+  };
 
   const sidebarVariants = {
     open: { 
@@ -464,33 +496,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </Button>
                   
                   {profile.subscription_status === 'active' && (
-                    <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                        >
-                          Cancel Subscription
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleCancelSubscription}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            Yes, Cancel Subscription
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <Button 
+                      className="w-full sm:w-auto"
+                      variant="outline"
+                      onClick={openCustomerPortal}
+                      disabled={isPortalLoading}
+                    >
+                      {isPortalLoading ? (
+                        <div className="flex items-center">
+                          <span className="mr-2">Loading</span>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          <span>Manage in Stripe Portal</span>
+                        </div>
+                      )}
+                    </Button>
                   )}
                   
                   {profile.subscription_status === 'canceled' && (

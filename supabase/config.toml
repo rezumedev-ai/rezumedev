@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.reactivate-subscription]
 verify_jwt = false
+
+[functions.create-customer-portal]
+verify_jwt = false
