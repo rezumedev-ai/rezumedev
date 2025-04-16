@@ -1,3 +1,7 @@
+
+// This is a client component
+"use client"
+
 import * as React from "react"
 
 import type {

@@ -9,8 +9,11 @@ import { Button } from "@/components/ui/button"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
+import { useAffiliateTracking } from "@/hooks/use-affiliate-tracking"
 
 export default function AffiliateDashboard() {
+  useAffiliateTracking(); // Use the tracking hook
+  
   const { user } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
