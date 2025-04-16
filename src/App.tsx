@@ -24,8 +24,8 @@ function App() {
   return (
     <React.StrictMode>
       <ErrorBoundary>
-        <Router>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Router>
             <QueryClientProvider client={queryClient}>
               <ToastProvider>
                 <AuthProvider>
@@ -35,8 +35,8 @@ function App() {
                 </AuthProvider>
               </ToastProvider>
             </QueryClientProvider>
-          </ThemeProvider>
-        </Router>
+          </Router>
+        </ThemeProvider>
       </ErrorBoundary>
     </React.StrictMode>
   );
