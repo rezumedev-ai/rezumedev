@@ -186,10 +186,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       }
     } catch (error) {
       console.error('Error accessing customer portal:', error);
-      toast({
-        title: "Error",
-        description: "Could not access the customer portal. Please try again later.",
-        variant: "destructive",
+      toast.error("Error", {
+        description: "Could not access the customer portal. Please try again later."
       });
     }
   };
@@ -346,9 +344,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-xl">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Subscription Details
+              <DialogTitle>
+                <div className="flex items-center gap-2 text-xl">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Subscription Details
+                </div>
               </DialogTitle>
               <DialogDescription>
                 {profile?.subscription_plan 
