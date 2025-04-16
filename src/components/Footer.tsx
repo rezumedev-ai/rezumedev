@@ -33,6 +33,11 @@ export const Footer = () => {
               <li>
                 <Link to="/features" className="text-sm text-muted-foreground hover:text-primary transition-colors">Features</Link>
               </li>
+              <li>
+                <Link to="/affiliate" className="hover:text-primary transition-colors">
+                  Affiliate Program
+                </Link>
+              </li>
             </ul>
           </div>
 

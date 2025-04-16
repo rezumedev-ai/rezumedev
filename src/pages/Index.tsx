@@ -1,4 +1,3 @@
-
 import { Helmet } from 'react-helmet';
 import { AnimatedHero } from "@/components/ui/animated-hero";
 import { Process } from "@/components/Process";
@@ -11,8 +10,11 @@ import { Header } from "@/components/Header";
 import { AnimatedTestimonialsSection } from "@/components/AnimatedTestimonialsSection";
 import ComparisonTable from "@/components/ComparisonTable";
 import PricingSection from "@/components/PricingSection";
+import { useAffiliateTracking } from "@/hooks/use-affiliate-tracking";
 
 const Index = () => {
+  useAffiliateTracking();
+
   return (
     <>
       <Helmet>

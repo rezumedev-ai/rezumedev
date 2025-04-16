@@ -1,123 +1,107 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
-
-export type PlanType = "monthly" | "yearly" | "lifetime";
+import { useSubscription } from "@/hooks/use-subscription";
+import { getStripe } from "@/lib/stripe";
+import { trackAffiliateConversion } from "@/utils/affiliateTracker";
 
 interface CheckoutButtonProps {
-  planType: PlanType;
-  disabled?: boolean;
-  className?: string;
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  plan: {
+    id: string;
+    name: string;
+    price: number;
+    interval: string;
+  };
   children: React.ReactNode;
 }
 
-// Environment detection - determines if we're in production or development
-const isProduction = window.location.hostname !== "localhost" && 
-                    !window.location.hostname.includes("127.0.0.1") &&
-                    !window.location.hostname.includes(".netlify.app");
-
-// Stripe publishable keys - safe to expose in client-side code
-const STRIPE_TEST_PUBLISHABLE_KEY = "pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi";
-const STRIPE_LIVE_PUBLISHABLE_KEY = "pk_live_51R0coQHK7YurnN3DQgm2RmqaJSXZs7bllvHjZyEGpGXaISvABbT59vNxwZ8fqwYe6VHsj5Eoe7lm1G3cq9ZsJ9I100RcqmMbkH";
-
-export const CheckoutButton = ({
-  planType,
-  disabled = false,
-  className,
-  variant = "default",
-  children
-}: CheckoutButtonProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { user, getAuthToken } = useAuth();
-  const navigate = useNavigate();
+export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ plan, children }) => {
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const { subscription, isSubscribed, isLoading } = useSubscription();
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
   const handleCheckout = async () => {
-    if (!user) {
-      toast.error("Login Required", {
-        description: "Please log in to subscribe to a plan"
-      });
-      navigate("/login", { state: { returnTo: "/pricing" } });
-      return;
-    }
-
-    setIsLoading(true);
-    toast.info("Preparing checkout...");
-
     try {
-      // Get the current session for authentication
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.error("Authentication error:", sessionError || "No session found");
-        throw new Error("Authentication error. Please try logging in again.");
+      setIsCheckoutLoading(true);
+
+      if (!user) {
+        toast({
+          title: "Not authenticated",
+          description: "Please log in to subscribe.",
+          variant: "destructive",
+        });
+        return;
       }
-      
-      // Get current timestamp for caching prevention
-      const timestamp = new Date().getTime();
-      
-      // Make the request to create a checkout session
-      const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
-        body: {
-          planType,
-          userId: user.id,
-          successUrl: `${window.location.origin}/payment-success?t=${timestamp}`,
-          cancelUrl: `${window.location.origin}/pricing?t=${timestamp}`,
-          mode: isProduction ? "live" : "test" // Pass the mode to the edge function
+
+      const stripe = await getStripe();
+
+      if (!stripe) {
+        toast({
+          title: "Failed to load Stripe",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { priceId } =
+        plan.id === "free"
+          ? { priceId: "" }
+          : { priceId: plan.id };
+
+      const response = await fetch("/api/create-stripe-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          priceId,
+          customerId: user.id,
+          planName: plan.name,
+        }),
       });
 
-      if (error) {
-        console.error("Function error:", error);
-        throw new Error(error.message || "Function error");
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast({
+          title: "Checkout failed",
+          description: errorData.error || "Something went wrong.",
+          variant: "destructive",
+        });
+        return;
       }
 
-      if (!sessionData?.url) {
-        console.error("No checkout URL returned:", sessionData);
-        throw new Error("No checkout URL returned");
-      }
+      const { sessionId } = await response.json();
 
-      // Redirect to Stripe checkout
-      toast.success("Redirecting to Stripe");
-      window.location.href = sessionData.url;
-      
-    } catch (error) {
-      console.error("Checkout error:", error);
-      
-      let errorMessage = "Failed to start checkout process. Please try again later.";
-      
-      if (error.message) {
-        errorMessage = error.message;
+      if (sessionId) {
+        // Add this right before redirecting or showing success:
+        await trackAffiliateConversion('subscription', plan.price);
+        stripe?.redirectToCheckout({ sessionId });
+      } else {
+        toast({
+          title: "Could not redirect to checkout",
+          description: "Please try again.",
+          variant: "destructive",
+        });
       }
-      
-      toast.error("Checkout Error", {
-        description: errorMessage
+    } catch (error: any) {
+      toast({
+        title: "Something went wrong",
+        description: error.message,
+        variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsCheckoutLoading(false);
     }
   };
 
+  const isLoadingState = isLoading || isCheckoutLoading;
+
   return (
-    <Button
-      variant={variant}
-      className={className}
-      onClick={handleCheckout}
-      disabled={disabled || isLoading}
-    >
-      {isLoading ? (
-        <div className="flex items-center">
-          <span className="mr-2">Processing</span>
-          <Loader2 className="h-4 w-4 animate-spin" />
-        </div>
-      ) : (
-        children
-      )}
+    <Button onClick={handleCheckout} disabled={isLoadingState}>
+      {children}
     </Button>
   );
 };
