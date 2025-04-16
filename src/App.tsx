@@ -26,15 +26,15 @@ function App() {
       <ErrorBoundary>
         <Router>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <ToastProvider>
-              <QueryClientProvider client={queryClient}>
+            <QueryClientProvider client={queryClient}>
+              <ToastProvider>
                 <AuthProvider>
                   <AppRoutes />
                   <Toaster />
                   <SonnerToaster />
                 </AuthProvider>
-              </QueryClientProvider>
-            </ToastProvider>
+              </ToastProvider>
+            </QueryClientProvider>
           </ThemeProvider>
         </Router>
       </ErrorBoundary>
