@@ -39,23 +39,38 @@ const setupFavicons = () => {
   }
 };
 
-// Add specific PDF rendering optimization
+// Add enhanced PDF rendering optimization
 const setupPdfOptimizations = () => {
   // Create a style element for PDF-specific CSS
   const style = document.createElement('style');
   style.textContent = `
     @media print {
-      /* Ensure icons align properly in print/PDF */
-      .pdf-contact-icon, [data-pdf-contact-icon="true"] {
+      /* Global PDF icon alignment fixes */
+      [data-pdf-contact-icon="true"], 
+      [data-pdf-section-icon="true"], 
+      [data-pdf-bullet="true"],
+      .pdf-contact-icon, 
+      .pdf-section-icon, 
+      .pdf-bullet-char {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
         vertical-align: middle !important;
         transform: translateY(0) !important;
+        line-height: 1 !important;
       }
       
-      /* Fix for section icons and bullets */
-      .pdf-section-icon, .pdf-bullet-char {
+      /* Resume content fixes for print */
+      #resume-content svg {
+        vertical-align: middle !important;
+      }
+      
+      /* Special template fixes */
+      .professional-navy-contact-icon,
+      .modern-professional-contact-icon,
+      .minimal-elegant-contact-icon,
+      .executive-clean-contact-icon,
+      .professional-executive-contact-icon {
         display: inline-flex !important;
         align-items: center !important;
         vertical-align: middle !important;

@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -110,7 +109,7 @@
     -webkit-print-color-adjust: exact;
   }
 
-  /* PDF-specific styling */
+  /* PDF-specific styling - Updated for consistent alignment */
   .pdf-mode {
     padding: 32px 32px 0 32px !important; /* Increased padding: Top, right, bottom, left padding for PDF export */
     box-sizing: border-box !important;
@@ -124,7 +123,7 @@
 
   .pdf-mode #resume-content .pdf-bullet-item {
     display: flex !important;
-    align-items: center !important;
+    align-items: flex-start !important;
     margin-bottom: 6px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
@@ -144,7 +143,7 @@
     border-radius: 50% !important;
     background-color: currentColor !important;
     vertical-align: top !important;
-    transform: translateY(2px) !important;
+    transform: translateY(0) !important;
   }
 
   .pdf-mode #resume-content .pdf-bullet-text {
@@ -159,9 +158,10 @@
     margin-right: 6px !important; 
     margin-top: 0 !important;
     vertical-align: middle !important;
+    line-height: 1 !important;
   }
 
-  /* Improve contact icons in PDF */
+  /* Enhanced contact icons in PDF */
   .pdf-mode #resume-content .pdf-icon-text {
     display: inline-flex !important;
     align-items: center !important;
@@ -173,7 +173,7 @@
     transform: translateY(0) !important;
   }
 
-  /* Section icons */
+  /* Section icons - enhanced for all templates */
   .pdf-mode #resume-content .pdf-section-icon {
     display: inline-flex !important;
     align-items: center !important;
@@ -181,10 +181,13 @@
     flex-shrink: 0 !important;
     margin-right: 8px !important;
     vertical-align: middle !important;
+    transform: translateY(0) !important;
+    line-height: 1 !important;
   }
 
-  /* Personal info icons - FIXED ALIGNMENT */
-  .pdf-mode #resume-content .pdf-contact-icon {
+  /* Personal info icons - FIXED ALIGNMENT for all templates */
+  .pdf-mode #resume-content .pdf-contact-icon,
+  .pdf-mode #resume-content [data-pdf-contact-icon="true"] {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -195,8 +198,9 @@
     margin-right: 6px !important;
   }
 
-  /* Flexible contact items with proper icon alignment */
-  .pdf-mode #resume-content .pdf-contact-item {
+  /* Flexible contact items with proper icon alignment for all templates */
+  .pdf-mode #resume-content .pdf-contact-item,
+  .pdf-mode #resume-content [data-pdf-contact-wrapper="true"] {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -216,6 +220,22 @@
     object-fit: cover !important;
     object-position: center !important;
     aspect-ratio: 1/1 !important;
+  }
+
+  /* All templates icon alignment fixes */
+  .pdf-mode #resume-content .professional-navy-contact-icon,
+  .pdf-mode #resume-content .modern-professional-contact-icon,
+  .pdf-mode #resume-content .minimal-elegant-contact-icon,
+  .pdf-mode #resume-content .executive-clean-contact-icon,
+  .pdf-mode #resume-content .professional-executive-contact-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    vertical-align: middle !important;
+    transform: translateY(0) !important;
+    line-height: 1 !important;
+    margin-right: 6px !important;
   }
 
   /* Other fixes from previous implementation */
@@ -321,6 +341,30 @@
     gap: 4px !important;
     line-height: 1.5 !important;
     margin-bottom: 4px !important;
+  }
+
+  /* Template specific fixes for PDF export */
+  .pdf-mode #resume-content .professional-navy-header,
+  .pdf-mode #resume-content .modern-professional-header,
+  .pdf-mode #resume-content .minimal-elegant-header,
+  .pdf-mode #resume-content .executive-clean-header,
+  .pdf-mode #resume-content .professional-executive-header {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Extra fix for all template icon alignment */
+  @media print, screen and (min-resolution: 192dpi) {
+    span[data-pdf-contact-icon="true"],
+    span[data-pdf-section-icon="true"],
+    span[data-pdf-bullet="true"] {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      vertical-align: middle !important;
+      transform: translateY(0) !important;
+      line-height: 1 !important;
+    }
   }
 
   .prose {
