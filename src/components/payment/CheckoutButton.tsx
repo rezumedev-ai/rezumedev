@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -5,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/use-subscription";
 import { getStripe } from "@/lib/stripe";
 import { trackAffiliateConversion } from "@/utils/affiliateTracker";
+import { type PlanType } from "@/pages/Pricing";
 
 interface CheckoutButtonProps {
   plan: {
@@ -13,10 +15,17 @@ interface CheckoutButtonProps {
     price: number;
     interval: string;
   };
+  planType: PlanType;
+  className?: string;
   children: React.ReactNode;
 }
 
-export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ plan, children }) => {
+export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ 
+  plan, 
+  planType, 
+  className = "", 
+  children 
+}) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { subscription, isSubscribed, isLoading } = useSubscription();
@@ -51,6 +60,7 @@ export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ plan, children }
           ? { priceId: "" }
           : { priceId: plan.id };
 
+      // Call the Supabase Edge Function to create a checkout session
       const response = await fetch("/api/create-stripe-checkout-session", {
         method: "POST",
         headers: {
@@ -60,6 +70,7 @@ export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ plan, children }
           priceId,
           customerId: user.id,
           planName: plan.name,
+          planType: planType,
         }),
       });
 
@@ -100,7 +111,7 @@ export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ plan, children }
   const isLoadingState = isLoading || isCheckoutLoading;
 
   return (
-    <Button onClick={handleCheckout} disabled={isLoadingState}>
+    <Button onClick={handleCheckout} disabled={isLoadingState} className={className}>
       {children}
     </Button>
   );
