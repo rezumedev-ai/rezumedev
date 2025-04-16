@@ -347,6 +347,7 @@ export type Database = {
           id: string
           payment_method: string | null
           resume_preferences: Json | null
+          subscription_end_date: string | null
           subscription_id: string | null
           subscription_plan: string | null
           subscription_status: string | null
@@ -361,6 +362,7 @@ export type Database = {
           id: string
           payment_method?: string | null
           resume_preferences?: Json | null
+          subscription_end_date?: string | null
           subscription_id?: string | null
           subscription_plan?: string | null
           subscription_status?: string | null
@@ -375,6 +377,7 @@ export type Database = {
           id?: string
           payment_method?: string | null
           resume_preferences?: Json | null
+          subscription_end_date?: string | null
           subscription_id?: string | null
           subscription_plan?: string | null
           subscription_status?: string | null

@@ -10,6 +10,13 @@ interface Subscription {
   current_period_end: string;
 }
 
+interface Profile {
+  subscription_id: string | null;
+  subscription_status: string | null;
+  subscription_plan: string | null;
+  subscription_end_date: string | null;
+}
+
 export function useSubscription() {
   const { user } = useAuth();
 
