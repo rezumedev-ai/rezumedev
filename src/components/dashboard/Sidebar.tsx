@@ -1,4 +1,4 @@
-
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +27,6 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -87,6 +86,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [isReactivating, setIsReactivating] = useState(false);
   const queryClient = useQueryClient();
+
+  // If the component is rendered outside of the expected React context, render nothing
+  if (!React) {
+    console.error("React is not available in this context");
+    return null;
+  }
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -236,7 +241,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     if (isRouterAvailable && navigate) {
       navigate("/");
     } else {
-      // Fallback if navigation isn't available
       window.location.href = "/";
     }
   };

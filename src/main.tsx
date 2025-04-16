@@ -2,6 +2,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import React from 'react' // Explicitly import React
 
 // Function to ensure all favicon-related elements use the custom favicon
 const setupFavicons = () => {
@@ -79,7 +80,11 @@ const initializeApp = () => {
   
   const rootElement = document.getElementById("root");
   if (rootElement) {
-    createRoot(rootElement).render(<App />);
+    createRoot(rootElement).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
   } else {
     console.error("Root element not found");
   }
