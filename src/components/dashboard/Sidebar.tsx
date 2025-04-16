@@ -50,7 +50,6 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useProfileQuery } from "../dashboard/resume-list/useProfileQuery";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -66,27 +65,28 @@ const formatPlanName = (plan: string | null) => {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
+  const queryClient = useQueryClient();
   
-  // Check if we're in a router context first
-  let location;
+  // Create a safe way to access router functionality
   let navigate;
-  let isRouterAvailable = true;
+  let location;
+  let isRouterAvailable = false;
   
   try {
+    // We're wrapping these hooks in try/catch because they might be called 
+    // outside a Router context during SSR or testing
     location = useLocation();
     navigate = useNavigate();
+    isRouterAvailable = true;
   } catch (error) {
-    // If useLocation or useNavigate fails, we're outside a Router
-    isRouterAvailable = false;
-    location = { pathname: '/' }; // Default value
+    console.log("Router not available, using fallback navigation");
+    location = { pathname: "/" };
   }
   
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [isReactivating, setIsReactivating] = useState(false);
-  const queryClient = useQueryClient();
-  
   const [isPortalLoading, setIsPortalLoading] = useState(false);
 
   const { data: profile } = useQuery({
@@ -248,20 +248,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     open: { opacity: 1 },
     closed: { opacity: 0 }
   };
-
-  const menuItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { 
-      id: 'pricing', 
-      icon: CreditCard, 
-      label: 'Pricing', 
-      path: '/pricing',
-      badge: profile?.subscription_plan && profile?.subscription_status === 'active' ? 
-        `${formatPlanName(profile.subscription_plan)}` : null
-    },
-    { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
-    { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
-  ];
 
   const handleLogout = async () => {
     await signOut();
