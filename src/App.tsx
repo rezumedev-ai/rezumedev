@@ -5,10 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { SonnerToaster } from "@/components/ui/sonner";
-import { ToastProvider } from "@/components/ToastProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppRoutes } from "./routes/AppRoutes";
+import { ToastProvider } from "./components/ToastProvider";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -24,9 +24,9 @@ function App() {
   return (
     <React.StrictMode>
       <ErrorBoundary>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ToastProvider>
-            <Router>
+        <Router>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ToastProvider>
               <QueryClientProvider client={queryClient}>
                 <AuthProvider>
                   <AppRoutes />
@@ -34,9 +34,9 @@ function App() {
                   <SonnerToaster />
                 </AuthProvider>
               </QueryClientProvider>
-            </Router>
-          </ToastProvider>
-        </ThemeProvider>
+            </ToastProvider>
+          </ThemeProvider>
+        </Router>
       </ErrorBoundary>
     </React.StrictMode>
   );
