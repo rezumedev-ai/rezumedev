@@ -1,16 +1,51 @@
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
 import { Copy, Link } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 export const LinkGenerator = () => {
   const [name, setName] = useState("")
   const [loading, setLoading] = useState(false)
+  const [links, setLinks] = useState([])
   const { toast } = useToast()
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      fetchLinks()
+    }
+  }, [user])
+
+  const fetchLinks = async () => {
+    try {
+      // Get affiliate ID
+      const { data: affiliate } = await supabase
+        .from('affiliates')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!affiliate) return
+
+      // Get links
+      const { data } = await supabase
+        .from('affiliate_links')
+        .select('*')
+        .eq('affiliate_id', affiliate.id)
+        .order('created_at', { ascending: false })
+
+      if (data) {
+        setLinks(data)
+      }
+    } catch (error) {
+      console.error("Error fetching links:", error)
+    }
+  }
 
   const generateLink = async () => {
     try {
@@ -47,6 +82,7 @@ export const LinkGenerator = () => {
       })
 
       setName("")
+      fetchLinks() // Refresh links after creating a new one
     } catch (error) {
       toast({
         variant: "destructive",
@@ -58,7 +94,7 @@ export const LinkGenerator = () => {
     }
   }
 
-  const copyToClipboard = (code: string) => {
+  const copyToClipboard = (code) => {
     navigator.clipboard.writeText(`${window.location.origin}?ref=${code}`)
     toast({
       title: "Copied!",
@@ -83,17 +119,21 @@ export const LinkGenerator = () => {
       <div className="mt-6">
         <h4 className="text-sm font-medium mb-2">Your Links</h4>
         <div className="space-y-2">
-          {data?.map((link) => (
-            <div key={link.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-              <div className="flex items-center gap-2">
-                <Link className="h-4 w-4" />
-                <span>{link.name}</span>
+          {links.length > 0 ? (
+            links.map((link) => (
+              <div key={link.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Link className="h-4 w-4" />
+                  <span>{link.name}</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(link.code)}>
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(link.code)}>
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground">No links created yet.</p>
+          )}
         </div>
       </div>
     </Card>
