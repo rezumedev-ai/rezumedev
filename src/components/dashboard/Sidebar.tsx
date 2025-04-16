@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,8 +67,21 @@ const formatPlanName = (plan: string | null) => {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
-  const location = useLocation();
-  const navigate = useNavigate();
+  
+  // Check if we're in a router context first
+  let location;
+  let navigate;
+  let isRouterAvailable = true;
+  
+  try {
+    location = useLocation();
+    navigate = useNavigate();
+  } catch (error) {
+    // If useLocation or useNavigate fails, we're outside a Router
+    isRouterAvailable = false;
+    location = { pathname: '/' }; // Default value
+  }
+  
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showManageDialog, setShowManageDialog] = useState(false);
@@ -219,7 +233,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const handleLogout = async () => {
     await signOut();
-    navigate("/");
+    if (isRouterAvailable && navigate) {
+      navigate("/");
+    } else {
+      // Fallback if navigation isn't available
+      window.location.href = "/";
+    }
   };
 
   const handleCancelSubscription = () => {
@@ -432,7 +451,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <Button 
                     variant="outline" 
                     className="w-full sm:w-auto"
-                    onClick={() => navigate("/pricing")}
+                    onClick={() => {
+                      if (isRouterAvailable && navigate) {
+                        navigate("/pricing");
+                      } else {
+                        window.location.href = "/pricing";
+                      }
+                    }}
                   >
                     <ArrowUpCircle className="mr-2 h-4 w-4" />
                     {profile.subscription_status === 'active' ? "Upgrade Plan" : "View Plans"}
@@ -488,7 +513,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               ) : (
                 <Button 
                   className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-hover"
-                  onClick={() => navigate("/pricing")}
+                  onClick={() => {
+                    if (isRouterAvailable && navigate) {
+                      navigate("/pricing");
+                    } else {
+                      window.location.href = "/pricing";
+                    }
+                  }}
                 >
                   Upgrade to Premium
                 </Button>
@@ -595,14 +626,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <motion.button
                     key={id}
                     onClick={() => {
-                      navigate(path);
+                      if (isRouterAvailable && navigate) {
+                        navigate(path);
+                      } else {
+                        window.location.href = path;
+                      }
                       if (isMobile && onClose) {
                         onClose();
                       }
                     }}
                     className={cn(
                       "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200",
-                      location.pathname === path
+                      isRouterAvailable && location?.pathname === path
                         ? "bg-primary text-white shadow-md hover:shadow-lg"
                         : "text-gray-600 hover:bg-primary/5"
                     )}
@@ -614,7 +649,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <div className="flex items-center">
                       <Icon className={cn(
                         "w-5 h-5 flex-shrink-0 mr-3",
-                        location.pathname === path && hoveredItem === id && "animate-pulse"
+                        isRouterAvailable && location?.pathname === path && hoveredItem === id && "animate-pulse"
                       )} />
                       <span className="truncate">{label}</span>
                     </div>
