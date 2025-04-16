@@ -12,10 +12,11 @@ export const ProtectedRoute = () => {
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        const returnPath = location.pathname !== "/login" ? location.pathname : undefined;
+        // Save the current location for redirect after login
+        const returnPath = location.pathname;
         navigate("/login", { 
           replace: true,
-          state: returnPath ? { returnTo: returnPath } : undefined
+          state: { returnTo: returnPath }
         });
       }
       setIsInitialized(true);

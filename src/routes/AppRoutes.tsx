@@ -1,5 +1,5 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Public Pages
@@ -55,21 +55,25 @@ export function AppRoutes() {
       <Route path="/payment-success" element={<PaymentSuccess />} />
 
       {/* Protected Routes */}
-      <Route path="/affiliate/*" element={<ProtectedRoute />}>
-        <Route path="dashboard" element={<AffiliateDashboard />} />
-        <Route path="apply" element={<AffiliateApplication />} />
-        <Route path="payouts" element={<AffiliatePayouts />} />
+      <Route element={<ProtectedRoute />}>
+        {/* App Routes */}
+        <Route path="/app/dashboard" element={<Dashboard />} />
+        <Route path="/app/settings" element={<Settings />} />
+        <Route path="/app/help" element={<Help />} />
+        <Route path="/app/new-resume" element={<NewResume />} />
+        <Route path="/app/resume-builder/:id?" element={<ResumeBuilder />} />
+        <Route path="/app/resume-preview/:id" element={<ResumePreview />} />
+        <Route path="/app/onboarding" element={<Onboarding />} />
+        
+        {/* Affiliate Routes */}
+        <Route path="/affiliate/dashboard" element={<AffiliateDashboard />} />
+        <Route path="/affiliate/apply" element={<AffiliateApplication />} />
+        <Route path="/affiliate/payouts" element={<AffiliatePayouts />} />
       </Route>
 
-      <Route path="/app/*" element={<ProtectedRoute />}>
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="help" element={<Help />} />
-        <Route path="new-resume" element={<NewResume />} />
-        <Route path="resume-builder/:id?" element={<ResumeBuilder />} />
-        <Route path="resume-preview/:id" element={<ResumePreview />} />
-        <Route path="onboarding" element={<Onboarding />} />
-      </Route>
+      {/* Redirect legacy affiliate routes */}
+      <Route path="/affiliate/*" element={<Navigate to="/affiliate" replace />} />
+      <Route path="/app/*" element={<Navigate to="/app/dashboard" replace />} />
 
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />

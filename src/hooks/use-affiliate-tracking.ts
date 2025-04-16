@@ -1,32 +1,19 @@
 
-"use client"
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { trackAffiliateClick } from "@/utils/affiliateTracker";
 
-import { useEffect } from 'react';
-import { trackAffiliateClick } from '@/utils/affiliateTracker';
-
-export function useAffiliateTracking() {
+export const useAffiliateTracking = () => {
+  const location = useLocation();
+  
   useEffect(() => {
-    const checkAndTrackAffiliate = async () => {
-      // Get URL parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const refCode = urlParams.get('ref');
-      
-      // If ref code exists, track the affiliate click
-      if (refCode) {
-        try {
-          await trackAffiliateClick(refCode);
-          
-          // Remove ref parameter from URL (optional)
-          urlParams.delete('ref');
-          const newUrl = window.location.pathname + 
-            (urlParams.toString() ? '?' + urlParams.toString() : '');
-          window.history.replaceState({}, document.title, newUrl);
-        } catch (error) {
-          console.error("Error tracking affiliate click:", error);
-        }
-      }
-    };
+    // Get URL parameters
+    const params = new URLSearchParams(location.search);
+    const refCode = params.get('ref');
     
-    checkAndTrackAffiliate();
-  }, []);
-}
+    if (refCode) {
+      // Track affiliate click
+      trackAffiliateClick(refCode);
+    }
+  }, [location.search]);
+};

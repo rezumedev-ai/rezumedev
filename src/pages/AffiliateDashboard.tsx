@@ -9,11 +9,9 @@ import { Button } from "@/components/ui/button"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
-import { useAffiliateTracking } from "@/hooks/use-affiliate-tracking"
+import { AffiliateLayout } from "@/components/affiliate/AffiliateLayout"
 
 export default function AffiliateDashboard() {
-  useAffiliateTracking(); // Use the tracking hook
-  
   const { user } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -29,7 +27,7 @@ export default function AffiliateDashboard() {
           .from('affiliates')
           .select('status')
           .eq('user_id', user.id)
-          .single()
+          .maybeSingle() // Using maybeSingle instead of single to avoid errors
 
         if (error) {
           console.error("Error checking affiliate status:", error)
@@ -63,9 +61,11 @@ export default function AffiliateDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <AffiliateLayout>
+        <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AffiliateLayout>
     )
   }
 
@@ -74,27 +74,29 @@ export default function AffiliateDashboard() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Affiliate Dashboard</h1>
-        <Button onClick={() => navigate('/affiliate/payouts')}>View Payouts</Button>
-      </div>
+    <AffiliateLayout>
+      <div className="container mx-auto py-8 space-y-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Affiliate Dashboard</h1>
+          <Button onClick={() => navigate('/affiliate/payouts')}>View Payouts</Button>
+        </div>
 
-      <DashboardMetrics />
-      
-      <div className="grid gap-8 md:grid-cols-2">
-        <LinkGenerator />
+        <DashboardMetrics />
         
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Tips</h3>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• Share your links on social media and your website</li>
-            <li>• Track your performance in real-time</li>
-            <li>• Commissions are paid monthly via your chosen payment method</li>
-            <li>• Need help? Contact our affiliate support team</li>
-          </ul>
-        </Card>
+        <div className="grid gap-8 md:grid-cols-2">
+          <LinkGenerator />
+          
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Quick Tips</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>• Share your links on social media and your website</li>
+              <li>• Track your performance in real-time</li>
+              <li>• Commissions are paid monthly via your chosen payment method</li>
+              <li>• Need help? Contact our affiliate support team</li>
+            </ul>
+          </Card>
+        </div>
       </div>
-    </div>
+    </AffiliateLayout>
   )
 }
