@@ -1,4 +1,4 @@
-
+import React, { useState } from 'react';
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +27,6 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -174,6 +173,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       setIsReactivating(false);
     }
   });
+
+  const handleCustomerPortal = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        body: { returnUrl: window.location.origin + '/dashboard' }
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Error accessing customer portal:', error);
+      toast({
+        title: "Error",
+        description: "Could not access the customer portal. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const sidebarVariants = {
     open: { 
@@ -464,33 +483,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </Button>
                   
                   {profile.subscription_status === 'active' && (
-                    <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                        >
-                          Cancel Subscription
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to cancel your subscription? You'll still have access to premium features until the end of your current billing period.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Keep My Subscription</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleCancelSubscription}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            Yes, Cancel Subscription
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <Button
+                      variant="outline"
+                      onClick={handleCustomerPortal}
+                      className="w-full sm:w-auto"
+                    >
+                      Manage Subscription
+                    </Button>
                   )}
                   
                   {profile.subscription_status === 'canceled' && (
