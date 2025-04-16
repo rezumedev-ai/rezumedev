@@ -1,5 +1,5 @@
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { DashboardMetrics } from "@/components/affiliate/DashboardMetrics"
 import { LinkGenerator } from "@/components/affiliate/LinkGenerator"
@@ -8,29 +8,67 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
+import { Loader2 } from "lucide-react"
 
 export default function AffiliateDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const [loading, setLoading] = useState(true)
+  const [hasAffiliateAccount, setHasAffiliateAccount] = useState(false)
 
   useEffect(() => {
     const checkAffiliateStatus = async () => {
       if (!user) return
 
-      const { data: affiliate } = await supabase
-        .from('affiliates')
-        .select('status')
-        .eq('user_id', user.id)
-        .single()
+      try {
+        const { data: affiliate, error } = await supabase
+          .from('affiliates')
+          .select('status')
+          .eq('user_id', user.id)
+          .single()
 
-      if (!affiliate) {
-        navigate('/affiliate/apply')
+        if (error) {
+          console.error("Error checking affiliate status:", error)
+          // If there's a specific not found error, redirect to apply page
+          if (error.code === 'PGRST116') {
+            navigate('/affiliate/apply')
+            return
+          }
+        }
+
+        if (!affiliate) {
+          navigate('/affiliate/apply')
+          return
+        }
+        
+        setHasAffiliateAccount(true)
+      } catch (error) {
+        console.error("Error in checkAffiliateStatus:", error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "There was a problem checking your affiliate status. Please try again later."
+        })
+      } finally {
+        setLoading(false)
       }
     }
 
     checkAffiliateStatus()
-  }, [user])
+  }, [user, navigate, toast])
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (!hasAffiliateAccount) {
+    return null // We'll redirect in the useEffect so no need to render anything
+  }
 
   return (
     <div className="container mx-auto py-8 space-y-8">

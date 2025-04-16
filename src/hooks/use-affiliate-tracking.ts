@@ -11,12 +11,17 @@ export function useAffiliateTracking() {
       
       // If ref code exists, track the affiliate click
       if (refCode) {
-        await trackAffiliateClick(refCode);
-        
-        // Clean URL by removing ref parameter (optional)
-        const newUrl = window.location.pathname + 
-          (urlParams.toString() ? '?' + urlParams.toString() : '');
-        window.history.replaceState({}, document.title, newUrl);
+        try {
+          await trackAffiliateClick(refCode);
+          
+          // Remove ref parameter from URL (optional)
+          urlParams.delete('ref');
+          const newUrl = window.location.pathname + 
+            (urlParams.toString() ? '?' + urlParams.toString() : '');
+          window.history.replaceState({}, document.title, newUrl);
+        } catch (error) {
+          console.error("Error tracking affiliate click:", error);
+        }
       }
     };
     

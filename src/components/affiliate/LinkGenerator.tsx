@@ -23,44 +23,75 @@ export const LinkGenerator = () => {
 
   const fetchLinks = async () => {
     try {
+      if (!user) return;
+      
       // Get affiliate ID
-      const { data: affiliate } = await supabase
+      const { data: affiliate, error: affiliateError } = await supabase
         .from('affiliates')
         .select('id')
         .eq('user_id', user.id)
         .single()
 
-      if (!affiliate) return
+      if (affiliateError || !affiliate) {
+        console.error("Error fetching affiliate:", affiliateError);
+        return;
+      }
 
       // Get links
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('affiliate_links')
         .select('*')
         .eq('affiliate_id', affiliate.id)
         .order('created_at', { ascending: false })
 
+      if (error) {
+        console.error("Error fetching links:", error);
+        return;
+      }
+
       if (data) {
-        setLinks(data)
+        setLinks(data);
       }
     } catch (error) {
-      console.error("Error fetching links:", error)
+      console.error("Error in fetchLinks:", error);
     }
   }
 
   const generateLink = async () => {
+    if (!name.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter a name for your link"
+      });
+      return;
+    }
+    
     try {
-      setLoading(true)
+      setLoading(true);
+
+      if (!user) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "You must be logged in to generate links"
+        });
+        return;
+      }
 
       // Get affiliate ID
-      const { data: affiliate } = await supabase
+      const { data: affiliate, error: affiliateError } = await supabase
         .from('affiliates')
         .select('id')
-        .single()
+        .eq('user_id', user.id)
+        .single();
 
-      if (!affiliate) throw new Error('No affiliate found')
+      if (affiliateError || !affiliate) {
+        throw new Error('No affiliate found. Please apply first.');
+      }
 
       // Generate a unique code
-      const code = Math.random().toString(36).substring(2, 8)
+      const code = Math.random().toString(36).substring(2, 8);
       
       // Create new link
       const { data: link, error } = await supabase
@@ -72,34 +103,35 @@ export const LinkGenerator = () => {
           target_url: window.location.origin
         })
         .select()
-        .single()
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Link Created",
         description: "Your affiliate link has been generated successfully"
-      })
+      });
 
-      setName("")
-      fetchLinks() // Refresh links after creating a new one
+      setName("");
+      fetchLinks(); // Refresh links after creating a new one
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   const copyToClipboard = (code) => {
-    navigator.clipboard.writeText(`${window.location.origin}?ref=${code}`)
+    const linkUrl = `${window.location.origin}?ref=${code}`;
+    navigator.clipboard.writeText(linkUrl);
     toast({
       title: "Copied!",
       description: "Link copied to clipboard"
-    })
+    });
   }
 
   return (
