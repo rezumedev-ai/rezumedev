@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -31,7 +30,6 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
-// Create the query client outside of the component to prevent recreation on renders
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -46,10 +44,10 @@ function App() {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          <Toaster />
+          <Sonner />
           <Router>
             <AuthProvider>
-              <Toaster />
-              <Sonner />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/signup" element={<SignUp />} />
