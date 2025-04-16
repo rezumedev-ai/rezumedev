@@ -56,7 +56,6 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-// Helper function to format plan names
 const formatPlanName = (plan: string | null) => {
   if (!plan) return 'Free';
   return plan.charAt(0).toUpperCase() + plan.slice(1);
@@ -67,14 +66,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
   
-  // Create a safe way to access router functionality
   let navigate;
   let location;
   let isRouterAvailable = false;
   
   try {
-    // We're wrapping these hooks in try/catch because they might be called 
-    // outside a Router context during SSR or testing
     location = useLocation();
     navigate = useNavigate();
     isRouterAvailable = true;
@@ -254,7 +250,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     if (isRouterAvailable && navigate) {
       navigate("/");
     } else {
-      // Fallback if navigation isn't available
       window.location.href = "/";
     }
   };
@@ -539,6 +534,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       </motion.div>
     );
   };
+
+  const menuItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { 
+      id: 'pricing', 
+      icon: CreditCard, 
+      label: 'Pricing', 
+      path: '/pricing',
+      badge: profile?.subscription_plan && profile?.subscription_status === 'active' ? 
+        `${formatPlanName(profile.subscription_plan)}` : null
+    },
+    { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
+    { id: 'help', icon: HelpCircle, label: 'Help & Support', path: '/help' },
+  ];
 
   return (
     <>
