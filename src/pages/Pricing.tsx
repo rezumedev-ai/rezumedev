@@ -74,6 +74,27 @@ const Pricing = () => {
   };
 
   const renderSubscriptionButton = (planType: PlanType) => {
+    const plans = {
+      monthly: {
+        id: "price_monthly",
+        name: "Monthly Plan",
+        price: 999,
+        interval: "month"
+      },
+      yearly: {
+        id: "price_yearly",
+        name: "Yearly Plan",
+        price: 7490,
+        interval: "year"
+      },
+      lifetime: {
+        id: "price_lifetime",
+        name: "Lifetime Plan",
+        price: 19900,
+        interval: "one-time"
+      }
+    };
+
     if (hasActiveSubscription && currentPlan === planType) {
       return (
         <Button variant="outline" className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800" disabled>
@@ -85,6 +106,7 @@ const Pricing = () => {
 
     return (
       <CheckoutButton
+        plan={plans[planType]}
         planType={planType}
         className={`w-full hover:scale-105 transition-transform ${
           hasActiveSubscription ? "bg-blue-600 hover:bg-blue-700" : ""

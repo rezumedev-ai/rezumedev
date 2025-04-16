@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -29,6 +30,10 @@ import NewResume from "./pages/NewResume";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import AffiliateDashboard from "./pages/AffiliateDashboard";
+import AffiliateApplication from "./pages/AffiliateApplication";
+import AffiliatePayouts from "./pages/AffiliatePayouts";
+import AffiliateHome from "./pages/AffiliateHome";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +69,31 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/guides" element={<Guides />} />
+                <Route path="/affiliate" element={<AffiliateHome />} />
+                <Route
+                  path="/affiliate/apply"
+                  element={
+                    <ProtectedRoute>
+                      <AffiliateApplication />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/affiliate/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <AffiliateDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/affiliate/payouts"
+                  element={
+                    <ProtectedRoute>
+                      <AffiliatePayouts />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/dashboard"
                   element={
