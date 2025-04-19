@@ -91,7 +91,7 @@ export const resumeTemplates: ResumeTemplate[] = [
       },
       icons: {
         sections: false,
-        contact: false,
+        contact: true,
         bullets: "dot"
       }
     }
@@ -139,7 +139,7 @@ export const resumeTemplates: ResumeTemplate[] = [
       },
       icons: {
         sections: false,
-        contact: false,
+        contact: true,
         bullets: "dot"
       }
     }
@@ -187,7 +187,7 @@ export const resumeTemplates: ResumeTemplate[] = [
       },
       icons: {
         sections: false,
-        contact: false,
+        contact: true,
         bullets: "dot"
       }
     }
@@ -235,8 +235,8 @@ export const resumeTemplates: ResumeTemplate[] = [
         lineHeight: "1.4"
       },
       icons: {
-        sections: false,
-        contact: false,
+        sections: true,
+        contact: true,
         bullets: "arrow",
         circularImage: true
       }
@@ -285,8 +285,8 @@ export const resumeTemplates: ResumeTemplate[] = [
         lineHeight: "1.4"
       },
       icons: {
-        sections: false,
-        contact: false,
+        sections: true,
+        contact: true,
         bullets: "dot",
         circularImage: true
       }

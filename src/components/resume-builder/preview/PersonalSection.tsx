@@ -1,3 +1,4 @@
+
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
 import { ImageUploadButton } from "./ImageUploadButton";
@@ -129,7 +130,8 @@ export function PersonalSection({
             {title}
           </div>
           <div className={currentStyle.contactContainer}>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -139,7 +141,8 @@ export function PersonalSection({
                 {email}
               </span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -150,7 +153,8 @@ export function PersonalSection({
               </span>
             </div>
             {linkedin && (
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
@@ -162,7 +166,8 @@ export function PersonalSection({
               </div>
             )}
             {website && (
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
@@ -179,7 +184,290 @@ export function PersonalSection({
     );
   }
 
-  // For all other templates
+  // Special rendering for Modern Professional template
+  if (template.id === "modern-professional") {
+    return (
+      <div className={currentStyle.container}>
+        <div className={styles["modern-professional"].imageContainer}>
+          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center relative">
+            {profileImageUrl ? (
+              <img 
+                src={profileImageUrl} 
+                alt={`${fullName}'s profile`} 
+                className="w-full h-full object-cover"
+                style={{aspectRatio: "1/1", objectPosition: "center"}}
+              />
+            ) : (
+              <div className="text-5xl text-emerald-700 font-bold">
+                {fullName.split(' ').map(name => name[0]).join('')}
+              </div>
+            )}
+            {isEditing && onImageUpdate && resumeId && (
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+                <ImageUploadButton 
+                  resumeId={resumeId} 
+                  currentImageUrl={profileImageUrl} 
+                  onImageUpdate={onImageUpdate} 
+                />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className={styles["modern-professional"].infoContainer}>
+          <h1 
+            className={`${currentStyle.name} outline-none`}
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("fullName", e)}
+          >
+            {fullName}
+          </h1>
+          <div 
+            className={`${currentStyle.title} outline-none`}
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("title", e)}
+          >
+            {title}
+          </div>
+          <div className={currentStyle.contactContainer}>
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
+              <span 
+                className="outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+              >
+                {email}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
+              <span 
+                className="outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+              >
+                {phone}
+              </span>
+            </div>
+            {linkedin && (
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
+                <span 
+                  className="outline-none"
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                >
+                  {linkedin}
+                </span>
+              </div>
+            )}
+            {website && (
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
+                <span 
+                  className="outline-none"
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                >
+                  {website}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (template.id === "modern-split") {
+    return (
+      <div className={currentStyle.container}>
+        <h1 
+          className={`${currentStyle.name} outline-none`}
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={(e) => handleContentEdit("fullName", e)}
+        >
+          {fullName}
+        </h1>
+        <div 
+          className={`${currentStyle.title} outline-none`}
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={(e) => handleContentEdit("title", e)}
+        >
+          {title}
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+          <div className="flex items-center gap-1">
+            <Mail className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
+            <span 
+              className="text-xs text-gray-600 outline-none"
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("email", e)}
+            >
+              {email}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Phone className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
+            <span 
+              className="text-xs text-gray-600 outline-none"
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("phone", e)}
+            >
+              {phone}
+            </span>
+          </div>
+          {linkedin && (
+            <div className="flex items-center gap-1">
+              <Linkedin className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
+              <span 
+                className="text-xs text-gray-600 outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("linkedin", e)}
+              >
+                {linkedin}
+              </span>
+            </div>
+          )}
+          {website && (
+            <div className="flex items-center gap-1">
+              <Globe className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
+              <span 
+                className="text-xs text-gray-600 outline-none"
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("website", e)}
+              >
+                {website}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const renderContact = () => {
+    if (template.id === "minimal-elegant") {
+      return (
+        <div className={currentStyle.contactContainer}>
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("email", e)}
+              className="outline-none"
+            >
+              {email}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Phone className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("phone", e)}
+              className="outline-none"
+            >
+              {phone}
+            </span>
+          </div>
+          {linkedin && (
+            <div className="flex items-center gap-2">
+              <Linkedin className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+              <span
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("linkedin", e)}
+                className="outline-none"
+              >
+                {linkedin}
+              </span>
+            </div>
+          )}
+          {website && (
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+              <span
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("website", e)}
+                className="outline-none"
+              >
+                {website}
+              </span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className={currentStyle.contactContainer}>
+        <div className="flex items-center gap-1.5">
+          <Mail className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
+          <div
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("email", e)}
+            className="outline-none"
+          >
+            {email}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Phone className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
+          <div
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={(e) => handleContentEdit("phone", e)}
+            className="outline-none"
+          >
+            {phone}
+          </div>
+        </div>
+        {linkedin && (
+          <div className="flex items-center gap-1.5">
+            <Linkedin className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
+            <div
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("linkedin", e)}
+              className="outline-none"
+            >
+              {linkedin}
+            </div>
+          </div>
+        )}
+        {website && (
+          <div className="flex items-center gap-1.5">
+            <Globe className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
+            <div
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("website", e)}
+              className="outline-none"
+            >
+              {website}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={currentStyle.container}>
       <div className={template.id === "minimal-elegant" ? "text-center" : ""}>
@@ -200,44 +488,8 @@ export function PersonalSection({
           {title}
         </div>
       </div>
-      <div className={currentStyle.contactContainer}>
-        <span 
-          className="outline-none"
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("email", e)}
-        >
-          {email}
-        </span>
-        <span 
-          className="outline-none"
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={(e) => handleContentEdit("phone", e)}
-        >
-          {phone}
-        </span>
-        {linkedin && (
-          <span 
-            className="outline-none"
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("linkedin", e)}
-          >
-            {linkedin}
-          </span>
-        )}
-        {website && (
-          <span 
-            className="outline-none"
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("website", e)}
-          >
-            {website}
-          </span>
-        )}
-      </div>
+      
+      {renderContact()}
     </div>
   );
 }
