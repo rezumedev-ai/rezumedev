@@ -187,7 +187,7 @@ export const resumeTemplates: ResumeTemplate[] = [
         lineHeight: "1.4"
       },
       icons: {
-        sections: true,
+        sections: false,
         contact: true,
         bullets: "arrow",
         circularImage: true
