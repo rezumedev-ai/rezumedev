@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe } from "lucide-react";
 import { ImageUploadButton } from "./ImageUploadButton";
@@ -129,8 +128,7 @@ export function PersonalSection({
             {title}
           </div>
           <div className={currentStyle.contactContainer}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
+            <div>
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -140,8 +138,7 @@ export function PersonalSection({
                 {email}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
+            <div>
               <span 
                 className="outline-none"
                 contentEditable={isEditing}
@@ -152,8 +149,7 @@ export function PersonalSection({
               </span>
             </div>
             {linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
+              <div>
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
@@ -165,8 +161,7 @@ export function PersonalSection({
               </div>
             )}
             {website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-white professional-navy-contact-icon pdf-contact-icon" data-pdf-contact-icon="true" />
+              <div>
                 <span 
                   className="outline-none"
                   contentEditable={isEditing}
