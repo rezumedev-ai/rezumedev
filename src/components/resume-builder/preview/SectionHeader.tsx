@@ -1,4 +1,3 @@
-
 import { Briefcase, GraduationCap, Award, Star, FileText, User, Code, FolderKanban } from "lucide-react";
 import { ResumeTemplate } from "../templates";
 import { cn } from "@/lib/utils";
@@ -52,7 +51,6 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     return (
       <h3 className={template.style.sectionStyle}>
         <div className="flex items-center after:content-[''] after:block after:h-0.5 after:flex-grow after:ml-2 after:bg-emerald-500">
-          {getIcon()}
           <span>{title}</span>
         </div>
       </h3>
