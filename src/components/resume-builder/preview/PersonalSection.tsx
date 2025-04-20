@@ -1,5 +1,6 @@
+
 import { ResumeTemplate } from "../templates";
-import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
+import { Mail, Phone, Linkedin, Globe } from "lucide-react";
 import { ImageUploadButton } from "./ImageUploadButton";
 
 interface PersonalSectionProps {
