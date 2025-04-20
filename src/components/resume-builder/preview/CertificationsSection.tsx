@@ -1,3 +1,4 @@
+
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
@@ -66,6 +67,7 @@ export function CertificationsSection({
     return { nameFontSize, orgFontSize, dateFontSize };
   }, [certifications]);
 
+  // Template-specific styles
   const styles = {
     "executive-clean": {
       section: "mb-5",
@@ -98,7 +100,7 @@ export function CertificationsSection({
     "professional-navy": {
       section: "mb-5",
       title: "text-[16px] font-bold uppercase tracking-wide text-[#0F2B5B] mb-3 pb-1 border-b-2 border-[#0F2B5B]",
-      name: `font-medium ${dynamicFontSizes.nameFontSize} text-[#0F2B5B]`,
+      name: `font-medium ${dynamicFontSizes.nameFontSize}`,
       organization: `${dynamicFontSizes.orgFontSize} text-gray-600`,
       date: `${dynamicFontSizes.dateFontSize} text-gray-500`
     },
@@ -118,7 +120,7 @@ export function CertificationsSection({
     return (
       <div className={currentStyle.section}>
         <SectionHeader title="Certificates" type="certifications" template={template} />
-        <div className="space-y-2">
+        <div className={template.id === "modern-split" ? "space-y-1.5 mt-1" : "space-y-2"}>
           {certifications.map((cert, index) => (
             <div key={index} className="flex justify-between items-baseline gap-2">
               <div>
@@ -130,15 +132,17 @@ export function CertificationsSection({
                 >
                   {cert.name}
                 </span>
-                <span className="text-gray-500 mx-1">•</span>
-                <span 
-                  className={`${currentStyle.organization} outline-none`}
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit(index, "organization", e)}
-                >
-                  {cert.organization}
-                </span>
+                {template.id !== "modern-split" && <span className="text-gray-500 mx-1">•</span>}
+                {template.id !== "modern-split" && (
+                  <span 
+                    className={`${currentStyle.organization} outline-none`}
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit(index, "organization", e)}
+                  >
+                    {cert.organization}
+                  </span>
+                )}
               </div>
               <span 
                 className={`${currentStyle.date} outline-none whitespace-nowrap`}
