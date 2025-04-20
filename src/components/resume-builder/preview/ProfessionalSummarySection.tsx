@@ -44,6 +44,11 @@ export function ProfessionalSummarySection({
       title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
       content: "text-[13px] text-gray-700"
     },
+    "professional-navy": {
+      section: "mb-5",
+      title: "text-[16px] font-bold uppercase tracking-wide text-[#0F2B5B] mb-3 pb-1 border-b-2 border-[#0F2B5B]",
+      content: "text-[14px] text-gray-700"
+    },
     "modern-professional": {
       section: "mb-5 col-span-12",
       title: "text-base font-bold text-emerald-700 uppercase tracking-wide mb-3",
@@ -69,12 +74,28 @@ export function ProfessionalSummarySection({
     );
   }
 
+  if (template.id === "professional-navy") {
+    return (
+      <div className={currentStyle.section}>
+        <SectionHeader title="Professional Summary" type="summary" template={template} />
+        <div 
+          className={`${currentStyle.content} outline-none`}
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSummaryEdit}
+        >
+          {summary}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
         {template.id === "modern-split" ? (
           <span className="flex items-center">
-            <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
+            <span className="inline-block w-2 h-0.5 bg-gray-400 mr-1"></span>
             Professional Summary
           </span>
         ) : template.id === "minimal-elegant" ? (
@@ -94,3 +115,4 @@ export function ProfessionalSummarySection({
     </div>
   );
 }
+
