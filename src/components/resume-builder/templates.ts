@@ -146,54 +146,6 @@ export const resumeTemplates: ResumeTemplate[] = [
   },
   
   {
-    id: "professional-executive",
-    name: "Professional Executive",
-    description: "Modern two-column layout with clean typography",
-    imageUrl: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
-    style: {
-      titleFont: "font-sans text-[42px] font-black tracking-wide text-black uppercase mb-1",
-      headerStyle: "mb-6",
-      sectionStyle: "text-[17px] font-bold text-black uppercase tracking-wider mb-2",
-      contentStyle: "grid grid-cols-12 gap-6",
-      layout: "executive",
-      colors: {
-        primary: "#000000",
-        secondary: "#666666",
-        text: "#333333",
-        border: "#EEEEEE",
-        background: "#FFFFFF"
-      },
-      spacing: {
-        sectionGap: "1.5rem",
-        itemGap: "0.875rem",
-        contentPadding: "1.75rem",
-        headerHeight: "auto",
-        margins: {
-          top: "0.5in",
-          right: "0.5in",
-          bottom: "0.5in",
-          left: "0.5in"
-        }
-      },
-      dimensions: {
-        maxWidth: "816px",
-        minHeight: "1056px"
-      },
-      typography: {
-        titleSize: "42px",
-        subtitleSize: "17px",
-        bodySize: "15px",
-        lineHeight: "1.4"
-      },
-      icons: {
-        sections: false,
-        contact: true,
-        bullets: "dot"
-      }
-    }
-  },
-  
-  {
     id: "modern-professional",
     name: "Modern Professional",
     description: "Contemporary two-column design with circular profile image and accent colors",
