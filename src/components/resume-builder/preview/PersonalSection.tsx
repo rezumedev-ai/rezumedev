@@ -82,7 +82,6 @@ export function PersonalSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  // Special rendering for Professional Navy template
   if (template.id === "professional-navy") {
     return (
       <div className={template.style.headerStyle}>
@@ -183,7 +182,6 @@ export function PersonalSection({
     );
   }
 
-  // Special rendering for Modern Professional template
   if (template.id === "modern-professional") {
     return (
       <div className={currentStyle.container}>
@@ -230,49 +228,45 @@ export function PersonalSection({
             {title}
           </div>
           <div className={currentStyle.contactContainer}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
-              <span 
-                className="outline-none"
+            <div>
+              <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("email", e)}
+                className="outline-none"
               >
                 {email}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
-              <span 
-                className="outline-none"
+            <div>
+              <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleContentEdit("phone", e)}
+                className="outline-none"
               >
                 {phone}
               </span>
             </div>
             {linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
-                <span 
-                  className="outline-none"
+              <div>
+                <span
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleContentEdit("linkedin", e)}
+                  className="outline-none"
                 >
                   {linkedin}
                 </span>
               </div>
             )}
             {website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-emerald-600 pdf-contact-icon" data-pdf-contact-icon="true" />
-                <span 
-                  className="outline-none"
+              <div>
+                <span
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleContentEdit("website", e)}
+                  className="outline-none"
                 >
                   {website}
                 </span>
@@ -409,7 +403,6 @@ export function PersonalSection({
       );
     }
 
-    // For executive-clean template, render without icons
     if (template.id === "executive-clean") {
       return (
         <div className={currentStyle.contactContainer}>
@@ -461,7 +454,6 @@ export function PersonalSection({
       );
     }
 
-    // Default rendering for other templates
     return (
       <div className={currentStyle.contactContainer}>
         <div className="flex items-center gap-1.5">
