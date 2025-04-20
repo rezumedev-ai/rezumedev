@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe, MapPin } from "lucide-react";
 import { ImageUploadButton } from "./ImageUploadButton";
@@ -362,8 +361,7 @@ export function PersonalSection({
     if (template.id === "minimal-elegant") {
       return (
         <div className={currentStyle.contactContainer}>
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+          <div>
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -373,8 +371,7 @@ export function PersonalSection({
               {email}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+          <div>
             <span
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -385,8 +382,7 @@ export function PersonalSection({
             </span>
           </div>
           {linkedin && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+            <div>
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
@@ -398,8 +394,7 @@ export function PersonalSection({
             </div>
           )}
           {website && (
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-black pdf-contact-icon" data-pdf-contact-icon="true" />
+            <div>
               <span
                 contentEditable={isEditing}
                 suppressContentEditableWarning
@@ -414,6 +409,59 @@ export function PersonalSection({
       );
     }
 
+    // For executive-clean template, render without icons
+    if (template.id === "executive-clean") {
+      return (
+        <div className={currentStyle.contactContainer}>
+          <div>
+            <div
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("email", e)}
+              className="outline-none"
+            >
+              {email}
+            </div>
+          </div>
+          <div>
+            <div
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("phone", e)}
+              className="outline-none"
+            >
+              {phone}
+            </div>
+          </div>
+          {linkedin && (
+            <div>
+              <div
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("linkedin", e)}
+                className="outline-none"
+              >
+                {linkedin}
+              </div>
+            </div>
+          )}
+          {website && (
+            <div>
+              <div
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("website", e)}
+                className="outline-none"
+              >
+                {website}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Default rendering for other templates
     return (
       <div className={currentStyle.contactContainer}>
         <div className="flex items-center gap-1.5">
