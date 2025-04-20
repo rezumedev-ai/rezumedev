@@ -30,13 +30,14 @@ export function useResumeSummary(
     }
   };
 
-  const handleSummaryUpdate = (summary: string) => {
+  const handleSummaryUpdate = (summaryText: string) => {
     if (!isEditing) return;
     
     setSummary(prev => {
+      // Create a new object with updated summary text
       const updated = {
         ...prev,
-        summary
+        summary: summaryText
       };
       
       const newState = {
