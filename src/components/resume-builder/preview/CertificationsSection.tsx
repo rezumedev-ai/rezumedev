@@ -1,4 +1,3 @@
-
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
@@ -95,28 +94,30 @@ export function CertificationsSection({
       name: `font-medium ${dynamicFontSizes.nameFontSize}`,
       organization: `${dynamicFontSizes.orgFontSize} text-gray-600`,
       date: `${dynamicFontSizes.dateFontSize} text-gray-500`
+    },
+    "modern-professional": {
+      section: "mb-4",
+      title: "text-[16px] font-bold uppercase tracking-wider text-emerald-700 mb-3 flex items-center",
+      name: `font-semibold ${dynamicFontSizes.nameFontSize} text-gray-800`,
+      organization: `${dynamicFontSizes.orgFontSize} text-gray-600`,
+      date: `${dynamicFontSizes.dateFontSize} text-gray-500`
     }
   };
 
-  const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+  const currentStyle = styles[template.id as keyof typeof styles] || styles["modern-professional"];
 
   return (
     <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
-        {template.id === "modern-split" ? (
+        {template.id === "modern-professional" ? (
           <span className="flex items-center">
-            <span className="inline-block w-3 h-0.5 bg-gray-400 mr-1"></span>
-            Certificates
+            <span className="text-emerald-700">Certificates</span>
           </span>
-        ) : template.id === "professional-executive" ? (
-          "Certificates"
-        ) : template.id === "minimal-elegant" ? (
-          <span>Certificates</span>
         ) : (
           "Certificates"
         )}
       </h3>
-      <div className={template.id === "minimal-elegant" ? "space-y-3" : template.id === "modern-split" ? "space-y-1.5" : "space-y-2"}>
+      <div className={template.id === "modern-split" ? "space-y-1.5 mt-1" : "space-y-2"}>
         {certifications.map((cert, index) => (
           template.id === "minimal-elegant" ? (
             <div key={index} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
@@ -158,7 +159,7 @@ export function CertificationsSection({
                 >
                   {cert.name}
                 </span>
-                {template.id !== "professional-executive" && template.id !== "modern-split" && <span className="text-gray-500 mx-1">•</span>}
+                {template.id !== "modern-split" && <span className="text-gray-500 mx-1">•</span>}
                 {template.id !== "modern-split" && (
                   <span 
                     className={`${currentStyle.organization} outline-none`}
