@@ -10,7 +10,8 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, type, template }: SectionHeaderProps) {
   const getIcon = () => {
-    if (!template.style.icons.sections) return null;
+    // Don't show icons for professional-navy template
+    if (!template.style.icons.sections || template.id === "professional-navy") return null;
 
     let iconClass = template.id === "professional-navy" 
       ? "w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0"
