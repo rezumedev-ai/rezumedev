@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
 import { SectionHeader } from "./SectionHeader";
@@ -73,14 +72,13 @@ export function SkillsSection({
     },
     "modern-split": {
       section: "mb-6",
-      title: "text-[16px] font-bold uppercase tracking-wide mb-3 flex items-center", // made main heading bigger to match other subheadings
+      title: "text-[16px] font-bold uppercase tracking-wide mb-3 flex items-center",
       skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
     },
     "minimal-elegant": {
       section: "mb-10",
-      // Changed skillType heading in minimal elegant to mimic other headings style (h3 style)
-      title: "text-[16px] font-bold uppercase tracking-wide mb-6 font-bold text-center", // increased size and weight to match subheadings
+      title: "text-[16px] font-bold uppercase tracking-wide mb-6 font-bold text-center",
       skillType: "font-semibold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
@@ -197,7 +195,58 @@ export function SkillsSection({
       </div>
     );
   }
-  
+
+  // ---- Minimal Elegant custom rendering to match Executive Clean style ----
+  if (template.id === "minimal-elegant") {
+    return (
+      <div className={styles["executive-clean"].section}>
+        <h3 className={styles["executive-clean"].title}>
+          Skills
+        </h3>
+        <div className="space-y-3 mt-3">
+          {hardSkills.length > 0 && (
+            <div>
+              <h4 className={styles["executive-clean"].skillType}>
+                Technical Skills
+              </h4>
+              <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
+                {hardSkills.map((skill, index) => (
+                  <BulletPoint
+                    key={index}
+                    template={template.id}
+                    className="ml-0 leading-snug"
+                    type="skills"
+                  >
+                    {skill}
+                  </BulletPoint>
+                ))}
+              </ul>
+            </div>
+          )}
+          {softSkills.length > 0 && (
+            <div>
+              <h4 className={styles["executive-clean"].skillType}>
+                Professional Skills
+              </h4>
+              <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
+                {softSkills.map((skill, index) => (
+                  <BulletPoint
+                    key={index}
+                    template={template.id}
+                    className="ml-0 leading-snug"
+                    type="skills"
+                  >
+                    {skill}
+                  </BulletPoint>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={
