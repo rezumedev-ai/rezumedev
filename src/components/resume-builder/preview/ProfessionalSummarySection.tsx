@@ -58,7 +58,7 @@ export function ProfessionalSummarySection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  // Fixed: Use explicit template ID checks instead of comparing string literals
+  // Handle each template ID with separate conditions
   if (template.id === "modern-professional") {
     return (
       <div className={currentStyle.section}>
