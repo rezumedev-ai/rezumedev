@@ -1,3 +1,4 @@
+
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
