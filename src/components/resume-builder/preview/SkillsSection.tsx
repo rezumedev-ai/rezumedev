@@ -79,9 +79,9 @@ export function SkillsSection({
     },
     "minimal-elegant": {
       section: "mb-10",
-      // Change skillType heading in minimal elegant to mimic other headings style (h3 style)
+      // Changed skillType heading in minimal elegant to mimic other headings style (h3 style)
       title: "text-xs uppercase tracking-[0.2em] text-black mb-6 font-bold text-center",
-      skillType: "text-base font-medium text-gray-800 mb-4 border-b border-gray-300 pb-1 text-center",
+      skillType: "font-semibold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "professional-executive": {
