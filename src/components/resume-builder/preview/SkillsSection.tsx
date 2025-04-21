@@ -78,9 +78,9 @@ export function SkillsSection({
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
     },
     "minimal-elegant": {
-      section: "mb-10",
-      // Adjust title here to visually match other section headings, smaller font, uppercase, tracking-wide, and add spacing top margin to separate from above education content
-      title: "text-[16px] font-bold uppercase tracking-wide mb-6 mt-8", 
+      section: "mb-10 mt-10", // Added top margin to push down section for spacing consistency
+      // Adjust title here to visually match other section headings: smaller font, uppercase, tracking-wide, spacing consistent with other headings
+      title: "text-[16px] font-bold uppercase tracking-wide mb-6 mt-0", 
       skillType: "font-semibold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
@@ -103,6 +103,9 @@ export function SkillsSection({
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     }
   };
+
+  // Additional adjustment for education section margin-bottom in executive-clean template to add more space before skills
+  const educationExtraSpacingClass = template.id === "executive-clean" ? "mb-8" : "";
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
@@ -201,14 +204,14 @@ export function SkillsSection({
   // ---- Minimal Elegant custom rendering to match Executive Clean style with adjusted heading spacing and font size ----
   if (template.id === "minimal-elegant") {
     return (
-      <div className={styles["executive-clean"].section}>
-        <h3 className={`${styles["executive-clean"].title} mt-8`}>
+      <div className={styles["minimal-elegant"].section}>
+        <h3 className={styles["minimal-elegant"].title}>
           Skills
         </h3>
         <div className="space-y-3 mt-3">
           {hardSkills.length > 0 && (
             <div>
-              <h4 className={styles["executive-clean"].skillType}>
+              <h4 className={styles["minimal-elegant"].skillType}>
                 Technical Skills
               </h4>
               <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
@@ -227,7 +230,7 @@ export function SkillsSection({
           )}
           {softSkills.length > 0 && (
             <div>
-              <h4 className={styles["executive-clean"].skillType}>
+              <h4 className={styles["minimal-elegant"].skillType}>
                 Professional Skills
               </h4>
               <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
@@ -305,3 +308,4 @@ export function SkillsSection({
     </div>
   );
 }
+
