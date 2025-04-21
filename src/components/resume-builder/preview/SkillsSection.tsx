@@ -73,14 +73,14 @@ export function SkillsSection({
     },
     "modern-split": {
       section: "mb-6",
-      title: "text-[13px] font-semibold text-indigo-600 uppercase tracking-wider mb-3 flex items-center",
+      title: "text-[16px] font-bold uppercase tracking-wide mb-3 flex items-center", // made main heading bigger to match other subheadings
       skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
     },
     "minimal-elegant": {
       section: "mb-10",
       // Changed skillType heading in minimal elegant to mimic other headings style (h3 style)
-      title: "text-xs uppercase tracking-[0.2em] text-black mb-6 font-bold text-center",
+      title: "text-[16px] font-bold uppercase tracking-wide mb-6 font-bold text-center", // increased size and weight to match subheadings
       skillType: "font-semibold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
