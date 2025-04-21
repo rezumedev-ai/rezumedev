@@ -12,19 +12,19 @@ interface SkillsSectionProps {
   onUpdate?: (type: "hard" | "soft", skills: string[]) => void;
 }
 
-export function SkillsSection({ 
-  hardSkills, 
-  softSkills, 
+export function SkillsSection({
+  hardSkills,
+  softSkills,
   template,
   isEditing,
-  onUpdate 
+  onUpdate
 }: SkillsSectionProps) {
   if (hardSkills.length === 0 && softSkills.length === 0) return null;
 
   const handleSkillsEdit = (type: "hard" | "soft", event: React.FocusEvent<HTMLDivElement>) => {
     if (!isEditing || !onUpdate) return;
     let newSkills: string[] = [];
-    
+
     if (template.id === "modern-split" || template.id === "modern-professional" || template.id === "professional-navy") {
       newSkills = Array.from(event.target.querySelectorAll('li')).map(li => li.textContent?.trim() || '');
     } else {
@@ -33,7 +33,7 @@ export function SkillsSection({
         .map(s => s.trim())
         .filter(Boolean);
     }
-    
+
     onUpdate(type, newSkills);
   };
 
@@ -41,10 +41,10 @@ export function SkillsSection({
     const totalHardSkills = hardSkills.length;
     const totalSoftSkills = softSkills.length;
     const totalSkills = totalHardSkills + totalSoftSkills;
-    
+
     let skillsFontSize = "text-sm";
     let titleFontSize = "text-sm";
-    
+
     if (totalSkills > 12) {
       skillsFontSize = "text-xs";
       titleFontSize = "text-xs";
@@ -55,12 +55,12 @@ export function SkillsSection({
       skillsFontSize = "text-base";
       titleFontSize = "text-base";
     }
-    
+
     const hasLongSkillNames = [...hardSkills, ...softSkills].some(skill => skill.length > 25);
     if (hasLongSkillNames) {
       skillsFontSize = totalSkills > 8 ? "text-xs" : "text-[13px]";
     }
-    
+
     return { skillsFontSize, titleFontSize };
   }, [hardSkills, softSkills]);
 
@@ -79,7 +79,8 @@ export function SkillsSection({
     },
     "minimal-elegant": {
       section: "mb-10",
-      title: "text-[16px] font-bold uppercase tracking-wide mb-6 font-bold text-center",
+      // Adjust title here to visually match other section headings, smaller font, uppercase, tracking-wide, and add spacing top margin to separate from above education content
+      title: "text-[16px] font-bold uppercase tracking-wide mb-6 mt-8", 
       skillType: "font-semibold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
@@ -109,7 +110,7 @@ export function SkillsSection({
     return (
       <div className={currentStyle.section}>
         <SectionHeader title="Skills" type="skills" template={template} />
-        
+
         <div className="space-y-4 mt-3">
           {hardSkills.length > 0 && (
             <div>
@@ -128,7 +129,7 @@ export function SkillsSection({
               </ul>
             </div>
           )}
-          
+
           {softSkills.length > 0 && (
             <div>
               <h4 className={currentStyle.skillType}>Soft Skills</h4>
@@ -150,12 +151,12 @@ export function SkillsSection({
       </div>
     );
   }
-  
+
   if (template.id === "modern-professional") {
     return (
       <div className={currentStyle.section}>
         <SectionHeader title="Skills" type="skills" template={template} />
-        
+
         <div className="space-y-4 mt-3">
           {hardSkills.length > 0 && (
             <div>
@@ -174,7 +175,7 @@ export function SkillsSection({
               </ul>
             </div>
           )}
-          
+
           {softSkills.length > 0 && (
             <div>
               <h4 className={currentStyle.skillType}>Soft Skills</h4>
@@ -197,11 +198,11 @@ export function SkillsSection({
     );
   }
 
-  // ---- Minimal Elegant custom rendering to match Executive Clean style ----
+  // ---- Minimal Elegant custom rendering to match Executive Clean style with adjusted heading spacing and font size ----
   if (template.id === "minimal-elegant") {
     return (
       <div className={styles["executive-clean"].section}>
-        <h3 className={styles["executive-clean"].title}>
+        <h3 className={`${styles["executive-clean"].title} mt-8`}>
           Skills
         </h3>
         <div className="space-y-3 mt-3">
@@ -263,8 +264,8 @@ export function SkillsSection({
         {hardSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Core Competencies" : 
-               template.id === "minimal-elegant" ? "Technical Skills" : "Technical Skills"}
+              {template.id === "professional-executive" ? "Core Competencies" :
+                template.id === "minimal-elegant" ? "Technical Skills" : "Technical Skills"}
             </h4>
             <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
               {hardSkills.map((skill, index) => (
@@ -283,8 +284,8 @@ export function SkillsSection({
         {softSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Professional Skills" : 
-               template.id === "minimal-elegant" ? "Professional Skills" : "Soft Skills"}
+              {template.id === "professional-executive" ? "Professional Skills" :
+                template.id === "minimal-elegant" ? "Professional Skills" : "Soft Skills"}
             </h4>
             <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
               {softSkills.map((skill, index) => (
