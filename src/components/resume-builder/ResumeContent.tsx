@@ -1,3 +1,4 @@
+
 import { ResumeTemplate } from "./templates";
 import { ResumeData, Education, Certification, WorkExperience } from "@/types/resume";
 import { PersonalSection } from "./preview/PersonalSection";
@@ -100,7 +101,7 @@ export function ResumeContent({
                 />
                 
                 <CertificationsSection 
-                  certifications={resumeState.certifications} 
+                  resumeData={resumeState}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={onCertificationUpdate}
@@ -167,7 +168,7 @@ export function ResumeContent({
                 />
                 
                 <CertificationsSection 
-                  certifications={resumeState.certifications} 
+                  resumeData={resumeState}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={onCertificationUpdate}
@@ -231,7 +232,7 @@ export function ResumeContent({
         />
         
         <CertificationsSection 
-          certifications={resumeState.certifications} 
+          resumeData={resumeState}
           template={template}
           isEditing={isEditing}
           onUpdate={onCertificationUpdate}
