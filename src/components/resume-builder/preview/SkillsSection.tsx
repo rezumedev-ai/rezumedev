@@ -66,7 +66,7 @@ export function SkillsSection({
 
   const styles = {
     "executive-clean": {
-      section: "mb-6",
+      section: "mb-6 mt-6", // Added top margin for better spacing after education
       title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       skillType: "font-semibold text-sm text-gray-700 mb-2",
       skillList: `${dynamicFontSizes.skillsFontSize} font-medium text-gray-800`
@@ -78,10 +78,9 @@ export function SkillsSection({
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
     },
     "minimal-elegant": {
-      section: "mb-10 mt-10", // Added top margin to push down section for spacing consistency
-      // Adjust title here to visually match other section headings: smaller font, uppercase, tracking-wide, spacing consistent with other headings
-      title: "text-[16px] font-bold uppercase tracking-wide mb-6 mt-0", 
-      skillType: "font-semibold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      section: "mb-10 mt-6", // Adjusted top margin for better spacing
+      title: "text-[16px] font-bold uppercase tracking-wide mb-6", // Match other section headings
+      skillType: "font-medium text-sm text-gray-700 mb-2", // Reduced size to match subsection styling in other sections
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "professional-executive": {
@@ -103,9 +102,6 @@ export function SkillsSection({
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     }
   };
-
-  // Additional adjustment for education section margin-bottom in executive-clean template to add more space before skills
-  const educationExtraSpacingClass = template.id === "executive-clean" ? "mb-8" : "";
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
@@ -201,7 +197,7 @@ export function SkillsSection({
     );
   }
 
-  // ---- Minimal Elegant custom rendering to match Executive Clean style with adjusted heading spacing and font size ----
+  // ---- Minimal Elegant custom rendering with corrected styling ----
   if (template.id === "minimal-elegant") {
     return (
       <div className={styles["minimal-elegant"].section}>
@@ -256,7 +252,7 @@ export function SkillsSection({
     <div
       className={
         template.id === "executive-clean"
-          ? `${currentStyle.section} mt-7`
+          ? `${currentStyle.section}`
           : currentStyle.section
       }
     >
@@ -308,4 +304,3 @@ export function SkillsSection({
     </div>
   );
 }
-
