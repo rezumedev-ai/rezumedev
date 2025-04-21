@@ -58,6 +58,7 @@ export function ProfessionalSummarySection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
+  // Fixed: Use explicit template ID checks instead of comparing string literals
   if (template.id === "modern-professional") {
     return (
       <div className={currentStyle.section}>
@@ -98,8 +99,6 @@ export function ProfessionalSummarySection({
             <span className="inline-block w-2 h-0.5 bg-gray-400 mr-1"></span>
             Professional Summary
           </span>
-        ) : template.id === "minimal-elegant" ? (
-          "Professional Summary"
         ) : (
           "Professional Summary"
         )}
@@ -115,4 +114,3 @@ export function ProfessionalSummarySection({
     </div>
   );
 }
-

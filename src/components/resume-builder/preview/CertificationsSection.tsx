@@ -132,7 +132,9 @@ export function CertificationsSection({
                 >
                   {cert.name}
                 </span>
+                {/* Fix: Only add separator dot if not in modern-split template */}
                 {template.id !== "modern-split" && <span className="text-gray-500 mx-1">•</span>}
+                {/* Fix: Only show organization if not in modern-split template */}
                 {template.id !== "modern-split" && (
                   <span 
                     className={`${currentStyle.organization} outline-none`}
