@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
 import { SectionHeader } from "./SectionHeader";
@@ -55,8 +54,8 @@ export function SkillsSection({
       skillsFontSize = "text-[13px]";
       titleFontSize = "text-[13px]";
     } else if (totalSkills <= 4) {
-      skillsFontSize = "text-sm";
-      titleFontSize = "text-sm";
+      skillsFontSize = "text-base";
+      titleFontSize = "text-base";
     }
     
     // Check for long skill names
@@ -71,9 +70,11 @@ export function SkillsSection({
   const styles = {
     "executive-clean": {
       section: "mb-6",
-      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      skillType: `font-bold ${dynamicFontSizes.titleFontSize} text-gray-700 mb-2`,
-      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
+      // Consistent subheading for executive-clean
+      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      skillType: "font-semibold text-sm text-gray-700 mb-2",
+      // Slightly bolder, larger font for skill items as per professional summary
+      skillList: `${dynamicFontSizes.skillsFontSize} font-medium text-gray-800`
     },
     "modern-split": {
       section: "mb-6",
@@ -204,10 +205,12 @@ export function SkillsSection({
   }
   
   // Standard templates
+  // --- EXECUTIVE CLEAN subheading update below ---
   return (
     <div className={currentStyle.section}>
-      <SectionHeader title="Skills" type="skills" template={template} />
-      
+      <h3 className={currentStyle.title}>
+        Skills
+      </h3>
       <div className="space-y-3 mt-3">
         {hardSkills.length > 0 && (
           <div>
@@ -215,7 +218,6 @@ export function SkillsSection({
               {template.id === "professional-executive" ? "Core Competencies" : 
                template.id === "minimal-elegant" ? "Technical Skills" : "Technical Skills"}
             </h4>
-            
             <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
               {hardSkills.map((skill, index) => (
                 <BulletPoint
@@ -230,14 +232,12 @@ export function SkillsSection({
             </ul>
           </div>
         )}
-        
         {softSkills.length > 0 && (
           <div>
             <h4 className={currentStyle.skillType}>
               {template.id === "professional-executive" ? "Professional Skills" : 
                template.id === "minimal-elegant" ? "Professional Skills" : "Soft Skills"}
             </h4>
-            
             <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
               {softSkills.map((skill, index) => (
                 <BulletPoint

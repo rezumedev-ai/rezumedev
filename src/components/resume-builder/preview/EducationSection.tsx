@@ -22,8 +22,8 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
 
   return (
     <div className="mt-1">
+      {/* For ALL templates, always use SectionHeader which uses the template style.sectionStyle */}
       <SectionHeader title="Education" type="education" template={template} />
-      
       <div className="space-y-3 mt-2">
         {education.map((edu, index) => (
           <div key={index} className={`${template.id === "modern-professional" ? 'pb-3' : ''}`}>
@@ -58,3 +58,4 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
     </div>
   );
 }
+

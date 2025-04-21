@@ -26,8 +26,10 @@ export function ProfessionalSummarySection({
   const styles = {
     "executive-clean": {
       section: "mb-6",
-      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300", // increased font size to 20px
-      content: "text-sm text-gray-700"
+      // Ensures ALL subheadings are consistent (bold, 20px, uppercase, etc.)
+      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      // Content font is now larger and slightly bolder for more presence
+      content: "text-base font-medium text-gray-800"
     },
     "modern-split": {
       section: "mb-4",
@@ -36,7 +38,7 @@ export function ProfessionalSummarySection({
     },
     "minimal-elegant": {
       section: "mb-5",
-      title: "text-[16px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200", // increased font size to 16px
+      title: "text-[16px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200",
       content: "text-[14px] text-gray-700 leading-relaxed"
     },
     "professional-executive": {
@@ -90,19 +92,12 @@ export function ProfessionalSummarySection({
     );
   }
 
+  // EXECUTIVE-CLEAN and others (default)
   return (
     <div className={currentStyle.section}>
+      {/* Consistent heading style for executive-clean */}
       <h3 className={currentStyle.title}>
-        {template.id === "modern-split" ? (
-          <span className="flex items-center">
-            <span className="inline-block w-2 h-0.5 bg-gray-400 mr-1"></span>
-            Professional Summary
-          </span>
-        ) : template.id === "minimal-elegant" ? (
-          "Professional Summary"
-        ) : (
-          "Professional Summary"
-        )}
+        Professional Summary
       </h3>
       <div 
         className={`${currentStyle.content} outline-none`}

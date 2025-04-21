@@ -1,4 +1,3 @@
-
 import { Certification } from "@/types/resume";
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
@@ -71,7 +70,7 @@ export function CertificationsSection({
   const styles = {
     "executive-clean": {
       section: "mb-5",
-      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-300",
+      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       name: `font-bold ${dynamicFontSizes.nameFontSize} text-gray-800`,
       organization: `${dynamicFontSizes.orgFontSize} text-gray-700`,
       date: `${dynamicFontSizes.dateFontSize} text-gray-500`
@@ -162,13 +161,7 @@ export function CertificationsSection({
   return (
     <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
-        {template.id === "modern-professional" ? (
-          <span className="flex items-center">
-            <span className="text-emerald-700">Certificates</span>
-          </span>
-        ) : (
-          "Certificates"
-        )}
+        Certificates
       </h3>
       <div className={template.id === "modern-split" ? "space-y-1.5 mt-1" : "space-y-2"}>
         {certifications.map((cert, index) => (
