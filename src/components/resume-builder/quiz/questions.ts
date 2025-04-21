@@ -25,7 +25,7 @@ export const questions: Question[] = [
     text: "What's your phone number?",
     type: "personal_info",
     field: "phone",
-    required: true,
+    required: false,
     placeholder: "+1 (555) 000-0000",
     inputType: "tel"
   },
