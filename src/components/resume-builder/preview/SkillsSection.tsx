@@ -1,3 +1,4 @@
+
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
 import { SectionHeader } from "./SectionHeader";
@@ -78,8 +79,9 @@ export function SkillsSection({
     },
     "minimal-elegant": {
       section: "mb-10",
+      // Change skillType heading in minimal elegant to mimic other headings style (h3 style)
       title: "text-xs uppercase tracking-[0.2em] text-black mb-6 font-bold text-center",
-      skillType: `${dynamicFontSizes.titleFontSize} font-bold text-black mb-3`,
+      skillType: "text-base font-medium text-gray-800 mb-4 border-b border-gray-300 pb-1 text-center",
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "professional-executive": {
