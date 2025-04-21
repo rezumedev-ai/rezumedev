@@ -1,6 +1,7 @@
 import { ResumeTemplate } from "../templates";
 import { Mail, Phone, Linkedin, Globe } from "lucide-react";
 import { ImageUploadButton } from "./ImageUploadButton";
+import { useDraggableImage } from "@/hooks/useDraggableImage";
 
 interface PersonalSectionProps {
   fullName: string;
@@ -82,18 +83,69 @@ export function PersonalSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
+  const imageDraggable = isEditing && (template.id === "modern-professional" || template.id === "professional-navy");
+  const {
+    offset: dragOffset,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    resetOffset
+  } = useDraggableImage(imageDraggable);
+
   if (template.id === "professional-navy") {
     return (
       <div className={template.style.headerStyle}>
         <div className={styles["professional-navy"].imageContainer}>
-          <div className="w-32 h-32 rounded-full bg-white border-4 border-white overflow-hidden flex items-center justify-center relative">
+          <div className="w-32 h-32 rounded-full bg-white border-4 border-white overflow-hidden flex items-center justify-center relative select-none">
             {profileImageUrl ? (
-              <img 
-                src={profileImageUrl} 
-                alt={`${fullName}'s profile`} 
-                className="w-full h-full object-cover"
-                style={{aspectRatio: "1/1", objectPosition: "center"}}
-              />
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  touchAction: "none",
+                  position: "relative",
+                  cursor: imageDraggable ? "grab" : "default",
+                }}
+                tabIndex={-1}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                aria-label={
+                  imageDraggable
+                    ? "Drag to reposition your photo (click and drag)"
+                    : "Profile image"
+                }
+              >
+                <img 
+                  src={profileImageUrl} 
+                  alt={`${fullName}'s profile`} 
+                  className="w-full h-full object-cover"
+                  style={{
+                    aspectRatio: "1/1",
+                    objectPosition: "center",
+                    transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
+                    transition: imageDraggable ? "none" : "transform 0.15s"
+                  }}
+                  draggable={false}
+                />
+                {imageDraggable && (
+                  <div
+                    className="absolute right-0 bottom-0 m-1 px-2 py-0.5 bg-black/60 text-[11px] text-white rounded z-10 pointer-events-none select-none"
+                  >
+                    Drag to reposition
+                  </div>
+                )}
+                {imageDraggable && (dragOffset.x !== 0 || dragOffset.y !== 0) && (
+                  <button
+                    type="button"
+                    onClick={resetOffset}
+                    className="absolute top-0 right-0 m-1 px-2 py-0.5 bg-white/90 border border-gray-200 text-xs rounded shadow z-20"
+                    tabIndex={-1}
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
             ) : (
               <div className="text-4xl text-[#0F2B5B] font-bold">
                 {fullName.split(' ').map(name => name[0]).join('')}
@@ -182,14 +234,56 @@ export function PersonalSection({
     return (
       <div className={currentStyle.container}>
         <div className={styles["modern-professional"].imageContainer}>
-          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center relative">
+          <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center relative select-none">
             {profileImageUrl ? (
-              <img 
-                src={profileImageUrl} 
-                alt={`${fullName}'s profile`} 
-                className="w-full h-full object-cover"
-                style={{aspectRatio: "1/1", objectPosition: "center"}}
-              />
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  touchAction: "none",
+                  position: "relative",
+                  cursor: imageDraggable ? "grab" : "default",
+                }}
+                tabIndex={-1}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                aria-label={
+                  imageDraggable
+                    ? "Drag to reposition your photo (click and drag)"
+                    : "Profile image"
+                }
+              >
+                <img 
+                  src={profileImageUrl} 
+                  alt={`${fullName}'s profile`} 
+                  className="w-full h-full object-cover"
+                  style={{
+                    aspectRatio: "1/1",
+                    objectPosition: "center",
+                    transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
+                    transition: imageDraggable ? "none" : "transform 0.15s"
+                  }}
+                  draggable={false}
+                />
+                {imageDraggable && (
+                  <div
+                    className="absolute right-0 bottom-0 m-1 px-2 py-0.5 bg-black/60 text-[11px] text-white rounded z-10 pointer-events-none select-none"
+                  >
+                    Drag to reposition
+                  </div>
+                )}
+                {imageDraggable && (dragOffset.x !== 0 || dragOffset.y !== 0) && (
+                  <button
+                    type="button"
+                    onClick={resetOffset}
+                    className="absolute top-0 right-0 m-1 px-2 py-0.5 bg-white/90 border border-gray-200 text-xs rounded shadow z-20"
+                    tabIndex={-1}
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
             ) : (
               <div className="text-5xl text-emerald-700 font-bold">
                 {fullName.split(' ').map(name => name[0]).join('')}
