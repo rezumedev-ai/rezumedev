@@ -26,7 +26,7 @@ export function ProfessionalSummarySection({
   const styles = {
     "executive-clean": {
       section: "mb-6",
-      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300", // increased font size to 20px
       content: "text-sm text-gray-700"
     },
     "modern-split": {
@@ -36,7 +36,7 @@ export function ProfessionalSummarySection({
     },
     "minimal-elegant": {
       section: "mb-5",
-      title: "text-[15px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200",
+      title: "text-[16px] font-bold text-gray-800 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200", // increased font size to 16px
       content: "text-[14px] text-gray-700 leading-relaxed"
     },
     "professional-executive": {
@@ -115,4 +115,3 @@ export function ProfessionalSummarySection({
     </div>
   );
 }
-
