@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
 import { SectionHeader } from "./SectionHeader";
@@ -66,9 +65,9 @@ export function SkillsSection({
 
   const styles = {
     "executive-clean": {
-      section: "mb-6 mt-6", // Added top margin for better spacing after education
-      title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      skillType: "font-semibold text-sm text-gray-700 mb-2",
+      section: "mb-8 mt-10",
+      title: "text-[17px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      skillType: "font-medium text-sm text-gray-700 mb-2",
       skillList: `${dynamicFontSizes.skillsFontSize} font-medium text-gray-800`
     },
     "modern-split": {
@@ -78,9 +77,9 @@ export function SkillsSection({
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
     },
     "minimal-elegant": {
-      section: "mb-10 mt-6", // Adjusted top margin for better spacing
-      title: "text-[16px] font-bold uppercase tracking-wide mb-6", // Match other section headings
-      skillType: "font-medium text-sm text-gray-700 mb-2", // Reduced size to match subsection styling in other sections
+      section: "mb-10 mt-10",
+      title: "text-[16px] font-bold uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
+      skillType: "font-bold text-sm text-gray-900 mb-2",
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "professional-executive": {
@@ -197,7 +196,6 @@ export function SkillsSection({
     );
   }
 
-  // ---- Minimal Elegant custom rendering with corrected styling ----
   if (template.id === "minimal-elegant") {
     return (
       <div className={styles["minimal-elegant"].section}>
@@ -249,13 +247,7 @@ export function SkillsSection({
   }
 
   return (
-    <div
-      className={
-        template.id === "executive-clean"
-          ? `${currentStyle.section}`
-          : currentStyle.section
-      }
-    >
+    <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
         Skills
       </h3>
