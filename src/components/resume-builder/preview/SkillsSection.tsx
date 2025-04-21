@@ -36,17 +36,14 @@ export function SkillsSection({
     onUpdate(type, newSkills);
   };
 
-  // Calculate dynamic font sizes based on content length
   const dynamicFontSizes = useMemo(() => {
     const totalHardSkills = hardSkills.length;
     const totalSoftSkills = softSkills.length;
     const totalSkills = totalHardSkills + totalSoftSkills;
     
-    // Base font size
     let skillsFontSize = "text-sm";
     let titleFontSize = "text-sm";
     
-    // Adjust based on total skills count
     if (totalSkills > 12) {
       skillsFontSize = "text-xs";
       titleFontSize = "text-xs";
@@ -58,7 +55,6 @@ export function SkillsSection({
       titleFontSize = "text-base";
     }
     
-    // Check for long skill names
     const hasLongSkillNames = [...hardSkills, ...softSkills].some(skill => skill.length > 25);
     if (hasLongSkillNames) {
       skillsFontSize = totalSkills > 8 ? "text-xs" : "text-[13px]";
@@ -70,10 +66,8 @@ export function SkillsSection({
   const styles = {
     "executive-clean": {
       section: "mb-6",
-      // Consistent subheading for executive-clean
       title: "text-[20px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
       skillType: "font-semibold text-sm text-gray-700 mb-2",
-      // Slightly bolder, larger font for skill items as per professional summary
       skillList: `${dynamicFontSizes.skillsFontSize} font-medium text-gray-800`
     },
     "modern-split": {
@@ -110,7 +104,6 @@ export function SkillsSection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
 
-  // Professional Navy template
   if (template.id === "professional-navy") {
     return (
       <div className={currentStyle.section}>
@@ -157,7 +150,6 @@ export function SkillsSection({
     );
   }
   
-  // Modern Professional template
   if (template.id === "modern-professional") {
     return (
       <div className={currentStyle.section}>
@@ -204,10 +196,14 @@ export function SkillsSection({
     );
   }
   
-  // Standard templates
-  // --- EXECUTIVE CLEAN subheading update below ---
   return (
-    <div className={currentStyle.section}>
+    <div
+      className={
+        template.id === "executive-clean"
+          ? `${currentStyle.section} mt-7`
+          : currentStyle.section
+      }
+    >
       <h3 className={currentStyle.title}>
         Skills
       </h3>
