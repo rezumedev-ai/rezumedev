@@ -27,7 +27,7 @@ export function TemplateItem({
       className={cn(
         "relative cursor-pointer rounded-xl overflow-hidden h-full flex flex-col border transition-all duration-300",
         isSelected 
-          ? "border-primary shadow-lg ring-2 ring-primary/30" 
+          ? "border-primary shadow-lg ring-2 ring-primary/30 scale-[1.02]" 
           : "border-gray-200 hover:border-primary/40 hover:shadow-md"
       )}
       onClick={onSelect}

@@ -1,47 +1,45 @@
 
-import { useState, useEffect } from 'react';
-import { ArrowLeftCircle, ArrowRightCircle, Sparkles, ExternalLink } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { ArrowRightCircle, ExternalLink, Sparkles } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { TemplateSelectionGrid } from './resume-builder/preview/TemplateSelectionGrid';
 
 export const ResumeTemplates = () => {
   const resumeTemplates = [
     {
+      id: "executive-clean",
       name: "Executive Clean",
       image: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
       description: "Commanding resume design for C-suite executives and senior leaders, highlighting strategic achievements and board experience",
       color: "from-blue-500 to-blue-700"
     },
     {
+      id: "minimal-elegant",
       name: "Minimal Elegant",
       image: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
       description: "Clean and sophisticated design with perfect typography, optimized for creative professionals",
       color: "from-emerald-500 to-emerald-700"
     },
     {
+      id: "professional-executive",
       name: "Professional Executive",
       image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
       description: "Bold modern layout with clean typography, perfect for senior managers and directors",
       color: "from-purple-500 to-purple-700"
     },
     {
+      id: "professional-navy",
       name: "Professional Navy",
       image: "/lovable-uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
       description: "Elegant two-column layout with navy header and modern typography, perfect for corporate professionals",
       color: "from-blue-700 to-indigo-900"
     },
     {
+      id: "modern-professional",
       name: "Modern Professional",
       image: "/lovable-uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
       description: "Contemporary design with creative accents, ideal for forward-thinking professionals in modern industries",
@@ -49,25 +47,108 @@ export const ResumeTemplates = () => {
     }
   ];
 
-  return (
-    <section className="py-20 bg-gradient-to-br from-background via-background/90 to-background/80 relative overflow-hidden">
-      {/* Decorative elements */}
-      <motion.div
-        className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.05 }}
-        transition={{ duration: 1 }}
-      >
-        <div className="absolute top-12 left-[10%] w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-12 right-[10%] w-64 h-64 bg-secondary/20 rounded-full blur-3xl"></div>
-      </motion.div>
+  // Reference for the template section
+  const sectionRef = useRef<HTMLDivElement>(null);
+  
+  // Mouse position for spotlight effect
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  // Smoothed versions of mouse coordinates
+  const smoothX = useSpring(mouseX, { damping: 50, stiffness: 300 });
+  const smoothY = useSpring(mouseY, { damping: 50, stiffness: 300 });
 
-      <div className="container relative z-10">
+  // Handle mouse move for spotlight effect
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { left, top } = sectionRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
+    mouseX.set(e.clientX - left);
+    mouseY.set(e.clientY - top);
+  };
+
+  // Template selection state for the grid view
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(resumeTemplates[0].id);
+
+  // Convert our simplified templates to the format expected by TemplateSelectionGrid
+  const formattedTemplates = resumeTemplates.map(template => ({
+    id: template.id,
+    name: template.name,
+    description: template.description,
+    imageUrl: template.image,
+    style: {
+      titleFont: "font-sans",
+      headerStyle: "mb-6",
+      sectionStyle: "text-lg font-semibold",
+      contentStyle: "space-y-4",
+      layout: "classic" as const,
+      colors: {
+        primary: "#1A1A1A",
+        secondary: "#4A4A4A",
+        text: "#2D2D2D",
+        border: "#E5E7EB",
+        background: "#FFFFFF"
+      },
+      spacing: {
+        sectionGap: "1.5rem",
+        itemGap: "1.25rem",
+        contentPadding: "2rem",
+        headerHeight: "160px",
+        margins: {
+          top: "0.5in",
+          right: "0.5in",
+          bottom: "0.5in",
+          left: "0.5in"
+        }
+      },
+      dimensions: {
+        maxWidth: "8.5in",
+        minHeight: "11in"
+      },
+      typography: {
+        titleSize: "46px",
+        subtitleSize: "20px",
+        bodySize: "16px",
+        lineHeight: "1.4"
+      },
+      icons: {
+        sections: false,
+        contact: true,
+        bullets: "dot" as const
+      }
+    }
+  }));
+
+  return (
+    <section 
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      className="py-24 relative overflow-hidden"
+    >
+      {/* Gradient background with enhanced effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 z-0">
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-20 left-[15%] w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-40 right-[10%] w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-60 right-[25%] w-60 h-60 bg-purple-500/5 rounded-full blur-3xl"></div>
+        </div>
+      </div>
+
+      {/* Spotlight effect */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-10 opacity-0 lg:opacity-40"
+        style={{
+          background: 'radial-gradient(600px circle at var(--x) var(--y), rgba(99, 102, 241, 0.15), transparent 40%)',
+          '--x': smoothX,
+          '--y': smoothY
+        } as any}
+      />
+
+      <div className="container relative z-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          viewport={{ once: true, margin: "-100px" }}
+          className="text-center mb-16"
         >
           <GradientHeading 
             variant="primary" 
@@ -82,106 +163,47 @@ export const ResumeTemplates = () => {
           </p>
         </motion.div>
 
+        {/* New masonry grid layout for templates */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-7xl mx-auto"
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8, staggerChildren: 0.1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          className="max-w-7xl mx-auto mb-16"
         >
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {resumeTemplates.map((template, index) => (
-                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                  <div className="p-1">
-                    <motion.div
-                      whileHover={{ 
-                        scale: 1.03, 
-                        y: -5,
-                        transition: { duration: 0.2 } 
-                      }}
-                      className="h-full"
-                    >
-                      <Card className="overflow-hidden h-full border border-border/40 bg-card/60 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
-                        <div className="bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
-                          <AspectRatio ratio={8.5/11} className="relative">
-                            <div className="absolute top-2 right-2 z-20">
-                              <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                                <span className="text-xs font-medium text-white">Premium</span>
-                              </div>
-                            </div>
-                            
-                            <img
-                              src={template.image}
-                              alt={`${template.name} Resume Template`}
-                              className="w-full h-full object-contain"
-                              loading="lazy"
-                            />
-                            
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
-                              <Link to="/signup">
-                                <Button variant="secondary" size="sm" className="font-medium gap-2">
-                                  Use Template <ExternalLink className="w-3.5 h-3.5" />
-                                </Button>
-                              </Link>
-                            </div>
-                          </AspectRatio>
-                        </div>
-                        
-                        <CardContent className="p-6">
-                          <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 text-white bg-gradient-to-r ${template.color}`}>
-                            Featured Template
-                          </div>
-                          <h3 className="text-xl font-bold mb-2">{template.name}</h3>
-                          <p className="text-muted-foreground text-sm mb-6">
-                            {template.description}
-                          </p>
-                          <Link to="/signup" className="block mt-auto">
-                            <Button variant="outline" size="sm" className="w-full gap-2 hover:bg-primary/10 transition-colors">
-                              Preview Template
-                              <ArrowRightCircle className="w-4 h-4" />
-                            </Button>
-                          </Link>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="flex items-center justify-center mt-8">
-              <CarouselPrevious className="relative mr-2 inset-auto left-0 top-0 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
-              <CarouselNext className="relative ml-2 inset-auto right-0 top-0 h-10 w-10 rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary hover:border-primary" />
-            </div>
-          </Carousel>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {resumeTemplates.map((template, index) => (
+              <TemplateCard 
+                key={template.id}
+                template={template}
+                index={index}
+              />
+            ))}
+          </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity:.0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-          className="text-center mt-14"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          viewport={{ once: true, margin: "-100px" }}
+          className="text-center mt-10"
         >
           <Link to="/signup">
-            <Button size="lg" className="px-8 py-6 text-base bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-hover transition-all duration-300 shadow-lg hover:shadow-xl">
+            <Button size="lg" className="px-8 py-6 text-base bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-hover transition-all duration-300 shadow-lg hover:shadow-xl group">
               Explore All Templates
-              <ArrowRightCircle className="ml-2 h-5 w-5" />
+              <ArrowRightCircle className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </Link>
         </motion.div>
 
-        {/* Features list */}
+        {/* Features list with improved design */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto"
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 max-w-4xl mx-auto"
         >
           {[
             { title: "ATS Optimized", description: "Pass any applicant tracking system with our perfectly formatted templates" },
@@ -191,9 +213,10 @@ export const ResumeTemplates = () => {
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 + (index * 0.1), duration: 0.5 }}
-              className="text-center p-6 rounded-lg bg-card/40 backdrop-blur-sm border border-border/30 shadow-sm"
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 + (index * 0.1), duration: 0.5 }}
+              viewport={{ once: true, margin: "-100px" }}
+              className="text-center p-6 rounded-lg bg-white backdrop-blur-sm border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="h-6 w-6 text-primary" />
@@ -205,5 +228,134 @@ export const ResumeTemplates = () => {
         </motion.div>
       </div>
     </section>
+  );
+};
+
+// New Template Card component with modern design
+interface TemplateCardProps {
+  template: {
+    id: string;
+    name: string;
+    image: string;
+    description: string;
+    color: string;
+  };
+  index: number;
+}
+
+const TemplateCard = ({ template, index }: TemplateCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Values for the 3D rotation effect
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  // Transform mouse movement to rotation values
+  const rotateX = useTransform(y, [-100, 100], [10, -10]);
+  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
+
+  // Handle mouse move for 3D effect
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const centerX = rect.left + width / 2;
+    const centerY = rect.top + height / 2;
+    
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+    
+    x.set(mouseX);
+    y.set(mouseY);
+  };
+
+  // Reset position when mouse leaves
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    setIsHovered(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-100px" }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      className="h-full"
+    >
+      <motion.div 
+        style={{ rotateX, rotateY, perspective: 1000 }}
+        className={`h-full rounded-2xl overflow-hidden backdrop-blur-sm border border-gray-100 hover:border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform
+          ${isHovered ? 'scale-[1.02]' : 'scale-100'}`}
+      >
+        <div className={`bg-gradient-to-b ${template.color} h-8 rounded-t-xl transition-height duration-300 ${isHovered ? 'h-12' : ''}`} />
+        
+        <div className="bg-white p-5">
+          {/* Template preview with 3D effect */}
+          <div className="relative rounded-lg overflow-hidden bg-gray-100 mb-4">
+            <AspectRatio ratio={8.5/11} className="relative">
+              <div className="absolute top-2 right-2 z-20">
+                <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-xs font-medium text-white">Premium</span>
+                </div>
+              </div>
+              
+              <img
+                src={template.image}
+                alt={`${template.name} Resume Template`}
+                className="w-full h-full object-contain hover:scale-[1.03] transition-transform duration-300"
+                loading="lazy"
+              />
+              
+              {/* Overlay with actions */}
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isHovered ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Link to="/signup">
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="font-medium gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                  >
+                    Use Template <ExternalLink className="w-3.5 h-3.5" />
+                  </Button>
+                </Link>
+              </motion.div>
+            </AspectRatio>
+          </div>
+          
+          {/* Template details with animated border */}
+          <div 
+            className={`relative p-4 rounded-xl border ${isHovered ? 'border-primary/20 bg-primary/5' : 'border-gray-100'} transition-colors duration-300`}
+          >
+            <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 text-white bg-gradient-to-r ${template.color}`}>
+              Featured Template
+            </div>
+            <h3 className="text-xl font-bold mb-2">{template.name}</h3>
+            <p className="text-muted-foreground text-sm mb-6">
+              {template.description}
+            </p>
+            <Link to="/signup" className="block mt-auto">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full gap-2 hover:bg-primary/10 transition-colors group"
+              >
+                Preview Template
+                <ArrowRightCircle className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };

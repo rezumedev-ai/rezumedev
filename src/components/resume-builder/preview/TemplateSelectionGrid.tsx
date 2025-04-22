@@ -41,7 +41,7 @@ export function TemplateSelectionGrid({
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-gradient-to-br from-white to-gray-50 max-h-[80vh] overflow-y-auto">
+    <div className="p-4 sm:p-6 bg-gradient-to-br from-white to-gray-50 rounded-lg max-h-[80vh] overflow-y-auto">
       <div className="text-center mb-4 sm:mb-6">
         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Choose a Template</h3>
         <p className="text-sm sm:text-base text-gray-600">
