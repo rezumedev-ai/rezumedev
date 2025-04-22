@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { ArrowRightCircle, ExternalLink, Sparkles } from 'lucide-react';
 import { GradientHeading } from './ui/gradient-heading';
@@ -163,7 +162,6 @@ export const ResumeTemplates = () => {
           </p>
         </motion.div>
 
-        {/* New masonry grid layout for templates */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -343,16 +341,6 @@ const TemplateCard = ({ template, index }: TemplateCardProps) => {
             <p className="text-muted-foreground text-sm mb-6">
               {template.description}
             </p>
-            <Link to="/signup" className="block mt-auto">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full gap-2 hover:bg-primary/10 transition-colors group"
-              >
-                Preview Template
-                <ArrowRightCircle className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
           </div>
         </div>
       </motion.div>
