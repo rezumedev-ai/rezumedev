@@ -3,9 +3,9 @@ import { CheckIcon, XIcon, StarIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const competitorNames = [
-  "TopResume",
-  "ResumeGenius",
-  "Novoresume"
+  "Builder A",
+  "Builder B",
+  "Builder C"
 ];
 
 type Feature = {
