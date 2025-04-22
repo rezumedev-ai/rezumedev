@@ -1,3 +1,4 @@
+
 import { Helmet } from 'react-helmet';
 import { AnimatedHero } from "@/components/ui/animated-hero";
 import { Process } from "@/components/Process";
@@ -10,7 +11,6 @@ import { Header } from "@/components/Header";
 import { AnimatedTestimonialsSection } from "@/components/AnimatedTestimonialsSection";
 import ComparisonTable from "@/components/ComparisonTable";
 import PricingSection from "@/components/PricingSection";
-import RezumeAdvantagesSection from "@/components/RezumeAdvantagesSection";
 
 const Index = () => {
   return (
@@ -144,7 +144,7 @@ const Index = () => {
           <Features />
           <ResumeTemplates />
           <AnimatedTestimonialsSection />
-          <RezumeAdvantagesSection />
+          <ComparisonTable />
           <FAQ />
           <PricingSection />
           <CTA />
