@@ -1,16 +1,16 @@
 import { Helmet } from 'react-helmet';
 import { AnimatedHero } from "@/components/ui/animated-hero";
+import { Process } from "@/components/Process";
+import { Features } from "@/components/Features";
 import { ResumeTemplates } from "@/components/ResumeTemplates";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { AnimatedTestimonialsSection } from "@/components/AnimatedTestimonialsSection";
+import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import PricingSection from "@/components/PricingSection";
-import { ProcessSection } from "@/components/landing/sections/ProcessSection";
-import { FeaturesSection } from "@/components/landing/sections/FeaturesSection";
-import { FAQSection } from "@/components/landing/sections/FAQSection";
-import { LandingReviewSection } from "@/components/landing/sections/LandingReviewSection";
+import { LandingReviewSection } from "@/components/LandingReviewSection";
 
 const Index = () => {
   return (
@@ -140,13 +140,13 @@ const Index = () => {
         <div className="pt-12">
           <AnimatedHero />
           <LandingReviewSection />
-          <ProcessSection />
-          <FeaturesSection />
+          <Process />
+          <Features />
           <ResumeTemplates />
           <ComparisonTable />
           <PricingSection />
           <AnimatedTestimonialsSection />
-          <FAQSection />
+          <FAQ />
           <CTA />
           <Footer />
         </div>
