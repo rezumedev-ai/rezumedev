@@ -20,7 +20,7 @@ export const ProcessCard: React.FC<ProcessCardProps> = ({
   iconName,
   animationDelay = 0
 }) => {
-  // Dynamically get the icon component
+  // Get the icon component from Lucide
   const IconComponent = LucideIcons[iconName];
   
   return (
@@ -32,7 +32,8 @@ export const ProcessCard: React.FC<ProcessCardProps> = ({
       
       <div className="relative">
         <div className="flex items-center justify-center w-12 h-12 mb-4 text-lg font-semibold text-primary bg-accent rounded-xl group-hover:scale-110 transition-transform">
-          {React.createElement(IconComponent, { className: "w-6 h-6" })}
+          {/* Use JSX for the icon instead of React.createElement */}
+          {IconComponent && <IconComponent className="w-6 h-6" />}
         </div>
         <h3 className="mb-2 text-xl font-semibold text-secondary group-hover:text-primary transition-colors">
           {title}
