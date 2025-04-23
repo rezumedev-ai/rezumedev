@@ -2,11 +2,14 @@
 import React from "react";
 import * as LucideIcons from "lucide-react";
 
+// Define valid icon names from lucide-react
+type LucideIconName = keyof typeof LucideIcons;
+
 interface ProcessCardProps {
   number: string;
   title: string;
   description: string;
-  iconName: keyof typeof LucideIcons;
+  iconName: LucideIconName;
   animationDelay?: number;
 }
 
@@ -29,7 +32,7 @@ export const ProcessCard: React.FC<ProcessCardProps> = ({
       
       <div className="relative">
         <div className="flex items-center justify-center w-12 h-12 mb-4 text-lg font-semibold text-primary bg-accent rounded-xl group-hover:scale-110 transition-transform">
-          {IconComponent && <IconComponent className="w-6 h-6" />}
+          {React.createElement(IconComponent, { className: "w-6 h-6" })}
         </div>
         <h3 className="mb-2 text-xl font-semibold text-secondary group-hover:text-primary transition-colors">
           {title}

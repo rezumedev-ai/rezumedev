@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Sparkle } from "lucide-react";
+import { Sparkle, UserCircle2, Bot, Download } from "lucide-react";
 import { ProcessCard } from "../ui/ProcessCard";
 import { SectionContainer } from "../ui/SectionContainer";
 import { SectionHeading } from "../ui/SectionHeading";
@@ -10,19 +10,19 @@ const steps = [
     number: "01",
     title: "Enter your details",
     description: "Fill in your professional information and job preferences",
-    iconName: "UserCircle2"
+    iconName: "UserCircle2" as const
   },
   {
     number: "02",
     title: "AI generates your resume",
     description: "Our AI creates a tailored, ATS-optimized resume",
-    iconName: "Bot"
+    iconName: "Bot" as const
   },
   {
     number: "03",
     title: "Download & apply",
     description: "Get your polished resume ready for job applications",
-    iconName: "Download"
+    iconName: "Download" as const
   },
 ];
 
