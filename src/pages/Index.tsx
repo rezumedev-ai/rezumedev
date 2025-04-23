@@ -1,4 +1,3 @@
-
 import { Helmet } from 'react-helmet';
 import { AnimatedHero } from "@/components/ui/animated-hero";
 import { Process } from "@/components/Process";
@@ -143,9 +142,9 @@ const Index = () => {
           <Features />
           <ResumeTemplates />
           <ComparisonTable />
+          <PricingSection />
           <AnimatedTestimonialsSection />
           <FAQ />
-          <PricingSection />
           <CTA />
           <Footer />
         </div>
@@ -155,4 +154,3 @@ const Index = () => {
 };
 
 export default Index;
-
