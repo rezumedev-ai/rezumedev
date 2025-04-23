@@ -10,6 +10,7 @@ import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import PricingSection from "@/components/PricingSection";
+import { LandingReviewSection } from "@/components/LandingReviewSection";
 
 const Index = () => {
   return (
@@ -138,11 +139,12 @@ const Index = () => {
         <Header />
         <div className="pt-12">
           <AnimatedHero />
-          <Process />
-          <Features />
           <ResumeTemplates />
           <ComparisonTable />
           <PricingSection />
+          <LandingReviewSection />
+          <Process />
+          <Features />
           <AnimatedTestimonialsSection />
           <FAQ />
           <CTA />
