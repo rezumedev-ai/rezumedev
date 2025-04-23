@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Sparkle, UserCircle2, Bot, Download } from "lucide-react";
+import { Sparkle } from "lucide-react";
 import { ProcessCard } from "../ui/ProcessCard";
 import { SectionContainer } from "../ui/SectionContainer";
 import { SectionHeading } from "../ui/SectionHeading";
