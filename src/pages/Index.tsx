@@ -1,4 +1,3 @@
-
 import { Helmet } from 'react-helmet';
 import { AnimatedHero } from "@/components/ui/animated-hero";
 import { Process } from "@/components/Process";
@@ -141,11 +140,11 @@ const Index = () => {
         <div className="pt-12">
           <AnimatedHero />
           <LandingReviewSection />
+          <Process />
+          <Features />
           <ResumeTemplates />
           <ComparisonTable />
           <PricingSection />
-          <Process />
-          <Features />
           <AnimatedTestimonialsSection />
           <FAQ />
           <CTA />
