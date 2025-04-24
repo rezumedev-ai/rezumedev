@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -8,8 +7,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function calculateTotalExperience(workExperience: any[]): { years: number; months: number } {
+  let totalMonths = 0;
+  const now = new Date();
+
+  workExperience.forEach(exp => {
+    const startDate = new Date(exp.startDate);
+    let endDate = exp.endDate === 'Present' || exp.endDate === 'Current' 
+      ? now 
+      : new Date(exp.endDate);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      console.warn('Invalid date found in experience:', exp);
+      return; // Skip this experience if dates are invalid
+    }
+
+    const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                  (endDate.getMonth() - startDate.getMonth());
+    
+    totalMonths += Math.max(0, months); // Ensure we don't add negative months
+  });
+
+  const years = Math.floor(totalMonths / 12);
+  const remainingMonths = totalMonths % 12;
+
+  return { years, months: remainingMonths };
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -28,23 +53,18 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
     
-    // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // First, update the status to enhancing
     await supabase
       .from('resumes')
       .update({ completion_status: 'enhancing' })
       .eq('id', resumeId);
     
-    // Extract job title from resumeData for the overall summary
     const jobTitle = resumeData.professional_summary?.title || '';
-    // Check if job description is provided
     const targetJobDescription = resumeData.professional_summary?.targetJobDescription || '';
     
-    // First, get industry-specific keywords for the target position
     let keywordsPrompt = '';
     
     if (targetJobDescription) {
@@ -104,7 +124,6 @@ RULES
     let industryKeywords = [];
     
     try {
-      // Try parsing the keywords response
       if (keywordsContent.includes('[') && keywordsContent.includes(']')) {
         const match = keywordsContent.match(/\[([^\]]+)\]/);
         if (match) {
@@ -120,32 +139,37 @@ RULES
     
     console.log('Generated keywords:', industryKeywords);
 
-    // Generate professional summary with the keywords
+    const experience = calculateTotalExperience(resumeData.work_experience);
+    const experienceString = `${experience.years} year${experience.years !== 1 ? 's' : ''}${
+      experience.months > 0 ? ` and ${experience.months} month${experience.months !== 1 ? 's' : ''}` : ''
+    }`;
+
     const summaryPrompt = `
-Write a professional summary for a ${jobTitle}.
+Generate a concise professional summary for a ${jobTitle}.
 
 CONTEXT
+• Total Experience: ${experienceString}
 • Job Title: ${jobTitle}
 • Target Keywords: ${industryKeywords.join(', ')}
 
 REQUIREMENTS
-1. Write 3‑4 impactful sentences (50‑70 words)
+1. Write 2‑3 impactful sentences (30‑50 words)
 2. Structure:
-   • Opening: Strong value proposition
-   • Middle: Core skills & achievements
-   • Close: Career focus statement
+   • Start with a headline including job title and specialization
+   • Include exact years of experience: "${experienceString}"
+   • Close with core competencies
 3. Incorporate 2‑3 target keywords naturally
 4. Use active voice
 5. No clichés ("results‑driven," "proven track record")
 6. Omit personal pronouns
-7. No specific metrics/years
+7. Keep factual, no embellishments
 
 FORMAT
-• Write in paragraph form
-• Focus on value delivery
-• Keep natural flow`;
+• Write in paragraph form with headline
+• Focus on specialization and expertise
+• Must include exact experience duration`;
 
-    console.log('Calling OpenAI API for professional summary...');
+    console.log('Calling OpenAI API for professional summary with new prompt...');
     
     const summaryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -175,7 +199,6 @@ FORMAT
     const enhancedSummary = summaryData.choices[0].message.content.trim();
     console.log('Generated professional summary');
     
-    // Process each work experience entry with the generated keywords
     const enhancedExperiences = [];
     
     for (let i = 0; i < resumeData.work_experience.length; i++) {
@@ -231,7 +254,6 @@ FORMATTING
         const responseContent = respData.choices[0].message.content.trim();
         let responsibilities = [];
 
-        // Parse the response content
         if (responseContent.includes('[') && responseContent.includes(']')) {
           const match = responseContent.match(/\[([^\]]+)\]/);
           if (match) {
@@ -241,17 +263,14 @@ FORMATTING
           responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
         }
 
-        // Clean up responsibilities
         responsibilities = responsibilities
           .map(resp => {
-            // Remove metrics and standardize format
             let clean = resp
               .replace(/\d+%/g, '')
               .replace(/increased|decreased|improved|enhanced|reduced|optimized/g, 'enhanced')
               .replace(/\s+/g, ' ')
               .trim();
             
-            // Ensure starts with past tense verb
             if (!/^[A-Z][a-z]+ed\b/.test(clean)) {
               clean = `Led ${clean}`;
             }
@@ -260,7 +279,6 @@ FORMATTING
           })
           .filter(resp => resp.length >= 30 && resp.length <= 100);
 
-        // Limit to 4 responsibilities
         responsibilities = responsibilities.slice(0, 4);
         
         if (responsibilities.length > 0) {
@@ -280,7 +298,6 @@ FORMATTING
       }
     }
     
-    // Generate skills using the keywords
     const skillsPrompt = `
 Generate skills for a ${jobTitle} resume.
 
@@ -341,7 +358,6 @@ OUTPUT FORMAT
       console.error('Error parsing skills:', e);
     }
     
-    // Update the resume in the database
     const updatePayload = {
       professional_summary: {
         ...resumeData.professional_summary,
@@ -377,7 +393,6 @@ OUTPUT FORMAT
   } catch (error) {
     console.error('Error in generate-professional-resume function:', error);
     
-    // Try to update the resume status to error
     try {
       const { resumeId } = await req.json();
       if (resumeId) {
