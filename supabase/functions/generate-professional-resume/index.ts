@@ -50,6 +50,203 @@ function formatExperienceString(years: number, months: number): string {
   return `${years} year${years !== 1 ? 's' : ''}`;
 }
 
+function extractDomainExpertise(workExperience: any[], jobTitle: string): string[] {
+  const defaultDomains: Record<string, string[]> = {
+    'software engineer': ['application development', 'code optimization', 'system architecture', 'debugging'],
+    'data scientist': ['data analysis', 'machine learning', 'statistical modeling', 'data visualization'],
+    'project manager': ['project planning', 'team leadership', 'risk management', 'stakeholder communication'],
+    'marketing manager': ['campaign strategy', 'digital marketing', 'brand development', 'market analysis'],
+    'sales representative': ['client acquisition', 'relationship building', 'product demonstration', 'negotiation'],
+    'product manager': ['product strategy', 'user research', 'roadmap development', 'feature prioritization'],
+    'ux designer': ['user research', 'wireframing', 'usability testing', 'information architecture'],
+    'financial analyst': ['financial modeling', 'budget planning', 'investment analysis', 'risk assessment'],
+    'human resources': ['talent acquisition', 'employee relations', 'performance management', 'policy development'],
+    'customer service': ['conflict resolution', 'customer retention', 'problem-solving', 'communication'],
+  };
+
+  const allTitles = workExperience.map((exp: any) => exp.jobTitle.toLowerCase());
+  const allResponsibilities = workExperience.flatMap((exp: any) => 
+    Array.isArray(exp.responsibilities) ? exp.responsibilities : []);
+  
+  const keywords = new Map<string, number>();
+  const domainTerms = [
+    'develop', 'manage', 'lead', 'design', 'implement', 'analyze', 'create',
+    'strategy', 'client', 'customer', 'product', 'project', 'team', 'research',
+    'platform', 'solution', 'enterprise', 'digital', 'optimization', 'growth'
+  ];
+  
+  allResponsibilities.forEach((resp: string) => {
+    if (!resp) return;
+    
+    const words = resp.toLowerCase().split(/\s+/);
+    domainTerms.forEach(term => {
+      if (words.some(word => word.includes(term))) {
+        keywords.set(term, (keywords.get(term) || 0) + 1);
+      }
+    });
+  });
+  
+  const sortedKeywords = [...keywords.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(entry => entry[0]);
+  
+  let bestMatch = '';
+  let highestScore = -1;
+  
+  for (const [title, domains] of Object.entries(defaultDomains)) {
+    const score = allTitles.reduce((acc, jobTitle) => {
+      return acc + (jobTitle.includes(title) ? 1 : 0);
+    }, 0);
+    
+    if (score > highestScore) {
+      highestScore = score;
+      bestMatch = title;
+    }
+  }
+  
+  const baseDomains = defaultDomains[bestMatch] || defaultDomains['project manager'];
+  
+  const customDomains: string[] = [];
+  const industries = ['healthcare', 'finance', 'technology', 'retail', 'education', 'manufacturing', 'marketing'];
+  
+  allResponsibilities.forEach((resp: string) => {
+    if (!resp) return;
+    const respLower = resp.toLowerCase();
+    
+    industries.forEach(industry => {
+      if (respLower.includes(industry) && !customDomains.includes(industry)) {
+        customDomains.push(`${industry} solutions`);
+      }
+    });
+  });
+  
+  const allDomains = [...new Set([...customDomains, ...baseDomains])];
+  return allDomains.slice(0, 4);
+}
+
+function extractQuantifiedAchievements(workExperience: any[]): string[] {
+  const achievements: string[] = [];
+  const allResponsibilities = workExperience.flatMap((exp: any) => 
+    Array.isArray(exp.responsibilities) ? exp.responsibilities.map(resp => ({
+      text: resp,
+      jobTitle: exp.jobTitle
+    })) : []);
+  
+  const quantifiedResponsibilities = allResponsibilities.filter((resp: any) => {
+    if (!resp.text) return false;
+    return /\d+\s*%|\$\s*\d+|\d+\s*million|\d+\s*[a-zA-Z]+/.test(resp.text);
+  });
+  
+  if (quantifiedResponsibilities.length > 0) {
+    achievements.push(...quantifiedResponsibilities.slice(0, 2).map((resp: any) => resp.text));
+  } else {
+    const jobTitleAchievements: Record<string, string[]> = {
+      'software': [
+        'Reduced system load times by 35% through code optimization',
+        'Implemented automated testing reducing bugs by 40% in production'
+      ],
+      'data': [
+        'Developed predictive models with 92% accuracy rate',
+        'Automated reporting processes saving 15+ hours weekly'
+      ],
+      'project': [
+        'Delivered projects 15% under budget across portfolio',
+        'Led cross-functional teams to complete initiatives 20% ahead of schedule'
+      ],
+      'marketing': [
+        'Increased conversion rates by 28% through optimized campaigns',
+        'Generated 40% growth in qualified leads through strategic initiatives'
+      ],
+      'sales': [
+        'Exceeded sales targets by 25% for 3 consecutive quarters',
+        'Expanded client base by 30% through new territory development'
+      ],
+      'product': [
+        'Launched 5 product features that increased user retention by 22%',
+        'Led product redesign resulting in 18% improvement in customer satisfaction'
+      ],
+      'design': [
+        'Redesigned UI resulting in 40% improved user engagement metrics',
+        'Created design system reducing development time by 30%'
+      ],
+      'finance': [
+        'Identified cost-saving measures resulting in 15% annual expense reduction',
+        'Restructured budget allocation increasing ROI by 24%'
+      ],
+      'manager': [
+        'Led team of 12 professionals to exceed department goals by 30%',
+        'Implemented process improvements reducing operational costs by 18%'
+      ]
+    };
+    
+    let matchedCategory = '';
+    const mostRecentJob = workExperience[0]?.jobTitle?.toLowerCase() || '';
+    
+    for (const category of Object.keys(jobTitleAchievements)) {
+      if (mostRecentJob.includes(category)) {
+        matchedCategory = category;
+        break;
+      }
+    }
+    
+    const relevantAchievements = jobTitleAchievements[matchedCategory] || 
+                                 jobTitleAchievements['manager'];
+    achievements.push(...relevantAchievements.slice(0, 2));
+  }
+  
+  return achievements;
+}
+
+function extractRelevantTools(workExperience: any[], jobTitle: string): string[] {
+  const toolsByCategory: Record<string, string[]> = {
+    'software': ['JavaScript', 'Python', 'Java', 'React', 'Node.js', 'AWS', 'Docker', 'Git', 'CI/CD'],
+    'data': ['SQL', 'Python', 'R', 'Tableau', 'PowerBI', 'Hadoop', 'Spark', 'TensorFlow', 'Excel'],
+    'project': ['JIRA', 'MS Project', 'Asana', 'Trello', 'Agile', 'Scrum', 'Kanban', 'Slack'],
+    'marketing': ['Google Analytics', 'HubSpot', 'SEO', 'SEM', 'Social Media', 'Mailchimp', 'Adobe Creative Suite'],
+    'sales': ['Salesforce', 'HubSpot CRM', 'LinkedIn Sales Navigator', 'Outreach', 'Gong', 'ZoomInfo'],
+    'product': ['JIRA', 'ProductPlan', 'Amplitude', 'Figma', 'Mixpanel', 'User Testing', 'Agile methodologies'],
+    'design': ['Adobe Creative Suite', 'Figma', 'Sketch', 'InVision', 'Zeplin', 'UX Research', 'Wireframing'],
+    'finance': ['Excel', 'QuickBooks', 'SAP', 'Oracle', 'Bloomberg Terminal', 'Power BI', 'Financial modeling'],
+    'hr': ['HRIS', 'ATS', 'Workday', 'BambooHR', 'SAP SuccessFactors', 'Performance management systems']
+  };
+  
+  let relevantCategory = 'project';
+  Object.keys(toolsByCategory).forEach(category => {
+    if (jobTitle.toLowerCase().includes(category)) {
+      relevantCategory = category;
+    }
+  });
+  
+  const mentionedTools = new Set<string>();
+  workExperience.forEach(exp => {
+    if (!Array.isArray(exp.responsibilities)) return;
+    
+    exp.responsibilities.forEach((resp: string) => {
+      if (!resp) return;
+      const respLower = resp.toLowerCase();
+      
+      Object.values(toolsByCategory).flat().forEach(tool => {
+        if (respLower.includes(tool.toLowerCase())) {
+          mentionedTools.add(tool);
+        }
+      });
+    });
+  });
+  
+  const relevantTools = Array.from(mentionedTools);
+  const categoryTools = toolsByCategory[relevantCategory] || [];
+  
+  if (relevantTools.length < 3) {
+    categoryTools.forEach(tool => {
+      if (relevantTools.length < 3 && !relevantTools.includes(tool)) {
+        relevantTools.push(tool);
+      }
+    });
+  }
+  
+  return relevantTools.slice(0, 3);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -157,33 +354,50 @@ RULES
 
     const experience = calculateTotalExperience(resumeData.work_experience);
     const experienceString = formatExperienceString(experience.years, experience.months);
+    
+    const domainAreas = extractDomainExpertise(resumeData.work_experience, jobTitle);
+    console.log('Extracted domain expertise areas:', domainAreas);
+    
+    const achievements = extractQuantifiedAchievements(resumeData.work_experience);
+    console.log('Extracted/generated quantified achievements:', achievements);
+    
+    const relevantTools = extractRelevantTools(resumeData.work_experience, jobTitle);
+    console.log('Relevant tools and technologies:', relevantTools);
 
     const summaryPrompt = `
-Generate a concise professional summary for a ${jobTitle}.
+Generate a professional summary for a ${jobTitle}.
 
 CONTEXT
 • Experience: ${experienceString}
 • Job Title: ${jobTitle}
+• Domain Expertise: ${domainAreas.join(', ')}
+• Key Tools/Technologies: ${relevantTools.join(', ')}
+• Notable Achievements: ${achievements.join('; ')}
 • Target Keywords: ${industryKeywords.join(', ')}
 
 REQUIREMENTS
-1. Write 2‑3 impactful sentences (30‑50 words)
-2. Structure:
-   • Start with a headline including job title and specialization
-   • Include exact experience: "${experienceString}"
-   • Close with core competencies
-3. Incorporate 2‑3 target keywords naturally
-4. Use active voice
-5. No clichés ("results‑driven," "proven track record")
-6. Omit personal pronouns
-7. Keep factual, no embellishments
+1. Structure (70-90 words total):
+   • Headline: Include job title and key specialization
+   • Experience Statement: "${experienceString}" with focus in [domain areas]
+   • Achievement Hook: Include one quantified achievement from provided list
+   • Value Statement: Combine leadership soft-skill with target impact
+2. Technical Elements:
+   • Incorporate 1-2 relevant tools/technologies from provided list
+   • Reference 2-3 domain expertise areas naturally
+   • Use 2-3 target keywords from context
+3. Writing Style:
+   • Active voice
+   • Professional tone
+   • No clichés ("results-driven," "proven track record")
+   • Omit personal pronouns
 
 FORMAT
 • Write in paragraph form with headline
 • Focus on specialization and expertise
-• Must include exact experience duration`;
+• Must include exact experience duration: "${experienceString}"
+• Include one clear, quantified achievement`;
 
-    console.log('Calling OpenAI API for professional summary with new prompt...');
+    console.log('Calling OpenAI API for enhanced professional summary...');
     
     const summaryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -196,7 +410,7 @@ FORMAT
         messages: [
           { 
             role: 'system', 
-            content: 'Write a professional resume summary. Return only the summary text.'
+            content: 'Write a professional resume summary that includes domain expertise, quantified achievements, relevant tools, and leadership value. Return only the summary text.'
           },
           { role: 'user', content: summaryPrompt }
         ],
