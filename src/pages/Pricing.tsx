@@ -1,57 +1,19 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Check, CheckCircle, Sparkles, Star } from "lucide-react";
-import { CheckoutButton } from "@/components/payment/CheckoutButton";
-import { useAuth } from "@/contexts/AuthContext";
-import { useState, useEffect } from "react";
+import { Sparkles } from "lucide-react";
 import { SimplifiedHeader } from "@/components/SimplifiedHeader";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-
-export type PlanType = "free" | "monthly" | "yearly" | "lifetime";
+import { PricingFeature } from "@/components/pricing/PricingFeature";
+import { SubscriptionButton } from "@/components/pricing/SubscriptionButton";
+import { ExtraInfo } from "@/components/pricing/ExtraInfo";
+import { usePricing } from "@/hooks/use-pricing";
 
 const Pricing = () => {
-  const { user } = useAuth();
   const isMobile = useIsMobile();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      if (!user) return null;
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching profile:", error);
-        return null;
-      }
-      
-      return data;
-    },
-    enabled: !!user
-  });
-
-  const hasActiveSubscription = profile?.subscription_status === 'active' && profile?.subscription_plan;
-  const currentPlan = profile?.subscription_plan as PlanType | undefined;
-
-  useEffect(() => {
-    if (user) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, [user]);
+  const { isAuthenticated, hasActiveSubscription, currentPlan, user } = usePricing();
 
   const renderHeader = () => {
     if (isAuthenticated) {
@@ -72,36 +34,6 @@ const Pricing = () => {
     } else {
       return <Header />;
     }
-  };
-
-  const renderSubscriptionButton = (planType: PlanType) => {
-    if (planType === "free") {
-      return (
-        <Button asChild variant="outline" className="w-full">
-          <Link to="/signup">Get Started Free</Link>
-        </Button>
-      );
-    }
-
-    if (hasActiveSubscription && currentPlan === planType) {
-      return (
-        <Button variant="outline" className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800" disabled>
-          <CheckCircle className="mr-2 h-4 w-4" />
-          Current Plan
-        </Button>
-      );
-    }
-
-    return (
-      <CheckoutButton
-        planType={planType}
-        className={`w-full hover:scale-105 transition-transform ${
-          hasActiveSubscription ? "bg-blue-600 hover:bg-blue-700" : ""
-        }`}
-      >
-        {hasActiveSubscription ? "Switch Plan" : "Subscribe Now"}
-      </CheckoutButton>
-    );
   };
 
   return (
@@ -191,7 +123,11 @@ const Pricing = () => {
                 <PricingFeature text="Community support" />
               </motion.ul>
               
-              {renderSubscriptionButton("free")}
+              <SubscriptionButton 
+                planType="free"
+                hasActiveSubscription={hasActiveSubscription}
+                currentPlan={currentPlan}
+              />
             </motion.div>
 
             {/* Monthly Plan */}
@@ -202,7 +138,6 @@ const Pricing = () => {
               transition={{ duration: 0.5 }}
               whileHover={{ scale: 1.02 }}
             >
-              {/* Decorative corner gradient */}
               <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 opacity-80 rounded-full"></div>
               
               <div className="mb-4">
@@ -240,7 +175,11 @@ const Pricing = () => {
                 <PricingFeature text="24/7 support" />
               </motion.ul>
               
-              {renderSubscriptionButton("monthly")}
+              <SubscriptionButton 
+                planType="monthly"
+                hasActiveSubscription={hasActiveSubscription}
+                currentPlan={currentPlan}
+              />
             </motion.div>
 
             {/* Yearly Plan */}
@@ -251,7 +190,6 @@ const Pricing = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               whileHover={{ scale: 1.05 }}
             >
-              {/* Spotlight effect */}
               <div className="absolute -z-10 inset-0 bg-gradient-to-tr from-primary/0 via-primary/5 to-primary/0 animate-pulse rounded-2xl"></div>
               
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full shadow-lg">
@@ -297,7 +235,11 @@ const Pricing = () => {
                 <PricingFeature text="Early access to new features" highlight />
               </motion.ul>
               
-              {renderSubscriptionButton("yearly")}
+              <SubscriptionButton 
+                planType="yearly"
+                hasActiveSubscription={hasActiveSubscription}
+                currentPlan={currentPlan}
+              />
             </motion.div>
 
             {/* Lifetime Plan */}
@@ -308,7 +250,6 @@ const Pricing = () => {
               transition={{ duration: 0.5, delay: 0.4 }}
               whileHover={{ scale: 1.02 }}
             >
-              {/* Decorative corner gradient */}
               <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-emerald-500/20 to-green-500/20 opacity-80 rounded-full"></div>
               
               {hasActiveSubscription && currentPlan === 'lifetime' && (
@@ -354,60 +295,19 @@ const Pricing = () => {
                 <PricingFeature text="VIP support" />
               </motion.ul>
               
-              {renderSubscriptionButton("lifetime")}
+              <SubscriptionButton 
+                planType="lifetime"
+                hasActiveSubscription={hasActiveSubscription}
+                currentPlan={currentPlan}
+              />
             </motion.div>
           </div>
           
-          {/* Extra info section */}
-          <motion.div 
-            className="max-w-2xl mx-auto text-center mt-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-          >
-            <div className="inline-flex items-center p-4 rounded-xl bg-accent/80 backdrop-blur-sm mb-6">
-              <div className="flex flex-col items-center p-3 rounded-lg">
-                <h4 className="font-medium text-secondary">Satisfaction Guaranteed</h4>
-                <p className="text-sm text-muted-foreground">14-day money-back guarantee</p>
-              </div>
-              <div className="h-10 w-px bg-muted mx-4"></div>
-              <div className="flex flex-col items-center p-3 rounded-lg">
-                <h4 className="font-medium text-secondary">Secure Payments</h4>
-                <p className="text-sm text-muted-foreground">SSL encrypted checkout</p>
-              </div>
-            </div>
-            
-            <p className="text-sm text-muted-foreground">
-              Questions about our pricing? <a href="/contact" className="text-primary hover:underline">Contact our team</a>
-            </p>
-          </motion.div>
+          <ExtraInfo />
         </div>
       </main>
       {!isAuthenticated && <Footer />}
     </div>
-  );
-};
-
-const PricingFeature = ({ text, highlight = false }: { text: string; highlight?: boolean }) => {
-  const itemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.3 } }
-  };
-
-  return (
-    <motion.li 
-      className={`flex items-center gap-2 group ${highlight ? 'font-medium' : ''}`}
-      variants={itemVariants}
-    >
-      <div className={`rounded-full p-1 group-hover:scale-110 transition-transform ${
-        highlight ? 'bg-primary/20' : 'bg-primary/10'
-      }`}>
-        <Check className={`h-4 w-4 ${highlight ? 'text-primary' : 'text-primary/80'}`} />
-      </div>
-      <span className={`${highlight ? 'text-secondary' : 'text-muted-foreground'} group-hover:text-primary transition-colors`}>
-        {text}
-      </span>
-    </motion.li>
   );
 };
 
