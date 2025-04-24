@@ -1,6 +1,7 @@
+
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Sparkles } from "lucide-react";
+import { Sparkles, CheckCircle, Star } from "lucide-react";
 import { SimplifiedHeader } from "@/components/SimplifiedHeader";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -9,6 +10,7 @@ import { PricingFeature } from "@/components/pricing/PricingFeature";
 import { SubscriptionButton } from "@/components/pricing/SubscriptionButton";
 import { ExtraInfo } from "@/components/pricing/ExtraInfo";
 import { usePricing } from "@/hooks/use-pricing";
+import { useState } from "react";
 
 const Pricing = () => {
   const isMobile = useIsMobile();
@@ -229,10 +231,10 @@ const Pricing = () => {
                   }
                 }}
               >
-                <PricingFeature text="Everything in Monthly" highlight />
-                <PricingFeature text="Save 25% annually" highlight />
-                <PricingFeature text="Priority support" highlight />
-                <PricingFeature text="Early access to new features" highlight />
+                <PricingFeature text="Everything in Monthly" highlight={true} />
+                <PricingFeature text="Save 25% annually" highlight={true} />
+                <PricingFeature text="Priority support" highlight={true} />
+                <PricingFeature text="Early access to new features" highlight={true} />
               </motion.ul>
               
               <SubscriptionButton 
