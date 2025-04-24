@@ -3,6 +3,7 @@ import { ResumeTemplate } from "../../../templates";
 import { motion } from "framer-motion";
 import { Check, Sparkles } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Badge } from "@/components/resume-builder/ui/Badge";
 
 interface TemplateImageProps {
   template: ResumeTemplate;
