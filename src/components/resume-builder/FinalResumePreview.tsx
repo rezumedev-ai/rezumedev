@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Eye } from "lucide-react";
+import { Eye, ZoomIn, ZoomOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface FinalResumePreviewProps {
   resumeData: ResumeData;
@@ -23,6 +24,7 @@ export function FinalResumePreview({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [resumeScale, setResumeScale] = useState(1);
+  const [isZoomed, setIsZoomed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const {
@@ -42,8 +44,14 @@ export function FinalResumePreview({
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
   
   const pageStyle = {
-    padding: isMobile ? "0.4in" : template.style.spacing.margins.top,
+    padding: isMobile ? "0.3in" : template.style.spacing.margins.top,
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
+  };
+  
+  const toggleZoom = () => {
+    setIsZoomed(!isZoomed);
+    // Recalculate scale after state update
+    setTimeout(() => updateScale(), 50);
   };
 
   const handleTemplateSwitching = (templateId: string) => {
@@ -53,50 +61,50 @@ export function FinalResumePreview({
     toast.success(`Template updated to ${resumeTemplates.find(t => t.id === templateId)?.name || 'new template'}`);
   };
 
-  useEffect(() => {
-    const updateScale = () => {
-      if (!containerRef.current) return;
+  const updateScale = () => {
+    if (!containerRef.current) return;
+    
+    // Get container dimensions
+    const containerWidth = containerRef.current.clientWidth;
+    const containerHeight = containerRef.current.clientHeight;
+    
+    // A4 dimensions (in pixels at 96 DPI)
+    const pageWidth = 21 * 37.8; // ~793px
+    const pageHeight = 29.7 * 37.8; // ~1122px
+    
+    if (isMobile) {
+      // For mobile, optimize for portrait view to show more of the resume
+      const isPortrait = window.innerHeight > window.innerWidth;
+      const availableWidth = containerWidth - 24; // Reduced padding for mobile
+      const availableHeight = containerHeight - 100; // Reduced space for toolbar
       
-      // Get container dimensions
-      const containerWidth = containerRef.current.clientWidth;
-      const containerHeight = containerRef.current.clientHeight;
+      // Calculate scale based on available dimensions
+      const widthScale = availableWidth / pageWidth;
       
-      // A4 dimensions (in pixels at 96 DPI)
-      const pageWidth = 21 * 37.8; // ~793px
-      const pageHeight = 29.7 * 37.8; // ~1122px
-      
-      if (isMobile) {
-        // For mobile, calculate the best scale
-        const isPortrait = window.innerHeight > window.innerWidth;
-        const availableWidth = containerWidth - 32; // Allow for some padding
-        const availableHeight = containerHeight - 120; // Allow for toolbar and some padding
-        
-        // Calculate scale based on available dimensions
-        const widthScale = availableWidth / pageWidth;
-        const heightScale = availableHeight / pageHeight;
-        
-        // When not zoomed, prioritize seeing the whole page
-        const baseScale = Math.min(widthScale, heightScale);
-        // Set a maximum scale factor for portrait mode to ensure users can see more context
-        const maxScale = isPortrait ? 0.45 : 0.65;
-        // Set a minimum scale to ensure the resume is not too small
-        const minScale = 0.35;
-        setResumeScale(Math.max(Math.min(baseScale, maxScale), minScale));
+      if (isZoomed) {
+        // When zoomed, prioritize readability while still showing the full width
+        setResumeScale(Math.min(widthScale * 1.5, 0.75));
       } else {
-        // For desktop, optimize the scale to use more space
-        const availableWidth = containerWidth - 48; // 48px padding
-        const availableHeight = containerHeight - 120; // 120px for toolbar and padding
-        
-        // Calculate scale based on available dimensions
-        const widthScale = availableWidth / pageWidth;
-        const heightScale = availableHeight / pageHeight;
-        
-        // Use the smaller scale to ensure the entire resume fits, but give it a minimum scale
-        const newScale = Math.max(Math.min(widthScale, heightScale, 1), 0.65);
-        setResumeScale(newScale);
+        // When not zoomed, show the full resume with a reasonable scale
+        // Always ensure the full width is visible
+        setResumeScale(Math.max(widthScale, 0.35));
       }
-    };
+    } else {
+      // For desktop, optimize the scale to use more space
+      const availableWidth = containerWidth - 48; // 48px padding
+      const availableHeight = containerHeight - 120; // 120px for toolbar and padding
+      
+      // Calculate scale based on available dimensions
+      const widthScale = availableWidth / pageWidth;
+      const heightScale = availableHeight / pageHeight;
+      
+      // Use the smaller scale to ensure the entire resume fits, but give it a minimum scale
+      const newScale = Math.max(Math.min(widthScale, heightScale, 1), 0.65);
+      setResumeScale(newScale);
+    }
+  };
 
+  useEffect(() => {
     updateScale();
     
     // Add event listeners for screen rotation and resize
@@ -107,12 +115,12 @@ export function FinalResumePreview({
       window.removeEventListener('resize', updateScale);
       window.removeEventListener('orientationchange', updateScale);
     };
-  }, [isMobile]);
+  }, [isMobile, isZoomed]);
   
   return (
     <motion.div 
       ref={containerRef}
-      className="flex flex-col items-center min-h-screen bg-white py-4 relative"
+      className="flex flex-col items-center min-h-screen bg-white py-2 sm:py-4 relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -129,39 +137,53 @@ export function FinalResumePreview({
         currentProfileImageUrl={resumeState.personal_info.profileImageUrl}
       />
       
-      <motion.div 
-        id="resume-content" 
-        className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-6 relative overflow-hidden"
-        style={{
-          ...pageStyle,
-          transform: `scale(${resumeScale})`,
-          transformOrigin: 'top center',
-          marginBottom: isMobile ? '1rem' : '1.5rem',
-          marginTop: '0.5rem'
-        }}
-        key={template.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <ResumeContent 
-          resumeState={resumeState}
-          template={template}
-          isEditing={isEditing}
-          resumeId={resumeId}
-          onPersonalInfoUpdate={handlePersonalInfoUpdate}
-          onProfileImageUpdate={handleProfileImageUpdate}
-          onSummaryUpdate={handleSummaryUpdate}
-          onSkillsUpdate={handleSkillsUpdate}
-          onEducationUpdate={handleEducationUpdate}
-          onCertificationUpdate={handleCertificationUpdate}
-          onExperienceUpdate={handleExperienceUpdate}
-        />
-      </motion.div>
+      <div className="relative w-full max-w-[21cm] mx-auto">
+        {isMobile && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleZoom}
+            className="absolute top-2 right-2 z-10 flex items-center gap-1 bg-white/80 backdrop-blur-sm px-2 py-1 h-auto"
+          >
+            {isZoomed ? <ZoomOut className="h-3 w-3" /> : <ZoomIn className="h-3 w-3" />}
+            <span className="text-xs">{isZoomed ? "Zoom Out" : "Zoom In"}</span>
+          </Button>
+        )}
+        
+        <motion.div 
+          id="resume-content" 
+          className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-4 sm:mb-6 relative overflow-hidden"
+          style={{
+            ...pageStyle,
+            transform: `scale(${resumeScale})`,
+            transformOrigin: 'top center',
+            marginBottom: isMobile ? '1rem' : '1.5rem',
+            marginTop: '0.5rem'
+          }}
+          key={template.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <ResumeContent 
+            resumeState={resumeState}
+            template={template}
+            isEditing={isEditing}
+            resumeId={resumeId}
+            onPersonalInfoUpdate={handlePersonalInfoUpdate}
+            onProfileImageUpdate={handleProfileImageUpdate}
+            onSummaryUpdate={handleSummaryUpdate}
+            onSkillsUpdate={handleSkillsUpdate}
+            onEducationUpdate={handleEducationUpdate}
+            onCertificationUpdate={handleCertificationUpdate}
+            onExperienceUpdate={handleExperienceUpdate}
+          />
+        </motion.div>
+      </div>
       
       {isMobile && (
-        <div className="text-center text-xs text-gray-500 mb-4 px-4">
-          <p>Pinch to zoom or adjust view as needed</p>
+        <div className="text-center text-xs text-gray-500 mb-2 px-4">
+          <p>Tap the zoom button or pinch to adjust view</p>
         </div>
       )}
     </motion.div>
