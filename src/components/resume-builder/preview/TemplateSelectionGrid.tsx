@@ -3,6 +3,7 @@ import { ResumeTemplate } from "../templates";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { TemplateItem } from "./template-selection/TemplateItem";
+import { containerVariants, itemVariants } from "./template-selection/templateAnimations";
 
 interface TemplateSelectionGridProps {
   templates: ResumeTemplate[];
@@ -16,29 +17,6 @@ export function TemplateSelectionGrid({
   onTemplateChange
 }: TemplateSelectionGridProps) {
   const [hoveredTemplateId, setHoveredTemplateId] = useState<string | null>(null);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12
-      }
-    }
-  };
 
   return (
     <div className="p-4 sm:p-6 bg-gradient-to-br from-white to-gray-50 rounded-lg max-h-[80vh] overflow-y-auto">
