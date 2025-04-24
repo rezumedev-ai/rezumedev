@@ -1,16 +1,18 @@
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Sparkles, CheckCircle, Star } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { SimplifiedHeader } from "@/components/SimplifiedHeader";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
-import { PricingFeature } from "@/components/pricing/PricingFeature";
-import { SubscriptionButton } from "@/components/pricing/SubscriptionButton";
 import { ExtraInfo } from "@/components/pricing/ExtraInfo";
 import { usePricing } from "@/hooks/use-pricing";
 import { useState } from "react";
+import { FreePlan } from "@/components/pricing/plans/FreePlan";
+import { MonthlyPlan } from "@/components/pricing/plans/MonthlyPlan";
+import { YearlyPlan } from "@/components/pricing/plans/YearlyPlan";
+import { LifetimePlan } from "@/components/pricing/plans/LifetimePlan";
 
 const Pricing = () => {
   const isMobile = useIsMobile();
@@ -80,229 +82,22 @@ const Pricing = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-4 gap-8 max-w-7xl mx-auto mb-16">
-            {/* Free Plan */}
-            <motion.div 
-              className="relative overflow-hidden border rounded-2xl p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-gray-500/20 to-gray-600/20 opacity-80 rounded-full"></div>
-              
-              <div className="mb-4">
-                <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 text-xs font-medium rounded-full mb-2">
-                  Free Plan
-                </span>
-                <h3 className="text-xl font-semibold text-secondary">Free</h3>
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-primary">$0</span>
-                  <span className="text-muted-foreground">/forever</span>
-                </div>
-                <p className="text-sm mt-2 text-muted-foreground">Perfect for trying out our AI resume builder</p>
-              </div>
-              
-              <motion.ul 
-                className="space-y-4 mb-8"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1
-                    }
-                  }
-                }}
-              >
-                <PricingFeature text="Create one resume" />
-                <PricingFeature text="Basic templates" />
-                <PricingFeature text="PDF export" />
-                <PricingFeature text="Community support" />
-              </motion.ul>
-              
-              <SubscriptionButton 
-                planType="free"
-                hasActiveSubscription={!!hasActiveSubscription}
-                currentPlan={currentPlan}
-              />
-            </motion.div>
-
-            {/* Monthly Plan */}
-            <motion.div 
-              className="relative overflow-hidden border rounded-2xl p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 opacity-80 rounded-full"></div>
-              
-              <div className="mb-4">
-                <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 text-xs font-medium rounded-full mb-2">
-                  Monthly Plan
-                </span>
-                <h3 className="text-xl font-semibold text-secondary">Monthly</h3>
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-primary">$9.99</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-              </div>
-              
-              <motion.ul 
-                className="space-y-4 mb-8"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1
-                    }
-                  }
-                }}
-              >
-                <PricingFeature text="Unlimited resume creations" />
-                <PricingFeature text="AI-powered suggestions" />
-                <PricingFeature text="Multiple templates" />
-                <PricingFeature text="Export to PDF" />
-                <PricingFeature text="24/7 support" />
-              </motion.ul>
-              
-              <SubscriptionButton 
-                planType="monthly"
-                hasActiveSubscription={!!hasActiveSubscription}
-                currentPlan={currentPlan}
-              />
-            </motion.div>
-
-            {/* Yearly Plan */}
-            <motion.div 
-              className={`relative border-2 ${hasActiveSubscription && currentPlan === 'yearly' ? 'border-green-500' : 'border-primary'} rounded-2xl p-8 bg-gradient-to-b from-primary/5 to-transparent shadow-lg transform md:scale-105 z-10 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}
-              initial={{ opacity: 0, y: -30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="absolute -z-10 inset-0 bg-gradient-to-tr from-primary/0 via-primary/5 to-primary/0 animate-pulse rounded-2xl"></div>
-              
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full shadow-lg">
-                <span className="text-sm font-medium text-white flex items-center">
-                  <Star className="w-3 h-3 mr-1 animate-pulse" />
-                  Most Popular
-                </span>
-              </div>
-              
-              <div className="mb-4">
-                <span className="inline-block bg-primary/80 text-white px-3 py-1 text-xs font-medium rounded-full mb-2">
-                  Yearly Plan
-                </span>
-                <h3 className="text-xl font-semibold text-secondary">Yearly</h3>
-              </div>
-              
-              <div className="mb-4">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-primary">$7.49</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <p className="text-sm mt-2 text-muted-foreground">Billed annually ($89.88/year)</p>
-              </div>
-              
-              <motion.ul 
-                className="space-y-4 mb-8"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1,
-                      delayChildren: 0.3
-                    }
-                  }
-                }}
-              >
-                <PricingFeature text="Everything in Monthly" highlight={true} />
-                <PricingFeature text="Save 25% annually" highlight={true} />
-                <PricingFeature text="Priority support" highlight={true} />
-                <PricingFeature text="Early access to new features" highlight={true} />
-              </motion.ul>
-              
-              <SubscriptionButton 
-                planType="yearly"
-                hasActiveSubscription={!!hasActiveSubscription}
-                currentPlan={currentPlan}
-              />
-            </motion.div>
-
-            {/* Lifetime Plan */}
-            <motion.div 
-              className="relative overflow-hidden border rounded-2xl p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-emerald-500/20 to-green-500/20 opacity-80 rounded-full"></div>
-              
-              {hasActiveSubscription && currentPlan === 'lifetime' && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full shadow-lg">
-                  <span className="text-sm font-medium text-white flex items-center">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Current Plan
-                  </span>
-                </div>
-              )}
-              
-              <div className="mb-4">
-                <span className="inline-block bg-emerald-100 text-emerald-700 px-3 py-1 text-xs font-medium rounded-full mb-2">
-                  Lifetime Plan
-                </span>
-                <h3 className="text-xl font-semibold text-secondary">Lifetime</h3>
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-primary">$199</span>
-                  <span className="text-muted-foreground">/one-time</span>
-                </div>
-              </div>
-              
-              <motion.ul 
-                className="space-y-4 mb-8"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1,
-                      delayChildren: 0.6
-                    }
-                  }
-                }}
-              >
-                <PricingFeature text="Everything in Yearly" />
-                <PricingFeature text="Lifetime updates" />
-                <PricingFeature text="VIP support" />
-              </motion.ul>
-              
-              <SubscriptionButton 
-                planType="lifetime"
-                hasActiveSubscription={!!hasActiveSubscription}
-                currentPlan={currentPlan}
-              />
-            </motion.div>
+            <FreePlan 
+              hasActiveSubscription={hasActiveSubscription} 
+              currentPlan={currentPlan}
+            />
+            <MonthlyPlan 
+              hasActiveSubscription={hasActiveSubscription} 
+              currentPlan={currentPlan}
+            />
+            <YearlyPlan 
+              hasActiveSubscription={hasActiveSubscription} 
+              currentPlan={currentPlan}
+            />
+            <LifetimePlan 
+              hasActiveSubscription={hasActiveSubscription} 
+              currentPlan={currentPlan}
+            />
           </div>
           
           <ExtraInfo />
@@ -314,3 +109,4 @@ const Pricing = () => {
 };
 
 export default Pricing;
+
