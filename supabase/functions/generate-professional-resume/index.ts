@@ -221,16 +221,26 @@ If description is empty, infer from standard ${jobTitle} roles.
       const experience = resumeData.work_experience[i];
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
-      // Create a job-specific prompt with a high temperature setting to ensure varied responses
-      // Now with strict character limits and NO percentage metrics
       let jobPrompt = `
-Generate 3-4 CONCISE, HIGHLY SPECIFIC job responsibilities for a ${experience.jobTitle} position at ${experience.companyName} that would impress a hiring manager.
+Generate 4 concise, highly specific job‑responsibility bullet points for a **${experience.jobTitle}** role at **${experience.companyName}**.
 
-Job Context:
-- Job Title: ${experience.jobTitle}
-- Company: ${experience.companyName}
-${experience.location ? `- Location: ${experience.location}` : ''}
-- Duration: ${experience.startDate} to ${experience.isCurrentJob ? 'Present' : experience.endDate}
+AVAILABLE KEYWORDS
+${jobKeywords}
+
+OUTPUT RULES
+• Return as a simple bulleted list, no heading.  
+• Sentence case; omit ending periods.  
+• 60–80 characters per bullet.
+
+CONTENT RULES
+0. Begin each bullet with a **past‑tense** action verb (e.g., Led, Conducted, Assisted).  
+1. Embed exactly one keyword from the list above in each bullet (different keyword each time).  
+2. Cover different functional areas (planning, execution, collaboration, compliance).  
+3. No specific numbers or percentages.  
+4. Be precise; cut filler words.
+
+SELF‑CHECK (do not output):
+✓ 4 bullets • past‑tense verbs • 60–80 characters • unique ideas • keyword used once per bullet
 `;
 
       // Add job description if available
