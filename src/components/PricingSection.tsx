@@ -7,6 +7,24 @@ import { Badge } from "@/components/ui/badge";
 const PricingSection = () => {
   const tiers = [
     {
+      name: "Free",
+      price: "$0",
+      period: "forever",
+      description: "Perfect for trying out our AI resume builder.",
+      features: [
+        "Create one resume",
+        "Basic templates",
+        "PDF export",
+        "Community support"
+      ],
+      cta: "Get Started Free",
+      link: "/signup",
+      popular: false,
+      color: "from-gray-500/20 to-gray-600/20",
+      badgeColor: "bg-gray-100 text-gray-700",
+      delay: 0.1
+    },
+    {
       name: "Monthly",
       price: "$9.99",
       period: "per month",

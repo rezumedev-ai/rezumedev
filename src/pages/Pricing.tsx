@@ -11,8 +11,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
-export type PlanType = "monthly" | "yearly" | "lifetime";
+export type PlanType = "free" | "monthly" | "yearly" | "lifetime";
 
 const Pricing = () => {
   const { user } = useAuth();
@@ -74,6 +75,14 @@ const Pricing = () => {
   };
 
   const renderSubscriptionButton = (planType: PlanType) => {
+    if (planType === "free") {
+      return (
+        <Button asChild variant="outline" className="w-full">
+          <Link to="/signup">Get Started Free</Link>
+        </Button>
+      );
+    }
+
     if (hasActiveSubscription && currentPlan === planType) {
       return (
         <Button variant="outline" className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800" disabled>
@@ -136,7 +145,55 @@ const Pricing = () => {
             </motion.p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+          <div className="grid md:grid-cols-4 gap-8 max-w-7xl mx-auto mb-16">
+            {/* Free Plan */}
+            <motion.div 
+              className="relative overflow-hidden border rounded-2xl p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br from-gray-500/20 to-gray-600/20 opacity-80 rounded-full"></div>
+              
+              <div className="mb-4">
+                <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 text-xs font-medium rounded-full mb-2">
+                  Free Plan
+                </span>
+                <h3 className="text-xl font-semibold text-secondary">Free</h3>
+              </div>
+              
+              <div className="mb-6">
+                <div className="flex items-baseline">
+                  <span className="text-3xl font-bold text-primary">$0</span>
+                  <span className="text-muted-foreground">/forever</span>
+                </div>
+                <p className="text-sm mt-2 text-muted-foreground">Perfect for trying out our AI resume builder</p>
+              </div>
+              
+              <motion.ul 
+                className="space-y-4 mb-8"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1
+                    }
+                  }
+                }}
+              >
+                <PricingFeature text="Create one resume" />
+                <PricingFeature text="Basic templates" />
+                <PricingFeature text="PDF export" />
+                <PricingFeature text="Community support" />
+              </motion.ul>
+              
+              {renderSubscriptionButton("free")}
+            </motion.div>
+
             {/* Monthly Plan */}
             <motion.div 
               className="relative overflow-hidden border rounded-2xl p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
