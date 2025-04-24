@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -22,7 +23,6 @@ serve(async (req) => {
 
     console.log(`Starting resume enhancement for ID: ${resumeId}`);
     
-    // Get OpenAI API key from environment variables
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
@@ -44,122 +44,31 @@ serve(async (req) => {
     // Check if job description is provided
     const targetJobDescription = resumeData.professional_summary?.targetJobDescription || '';
     
-    // Generate professional summary with increased length
-    const summaryPrompt = `
-You are an expert resume writer.
-
-TASK
-Write a professional summary for a ${jobTitle} using the candidate info below.
-
-CANDIDATE INFO
-${JSON.stringify(resumeData.personal_info, null, 2)}
-${JSON.stringify(resumeData.professional_summary, null, 2)}
-
-OPTIONAL TARGET KEYWORDS
-${jobKeywords}
-
-EXEMPLAR SUMMARIES
-• "Strategic Product Manager who fuses data‑driven insight with design thinking to launch category‑defining SaaS solutions, boosting ARR and user retention. Adept at translating market signals into roadmaps and galvanizing cross‑functional teams toward aggressive KPIs."
-• "Human‑centric UX Designer blending psychology and visual storytelling to craft frictionless mobile experiences. Partners with engineers & PMs to cut onboarding time 30% while elevating NPS. Passionate about accessibility and inclusive design."
-
-REQUIREMENTS
-1. Draft 3–4 sentences (50–70 words).
-2. Structure:
-   – Sentence 1: punchy value proposition.  
-   – Sentences 2–3: core skills, standout differentiators, embedded keywords.  
-   – Sentence 4: cultural/impact fit statement.
-3. Use vivid action verbs (e.g., orchestrates, accelerates, elevates) and avoid clichés ("results‑oriented," "proven track record").
-4. Do NOT state specific metrics or years.
-5. Naturally weave in the most relevant target keywords for ATS.
-6. Tailor every word to a ${jobTitle} role.
-
-SELF-CHECK (do not output the checklist):
-• ≤ 80 words, ≥ 1 target keyword, no clichés, reads fluently.
-`;
-
-    console.log('Calling OpenAI API for professional summary...');
-    
-    const summaryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { 
-            role: 'system', 
-            content: 'You are an expert resume writer specializing in ATS-optimized content. Create only the requested text with no additional commentary. Keep content concise and impactful.'
-          },
-          { role: 'user', content: summaryPrompt }
-        ],
-        temperature: 0.7,
-      }),
-    });
-
-    if (!summaryResponse.ok) {
-      const errorText = await summaryResponse.text();
-      console.error('OpenAI API error for summary:', errorText);
-      throw new Error(`OpenAI API error: ${summaryResponse.status} ${summaryResponse.statusText}`);
-    }
-
-    const summaryData = await summaryResponse.json();
-    const enhancedSummary = summaryData.choices[0].message.content.trim();
-    console.log('Generated professional summary');
-    
-    // Make a copy of the work experience array to ensure we're not modifying the original
-    const enhancedExperiences = [];
-    
     // First, get industry-specific keywords for the target position
     let keywordsPrompt = '';
     
     if (targetJobDescription) {
       keywordsPrompt = `
-You are an ATS keyword extraction engine.
+Extract keywords for a ${jobTitle} résumé from this job description:
 
-TASK
-From the job description below, output a JSON array of the 10 highest‑impact keywords or key phrases for a ${jobTitle} résumé.
-
-JOB DESCRIPTION
 """
 ${targetJobDescription}
 """
 
 RULES
-• Rank by importance (most critical first).  
-• Use exact phrases from the description; do not invent.  
-• Skip generic fluff ("fast‑paced environment").  
-• Output format:
-[
-  {"keyword": "<term>", "score": <0‑1>},
-  ...
-]
-If description is empty, infer from standard ${jobTitle} roles.
-`;
+• Extract 15 important keywords & phrases
+• Prioritize specific skills, tools, technologies
+• Skip generic phrases ("team player")
+• Output format: ["keyword1", "keyword2", ...]`;
     } else {
       keywordsPrompt = `
-You are an ATS keyword extraction engine.
-
-TASK
-From the job description below, output a JSON array of the 10 highest‑impact keywords or key phrases for a ${jobTitle} résumé.
-
-JOB DESCRIPTION
-"""
-Standard ${jobTitle} role
-"""
+Generate keywords for a standard ${jobTitle} résumé.
 
 RULES
-• Rank by importance (most critical first).  
-• Use exact phrases from the description; do not invent.  
-• Skip generic fluff ("fast‑paced environment").  
-• Output format:
-[
-  {"keyword": "<term>", "score": <0‑1>},
-  ...
-]
-If description is empty, infer from standard ${jobTitle} roles.
-`;
+• List 15 important keywords & phrases
+• Focus on industry‑standard skills & competencies
+• Include technical & soft skills
+• Output format: ["keyword1", "keyword2", ...]`;
     }
 
     console.log(targetJobDescription 
@@ -177,116 +86,121 @@ If description is empty, infer from standard ${jobTitle} roles.
         messages: [
           { 
             role: 'system', 
-            content: 'You are an expert in resume optimization and ATS systems. Generate only the requested list of keywords with no additional text.'
+            content: 'Extract or generate keywords that will help this resume pass ATS systems. Return only the array of keywords.'
           },
           { role: 'user', content: keywordsPrompt }
         ],
         temperature: 0.5,
       }),
     });
-    
-    let industryKeywords = [];
-    
-    if (keywordsResponse.ok) {
-      try {
-        const keywordsData = await keywordsResponse.json();
-        const keywordsContent = keywordsData.choices[0].message.content.trim();
-        
-        try {
-          // First try parsing directly
-          industryKeywords = JSON.parse(keywordsContent);
-        } catch (e) {
-          // If direct parsing fails, try to extract JSON portion
-          const jsonMatch = keywordsContent.match(/\[[\s\S]*\]/);
-          if (jsonMatch) {
-            industryKeywords = JSON.parse(jsonMatch[0]);
-          } else {
-            // If that fails, fall back to line-by-line parsing
-            industryKeywords = keywordsContent
-              .split('\n')
-              .filter(line => line.trim())
-              .map(line => line.replace(/^[-•*]\s*/, '').trim());
-          }
-        }
-        
-        console.log(`Generated ${industryKeywords.length} industry keywords`);
-      } catch (e) {
-        console.error('Error parsing industry keywords:', e);
-        // Continue without keywords if parsing fails
-      }
+
+    if (!keywordsResponse.ok) {
+      console.error('OpenAI API error for keywords:', await keywordsResponse.text());
+      throw new Error('Failed to generate keywords');
     }
     
-    // Process each work experience entry separately to ensure unique responsibilities
+    const keywordsData = await keywordsResponse.json();
+    const keywordsContent = keywordsData.choices[0].message.content.trim();
+    let industryKeywords = [];
+    
+    try {
+      // Try parsing the keywords response
+      if (keywordsContent.includes('[') && keywordsContent.includes(']')) {
+        const match = keywordsContent.match(/\[([^\]]+)\]/);
+        if (match) {
+          industryKeywords = JSON.parse(`[${match[1]}]`);
+        }
+      } else {
+        industryKeywords = keywordsContent.split('\n').map(k => k.replace(/^[•\-\d.]\s*/, '').trim());
+      }
+    } catch (e) {
+      console.error('Error parsing keywords:', e);
+      industryKeywords = [];
+    }
+    
+    console.log('Generated keywords:', industryKeywords);
+
+    // Generate professional summary with the keywords
+    const summaryPrompt = `
+Write a professional summary for a ${jobTitle}.
+
+CONTEXT
+• Job Title: ${jobTitle}
+• Target Keywords: ${industryKeywords.join(', ')}
+
+REQUIREMENTS
+1. Write 3‑4 impactful sentences (50‑70 words)
+2. Structure:
+   • Opening: Strong value proposition
+   • Middle: Core skills & achievements
+   • Close: Career focus statement
+3. Incorporate 2‑3 target keywords naturally
+4. Use active voice
+5. No clichés ("results‑driven," "proven track record")
+6. Omit personal pronouns
+7. No specific metrics/years
+
+FORMAT
+• Write in paragraph form
+• Focus on value delivery
+• Keep natural flow`;
+
+    console.log('Calling OpenAI API for professional summary...');
+    
+    const summaryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'Write a professional resume summary. Return only the summary text.'
+          },
+          { role: 'user', content: summaryPrompt }
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    if (!summaryResponse.ok) {
+      console.error('OpenAI API error for summary:', await summaryResponse.text());
+      throw new Error('Failed to generate summary');
+    }
+
+    const summaryData = await summaryResponse.json();
+    const enhancedSummary = summaryData.choices[0].message.content.trim();
+    console.log('Generated professional summary');
+    
+    // Process each work experience entry with the generated keywords
+    const enhancedExperiences = [];
+    
     for (let i = 0; i < resumeData.work_experience.length; i++) {
       const experience = resumeData.work_experience[i];
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
-      let jobPrompt = `
-Generate 4 concise, highly specific job‑responsibility bullet points for a **${experience.jobTitle}** role at **${experience.companyName}**.
+      const responsibilitiesPrompt = `
+Write 4 bullet points for a ${experience.jobTitle} at ${experience.companyName}.
 
 AVAILABLE KEYWORDS
-${jobKeywords}
+${industryKeywords.join(', ')}
 
-OUTPUT RULES
-• Return as a simple bulleted list, no heading.  
-• Sentence case; omit ending periods.  
-• 60–80 characters per bullet.
+REQUIREMENTS
+• Start each with a past‑tense verb
+• 60‑80 characters per bullet
+• Include 1 keyword per bullet
+• Focus on achievements
+• No metrics/numbers
+• No period at end
 
-CONTENT RULES
-0. Begin each bullet with a **past‑tense** action verb (e.g., Led, Conducted, Assisted).  
-1. Embed exactly one keyword from the list above in each bullet (different keyword each time).  
-2. Cover different functional areas (planning, execution, collaboration, compliance).  
-3. No specific numbers or percentages.  
-4. Be precise; cut filler words.
+FORMATTING
+• Return as array: ["point 1", "point 2", ...]
+• Start each with action verb
+• Use proper capitalization`;
 
-SELF‑CHECK (do not output):
-✓ 4 bullets • past‑tense verbs • 60–80 characters • unique ideas • keyword used once per bullet
-`;
-
-      // Add job description if available
-      if (targetJobDescription) {
-        jobPrompt += `
-Target Job Description:
-${targetJobDescription}
-
-Requirements:
-1. Each bullet point must start with a strong action verb
-2. Each bullet point MUST be 60-80 characters maximum (strict limit for A4 page fitting)
-3. Include 1-2 keywords from the target job description in each bullet
-4. Ensure the responsibilities align well with what the target job requires
-5. DO NOT include specific percentage improvements or metrics
-6. Use precise wording and eliminate unnecessary words
-7. Ensure all bullets are different from each other
-`;
-      } else {
-        jobPrompt += `
-Requirements:
-1. Each bullet point must start with a strong action verb
-2. Each bullet point MUST be 60-80 characters maximum (strict limit for A4 page fitting)
-3. Include 1-2 industry-specific keywords in each bullet
-4. DO NOT include specific percentage improvements or metrics
-5. Use precise wording and eliminate unnecessary words
-6. Ensure all bullets are different from each other
-`;
-      }
-
-      jobPrompt += `
-Format Tips:
-- Do NOT use complete sentences - use resume-style fragments
-- Avoid articles (a, an, the) when possible
-- Use present tense for current job, past tense for previous jobs
-- Focus on achievements and skills rather than metrics
-
-DO NOT RETURN ANY EXPLANATION OR INTRODUCTION. RETURN ONLY A JSON ARRAY OF STRING BULLET POINTS.
-Example response format: ["Bullet 1", "Bullet 2", "Bullet 3", "Bullet 4"]
-
-IMPORTANT: The bullets MUST be under 80 characters each to fit on a standard A4 resume.
-DO NOT include percentage metrics or specific numerical achievements.
-`;
-
-      // Add a random seed to ensure varied responses
-      const randomSeed = Math.floor(Math.random() * 10000);
-      
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -298,17 +212,16 @@ DO NOT include percentage metrics or specific numerical achievements.
           messages: [
             { 
               role: 'system', 
-              content: `You are an expert resume writer who specializes in creating ATS-optimized, job-specific responsibilities that fit perfectly on an A4 page. You must create CONCISE bullet points that are no more than 80 characters each. Do not include specific percentage or numerical metrics. Random seed: ${randomSeed}`
+              content: 'Generate resume bullet points. Return only the JSON array of points.'
             },
-            { role: 'user', content: jobPrompt }
+            { role: 'user', content: responsibilitiesPrompt }
           ],
           temperature: 0.8,
         }),
       });
 
       if (!responsibilitiesResponse.ok) {
-        console.error(`Error generating responsibilities for job ${i + 1}`);
-        // Add the experience with original responsibilities to avoid empty entries
+        console.error(`Error generating responsibilities for ${experience.jobTitle}:`, await responsibilitiesResponse.text());
         enhancedExperiences.push({...experience});
         continue;
       }
@@ -316,46 +229,39 @@ DO NOT include percentage metrics or specific numerical achievements.
       try {
         const respData = await responsibilitiesResponse.json();
         const responseContent = respData.choices[0].message.content.trim();
-        
-        // Try to parse the response as JSON
         let responsibilities = [];
-        try {
-          // First try parsing directly
-          responsibilities = JSON.parse(responseContent);
-        } catch (e) {
-          // If direct parsing fails, try to extract JSON portion
-          const jsonMatch = responseContent.match(/\[[\s\S]*\]/);
-          if (jsonMatch) {
-            responsibilities = JSON.parse(jsonMatch[0]);
-          } else {
-            // If that fails, fall back to line-by-line parsing
-            responsibilities = responseContent
-              .split('\n')
-              .filter(line => line.trim())
-              .map(line => line.replace(/^[-•*]\s*/, '').trim());
+
+        // Parse the response content
+        if (responseContent.includes('[') && responseContent.includes(']')) {
+          const match = responseContent.match(/\[([^\]]+)\]/);
+          if (match) {
+            responsibilities = JSON.parse(`[${match[1]}]`);
           }
+        } else {
+          responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
         }
-        
-        // Ensure each responsibility is within the character limit and without percentages
-        responsibilities = responsibilities.map(resp => {
-          // Remove any percentage metrics
-          let cleanedResp = resp.replace(/\s+by\s+\d+%/gi, '');
-          cleanedResp = cleanedResp.replace(/\d+%/gi, '');
-          cleanedResp = cleanedResp.replace(/reducing\s+by/gi, 'reducing');
-          cleanedResp = cleanedResp.replace(/increasing\s+by/gi, 'increasing');
-          cleanedResp = cleanedResp.replace(/improving\s+by/gi, 'improving');
-          cleanedResp = cleanedResp.replace(/enhancing\s+by/gi, 'enhancing');
-          cleanedResp = cleanedResp.replace(/\s+\s+/g, ' '); // Fix double spaces
-          cleanedResp = cleanedResp.trim();
-          
-          // No truncation - we'll keep full text and handle wrapping in UI
-          return cleanedResp;
-        });
-        
-        // Limit to max 4 responsibilities per job to ensure everything fits on the page
-        if (responsibilities.length > 4) {
-          responsibilities = responsibilities.slice(0, 4);
-        }
+
+        // Clean up responsibilities
+        responsibilities = responsibilities
+          .map(resp => {
+            // Remove metrics and standardize format
+            let clean = resp
+              .replace(/\d+%/g, '')
+              .replace(/increased|decreased|improved|enhanced|reduced|optimized/g, 'enhanced')
+              .replace(/\s+/g, ' ')
+              .trim();
+            
+            // Ensure starts with past tense verb
+            if (!/^[A-Z][a-z]+ed\b/.test(clean)) {
+              clean = `Led ${clean}`;
+            }
+            
+            return clean;
+          })
+          .filter(resp => resp.length >= 30 && resp.length <= 100);
+
+        // Limit to 4 responsibilities
+        responsibilities = responsibilities.slice(0, 4);
         
         if (responsibilities.length > 0) {
           enhancedExperiences.push({
@@ -363,90 +269,35 @@ DO NOT include percentage metrics or specific numerical achievements.
             responsibilities
           });
           
-          // Log the character count of each responsibility
-          console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}:`);
-          responsibilities.forEach((resp, idx) => {
-            console.log(`  ${idx+1}. Length: ${resp.length} chars - ${resp}`);
-          });
+          console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
         } else {
-          // If we couldn't parse any responsibilities, keep the original
           enhancedExperiences.push({...experience});
           console.log(`Using original responsibilities for ${experience.jobTitle}`);
         }
       } catch (e) {
         console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
-        // Keep the original experience data if processing fails
         enhancedExperiences.push({...experience});
       }
     }
     
-    // Double-check we haven't accidentally created duplicate responsibilities
-    // This is a final verification step to ensure our changes worked
-    const allResponsibilitiesSets = new Map();
-    
-    for (let i = 0; i < enhancedExperiences.length; i++) {
-      const respStr = enhancedExperiences[i].responsibilities.join('|');
-      
-      if (allResponsibilitiesSets.has(respStr)) {
-        console.log(`WARNING: Detected duplicate responsibilities for job ${i+1}`);
-        
-        // Try to make this set of responsibilities unique by modifying them
-        enhancedExperiences[i].responsibilities = enhancedExperiences[i].responsibilities.map(resp => {
-          // Add job-specific prefix to make it unique
-          const prefix = `${enhancedExperiences[i].jobTitle.split(' ')[0]}: `;
-          return prefix + resp;
-        });
-      }
-      
-      allResponsibilitiesSets.set(respStr, i);
-    }
-    
-    // Generate skills with full words (no abbreviations)
-    let skillsPrompt = '';
-    
-    if (targetJobDescription) {
-      skillsPrompt = `
-Extract a concise skills list for a ${jobTitle} resume based on this job description:
+    // Generate skills using the keywords
+    const skillsPrompt = `
+Generate skills for a ${jobTitle} resume.
 
-${targetJobDescription}
+AVAILABLE KEYWORDS
+${industryKeywords.join(', ')}
 
-Requirements:
-- Include 6 hard/technical skills that are SPECIFICALLY MENTIONED or CLEARLY NEEDED for this job
-- Include 4 soft skills most valued in the job description
-- Prioritize skills that appear explicitly in the job description
-- Focus on skills that will help the resume match the job requirements
-- DO NOT use abbreviations or short forms (e.g., use "Project Management" not "Project Mgmt" or "Proj Mgmt")
-- Use complete words for all skills (e.g., "Problem Solving" not "Problem Solv")
-- Each skill should be written out completely with proper capitalization
+REQUIREMENTS
+• 6 technical/hard skills
+• 4 soft skills
+• Use full words (no abbreviations)
+• Capitalize properly
 
-Format your response as a JSON object with this exact structure:
+OUTPUT FORMAT
 {
   "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
   "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
-}
-`;
-    } else {
-      skillsPrompt = `
-Generate a concise skills list for a ${jobTitle} resume that will maximize success with ATS systems.
-
-Industry Context:
-${industryKeywords && industryKeywords.length > 0 ? `- Industry Keywords: ${industryKeywords.join(', ')}` : ''}
-
-Requirements:
-- Include 6 hard/technical skills that are SPECIFIC to the ${jobTitle} role
-- Include 4 soft skills most valued for the ${jobTitle} position
-- Prioritize skills that appear frequently in job postings for this role
-- DO NOT use abbreviations or short forms (e.g., use "Project Management" not "Project Mgmt" or "Proj Mgmt")
-- Use complete words for all skills (e.g., "Problem Solving" not "Problem Solv")
-- Each skill should be written out completely with proper capitalization
-
-Format your response as a JSON object with this exact structure:
-{
-  "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
-  "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
-}
-`;
-    }
+}`;
 
     const skillsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -459,7 +310,7 @@ Format your response as a JSON object with this exact structure:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a professional resume skills expert. Generate concise skills that will help a candidate pass ATS systems. DO NOT use abbreviations or shortened forms of words. Use complete terms for all skills. Return only the JSON object with no additional commentary.'
+            content: 'Generate a JSON object with skills for a resume. Return only the JSON.'
           },
           { role: 'user', content: skillsPrompt }
         ],
@@ -467,56 +318,27 @@ Format your response as a JSON object with this exact structure:
       }),
     });
 
+    if (!skillsResponse.ok) {
+      console.error('OpenAI API error for skills:', await skillsResponse.text());
+      throw new Error('Failed to generate skills');
+    }
+
+    const skillsData = await skillsResponse.json();
+    const skillsContent = skillsData.choices[0].message.content.trim();
     let skills = {
-      hard_skills: [
-        "Project Management", 
-        "Data Analysis",
-        "Process Improvement",
-        "Reporting",
-        "Budgeting",
-        "Team Leadership"
-      ],
-      soft_skills: [
-        "Communication",
-        "Problem Solving",
-        "Teamwork",
-        "Adaptability"
-      ]
+      hard_skills: [],
+      soft_skills: []
     };
 
-    if (skillsResponse.ok) {
-      try {
-        const skillsData = await skillsResponse.json();
-        const skillsContent = skillsData.choices[0].message.content.trim();
-        
-        // Try to parse the JSON from the response
-        try {
-          // First try parsing directly
-          const parsedSkills = JSON.parse(skillsContent);
-          if (parsedSkills && parsedSkills.hard_skills && parsedSkills.soft_skills) {
-            skills = parsedSkills;
-            console.log('Generated skills successfully');
-          }
-        } catch (e) {
-          // If direct parsing fails, try to extract JSON portion
-          const jsonMatch = skillsContent.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            const parsedSkills = JSON.parse(jsonMatch[0]);
-            if (parsedSkills && parsedSkills.hard_skills && parsedSkills.soft_skills) {
-              skills = parsedSkills;
-              console.log('Generated skills successfully (extracted from response)');
-            }
-          } else {
-            console.error('Failed to parse skills JSON:', e);
-          }
+    try {
+      if (skillsContent.includes('{') && skillsContent.includes('}')) {
+        const match = skillsContent.match(/\{([^}]+)\}/);
+        if (match) {
+          skills = JSON.parse(`{${match[1]}}`);
         }
-      } catch (e) {
-        console.error('Error processing skills response:', e);
-        // We'll use the default skills defined above
       }
-    } else {
-      console.error('Error calling OpenAI for skills');
-      // We'll use the default skills defined above
+    } catch (e) {
+      console.error('Error parsing skills:', e);
     }
     
     // Update the resume in the database
@@ -530,18 +352,7 @@ Format your response as a JSON object with this exact structure:
       completion_status: 'completed'
     };
 
-    console.log('Updating resume in database with enhanced data...');
-    
-    // Before update, log what we're about to update
-    console.log('Number of work experiences being updated:', enhancedExperiences.length);
-    for (const exp of enhancedExperiences) {
-      console.log(`${exp.jobTitle} at ${exp.companyName}: ${exp.responsibilities.length} responsibilities`);
-      // Log the first responsibility for each job to verify uniqueness and length
-      if (exp.responsibilities.length > 0) {
-        console.log(`First responsibility: ${exp.responsibilities[0]}`);
-        console.log(`Length: ${exp.responsibilities[0].length} characters`);
-      }
-    }
+    console.log('Updating resume with enhanced data...');
     
     const { error: updateError } = await supabase
       .from('resumes')
