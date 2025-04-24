@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, LayoutTemplate, Save, Lock, Camera } from "lucide-react";
@@ -83,38 +82,33 @@ export function ResumePreviewToolbar({
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={`w-full max-w-[21cm] mx-auto ${isMobile ? 'mb-2 bg-white/90' : 'mb-6 bg-white'} rounded-lg shadow-md p-2`}
-    >
+    <div className="w-full max-w-[21cm] mx-auto mb-4 sm:mb-6 bg-white rounded-lg shadow-md p-2 sm:p-3">
       <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-2">
         <Button 
           variant="ghost" 
           onClick={onBackToDashboard}
-          className="flex items-center gap-1 sm:gap-2 text-gray-600 hover:text-primary hover:bg-gray-100 text-xs sm:text-base px-2 py-1 sm:px-3 sm:py-2 h-auto"
+          className="flex items-center gap-1.5 sm:gap-2 text-gray-600 hover:text-primary hover:bg-gray-100 text-sm sm:text-base px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
         >
-          <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+          <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span className="hidden sm:inline">Back to Dashboard</span>
           <span className="sm:hidden">Back</span>
         </Button>
         
-        <div className="flex items-center gap-1.5 sm:gap-3 ml-auto">
+        <div className="flex items-center gap-2 sm:gap-3 ml-auto">
           {onToggleEdit && (
             <Button 
               onClick={onToggleEdit} 
               variant="outline"
-              className="flex items-center gap-1 bg-white shadow-sm hover:bg-gray-100 text-xs px-2 py-1 h-auto"
+              className="flex items-center gap-1 sm:gap-2 bg-white shadow-sm hover:bg-gray-100 text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
             >
               {isEditing ? (
                 <>
-                  <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>Save</span>
                 </>
               ) : (
                 <>
-                  <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>Edit</span>
                 </>
               )}
@@ -134,13 +128,13 @@ export function ResumePreviewToolbar({
               <SheetTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="flex items-center gap-1 bg-white shadow-sm hover:bg-gray-100 text-xs px-2 py-1 h-auto"
+                  className="flex items-center gap-1 sm:gap-2 bg-white shadow-sm hover:bg-gray-100 text-xs sm:text-sm px-2.5 py-1.5 sm:px-3 sm:py-2 h-auto"
                 >
-                  <LayoutTemplate className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>Style</span>
+                  <LayoutTemplate className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>Template</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="h-[70vh] p-0 rounded-t-2xl">
+              <SheetContent side="bottom" className="h-[90vh] p-0 rounded-t-2xl">
                 <TemplateSelectionGrid 
                   templates={templates}
                   currentTemplateId={currentTemplateId}
@@ -206,6 +200,6 @@ export function ResumePreviewToolbar({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 }
