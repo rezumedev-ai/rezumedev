@@ -116,28 +116,49 @@ SELF-CHECK (do not output the checklist):
     
     if (targetJobDescription) {
       keywordsPrompt = `
-Extract the top 10 most important skills, keywords, and qualifications from this job description for a ${jobTitle} position:
+You are an ATS keyword extraction engine.
 
+TASK
+From the job description below, output a JSON array of the 10 highest‑impact keywords or key phrases for a ${jobTitle} résumé.
+
+JOB DESCRIPTION
+"""
 ${targetJobDescription}
+"""
 
-Make sure to include specific technical skills, methodologies, and qualifications mentioned in the job posting.
-
-Format your response as a JSON array of strings only, with no additional commentary. Example:
-["Keyword 1", "Keyword 2", "Keyword 3", ...]
+RULES
+• Rank by importance (most critical first).  
+• Use exact phrases from the description; do not invent.  
+• Skip generic fluff ("fast‑paced environment").  
+• Output format:
+[
+  {"keyword": "<term>", "score": <0‑1>},
+  ...
+]
+If description is empty, infer from standard ${jobTitle} roles.
 `;
     } else {
       keywordsPrompt = `
-Generate the top 10 industry-specific keywords and phrases for a ${jobTitle} position that would best optimize a resume for ATS systems.
+You are an ATS keyword extraction engine.
 
-Consider:
-- Technical skills specific to this role
-- Industry terminology
-- Certifications and qualifications
-- Software and tools commonly used
-- Methodologies and frameworks relevant to ${jobTitle}
+TASK
+From the job description below, output a JSON array of the 10 highest‑impact keywords or key phrases for a ${jobTitle} résumé.
 
-Format your response as a JSON array of strings only, with no additional commentary. Example:
-["Keyword 1", "Keyword 2", "Keyword 3", ...]
+JOB DESCRIPTION
+"""
+Standard ${jobTitle} role
+"""
+
+RULES
+• Rank by importance (most critical first).  
+• Use exact phrases from the description; do not invent.  
+• Skip generic fluff ("fast‑paced environment").  
+• Output format:
+[
+  {"keyword": "<term>", "score": <0‑1>},
+  ...
+]
+If description is empty, infer from standard ${jobTitle} roles.
 `;
     }
 
