@@ -127,7 +127,7 @@ const Pricing = () => {
               
               <SubscriptionButton 
                 planType="free"
-                hasActiveSubscription={hasActiveSubscription}
+                hasActiveSubscription={!!hasActiveSubscription}
                 currentPlan={currentPlan}
               />
             </motion.div>
@@ -179,7 +179,7 @@ const Pricing = () => {
               
               <SubscriptionButton 
                 planType="monthly"
-                hasActiveSubscription={hasActiveSubscription}
+                hasActiveSubscription={!!hasActiveSubscription}
                 currentPlan={currentPlan}
               />
             </motion.div>
@@ -239,7 +239,7 @@ const Pricing = () => {
               
               <SubscriptionButton 
                 planType="yearly"
-                hasActiveSubscription={hasActiveSubscription}
+                hasActiveSubscription={!!hasActiveSubscription}
                 currentPlan={currentPlan}
               />
             </motion.div>
@@ -299,7 +299,7 @@ const Pricing = () => {
               
               <SubscriptionButton 
                 planType="lifetime"
-                hasActiveSubscription={hasActiveSubscription}
+                hasActiveSubscription={!!hasActiveSubscription}
                 currentPlan={currentPlan}
               />
             </motion.div>
