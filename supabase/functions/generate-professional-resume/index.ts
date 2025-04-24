@@ -34,6 +34,22 @@ function calculateTotalExperience(workExperience: any[]): { years: number; month
   return { years, months: remainingMonths };
 }
 
+function formatExperienceString(years: number, months: number): string {
+  if (years === 0) {
+    return `${months} month${months !== 1 ? 's' : ''}`;
+  }
+
+  if (months >= 8) {
+    return `nearly ${years + 1} year${years + 1 !== 1 ? 's' : ''}`;
+  }
+
+  if (months >= 1) {
+    return `more than ${years} year${years !== 1 ? 's' : ''}`;
+  }
+
+  return `${years} year${years !== 1 ? 's' : ''}`;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -140,15 +156,13 @@ RULES
     console.log('Generated keywords:', industryKeywords);
 
     const experience = calculateTotalExperience(resumeData.work_experience);
-    const experienceString = `${experience.years} year${experience.years !== 1 ? 's' : ''}${
-      experience.months > 0 ? ` and ${experience.months} month${experience.months !== 1 ? 's' : ''}` : ''
-    }`;
+    const experienceString = formatExperienceString(experience.years, experience.months);
 
     const summaryPrompt = `
 Generate a concise professional summary for a ${jobTitle}.
 
 CONTEXT
-• Total Experience: ${experienceString}
+• Experience: ${experienceString}
 • Job Title: ${jobTitle}
 • Target Keywords: ${industryKeywords.join(', ')}
 
@@ -156,7 +170,7 @@ REQUIREMENTS
 1. Write 2‑3 impactful sentences (30‑50 words)
 2. Structure:
    • Start with a headline including job title and specialization
-   • Include exact years of experience: "${experienceString}"
+   • Include exact experience: "${experienceString}"
    • Close with core competencies
 3. Incorporate 2‑3 target keywords naturally
 4. Use active voice
