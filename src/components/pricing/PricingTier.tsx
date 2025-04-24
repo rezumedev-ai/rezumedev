@@ -9,7 +9,7 @@ interface PricingTierProps {
   price: string;
   period: string;
   description: string;
-  features: string[];
+  features: readonly string[] | string[]; // Accept both readonly and mutable string arrays
   cta: string;
   link: string;
   popular: boolean;
