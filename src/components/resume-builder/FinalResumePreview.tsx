@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
@@ -22,7 +21,7 @@ export function FinalResumePreview({
 }: FinalResumePreviewProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [resumeScale, setResumeScale] = useState(1);
+  const [resumeScale, setResumeScale] = useState(isMobile ? 0.35 : 1);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const {
@@ -66,22 +65,8 @@ export function FinalResumePreview({
       const pageHeight = 29.7 * 37.8; // ~1122px
       
       if (isMobile) {
-        // For mobile, calculate the best scale
-        const isPortrait = window.innerHeight > window.innerWidth;
-        const availableWidth = containerWidth - 32; // Allow for some padding
-        const availableHeight = containerHeight - 120; // Allow for toolbar and some padding
-        
-        // Calculate scale based on available dimensions
-        const widthScale = availableWidth / pageWidth;
-        const heightScale = availableHeight / pageHeight;
-        
-        // When not zoomed, prioritize seeing the whole page
-        const baseScale = Math.min(widthScale, heightScale);
-        // Set a maximum scale factor for portrait mode to ensure users can see more context
-        const maxScale = isPortrait ? 0.45 : 0.65;
-        // Set a minimum scale to ensure the resume is not too small
-        const minScale = 0.35;
-        setResumeScale(Math.max(Math.min(baseScale, maxScale), minScale));
+        // For mobile, set a fixed initial scale that shows the full resume
+        setResumeScale(0.35);
       } else {
         // For desktop, optimize the scale to use more space
         const availableWidth = containerWidth - 48; // 48px padding
