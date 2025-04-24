@@ -2,6 +2,7 @@
 import React from 'react';
 import { ResumeData, Certification } from "@/types/resume";
 import { ResumeTemplate } from "@/components/resume-builder/templates";
+import { formatDate } from "@/lib/utils";
 
 interface CertificationsSectionProps {
   resumeData: ResumeData;
@@ -34,7 +35,7 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
             <div className="font-semibold">{certification.name}</div>
             {templateCondition && <div className="text-sm text-gray-600">{certification.organization}</div>}
             <div className="text-sm text-gray-500">
-              {certification.completionDate} {certification.completionDate ? '•' : ''} {certification.organization}
+              {formatDate(certification.completionDate)} {certification.completionDate ? '•' : ''} {certification.organization}
             </div>
           </li>
         ))}
