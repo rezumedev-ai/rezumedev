@@ -1,4 +1,5 @@
 
+import React, { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Sparkles } from "lucide-react";
@@ -8,7 +9,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { ExtraInfo } from "@/components/pricing/ExtraInfo";
 import { usePricing } from "@/hooks/use-pricing";
-import { useState } from "react";
 import { FreePlan } from "@/components/pricing/plans/FreePlan";
 import { MonthlyPlan } from "@/components/pricing/plans/MonthlyPlan";
 import { YearlyPlan } from "@/components/pricing/plans/YearlyPlan";
@@ -83,19 +83,19 @@ const Pricing = () => {
 
           <div className="grid md:grid-cols-4 gap-8 max-w-7xl mx-auto mb-16">
             <FreePlan 
-              hasActiveSubscription={hasActiveSubscription} 
+              hasActiveSubscription={!!hasActiveSubscription} 
               currentPlan={currentPlan}
             />
             <MonthlyPlan 
-              hasActiveSubscription={hasActiveSubscription} 
+              hasActiveSubscription={!!hasActiveSubscription} 
               currentPlan={currentPlan}
             />
             <YearlyPlan 
-              hasActiveSubscription={hasActiveSubscription} 
+              hasActiveSubscription={!!hasActiveSubscription} 
               currentPlan={currentPlan}
             />
             <LifetimePlan 
-              hasActiveSubscription={hasActiveSubscription} 
+              hasActiveSubscription={!!hasActiveSubscription} 
               currentPlan={currentPlan}
             />
           </div>
@@ -109,4 +109,3 @@ const Pricing = () => {
 };
 
 export default Pricing;
-
