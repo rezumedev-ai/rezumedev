@@ -46,20 +46,35 @@ serve(async (req) => {
     
     // Generate professional summary with increased length
     const summaryPrompt = `
-Create a powerful professional summary for a ${jobTitle} based on the following information:
+You are an expert resume writer.
+
+TASK
+Write a professional summary for a ${jobTitle} using the candidate info below.
+
+CANDIDATE INFO
 ${JSON.stringify(resumeData.personal_info, null, 2)}
 ${JSON.stringify(resumeData.professional_summary, null, 2)}
-${targetJobDescription ? `\nTarget Job Description: ${targetJobDescription}` : ''}
 
-Requirements:
-- Write 3-4 sentences (approximately 50-70 words)
-- Highlight value and expertise without metrics or years
-- Use powerful, active language
-${targetJobDescription ? '- Align with the skills and requirements from the provided job description' : '- Include relevant industry keywords for ATS systems'}
-- Focus on what makes this candidate valuable to employers
-- Make it tailored specifically for a ${jobTitle} role
+OPTIONAL TARGET KEYWORDS
+${jobKeywords}
 
-Format your response as plain text only (no JSON).
+EXEMPLAR SUMMARIES
+• "Strategic Product Manager who fuses data‑driven insight with design thinking to launch category‑defining SaaS solutions, boosting ARR and user retention. Adept at translating market signals into roadmaps and galvanizing cross‑functional teams toward aggressive KPIs."
+• "Human‑centric UX Designer blending psychology and visual storytelling to craft frictionless mobile experiences. Partners with engineers & PMs to cut onboarding time 30% while elevating NPS. Passionate about accessibility and inclusive design."
+
+REQUIREMENTS
+1. Draft 3–4 sentences (50–70 words).
+2. Structure:
+   – Sentence 1: punchy value proposition.  
+   – Sentences 2–3: core skills, standout differentiators, embedded keywords.  
+   – Sentence 4: cultural/impact fit statement.
+3. Use vivid action verbs (e.g., orchestrates, accelerates, elevates) and avoid clichés ("results‑oriented," "proven track record").
+4. Do NOT state specific metrics or years.
+5. Naturally weave in the most relevant target keywords for ATS.
+6. Tailor every word to a ${jobTitle} role.
+
+SELF-CHECK (do not output the checklist):
+• ≤ 80 words, ≥ 1 target keyword, no clichés, reads fluently.
 `;
 
     console.log('Calling OpenAI API for professional summary...');
@@ -75,7 +90,7 @@ Format your response as plain text only (no JSON).
         messages: [
           { 
             role: 'system', 
-            content: 'You are a professional resume writer specializing in ATS-optimized content. Create only the requested text with no additional commentary. Keep content concise and impactful.'
+            content: 'You are an expert resume writer specializing in ATS-optimized content. Create only the requested text with no additional commentary. Keep content concise and impactful.'
           },
           { role: 'user', content: summaryPrompt }
         ],
