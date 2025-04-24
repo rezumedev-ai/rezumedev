@@ -1,85 +1,12 @@
-import { Check, CheckCircle2, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+
+import { CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { PricingTier } from "./pricing/PricingTier";
+import { PricingHeader } from "./pricing/PricingHeader";
+import { pricingTiers } from "./pricing/pricing-config";
 
 const PricingSection = () => {
-  const tiers = [
-    {
-      name: "Free",
-      price: "$0",
-      period: "forever",
-      description: "Perfect for trying out our AI resume builder.",
-      features: [
-        "Create one resume",
-        "Basic templates",
-        "PDF export",
-        "Community support"
-      ],
-      cta: "Get Started Free",
-      link: "/signup",
-      popular: false,
-      color: "from-gray-500/20 to-gray-600/20",
-      badgeColor: "bg-gray-100 text-gray-700",
-      delay: 0.1
-    },
-    {
-      name: "Monthly",
-      price: "$9.99",
-      period: "per month",
-      description: "Perfect for job seekers looking for short-term resume tools.",
-      features: [
-        "Unlimited resume creations",
-        "AI-powered suggestions",
-        "Multiple templates",
-        "Export to PDF",
-        "24/7 support"
-      ],
-      cta: "Start Monthly",
-      link: "/pricing",
-      popular: false,
-      color: "from-blue-500/20 to-cyan-500/20",
-      badgeColor: "bg-blue-100 text-blue-700",
-      delay: 0.1
-    },
-    {
-      name: "Yearly",
-      price: "$7.49",
-      period: "per month",
-      description: "Our most popular plan with the best value for serious job hunters.",
-      features: [
-        "Everything in Monthly",
-        "Save 25% annually",
-        "Priority support",
-        "Early access to new features"
-      ],
-      cta: "Start Yearly",
-      link: "/pricing",
-      popular: true,
-      color: "from-violet-500/20 to-purple-500/20",
-      badgeColor: "bg-primary/80 text-white",
-      delay: 0.2
-    },
-    {
-      name: "Lifetime",
-      price: "$199",
-      period: "one-time",
-      description: "Never pay again with our comprehensive lifetime package.",
-      features: [
-        "Everything in Yearly",
-        "Lifetime updates",
-        "VIP support"
-      ],
-      cta: "Get Lifetime",
-      link: "/pricing",
-      popular: false,
-      color: "from-emerald-500/20 to-green-500/20",
-      badgeColor: "bg-emerald-100 text-emerald-700",
-      delay: 0.3
-    }
-  ];
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -89,20 +16,6 @@ const PricingSection = () => {
         delayChildren: 0.3
       }
     }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
-
-  const featureVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0 }
   };
 
   return (
@@ -134,163 +47,17 @@ const PricingSection = () => {
       ></motion.div>
       
       <div className="container relative z-10">
-        <motion.div 
-          className="max-w-2xl mx-auto mb-16 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <motion.div 
-            className="inline-flex items-center px-4 py-1.5 mb-4 text-sm font-medium text-primary bg-primary/10 rounded-full"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
-            Plans for Every Career Stage
-          </motion.div>
-          
-          <motion.h2 
-            className="mb-4 text-3xl font-bold tracking-tight md:text-4xl"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <span className="text-black">Invest</span>{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover">
-              in Your Career Success
-            </span>
-          </motion.h2>
-          
-          <motion.p 
-            className="text-lg text-muted-foreground"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            Choose the perfect plan for your career journey. All plans include our core AI-powered resume features.
-          </motion.p>
-        </motion.div>
+        <PricingHeader />
         
         <motion.div 
-          className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto"
+          className="grid gap-8 md:grid-cols-4 max-w-6xl mx-auto"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {tiers.map((tier, index) => (
-            <motion.div
-              key={tier.name}
-              className={`relative p-8 pt-10 bg-white border rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 ${tier.popular ? 'border-primary md:scale-105 z-10' : 'border-gray-200'} overflow-hidden`}
-              variants={itemVariants}
-              whileHover={{ y: -8, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div 
-                className={`absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br ${tier.color} opacity-80 rounded-full`}
-                animate={{ 
-                  rotate: [0, 15, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  duration: 8, 
-                  repeat: Infinity,
-                  repeatType: "reverse"
-                }}
-              ></motion.div>
-              
-              <motion.div 
-                className="mb-4 mt-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: tier.delay }}
-              >
-                <span className={`inline-block ${tier.badgeColor} px-3 py-1 text-xs font-medium rounded-full mb-2`}>
-                  {tier.name} Plan
-                </span>
-                <h3 className="text-xl font-semibold text-secondary">{tier.name}</h3>
-              </motion.div>
-              
-              <motion.div 
-                className="mb-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: tier.delay + 0.1 }}
-              >
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-primary">{tier.price}</span>
-                  <span className="ml-2 text-muted-foreground">/{tier.period}</span>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">{tier.description}</p>
-              </motion.div>
-              
-              <motion.div 
-                className="space-y-4 mb-8"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1,
-                      delayChildren: tier.delay + 0.2
-                    }
-                  }
-                }}
-              >
-                {tier.features.map((feature) => (
-                  <motion.div 
-                    key={feature} 
-                    className="flex items-start gap-3 group"
-                    variants={featureVariants}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <motion.div 
-                      className={`rounded-full p-1 bg-gradient-to-br ${tier.color} group-hover:scale-110 transition-transform`}
-                      whileHover={{ scale: 1.2, rotate: 5 }}
-                    >
-                      <Check className="h-4 w-4 text-primary" />
-                    </motion.div>
-                    <span className="text-muted-foreground group-hover:text-primary transition-colors">{feature}</span>
-                  </motion.div>
-                ))}
-              </motion.div>
-              
-              <motion.div 
-                className="mt-auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: tier.delay + 0.4 }}
-              >
-                <Button 
-                  asChild 
-                  className={`w-full group ${tier.popular ? 'bg-primary hover:bg-primary-hover' : ''}`}
-                  variant={tier.popular ? "default" : "outline"}
-                >
-                  <Link to={tier.link}>
-                    {tier.cta}
-                    <motion.span 
-                      className="ml-2 transition-transform"
-                      animate={{ x: [0, 4, 0] }} 
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: Infinity,
-                        repeatType: "reverse", 
-                        repeatDelay: 1 
-                      }}
-                    >
-                      →
-                    </motion.span>
-                  </Link>
-                </Button>
-              </motion.div>
-            </motion.div>
+          {pricingTiers.map((tier) => (
+            <PricingTier key={tier.name} {...tier} />
           ))}
         </motion.div>
         
