@@ -434,7 +434,10 @@ FORMAT
 
     const summaryData = await summaryResponse.json();
     const enhancedSummary = summaryData.choices[0].message.content.trim();
-    console.log('Generated professional summary');
+
+    // Sanitize summary by removing all "**" markdown formatting
+    const cleanSummary = enhancedSummary.replace(/\*\*/g, '').trim();
+    console.log('Clean summary:', cleanSummary);
     
     const enhancedExperiences = [];
     
@@ -598,7 +601,7 @@ OUTPUT FORMAT
     const updatePayload = {
       professional_summary: {
         ...resumeData.professional_summary,
-        summary: enhancedSummary
+        summary: cleanSummary
       },
       work_experience: enhancedExperiences,
       skills: skills,
