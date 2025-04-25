@@ -13,19 +13,28 @@ function calculateTotalExperience(workExperience: any[]): { years: number; month
 
   workExperience.forEach(exp => {
     const startDate = new Date(exp.startDate);
-    let endDate = exp.endDate === 'Present' || exp.endDate === 'Current' 
+    
+    let endDate = exp.isCurrentJob || !exp.endDate || exp.endDate === 'Present' || exp.endDate === 'Current'
       ? now 
       : new Date(exp.endDate);
 
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      console.warn('Invalid date found in experience:', exp);
-      return; // Skip this experience if dates are invalid
+    if (isNaN(startDate.getTime())) {
+      console.warn('Invalid start date found in experience:', exp);
+      return;
+    }
+
+    if (isNaN(endDate.getTime())) {
+      console.warn('Invalid end date found in experience, using current date:', exp);
+      endDate = now;
     }
 
     const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
                   (endDate.getMonth() - startDate.getMonth());
     
-    totalMonths += Math.max(0, months); // Ensure we don't add negative months
+    const days = endDate.getDate() - startDate.getDate();
+    const partialMonth = days > 15 ? 1 : 0;
+    
+    totalMonths += Math.max(0, months + partialMonth);
   });
 
   const years = Math.floor(totalMonths / 12);
