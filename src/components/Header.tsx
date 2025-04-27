@@ -1,10 +1,9 @@
-
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 
-export const Header = () => {
+const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -126,3 +125,5 @@ export const Header = () => {
     </header>
   );
 };
+
+export default Header;
