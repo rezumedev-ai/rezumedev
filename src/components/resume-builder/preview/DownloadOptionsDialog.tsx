@@ -211,14 +211,28 @@ export function DownloadOptionsDialog({
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const a4AspectRatio = pdfWidth / pdfHeight;
+      
+      let imgWidth, imgHeight, offsetX, offsetY;
+      
+      if (canvasAspectRatio > a4AspectRatio) {
+        imgWidth = pdfWidth;
+        imgHeight = imgWidth / canvasAspectRatio;
+        offsetX = 0;
+        offsetY = (pdfHeight - imgHeight) / 2;
+      } else {
+        imgHeight = pdfHeight;
+        imgWidth = imgHeight * canvasAspectRatio;
+        offsetX = (pdfWidth - imgWidth) / 2;
+        offsetY = 0;
+      }
       
       pdf.addImage(
         imgData,
         'JPEG',
-        0,
-        0,
+        offsetX,
+        offsetY,
         imgWidth,
         imgHeight,
         undefined,
