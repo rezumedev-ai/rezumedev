@@ -448,21 +448,25 @@ FORMAT
       const responsibilitiesPrompt = `
 Write 4 bullet points for a ${experience.jobTitle} at ${experience.companyName}.
 
-AVAILABLE KEYWORDS
-${industryKeywords.join(', ')}
+ACTION VERBS LIST (use different verbs for each bullet)
+Developed, Implemented, Managed, Coordinated, Designed, Established, Created, Executed,
+Launched, Spearheaded, Streamlined, Enhanced, Transformed, Revamped, Orchestrated,
+Pioneered, Formulated, Generated, Initiated, Oversaw
 
 REQUIREMENTS
-• Start each with a past‑tense verb
+• Each bullet MUST start with a different action verb from the list above
+• No metrics or numbers
+• Focus on impact and achievements
 • 60‑80 characters per bullet
-• Include 1 keyword per bullet
-• Focus on achievements
-• No metrics/numbers
 • No period at end
+• Avoid generic descriptions
+• Must be specific to the role and company
 
 FORMATTING
 • Return as array: ["point 1", "point 2", ...]
-• Start each with action verb
-• Use proper capitalization`;
+• Proper capitalization
+• Past tense only
+• Professional tone`;
 
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -475,11 +479,11 @@ FORMATTING
           messages: [
             { 
               role: 'system', 
-              content: 'Generate resume bullet points. Return only the JSON array of points.'
+              content: 'Generate resume bullet points with unique action verbs. Each bullet must start with a different verb. Ensure professional tone and specificity to the role. Return only the JSON array of points.'
             },
             { role: 'user', content: responsibilitiesPrompt }
           ],
-          temperature: 0.8,
+          temperature: 0.7,
         }),
       });
 
@@ -503,20 +507,9 @@ FORMATTING
           responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
         }
 
+        // Basic formatting cleanup
         responsibilities = responsibilities
-          .map(resp => {
-            let clean = resp
-              .replace(/\d+%/g, '')
-              .replace(/increased|decreased|improved|enhanced|reduced|optimized/g, 'enhanced')
-              .replace(/\s+/g, ' ')
-              .trim();
-            
-            if (!/^[A-Z][a-z]+ed\b/.test(clean)) {
-              clean = `Led ${clean}`;
-            }
-            
-            return clean;
-          })
+          .map(resp => resp.trim())
           .filter(resp => resp.length >= 30 && resp.length <= 100);
 
         responsibilities = responsibilities.slice(0, 4);
