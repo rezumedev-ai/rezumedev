@@ -446,42 +446,23 @@ FORMAT
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
       const responsibilitiesPrompt = `
-Write 4 professional bullet points for a ${experience.jobTitle} at ${experience.companyName}.
+Write 4 bullet points for a ${experience.jobTitle} at ${experience.companyName}.
 
 AVAILABLE KEYWORDS
 ${industryKeywords.join(', ')}
 
 REQUIREMENTS
-1. Format:
-• Start each with a powerful action verb (no weak verbs like "helped")
-• Use past tense
-• 18-24 words per bullet
+• Start each with a past‑tense verb
+• 60‑80 characters per bullet
+• Include 1 keyword per bullet
+• Focus on achievements
+• No metrics/numbers
 • No period at end
-• Professional tone
-• Return ONLY a JSON array of strings: ["point 1", "point 2", ...]
 
-2. Content Rules:
-• Include specific projects, skills, or tools used
-• Highlight measurable results (%, $, time saved)
-• Focus on impact and value delivered
-• Mention team size or scope when relevant
-• Include 1-2 keywords from list above per bullet
-• Ensure each bullet is unique and non-repetitive
-
-3. Style Guide:
-• Active voice only
-• No buzzwords or clichés
-• Be specific and concrete
-• Show progression of responsibility
-• Quantify impact where possible
-
-4. Structure:
-• Action Verb → Task/Project → Result/Impact
-• Example: "Spearheaded database optimization project reducing query times by 40% and improving user experience for 50,000+ customers"
-
-OUTPUT FORMAT
-Return ONLY a JSON array of exactly 4 bullet points, no additional text. Example:
-["Spearheaded database optimization reducing query times by 40%", "Led agile team of 8 developers increasing sprint velocity by 35%"]`;
+FORMATTING
+• Return as array: ["point 1", "point 2", ...]
+• Start each with action verb
+• Use proper capitalization`;
 
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -494,7 +475,7 @@ Return ONLY a JSON array of exactly 4 bullet points, no additional text. Example
           messages: [
             { 
               role: 'system', 
-              content: 'You are a resume bullet point generator. Return ONLY a valid JSON array of strings, nothing else.'
+              content: 'Generate resume bullet points. Return only the JSON array of points.'
             },
             { role: 'user', content: responsibilitiesPrompt }
           ],
@@ -511,58 +492,45 @@ Return ONLY a JSON array of exactly 4 bullet points, no additional text. Example
       try {
         const respData = await responsibilitiesResponse.json();
         const responseContent = respData.choices[0].message.content.trim();
-        console.log('Raw OpenAI response:', responseContent);
-        
         let responsibilities = [];
-        try {
-          // Direct JSON parsing attempt
-          responsibilities = JSON.parse(responseContent);
-          
-          if (!Array.isArray(responsibilities)) {
-            console.error('Parsed response is not an array:', responsibilities);
-            throw new Error('Response is not an array');
-          }
-        } catch (parseError) {
-          console.error('Error parsing OpenAI response:', parseError);
-          // Fallback: try to extract array from response
-          const match = responseContent.match(/\[([\s\S]*)\]/);
+
+        if (responseContent.includes('[') && responseContent.includes(']')) {
+          const match = responseContent.match(/\[([^\]]+)\]/);
           if (match) {
-            try {
-              responsibilities = JSON.parse(`[${match[1]}]`);
-            } catch (fallbackError) {
-              console.error('Fallback parsing failed:', fallbackError);
-              responsibilities = [];
-            }
+            responsibilities = JSON.parse(`[${match[1]}]`);
           }
+        } else {
+          responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
         }
 
-        // Minimal sanitization to preserve content
         responsibilities = responsibilities
-          .filter(Boolean) // Remove any null/undefined entries
           .map(resp => {
-            if (typeof resp !== 'string') {
-              console.log('Non-string responsibility:', resp);
-              return '';
+            let clean = resp
+              .replace(/\d+%/g, '')
+              .replace(/increased|decreased|improved|enhanced|reduced|optimized/g, 'enhanced')
+              .replace(/\s+/g, ' ')
+              .trim();
+            
+            if (!/^[A-Z][a-z]+ed\b/.test(clean)) {
+              clean = `Led ${clean}`;
             }
-            return resp
-              .trim()
-              .replace(/^["']+|["']+$/g, '') // Remove only surrounding quotes
-              .replace(/\s+/g, ' ') // Normalize whitespace
-              .replace(/\.$/, ''); // Remove trailing period only
+            
+            return clean;
           })
           .filter(resp => resp.length >= 30 && resp.length <= 100);
 
-        console.log('Processed responsibilities:', responsibilities);
-
+        responsibilities = responsibilities.slice(0, 4);
+        
         if (responsibilities.length > 0) {
           enhancedExperiences.push({
             ...experience,
-            responsibilities: responsibilities.slice(0, 4)
+            responsibilities
           });
+          
           console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
         } else {
-          console.log('No valid responsibilities generated, keeping original');
           enhancedExperiences.push({...experience});
+          console.log(`Using original responsibilities for ${experience.jobTitle}`);
         }
       } catch (e) {
         console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
