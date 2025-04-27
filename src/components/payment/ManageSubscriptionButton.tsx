@@ -29,14 +29,27 @@ export const ManageSubscriptionButton = ({
         body: { returnUrl: window.location.href }
       });
 
-      if (error) throw error;
-      if (!data?.url) throw new Error("No portal URL returned");
+      if (error) {
+        console.error("Portal error:", error);
+        throw error;
+      }
+
+      if (!data?.url) {
+        throw new Error("No portal URL returned");
+      }
 
       window.location.href = data.url;
     } catch (error) {
-      console.error("Portal error:", error);
-      toast.error("Could not load subscription portal", {
-        description: error instanceof Error ? error.message : "Please try again later"
+      console.error("Subscription portal error:", error);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Failed to access subscription portal";
+      
+      toast.error("Subscription Portal Error", {
+        description: errorMessage === "No portal URL returned"
+          ? "Unable to create subscription portal. Please try again later."
+          : errorMessage
       });
     } finally {
       setIsLoading(false);
