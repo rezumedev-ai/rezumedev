@@ -1,5 +1,6 @@
+
 import { Helmet } from 'react-helmet';
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useParams } from "react-router-dom";
 import { BlogHeader } from "@/components/blog/BlogHeader";
