@@ -176,12 +176,12 @@ Deno.serve(async (req) => {
         
         // Get user ID from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
-        const planType = session.metadata?.planType;
+        const customerId = session.customer;
         
-        if (!userId) {
-          console.error(`${LOG_PREFIX.ERROR} No user ID found in session:`, session.id);
+        if (!userId || !customerId) {
+          console.error(`${LOG_PREFIX.ERROR} No user ID or customer ID found in session:`, session.id);
           return new Response(
-            JSON.stringify({ error: 'No user ID found in session' }),
+            JSON.stringify({ error: 'Missing user ID or customer ID in session' }),
             { 
               status: 400,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -189,9 +189,9 @@ Deno.serve(async (req) => {
           );
         }
         
-        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Updating subscription for user ${userId} with plan ${planType}`);
+        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Updating subscription for user ${userId} with Stripe customer ${customerId}`);
         
-        // Update user profile with subscription info - REMOVED subscription_mode field
+        // Update user profile with subscription info and customer ID
         const { error: updateError } = await supabase
           .from('profiles')
           .update({
@@ -199,6 +199,7 @@ Deno.serve(async (req) => {
             subscription_status: 'active',
             subscription_id: session.subscription || session.id,
             payment_method: 'card',
+            stripe_customer_id: customerId,
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);

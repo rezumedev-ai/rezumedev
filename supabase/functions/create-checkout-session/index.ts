@@ -1,4 +1,3 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 import Stripe from 'https://esm.sh/stripe@13.10.0';
 
@@ -90,6 +89,25 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Look up existing customer
+    const customers = await stripe.customers.list({ email: userData.email, limit: 1 });
+    let customerId;
+    
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+      console.log(`Found existing Stripe customer: ${customerId}`);
+    } else {
+      // Create a new customer if none exists
+      const newCustomer = await stripe.customers.create({
+        email: userData.email,
+        metadata: {
+          userId: userId
+        }
+      });
+      customerId = newCustomer.id;
+      console.log(`Created new Stripe customer: ${customerId}`);
+    }
+
     // Set up product and pricing based on plan type
     let productName;
     let unitAmount;
@@ -114,8 +132,9 @@ Deno.serve(async (req) => {
     console.log(`[${isLiveMode ? 'LIVE' : 'TEST'}] Checkout mode:`, checkoutMode);
     
     try {
-      // Create a checkout session with dynamic product data
+      // Create a checkout session with dynamic product data and customer ID
       const sessionData = {
+        customer: customerId,
         payment_method_types: ['card'],
         line_items: [{
           price_data: {
@@ -134,7 +153,6 @@ Deno.serve(async (req) => {
         success_url: successUrl || `${Deno.env.get('PUBLIC_SITE_URL') || 'https://rezume.dev'}/payment-success`,
         cancel_url: cancelUrl || `${Deno.env.get('PUBLIC_SITE_URL') || 'https://rezume.dev'}/pricing`,
         client_reference_id: userId,
-        customer_email: userData.email,
         metadata: {
           userId: userId,
           planType: planType,
