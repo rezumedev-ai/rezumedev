@@ -446,23 +446,40 @@ FORMAT
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
       const responsibilitiesPrompt = `
-Write 4 bullet points for a ${experience.jobTitle} at ${experience.companyName}.
+Generate 4 professional bullet points for a ${experience.jobTitle} position at ${experience.companyName}.
 
-AVAILABLE KEYWORDS
-${industryKeywords.join(', ')}
+RULES
+1. Start each with a powerful action verb
+   • Use verbs like: Developed, Implemented, Spearheaded, Orchestrated, Generated
+   • Avoid weak verbs like: Helped, Assisted, Supported
+   • No repeating verbs
 
-REQUIREMENTS
-• Start each with a past‑tense verb
-• 60‑80 characters per bullet
-• Include 1 keyword per bullet
-• Focus on achievements
-• No metrics/numbers
-• No period at end
+2. Show measurable impact
+   • Include metrics (%, $, time saved, scale)
+   • Highlight business outcomes
+   • Quantify team size, project scope, or results
 
-FORMATTING
-• Return as array: ["point 1", "point 2", ...]
-• Start each with action verb
-• Use proper capitalization`;
+3. Be specific
+   • Name technologies, tools, or methodologies used
+   • Mention project types or industry-specific terms
+   • Include relevant skills from job requirements
+
+4. Format & Style
+   • 18-24 words per bullet
+   • No passive voice
+   • Write in past tense
+   • Focus on achievements, not just duties
+   • Make each bullet unique and non-repetitive
+
+FORMAT
+[
+  "First bullet point with metrics",
+  "Second bullet point with tools",
+  "Third bullet point with outcomes",
+  "Fourth bullet point with impact"
+]
+
+Keep bullets clear, impactful, and error-free.`;
 
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -475,11 +492,11 @@ FORMATTING
           messages: [
             { 
               role: 'system', 
-              content: 'Generate resume bullet points. Return only the JSON array of points.'
+              content: 'You are a professional resume writer focused on creating impactful bullet points that highlight achievements and skills. Return only the JSON array of bullet points.'
             },
             { role: 'user', content: responsibilitiesPrompt }
           ],
-          temperature: 0.8,
+          temperature: 0.7,
         }),
       });
 
@@ -499,38 +516,21 @@ FORMATTING
           if (match) {
             responsibilities = JSON.parse(`[${match[1]}]`);
           }
-        } else {
-          responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
         }
 
         responsibilities = responsibilities
-          .map(resp => {
-            let clean = resp
-              .replace(/\d+%/g, '')
-              .replace(/increased|decreased|improved|enhanced|reduced|optimized/g, 'enhanced')
-              .replace(/\s+/g, ' ')
-              .trim();
-            
-            if (!/^[A-Z][a-z]+ed\b/.test(clean)) {
-              clean = `Led ${clean}`;
-            }
-            
-            return clean;
-          })
-          .filter(resp => resp.length >= 30 && resp.length <= 100);
+          .filter(resp => resp && typeof resp === 'string' && resp.length >= 30 && resp.length <= 150)
+          .slice(0, 4);
 
-        responsibilities = responsibilities.slice(0, 4);
-        
         if (responsibilities.length > 0) {
           enhancedExperiences.push({
             ...experience,
             responsibilities
           });
-          
           console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
         } else {
+          console.log(`Keeping original responsibilities for ${experience.jobTitle}`);
           enhancedExperiences.push({...experience});
-          console.log(`Using original responsibilities for ${experience.jobTitle}`);
         }
       } catch (e) {
         console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
