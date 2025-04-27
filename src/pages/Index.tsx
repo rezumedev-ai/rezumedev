@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import Header from "@/components/Header";
 import { AnimatedHero } from "@/components/ui/animated-hero";
 import { Process } from "@/components/Process";
 import { Features } from "@/components/Features";
@@ -8,7 +9,6 @@ import { AnimatedTestimonialsSection } from "@/components/AnimatedTestimonialsSe
 import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import PricingSection from "@/components/PricingSection";
 import { LandingReviewSection } from "@/components/LandingReviewSection";
 

@@ -1,6 +1,5 @@
-
 import { Helmet } from 'react-helmet';
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Features as FeaturesSection } from "@/components/Features";
 import { Button } from "@/components/ui/button";
