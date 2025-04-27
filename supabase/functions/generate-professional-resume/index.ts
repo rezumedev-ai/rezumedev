@@ -521,23 +521,32 @@ Return JSON array of exactly 4 bullets following these rules`;
           responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
         }
 
+        // New sanitization logic that preserves important details
         responsibilities = responsibilities
           .map(resp => {
+            // Basic cleanup without removing important content
             let clean = resp
-              .replace(/\d+%/g, '')
-              .replace(/increased|decreased|improved|enhanced|reduced|optimized/g, 'enhanced')
-              .replace(/\s+/g, ' ')
+              .replace(/"/g, '') // Remove quotes
+              .replace(/\s+/g, ' ') // Normalize whitespace
               .trim();
             
-            if (!/^[A-Z][a-z]+ed\b/.test(clean)) {
-              clean = `Led ${clean}`;
+            // Remove trailing periods but keep other punctuation
+            if (clean.endsWith('.')) {
+              clean = clean.slice(0, -1);
             }
+            
+            // Ensure first letter is capitalized
+            clean = clean.charAt(0).toUpperCase() + clean.slice(1);
             
             return clean;
           })
-          .filter(resp => resp.length >= 30 && resp.length <= 100);
+          .filter(resp => {
+            // Keep only reasonably sized bullets (between 30-100 chars)
+            const length = resp.length;
+            return length >= 30 && length <= 100;
+          });
 
-        responsibilities = responsibilities.slice(0, 4);
+        responsibilities = responsibilities.slice(0, 4); // Keep maximum 4 bullets
         
         if (responsibilities.length > 0) {
           enhancedExperiences.push({
