@@ -3,8 +3,39 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { CheckoutButton } from "@/components/payment/CheckoutButton";
+import { ManageSubscriptionButton } from "@/components/payment/ManageSubscriptionButton";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PricingSection = () => {
+  const { user } = useAuth();
+  
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!user
+  });
+
+  const hasActiveSubscription = profile?.subscription_status === 'active' && profile?.subscription_plan;
+  const currentPlan = profile?.subscription_plan;
+
   const tiers = [
     {
       name: "Monthly",
@@ -314,6 +345,35 @@ const PricingSection = () => {
               </motion.span>
             </Link>
           </p>
+        </motion.div>
+        
+        <motion.div 
+          className="max-w-2xl mx-auto mt-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
+          {hasActiveSubscription ? (
+            <div className="space-y-4">
+              <ManageSubscriptionButton variant="outline" />
+              <p className="text-sm text-muted-foreground mt-2">
+                Manage your subscription, billing information, and payment methods
+              </p>
+            </div>
+          ) : (
+            <motion.div 
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-accent/80 backdrop-blur-sm mb-6"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <CheckCircle2 className="w-5 h-5 text-primary" />
+              <div>
+                <p className="text-sm font-medium text-secondary">
+                  All plans include a 14-day money-back guarantee
+                </p>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </section>
