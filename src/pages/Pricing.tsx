@@ -76,10 +76,13 @@ const Pricing = () => {
   const renderSubscriptionButton = (planType: PlanType) => {
     if (hasActiveSubscription && currentPlan === planType) {
       return (
-        <Button variant="outline" className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800" disabled>
-          <CheckCircle className="mr-2 h-4 w-4" />
-          Current Plan
-        </Button>
+        <ManageSubscriptionButton 
+          variant="outline" 
+          className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800"
+        >
+          <CheckCircle2 className="mr-2 h-4 w-4" />
+          Manage Current Plan
+        </ManageSubscriptionButton>
       );
     }
 
@@ -257,7 +260,7 @@ const Pricing = () => {
               {hasActiveSubscription && currentPlan === 'lifetime' && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 px-4 py-1 rounded-full shadow-lg">
                   <span className="text-sm font-medium text-white flex items-center">
-                    <CheckCircle className="w-3 h-3 mr-1" />
+                    <CheckCircle2 className="w-3 h-3 mr-1" />
                     Current Plan
                   </span>
                 </div>

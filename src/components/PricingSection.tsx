@@ -118,6 +118,31 @@ const PricingSection = () => {
     visible: { opacity: 1, x: 0 }
   };
 
+  const renderSubscriptionButton = (planType: PlanType) => {
+    if (hasActiveSubscription && currentPlan === planType) {
+      return (
+        <ManageSubscriptionButton 
+          variant="outline" 
+          className="w-full bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800"
+        >
+          <CheckCircle2 className="mr-2 h-4 w-4" />
+          Manage Current Plan
+        </ManageSubscriptionButton>
+      );
+    }
+
+    return (
+      <CheckoutButton
+        planType={planType}
+        className={`w-full hover:scale-105 transition-transform ${
+          hasActiveSubscription ? "bg-blue-600 hover:bg-blue-700" : ""
+        }`}
+      >
+        {hasActiveSubscription ? "Switch Plan" : "Subscribe Now"}
+      </CheckoutButton>
+    );
+  };
+
   return (
     <section className="relative py-20 overflow-hidden bg-white sm:py-32">
       <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-accent/50 to-transparent"></div>
@@ -281,27 +306,7 @@ const PricingSection = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: tier.delay + 0.4 }}
               >
-                <Button 
-                  asChild 
-                  className={`w-full group ${tier.popular ? 'bg-primary hover:bg-primary-hover' : ''}`}
-                  variant={tier.popular ? "default" : "outline"}
-                >
-                  <Link to={tier.link}>
-                    {tier.cta}
-                    <motion.span 
-                      className="ml-2 transition-transform"
-                      animate={{ x: [0, 4, 0] }} 
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: Infinity,
-                        repeatType: "reverse", 
-                        repeatDelay: 1 
-                      }}
-                    >
-                      →
-                    </motion.span>
-                  </Link>
-                </Button>
+                {renderSubscriptionButton(tier.name)}
               </motion.div>
             </motion.div>
           ))}
