@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -75,12 +74,8 @@ export function DownloadOptionsDialog({
       clonedResume.style.overflow = 'hidden';
       clonedResume.className = resumeElement.className + ' pdf-mode';
       
-      clonedResume.style.padding = '32px 32px 0 32px'; 
-      
       document.body.appendChild(clonedResume);
 
-      // Enhanced icon handling for PDF export
-      // Fix contact icons alignment in PDF
       const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
       contactIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
@@ -112,7 +107,6 @@ export function DownloadOptionsDialog({
         }
       });
 
-      // Fix bullet points in PDF
       const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
@@ -144,7 +138,6 @@ export function DownloadOptionsDialog({
         itemElement.style.marginBottom = '4px';
       });
 
-      // Fix section icons in PDF
       const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
