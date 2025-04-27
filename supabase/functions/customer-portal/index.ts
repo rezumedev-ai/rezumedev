@@ -23,25 +23,20 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
-
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
-    logStep("Authorization header found");
-
-    // Initialize Supabase client with the service role key
+    // Initialize Supabase client with service role key for admin access
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
 
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
+    logStep("Authorization header found");
+
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    
     const user = userData.user;
     if (!user?.id) throw new Error("User not authenticated");
     logStep("User authenticated", { userId: user.id });
@@ -59,6 +54,19 @@ serve(async (req) => {
 
     const customerId = profileData.stripe_customer_id;
     logStep("Found Stripe customer", { customerId });
+
+    // Determine if we're in live mode by checking the customer ID prefix
+    const isLiveMode = customerId.startsWith('cus_') && !customerId.includes('test');
+    logStep(`Operating in ${isLiveMode ? 'LIVE' : 'TEST'} mode`);
+
+    // Select the appropriate Stripe key based on mode
+    const stripeKey = isLiveMode 
+      ? Deno.env.get("STRIPE_LIVE_SECRET_KEY") 
+      : Deno.env.get("STRIPE_SECRET_KEY");
+
+    if (!stripeKey) {
+      throw new Error(`Missing ${isLiveMode ? 'live' : 'test'} Stripe secret key`);
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
@@ -89,4 +97,3 @@ serve(async (req) => {
     });
   }
 });
-
