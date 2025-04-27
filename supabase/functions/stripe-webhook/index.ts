@@ -174,14 +174,20 @@ Deno.serve(async (req) => {
         // Log the entire session for debugging
         console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Checkout session completed:`, JSON.stringify(session, null, 2));
         
-        // Get user ID from session metadata
+        // Get user ID and plan type from session metadata
         const userId = session.metadata?.userId || session.client_reference_id;
         const customerId = session.customer;
+        const planType = session.metadata?.planType;
         
-        if (!userId || !customerId) {
-          console.error(`${LOG_PREFIX.ERROR} No user ID or customer ID found in session:`, session.id);
+        if (!userId || !customerId || !planType) {
+          console.error(`${LOG_PREFIX.ERROR} Missing required data in session:`, {
+            userId,
+            customerId,
+            planType,
+            sessionId: session.id
+          });
           return new Response(
-            JSON.stringify({ error: 'Missing user ID or customer ID in session' }),
+            JSON.stringify({ error: 'Missing required session data' }),
             { 
               status: 400,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -189,9 +195,9 @@ Deno.serve(async (req) => {
           );
         }
         
-        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Updating subscription for user ${userId} with Stripe customer ${customerId}`);
+        console.log(`${isLiveMode ? LOG_PREFIX.LIVE : LOG_PREFIX.TEST} Updating subscription for user ${userId} with plan ${planType} and customer ${customerId}`);
         
-        // Update user profile with subscription info and customer ID
+        // Update user profile with subscription info
         const { error: updateError } = await supabase
           .from('profiles')
           .update({
