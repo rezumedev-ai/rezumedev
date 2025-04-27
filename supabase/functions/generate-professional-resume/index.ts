@@ -458,7 +458,7 @@ REQUIREMENTS
 • 18-24 words per bullet
 • No period at end
 • Professional tone
-• Return as array: ["point 1", "point 2", ...]
+• Return ONLY a JSON array of strings: ["point 1", "point 2", ...]
 
 2. Content Rules:
 • Include specific projects, skills, or tools used
@@ -480,7 +480,8 @@ REQUIREMENTS
 • Example: "Spearheaded database optimization project reducing query times by 40% and improving user experience for 50,000+ customers"
 
 OUTPUT FORMAT
-Return JSON array of exactly 4 bullets following these rules`;
+Return ONLY a JSON array of exactly 4 bullet points, no additional text. Example:
+["Spearheaded database optimization reducing query times by 40%", "Led agile team of 8 developers increasing sprint velocity by 35%"]`;
 
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -493,7 +494,7 @@ Return JSON array of exactly 4 bullets following these rules`;
           messages: [
             { 
               role: 'system', 
-              content: 'Generate resume bullet points. Return only the JSON array of points.'
+              content: 'You are a resume bullet point generator. Return ONLY a valid JSON array of strings, nothing else.'
             },
             { role: 'user', content: responsibilitiesPrompt }
           ],
@@ -510,54 +511,58 @@ Return JSON array of exactly 4 bullets following these rules`;
       try {
         const respData = await responsibilitiesResponse.json();
         const responseContent = respData.choices[0].message.content.trim();
+        console.log('Raw OpenAI response:', responseContent);
+        
         let responsibilities = [];
-
-        if (responseContent.includes('[') && responseContent.includes(']')) {
-          const match = responseContent.match(/\[([^\]]+)\]/);
-          if (match) {
-            responsibilities = JSON.parse(`[${match[1]}]`);
+        try {
+          // Direct JSON parsing attempt
+          responsibilities = JSON.parse(responseContent);
+          
+          if (!Array.isArray(responsibilities)) {
+            console.error('Parsed response is not an array:', responsibilities);
+            throw new Error('Response is not an array');
           }
-        } else {
-          responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
+        } catch (parseError) {
+          console.error('Error parsing OpenAI response:', parseError);
+          // Fallback: try to extract array from response
+          const match = responseContent.match(/\[([\s\S]*)\]/);
+          if (match) {
+            try {
+              responsibilities = JSON.parse(`[${match[1]}]`);
+            } catch (fallbackError) {
+              console.error('Fallback parsing failed:', fallbackError);
+              responsibilities = [];
+            }
+          }
         }
 
-        // New sanitization logic that preserves important details
+        // Minimal sanitization to preserve content
         responsibilities = responsibilities
+          .filter(Boolean) // Remove any null/undefined entries
           .map(resp => {
-            // Basic cleanup without removing important content
-            let clean = resp
-              .replace(/"/g, '') // Remove quotes
-              .replace(/\s+/g, ' ') // Normalize whitespace
-              .trim();
-            
-            // Remove trailing periods but keep other punctuation
-            if (clean.endsWith('.')) {
-              clean = clean.slice(0, -1);
+            if (typeof resp !== 'string') {
+              console.log('Non-string responsibility:', resp);
+              return '';
             }
-            
-            // Ensure first letter is capitalized
-            clean = clean.charAt(0).toUpperCase() + clean.slice(1);
-            
-            return clean;
+            return resp
+              .trim()
+              .replace(/^["']+|["']+$/g, '') // Remove only surrounding quotes
+              .replace(/\s+/g, ' ') // Normalize whitespace
+              .replace(/\.$/, ''); // Remove trailing period only
           })
-          .filter(resp => {
-            // Keep only reasonably sized bullets (between 30-100 chars)
-            const length = resp.length;
-            return length >= 30 && length <= 100;
-          });
+          .filter(resp => resp.length >= 30 && resp.length <= 100);
 
-        responsibilities = responsibilities.slice(0, 4); // Keep maximum 4 bullets
-        
+        console.log('Processed responsibilities:', responsibilities);
+
         if (responsibilities.length > 0) {
           enhancedExperiences.push({
             ...experience,
-            responsibilities
+            responsibilities: responsibilities.slice(0, 4)
           });
-          
           console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
         } else {
+          console.log('No valid responsibilities generated, keeping original');
           enhancedExperiences.push({...experience});
-          console.log(`Using original responsibilities for ${experience.jobTitle}`);
         }
       } catch (e) {
         console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
