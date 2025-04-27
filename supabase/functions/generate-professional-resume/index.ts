@@ -7,6 +7,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function getRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function calculateTotalExperience(workExperience: any[]): { years: number; months: number } {
   let totalMonths = 0;
   const now = new Date();
@@ -133,7 +137,7 @@ function extractDomainExpertise(workExperience: any[], jobTitle: string): string
   return allDomains.slice(0, 4);
 }
 
-function extractQuantifiedAchievements(workExperience: any[]): string[] {
+function extractQuantifiedAchievements(workExperience: any[], jobTitle: string): string[] {
   const achievements: string[] = [];
   const allResponsibilities = workExperience.flatMap((exp: any) => 
     Array.isArray(exp.responsibilities) ? exp.responsibilities.map(resp => ({
@@ -151,56 +155,125 @@ function extractQuantifiedAchievements(workExperience: any[]): string[] {
   } else {
     const jobTitleAchievements: Record<string, string[]> = {
       'software': [
-        'Reduced system load times by 35% through code optimization',
-        'Implemented automated testing reducing bugs by 40% in production'
+        `Optimized application performance resulting in ${getRandomNumber(20, 45)}% reduction in load times`,
+        `Led development of new features increasing user engagement by ${getRandomNumber(25, 40)}%`,
+        `Implemented automated testing reducing production bugs by ${getRandomNumber(35, 60)}%`,
+        `Architected microservices solution improving scalability by ${getRandomNumber(30, 50)}%`,
+        `Reduced API response times by ${getRandomNumber(40, 70)}% through code optimization`,
+        `Migrated legacy systems resulting in ${getRandomNumber(20, 35)}% cost savings`
       ],
       'data': [
-        'Developed predictive models with 92% accuracy rate',
-        'Automated reporting processes saving 15+ hours weekly'
-      ],
-      'project': [
-        'Delivered projects 15% under budget across portfolio',
-        'Led cross-functional teams to complete initiatives 20% ahead of schedule'
-      ],
-      'marketing': [
-        'Increased conversion rates by 28% through optimized campaigns',
-        'Generated 40% growth in qualified leads through strategic initiatives'
-      ],
-      'sales': [
-        'Exceeded sales targets by 25% for 3 consecutive quarters',
-        'Expanded client base by 30% through new territory development'
+        `Developed predictive models achieving ${getRandomNumber(85, 95)}% accuracy rate`,
+        `Built data pipeline processing ${getRandomNumber(2, 10)} million records daily`,
+        `Reduced data processing time by ${getRandomNumber(40, 60)}% through optimization`,
+        `Created analytics dashboard saving ${getRandomNumber(10, 20)} hours weekly`,
+        `Improved data quality metrics by ${getRandomNumber(25, 45)}%`,
+        `Automated reporting workflows reducing manual effort by ${getRandomNumber(50, 70)}%`
       ],
       'product': [
-        'Launched 5 product features that increased user retention by 22%',
-        'Led product redesign resulting in 18% improvement in customer satisfaction'
+        `Launched key features increasing user retention by ${getRandomNumber(15, 30)}%`,
+        `Led product redesign improving customer satisfaction by ${getRandomNumber(20, 35)}%`,
+        `Optimized user journey reducing churn by ${getRandomNumber(20, 40)}%`,
+        `Implemented A/B testing improving conversion rates by ${getRandomNumber(15, 35)}%`,
+        `Drove ${getRandomNumber(25, 45)}% increase in user engagement metrics`,
+        `Reduced customer support tickets by ${getRandomNumber(30, 50)}% through UX improvements`
+      ],
+      'marketing': [
+        `Generated ${getRandomNumber(30, 60)}% growth in qualified leads`,
+        `Achieved ${getRandomNumber(20, 40)}% increase in conversion rates`,
+        `Managed campaigns with ${getRandomNumber(15, 30)}% ROI improvement`,
+        `Grew social media engagement by ${getRandomNumber(40, 70)}%`,
+        `Increased organic traffic by ${getRandomNumber(35, 65)}% through SEO optimization`,
+        `Reduced customer acquisition cost by ${getRandomNumber(20, 40)}%`
+      ],
+      'sales': [
+        `Exceeded sales targets by ${getRandomNumber(20, 40)}% for consecutive quarters`,
+        `Expanded client base by ${getRandomNumber(25, 45)}% through territory development`,
+        `Generated ${getRandomNumber(2, 5)}M in new business revenue`,
+        `Achieved ${getRandomNumber(110, 130)}% of annual sales quota`,
+        `Reduced sales cycle length by ${getRandomNumber(20, 35)}%`,
+        `Improved lead conversion rate by ${getRandomNumber(25, 45)}%`
       ],
       'design': [
-        'Redesigned UI resulting in 40% improved user engagement metrics',
-        'Created design system reducing development time by 30%'
+        `Improved user engagement metrics by ${getRandomNumber(30, 50)}%`,
+        `Reduced development time by ${getRandomNumber(25, 40)}% with new design system`,
+        `Increased mobile conversion rate by ${getRandomNumber(20, 35)}%`,
+        `Achieved ${getRandomNumber(15, 30)}% reduction in user error rates`,
+        `Improved accessibility compliance by ${getRandomNumber(40, 60)}%`,
+        `Reduced prototype iteration time by ${getRandomNumber(30, 50)}%`
       ],
       'finance': [
-        'Identified cost-saving measures resulting in 15% annual expense reduction',
-        'Restructured budget allocation increasing ROI by 24%'
+        `Identified cost savings of ${getRandomNumber(10, 25)}% annually`,
+        `Improved budget accuracy by ${getRandomNumber(15, 30)}%`,
+        `Reduced processing time by ${getRandomNumber(30, 50)}%`,
+        `Achieved ${getRandomNumber(15, 25)}% reduction in operational costs`,
+        `Increased forecast accuracy by ${getRandomNumber(20, 35)}%`,
+        `Optimized cash flow improving working capital by ${getRandomNumber(15, 30)}%`
       ],
-      'manager': [
-        'Led team of 12 professionals to exceed department goals by 30%',
-        'Implemented process improvements reducing operational costs by 18%'
+      'operations': [
+        `Streamlined processes reducing costs by ${getRandomNumber(15, 30)}%`,
+        `Improved operational efficiency by ${getRandomNumber(20, 40)}%`,
+        `Reduced workflow bottlenecks by ${getRandomNumber(25, 45)}%`,
+        `Achieved ${getRandomNumber(15, 30)}% improvement in delivery times`,
+        `Optimized resource allocation saving ${getRandomNumber(20, 35)}%`,
+        `Reduced operational errors by ${getRandomNumber(30, 50)}%`
+      ],
+      'hr': [
+        `Reduced employee turnover by ${getRandomNumber(20, 40)}%`,
+        `Improved hiring efficiency by ${getRandomNumber(25, 45)}%`,
+        `Achieved ${getRandomNumber(90, 95)}% employee satisfaction rate`,
+        `Reduced time-to-hire by ${getRandomNumber(30, 50)}%`,
+        `Implemented training programs improving productivity by ${getRandomNumber(15, 30)}%`,
+        `Decreased onboarding time by ${getRandomNumber(25, 40)}%`
       ]
     };
     
     let matchedCategory = '';
+    const jobTitleLower = jobTitle.toLowerCase();
     const mostRecentJob = workExperience[0]?.jobTitle?.toLowerCase() || '';
+    const allJobTitles = [jobTitleLower, mostRecentJob];
     
-    for (const category of Object.keys(jobTitleAchievements)) {
-      if (mostRecentJob.includes(category)) {
-        matchedCategory = category;
-        break;
+    for (const title of allJobTitles) {
+      for (const [category, _] of Object.entries(jobTitleAchievements)) {
+        if (
+          title.includes(category) || 
+          (category === 'software' && (
+            title.includes('developer') || 
+            title.includes('engineer') || 
+            title.includes('programmer')
+          )) ||
+          (category === 'data' && (
+            title.includes('analyst') || 
+            title.includes('scientist') || 
+            title.includes('analytics')
+          )) ||
+          (category === 'operations' && (
+            title.includes('manager') || 
+            title.includes('coordinator') || 
+            title.includes('supervisor')
+          ))
+        ) {
+          matchedCategory = category;
+          break;
+        }
+      }
+      if (matchedCategory) break;
+    }
+    
+    if (!matchedCategory) {
+      if (jobTitleLower.includes('director') || jobTitleLower.includes('head')) {
+        matchedCategory = 'operations';
+      } else if (jobTitleLower.includes('consultant')) {
+        matchedCategory = mostRecentJob.includes('tech') ? 'software' : 'operations';
       }
     }
     
-    const relevantAchievements = jobTitleAchievements[matchedCategory] || 
-                                 jobTitleAchievements['manager'];
-    achievements.push(...relevantAchievements.slice(0, 2));
+    const categoryAchievements = jobTitleAchievements[matchedCategory] || jobTitleAchievements['operations'];
+    const selectedIndexes = new Set<number>();
+    while (selectedIndexes.size < 2) {
+      selectedIndexes.add(Math.floor(Math.random() * categoryAchievements.length));
+    }
+    achievements.push(...Array.from(selectedIndexes).map(i => categoryAchievements[i]));
   }
   
   return achievements;
@@ -367,7 +440,7 @@ RULES
     const domainAreas = extractDomainExpertise(resumeData.work_experience, jobTitle);
     console.log('Extracted domain expertise areas:', domainAreas);
     
-    const achievements = extractQuantifiedAchievements(resumeData.work_experience);
+    const achievements = extractQuantifiedAchievements(resumeData.work_experience, jobTitle);
     console.log('Extracted/generated quantified achievements:', achievements);
     
     const relevantTools = extractRelevantTools(resumeData.work_experience, jobTitle);
@@ -419,11 +492,11 @@ FORMAT
         messages: [
           { 
             role: 'system', 
-            content: 'Write a professional resume summary that includes domain expertise, quantified achievements, relevant tools, and leadership value. Return only the summary text.'
+            content: 'Write a professional resume summary that includes domain expertise, quantified achievements, relevant tools, and leadership value. Return only the summary text. Ensure achievements are specific and varied.'
           },
           { role: 'user', content: summaryPrompt }
         ],
-        temperature: 0.7,
+        temperature: 0.8,
       }),
     });
 
