@@ -1,6 +1,5 @@
-
 import { Helmet } from 'react-helmet';
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
