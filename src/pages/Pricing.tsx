@@ -1,8 +1,9 @@
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Check, CheckCircle, Sparkles, Star } from "lucide-react";
+import { Check, CheckCircle2, Sparkles, Star } from "lucide-react";
 import { CheckoutButton } from "@/components/payment/CheckoutButton";
+import { ManageSubscriptionButton } from "@/components/payment/ManageSubscriptionButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { SimplifiedHeader } from "@/components/SimplifiedHeader";

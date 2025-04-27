@@ -8,6 +8,7 @@ import { ManageSubscriptionButton } from "@/components/payment/ManageSubscriptio
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { PlanType } from "@/pages/Pricing";
 
 const PricingSection = () => {
   const { user } = useAuth();
@@ -118,8 +119,9 @@ const PricingSection = () => {
     visible: { opacity: 1, x: 0 }
   };
 
-  const renderSubscriptionButton = (planType: PlanType) => {
-    if (hasActiveSubscription && currentPlan === planType) {
+  const renderSubscriptionButton = (planType: string) => {
+    const plan = planType.toLowerCase() as PlanType;
+    if (hasActiveSubscription && currentPlan?.toLowerCase() === plan) {
       return (
         <ManageSubscriptionButton 
           variant="outline" 
@@ -133,7 +135,7 @@ const PricingSection = () => {
 
     return (
       <CheckoutButton
-        planType={planType}
+        planType={plan}
         className={`w-full hover:scale-105 transition-transform ${
           hasActiveSubscription ? "bg-blue-600 hover:bg-blue-700" : ""
         }`}
