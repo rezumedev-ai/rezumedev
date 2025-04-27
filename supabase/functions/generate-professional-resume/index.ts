@@ -446,23 +446,41 @@ FORMAT
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
       const responsibilitiesPrompt = `
-Write 4 bullet points for a ${experience.jobTitle} at ${experience.companyName}.
+Write 4 professional bullet points for a ${experience.jobTitle} at ${experience.companyName}.
 
 AVAILABLE KEYWORDS
 ${industryKeywords.join(', ')}
 
 REQUIREMENTS
-• Start each with a past‑tense verb
-• 60‑80 characters per bullet
-• Include 1 keyword per bullet
-• Focus on achievements
-• No metrics/numbers
+1. Format:
+• Start each with a powerful action verb (no weak verbs like "helped")
+• Use past tense
+• 18-24 words per bullet
 • No period at end
-
-FORMATTING
+• Professional tone
 • Return as array: ["point 1", "point 2", ...]
-• Start each with action verb
-• Use proper capitalization`;
+
+2. Content Rules:
+• Include specific projects, skills, or tools used
+• Highlight measurable results (%, $, time saved)
+• Focus on impact and value delivered
+• Mention team size or scope when relevant
+• Include 1-2 keywords from list above per bullet
+• Ensure each bullet is unique and non-repetitive
+
+3. Style Guide:
+• Active voice only
+• No buzzwords or clichés
+• Be specific and concrete
+• Show progression of responsibility
+• Quantify impact where possible
+
+4. Structure:
+• Action Verb → Task/Project → Result/Impact
+• Example: "Spearheaded database optimization project reducing query times by 40% and improving user experience for 50,000+ customers"
+
+OUTPUT FORMAT
+Return JSON array of exactly 4 bullets following these rules`;
 
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
