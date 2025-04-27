@@ -7,10 +7,9 @@ export const formatDateRange = (startDate: string, endDate: string, isCurrentJob
   // Handle empty dates
   if (!startDate && !endDate) return '';
   if (!startDate) return `Until ${formatDate(endDate)}`;
-  if (!endDate && !isCurrentJob) return `From ${formatDate(startDate)}`;
   
-  // Handle current jobs
-  if (isCurrentJob) {
+  // Handle current jobs and jobs with no end date
+  if (isCurrentJob || !endDate) {
     return `${formatDate(startDate)} - Present`;
   }
   
