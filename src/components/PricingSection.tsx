@@ -367,20 +367,7 @@ const PricingSection = () => {
                 Manage your subscription, billing information, and payment methods
               </p>
             </div>
-          ) : (
-            <motion.div 
-              className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-accent/80 backdrop-blur-sm mb-6"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <CheckCircle2 className="w-5 h-5 text-primary" />
-              <div>
-                <p className="text-sm font-medium text-secondary">
-                  All plans include a 14-day money-back guarantee
-                </p>
-              </div>
-            </motion.div>
-          )}
+          ) : null}
         </motion.div>
       </div>
     </section>
