@@ -65,12 +65,20 @@ export function DownloadOptionsDialog({
 
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      // Get the exact dimensions of the original element
+      const originalWidth = resumeElement.offsetWidth;
+      const originalHeight = resumeElement.offsetHeight;
+      
+      // Create a clone with exact A4 proportions to ensure consistency
       const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
       clonedResume.id = 'pdf-preparation-div';
       clonedResume.style.position = 'absolute';
       clonedResume.style.left = '-9999px';
-      clonedResume.style.width = `${resumeElement.offsetWidth}px`;
-      clonedResume.style.height = `${resumeElement.offsetHeight}px`;
+      // Set exact dimensions to match A4 aspect ratio while preserving content
+      clonedResume.style.width = `${originalWidth}px`;
+      clonedResume.style.height = `${originalHeight}px`;
+      clonedResume.style.margin = '0';
+      clonedResume.style.padding = '0';
       clonedResume.style.overflow = 'hidden';
       clonedResume.className = resumeElement.className + ' pdf-mode';
       
@@ -172,14 +180,16 @@ export function DownloadOptionsDialog({
         }
       });
 
+      // Improved canvas capture settings with higher resolution and quality
       const pixelRatio = window.devicePixelRatio || 1;
       
       const captureSettings = {
-        scale: pixelRatio * 2.5,
+        scale: pixelRatio * 3, // Increased scale for better quality
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
         imageTimeout: 15000,
+        logging: false, // Disable logging for better performance
         windowWidth: document.documentElement.offsetWidth,
         windowHeight: document.documentElement.offsetHeight,
         onclone: (clonedDoc: Document) => {
@@ -199,8 +209,9 @@ export function DownloadOptionsDialog({
       
       document.body.removeChild(clonedResume);
 
-      const pdfWidth = 210;
-      const pdfHeight = 297;
+      // A4 dimensions in mm
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
       
       const pdf = new jsPDF({
         format: 'a4',
@@ -211,28 +222,22 @@ export function DownloadOptionsDialog({
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
+      // Calculate the correct scaling from canvas to PDF to maintain aspect ratio
+      // and ensure content fills the width without unnecessary white space
       const canvasAspectRatio = canvas.width / canvas.height;
       const a4AspectRatio = pdfWidth / pdfHeight;
       
-      let imgWidth, imgHeight, offsetX, offsetY;
+      // Instead of centering with offsetX/offsetY, use the full width of the PDF
+      // and calculate height based on aspect ratio
+      const imgWidth = pdfWidth;
+      const imgHeight = imgWidth / canvasAspectRatio;
       
-      if (canvasAspectRatio > a4AspectRatio) {
-        imgWidth = pdfWidth;
-        imgHeight = imgWidth / canvasAspectRatio;
-        offsetX = 0;
-        offsetY = (pdfHeight - imgHeight) / 2;
-      } else {
-        imgHeight = pdfHeight;
-        imgWidth = imgHeight * canvasAspectRatio;
-        offsetX = (pdfWidth - imgWidth) / 2;
-        offsetY = 0;
-      }
-      
+      // No more offsetX calculations - use full width and align to top
       pdf.addImage(
         imgData,
         'JPEG',
-        offsetX,
-        offsetY,
+        0, // No horizontal offset - use full width
+        0, // No vertical offset - align to top
         imgWidth,
         imgHeight,
         undefined,
