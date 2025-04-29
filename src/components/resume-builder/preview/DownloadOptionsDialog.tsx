@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { DynamicTypography } from "@/components/ui/dynamic-typography";
 
 interface DownloadOptionsDialogProps {
   isDownloading: boolean;
@@ -69,6 +70,9 @@ export function DownloadOptionsDialog({
       const originalWidth = resumeElement.offsetWidth;
       const originalHeight = resumeElement.offsetHeight;
       
+      // Get template ID to apply template-specific optimizations
+      const templateId = resumeElement.getAttribute('data-template-id') || 'minimal-clean';
+      
       // Create a clone with exact A4 proportions to ensure consistency
       const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
       clonedResume.id = 'pdf-preparation-div';
@@ -83,6 +87,64 @@ export function DownloadOptionsDialog({
       clonedResume.className = resumeElement.className + ' pdf-mode';
       
       document.body.appendChild(clonedResume);
+
+      // First check if we need to adjust font sizes for problematic templates
+      if (['minimal-elegant', 'executive-clean'].includes(templateId)) {
+        // Find sections that might cause overflow issues
+        const skillsSection = clonedResume.querySelector('[data-section="skills"]');
+        const certSection = clonedResume.querySelector('[data-section="certifications"]');
+        
+        if (skillsSection) {
+          // Adjust skills section font sizes if needed
+          const skillHeadings = skillsSection.querySelectorAll('h4');
+          skillHeadings.forEach(heading => {
+            const headingElem = heading as HTMLElement;
+            if (headingElem.style.fontSize) {
+              const currentSize = parseFloat(headingElem.style.fontSize);
+              headingElem.style.fontSize = `${Math.max(currentSize * 0.85, 10)}px`;
+            }
+          });
+          
+          // Find skill lists and adjust their text size
+          const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
+          skillLists.forEach(list => {
+            const listElem = list as HTMLElement;
+            const items = listElem.querySelectorAll('li');
+            items.forEach(item => {
+              const itemElem = item as HTMLElement;
+              itemElem.style.fontSize = '10px';
+              itemElem.style.lineHeight = '1.2';
+              itemElem.style.marginBottom = '2px';
+            });
+          });
+        }
+        
+        if (certSection) {
+          // Adjust certification section font sizes
+          const certItems = certSection.querySelectorAll('div');
+          certItems.forEach(item => {
+            const itemElem = item as HTMLElement;
+            // Only adjust actual certification items, not containers
+            if (itemElem.classList.contains('flex')) {
+              const textElements = itemElem.querySelectorAll('span');
+              textElements.forEach(span => {
+                const spanElem = span as HTMLElement;
+                spanElem.style.fontSize = '10px';
+              });
+            }
+          });
+        }
+        
+        // Check for any education section that might need adjustment
+        const educationSection = clonedResume.querySelector('[data-section="education"]');
+        if (educationSection) {
+          const dateTexts = educationSection.querySelectorAll('.text-gray-500');
+          dateTexts.forEach(date => {
+            const dateElem = date as HTMLElement;
+            dateElem.style.fontSize = '10px';
+          });
+        }
+      }
 
       const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
       contactIcons.forEach(icon => {
@@ -179,6 +241,53 @@ export function DownloadOptionsDialog({
           }
         }
       });
+      
+      // Check if we need to apply content length optimizations
+      const contentOptimization = () => {
+        // Find sections that might contain a lot of content
+        const experienceSection = clonedResume.querySelector('[data-section="experience"]');
+        if (experienceSection) {
+          const experienceItems = experienceSection.querySelectorAll('[data-experience-item="true"]');
+          
+          // If there are many experience items, we need to adjust spacing
+          if (experienceItems.length > 3) {
+            experienceItems.forEach(item => {
+              const itemElem = item as HTMLElement;
+              // Reduce margins between items
+              itemElem.style.marginBottom = '6px';
+              
+              // Find responsibility lists and adjust their spacing
+              const respList = itemElem.querySelector('ul');
+              if (respList) {
+                const respListElem = respList as HTMLElement;
+                respListElem.style.marginTop = '2px';
+                
+                // Make responsibility text smaller
+                const listItems = respListElem.querySelectorAll('li');
+                listItems.forEach(li => {
+                  const liElem = li as HTMLElement;
+                  liElem.style.fontSize = '10px';
+                  liElem.style.marginBottom = '1px';
+                  liElem.style.lineHeight = '1.2';
+                });
+              }
+            });
+          }
+        }
+        
+        // Handle long skills lists
+        const skillsList = clonedResume.querySelectorAll('[data-skill-item="true"]');
+        if (skillsList.length > 15) {
+          skillsList.forEach(skill => {
+            const skillElem = skill as HTMLElement;
+            skillElem.style.fontSize = '10px';
+            skillElem.style.lineHeight = '1.1';
+          });
+        }
+      };
+      
+      // Apply content-based optimizations
+      contentOptimization();
 
       // Improved canvas capture settings with higher resolution and quality
       const pixelRatio = window.devicePixelRatio || 1;
@@ -227,22 +336,39 @@ export function DownloadOptionsDialog({
       const canvasAspectRatio = canvas.width / canvas.height;
       const a4AspectRatio = pdfWidth / pdfHeight;
       
-      // Instead of centering with offsetX/offsetY, use the full width of the PDF
-      // and calculate height based on aspect ratio
-      const imgWidth = pdfWidth;
-      const imgHeight = imgWidth / canvasAspectRatio;
-      
-      // No more offsetX calculations - use full width and align to top
-      pdf.addImage(
-        imgData,
-        'JPEG',
-        0, // No horizontal offset - use full width
-        0, // No vertical offset - align to top
-        imgWidth,
-        imgHeight,
-        undefined,
-        'FAST'
-      );
+      // Check if content is too tall for A4 height
+      if (canvasAspectRatio < a4AspectRatio) {
+        // Content is taller than A4 proportions - we need to scale to fit height
+        const imgHeight = pdfHeight;
+        const imgWidth = imgHeight * canvasAspectRatio;
+        const offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
+        
+        pdf.addImage(
+          imgData,
+          'JPEG',
+          offsetX, // Center horizontally
+          0, // Align to top
+          imgWidth,
+          imgHeight,
+          undefined,
+          'FAST'
+        );
+      } else {
+        // Content fits within A4 proportions or is wider - use full width
+        const imgWidth = pdfWidth;
+        const imgHeight = imgWidth / canvasAspectRatio;
+        
+        pdf.addImage(
+          imgData,
+          'JPEG',
+          0, // No horizontal offset - use full width
+          0, // No vertical offset - align to top
+          imgWidth,
+          imgHeight,
+          undefined,
+          'FAST'
+        );
+      }
 
       pdf.save('resume.pdf');
       

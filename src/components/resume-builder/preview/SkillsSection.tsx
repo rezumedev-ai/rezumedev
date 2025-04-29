@@ -1,3 +1,4 @@
+
 import { ResumeTemplate } from "../templates";
 import { useMemo } from "react";
 import { SectionHeader } from "./SectionHeader";
@@ -106,7 +107,7 @@ export function SkillsSection({
 
   if (template.id === "professional-navy") {
     return (
-      <div className={currentStyle.section}>
+      <div className={currentStyle.section} data-section="skills">
         <SectionHeader title="Skills" type="skills" template={template} />
 
         <div className="space-y-4 mt-3">
@@ -120,6 +121,7 @@ export function SkillsSection({
                     template="professional-navy"
                     className="ml-0 leading-snug"
                     type="skills"
+                    data-skill-item="true"
                   >
                     {skill}
                   </BulletPoint>
@@ -138,6 +140,7 @@ export function SkillsSection({
                     template="professional-navy"
                     className="ml-0 leading-snug"
                     type="skills"
+                    data-skill-item="true"
                   >
                     {skill}
                   </BulletPoint>
@@ -152,7 +155,7 @@ export function SkillsSection({
 
   if (template.id === "modern-professional") {
     return (
-      <div className={currentStyle.section}>
+      <div className={currentStyle.section} data-section="skills">
         <SectionHeader title="Skills" type="skills" template={template} />
 
         <div className="space-y-4 mt-3">
@@ -166,6 +169,7 @@ export function SkillsSection({
                     template="modern-professional"
                     className="ml-0 leading-snug"
                     type="skills"
+                    data-skill-item="true"
                   >
                     {skill}
                   </BulletPoint>
@@ -184,6 +188,7 @@ export function SkillsSection({
                     template="modern-professional"
                     className="ml-0 leading-snug"
                     type="skills"
+                    data-skill-item="true"
                   >
                     {skill}
                   </BulletPoint>
@@ -198,7 +203,7 @@ export function SkillsSection({
 
   if (template.id === "minimal-elegant") {
     return (
-      <div className={styles["minimal-elegant"].section}>
+      <div className={styles["minimal-elegant"].section} data-section="skills">
         <h3 className={styles["minimal-elegant"].title}>
           Skills
         </h3>
@@ -215,6 +220,7 @@ export function SkillsSection({
                     template={template.id}
                     className="ml-0 leading-snug"
                     type="skills"
+                    data-skill-item="true"
                   >
                     {skill}
                   </BulletPoint>
@@ -234,6 +240,7 @@ export function SkillsSection({
                     template={template.id}
                     className="ml-0 leading-snug"
                     type="skills"
+                    data-skill-item="true"
                   >
                     {skill}
                   </BulletPoint>
@@ -247,7 +254,7 @@ export function SkillsSection({
   }
 
   return (
-    <div className={currentStyle.section}>
+    <div className={currentStyle.section} data-section="skills">
       <h3 className={currentStyle.title}>
         Skills
       </h3>
@@ -265,6 +272,7 @@ export function SkillsSection({
                   template={template.id}
                   className="ml-0 leading-snug"
                   type="skills"
+                  data-skill-item="true"
                 >
                   {skill}
                 </BulletPoint>
@@ -285,6 +293,7 @@ export function SkillsSection({
                   template={template.id}
                   className="ml-0 leading-snug"
                   type="skills"
+                  data-skill-item="true"
                 >
                   {skill}
                 </BulletPoint>

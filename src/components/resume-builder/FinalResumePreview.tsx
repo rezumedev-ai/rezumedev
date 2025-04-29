@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { ResumeData } from "@/types/resume";
 import { resumeTemplates } from "./templates";
@@ -124,6 +125,7 @@ export function FinalResumePreview({
           marginBottom: isMobile ? '1rem' : '1.5rem',
           marginTop: '0.5rem'
         }}
+        data-template-id={template.id}
         key={template.id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
