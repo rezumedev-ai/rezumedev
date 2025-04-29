@@ -222,7 +222,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { 
       id: 'pricing', 
       icon: CreditCard, 
-      label: 'Pricing', 
+      label: 'Subscription', 
       path: '/pricing',
       badge: profile?.subscription_plan && profile?.subscription_status === 'active' ? 
         `${formatPlanName(profile.subscription_plan)}` : null
