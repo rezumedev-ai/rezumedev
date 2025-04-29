@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const faqs = [
   {
@@ -157,17 +158,13 @@ export default function Help() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 text-base mb-2">Contact Support</h3>
-                    <p className="text-gray-600 text-sm mb-2">We're here to help! Reach out by email:</p>
+                    <p className="text-gray-600 text-sm mb-4">We're here to help! Reach out to our support team.</p>
                     
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Mail className="w-3.5 h-3.5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">support@rezume.dev</p>
-                        <p className="text-xs text-gray-500">Response within 24 hours</p>
-                      </div>
-                    </div>
+                    <Link to="/contact">
+                      <Button className="flex items-center gap-2">
+                        <Mail className="h-4 w-4" /> Contact Support
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </Card>
