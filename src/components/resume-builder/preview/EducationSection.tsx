@@ -21,12 +21,12 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
   };
 
   return (
-    <div className="mt-1">
+    <div className="mt-1" data-section="education">
       {/* For ALL templates, always use SectionHeader which uses the template style.sectionStyle */}
       <SectionHeader title="Education" type="education" template={template} />
-      <div className="space-y-3 mt-2">
+      <div className="space-y-3 mt-2 pdf-bullet-list">
         {education.map((edu, index) => (
-          <div key={index} className="pb-3">
+          <div key={index} className="pb-3" data-edu-item="true">
             <div className="flex justify-between items-start">
               <div>
                 <div 
