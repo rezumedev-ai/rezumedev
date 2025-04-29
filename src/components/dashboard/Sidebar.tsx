@@ -316,15 +316,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
         
         <Dialog open={showManageDialog} onOpenChange={setShowManageDialog}>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full mt-2 bg-white/20 text-white hover:bg-white/30 text-xs"
-            >
-              Manage Subscription
-            </Button>
-          </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
