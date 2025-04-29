@@ -1,3 +1,4 @@
+
 import { ResumeTemplate } from "../templates";
 import { SectionHeader } from "./SectionHeader";
 
@@ -62,7 +63,7 @@ export function ProfessionalSummarySection({
 
   if (template.id === "modern-professional" || template.id === "professional-navy") {
     return (
-      <div className={currentStyle.section}>
+      <div className={currentStyle.section} data-section="summary">
         <SectionHeader title="Professional Summary" type="summary" template={template} />
         <div 
           className={`${currentStyle.content} outline-none`}
@@ -78,7 +79,7 @@ export function ProfessionalSummarySection({
 
   // Standard rendering for other templates
   return (
-    <div className={currentStyle.section}>
+    <div className={currentStyle.section} data-section="summary">
       <h3 className={currentStyle.title}>
         Professional Summary
       </h3>
