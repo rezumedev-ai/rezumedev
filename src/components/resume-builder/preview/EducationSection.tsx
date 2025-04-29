@@ -26,11 +26,11 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
       <SectionHeader title="Education" type="education" template={template} />
       <div className="space-y-3 mt-2">
         {education.map((edu, index) => (
-          <div key={index} className={`${template.id === "modern-professional" ? 'pb-3' : ''}`}>
+          <div key={index} className="pb-3">
             <div className="flex justify-between items-start">
               <div>
                 <div 
-                  className={`font-semibold ${template.id === "modern-professional" ? 'text-gray-900' : ''}`}
+                  className="font-semibold text-[14px] text-gray-900"
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleFieldEdit(index, "degreeName", e)}
@@ -38,7 +38,7 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
                   {edu.degreeName}
                 </div>
                 <div 
-                  className={`text-sm ${template.id === "modern-professional" ? 'text-gray-700' : 'text-gray-600'}`}
+                  className="text-[13px] text-gray-700"
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleFieldEdit(index, "schoolName", e)}
@@ -47,7 +47,7 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
                 </div>
               </div>
               <div 
-                className={`text-sm ${template.id === "modern-professional" ? 'text-emerald-600 font-medium' : 'text-gray-500'} whitespace-nowrap`}
+                className={`text-[13px] ${template.id === "modern-professional" ? 'text-emerald-600 font-medium' : template.id === "professional-navy" ? 'text-[#0F2B5B] font-medium' : 'text-gray-500'} whitespace-nowrap`}
               >
                 {formatDateRange(edu.startDate, edu.endDate)}
               </div>
@@ -58,4 +58,3 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
     </div>
   );
 }
-

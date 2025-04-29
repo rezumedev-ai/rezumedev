@@ -37,235 +37,85 @@ export function SkillsSection({
     onUpdate(type, newSkills);
   };
 
+  // Standardized font sizes based on modern-professional template
   const dynamicFontSizes = useMemo(() => {
     const totalHardSkills = hardSkills.length;
     const totalSoftSkills = softSkills.length;
     const totalSkills = totalHardSkills + totalSoftSkills;
 
-    let skillsFontSize = "text-sm";
+    // Default sizes from modern-professional
+    let skillsFontSize = "text-[14px]";
     let titleFontSize = "text-sm";
 
-    if (totalSkills > 12) {
+    // Only adjust down if we have too many skills
+    if (totalSkills > 14) {
       skillsFontSize = "text-xs";
       titleFontSize = "text-xs";
-    } else if (totalSkills > 8) {
+    } else if (totalSkills > 10) {
       skillsFontSize = "text-[13px]";
-      titleFontSize = "text-[13px]";
-    } else if (totalSkills <= 4) {
-      skillsFontSize = "text-base";
-      titleFontSize = "text-base";
     }
 
-    const hasLongSkillNames = [...hardSkills, ...softSkills].some(skill => skill.length > 25);
-    if (hasLongSkillNames) {
-      skillsFontSize = totalSkills > 8 ? "text-xs" : "text-[13px]";
+    // Additional check for long skill names
+    const hasLongSkillNames = [...hardSkills, ...softSkills].some(skill => skill.length > 20);
+    if (hasLongSkillNames && totalSkills > 8) {
+      skillsFontSize = "text-xs";
     }
 
     return { skillsFontSize, titleFontSize };
   }, [hardSkills, softSkills]);
 
+  // Standardized styles based on modern-professional
   const styles = {
     "executive-clean": {
-      section: "mb-8 mt-10",
-      title: "text-[17px] font-bold text-gray-800 uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      skillType: "font-medium text-sm text-gray-700 mb-2",
-      skillList: `${dynamicFontSizes.skillsFontSize} font-medium text-gray-800`
+      section: "mb-6",
+      title: "text-base font-bold text-gray-800 uppercase tracking-wide mb-3",
+      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2 border-b border-gray-200 pb-1`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "modern-split": {
       section: "mb-6",
-      title: "text-[16px] font-bold uppercase tracking-wide mb-3 flex items-center",
-      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2`,
-      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-600`
+      title: "text-base font-bold uppercase tracking-wide mb-3 flex items-center",
+      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2 border-b border-gray-200 pb-1`,
+      skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "minimal-elegant": {
-      section: "mb-10 mt-10",
-      title: "text-[16px] font-bold uppercase tracking-wide mb-4 pb-2 border-b border-gray-300",
-      skillType: "font-bold text-sm text-gray-900 mb-2",
+      section: "mb-6",
+      title: "text-base font-bold uppercase tracking-wide mb-3",
+      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2 border-b border-gray-200 pb-1`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "professional-executive": {
-      section: "mb-5",
-      title: "text-base font-bold text-black uppercase tracking-wide mb-3 pb-1 border-b border-black",
-      skillType: `font-medium ${dynamicFontSizes.titleFontSize} mb-1`,
+      section: "mb-6",
+      title: "text-base font-bold text-black uppercase tracking-wide mb-3",
+      skillType: `${dynamicFontSizes.titleFontSize} font-medium text-gray-700 mb-2 border-b border-gray-200 pb-1`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "modern-professional": {
       section: "mb-6",
       title: "text-base font-bold text-emerald-700 uppercase tracking-wide mb-3",
-      skillType: `font-semibold ${dynamicFontSizes.titleFontSize} text-gray-700 mb-2 border-b border-gray-200 pb-1`,
+      skillType: `${dynamicFontSizes.titleFontSize} font-semibold text-gray-700 mb-2 border-b border-gray-200 pb-1`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     },
     "professional-navy": {
       section: "mb-6",
       title: "text-base font-bold text-[#0F2B5B] uppercase tracking-wide mb-3",
-      skillType: `font-semibold ${dynamicFontSizes.titleFontSize} text-gray-700 mb-2 border-b border-gray-200 pb-1`,
+      skillType: `${dynamicFontSizes.titleFontSize} font-semibold text-gray-700 mb-2 border-b border-gray-200 pb-1`,
       skillList: `${dynamicFontSizes.skillsFontSize} text-gray-700`
     }
   };
 
-  const currentStyle = styles[template.id as keyof typeof styles] || styles["executive-clean"];
+  const currentStyle = styles[template.id as keyof typeof styles] || styles["modern-professional"];
 
-  if (template.id === "professional-navy") {
-    return (
-      <div className={currentStyle.section} data-section="skills">
-        <SectionHeader title="Skills" type="skills" template={template} />
-
-        <div className="space-y-4 mt-3">
-          {hardSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Technical Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {hardSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="professional-navy"
-                    className="ml-0 leading-snug"
-                    type="skills"
-                    data-skill-item="true"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {softSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Soft Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {softSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="professional-navy"
-                    className="ml-0 leading-snug"
-                    type="skills"
-                    data-skill-item="true"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (template.id === "modern-professional") {
-    return (
-      <div className={currentStyle.section} data-section="skills">
-        <SectionHeader title="Skills" type="skills" template={template} />
-
-        <div className="space-y-4 mt-3">
-          {hardSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Technical Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {hardSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="modern-professional"
-                    className="ml-0 leading-snug"
-                    type="skills"
-                    data-skill-item="true"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {softSkills.length > 0 && (
-            <div>
-              <h4 className={currentStyle.skillType}>Soft Skills</h4>
-              <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {softSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template="modern-professional"
-                    className="ml-0 leading-snug"
-                    type="skills"
-                    data-skill-item="true"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (template.id === "minimal-elegant") {
-    return (
-      <div className={styles["minimal-elegant"].section} data-section="skills">
-        <h3 className={styles["minimal-elegant"].title}>
-          Skills
-        </h3>
-        <div className="space-y-3 mt-3">
-          {hardSkills.length > 0 && (
-            <div>
-              <h4 className={styles["minimal-elegant"].skillType}>
-                Technical Skills
-              </h4>
-              <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {hardSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template={template.id}
-                    className="ml-0 leading-snug"
-                    type="skills"
-                    data-skill-item="true"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-          {softSkills.length > 0 && (
-            <div>
-              <h4 className={styles["minimal-elegant"].skillType}>
-                Professional Skills
-              </h4>
-              <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
-                {softSkills.map((skill, index) => (
-                  <BulletPoint
-                    key={index}
-                    template={template.id}
-                    className="ml-0 leading-snug"
-                    type="skills"
-                    data-skill-item="true"
-                  >
-                    {skill}
-                  </BulletPoint>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
+  // Common rendering pattern for all templates except ones that require special handling
   return (
     <div className={currentStyle.section} data-section="skills">
-      <h3 className={currentStyle.title}>
-        Skills
-      </h3>
-      <div className="space-y-3 mt-3">
+      <SectionHeader title="Skills" type="skills" template={template} />
+
+      <div className="space-y-4 mt-3">
         {hardSkills.length > 0 && (
           <div>
-            <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Core Competencies" :
-                template.id === "minimal-elegant" ? "Technical Skills" : "Technical Skills"}
-            </h4>
-            <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
+            <h4 className={currentStyle.skillType}>Technical Skills</h4>
+            <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
               {hardSkills.map((skill, index) => (
                 <BulletPoint
                   key={index}
@@ -280,13 +130,11 @@ export function SkillsSection({
             </ul>
           </div>
         )}
+
         {softSkills.length > 0 && (
           <div>
-            <h4 className={currentStyle.skillType}>
-              {template.id === "professional-executive" ? "Professional Skills" :
-                template.id === "minimal-elegant" ? "Professional Skills" : "Soft Skills"}
-            </h4>
-            <ul className="space-y-1 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
+            <h4 className={currentStyle.skillType}>Soft Skills</h4>
+            <ul className="space-y-1.5 mt-2 pdf-bullet-list" data-pdf-bullet-list="true">
               {softSkills.map((skill, index) => (
                 <BulletPoint
                   key={index}

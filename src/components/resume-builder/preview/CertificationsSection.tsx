@@ -28,13 +28,13 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
 
   return (
     <section className="mb-4">
-      <h3 className={template?.style?.sectionStyle || "text-lg font-semibold mb-2"}>Certifications</h3>
-      <ul>
+      <h3 className={template?.style?.sectionStyle || "text-base font-semibold mb-3"}>Certifications</h3>
+      <ul className="space-y-2">
         {certifications.map((certification, index) => (
           <li key={index} className="mb-2">
-            <div className="font-semibold">{certification.name}</div>
-            {templateCondition && <div className="text-sm text-gray-600">{certification.organization}</div>}
-            <div className="text-sm text-gray-500">
+            <div className="font-semibold text-[14px] text-gray-900">{certification.name}</div>
+            {templateCondition && <div className="text-[13px] text-gray-600">{certification.organization}</div>}
+            <div className="text-[13px] text-gray-500">
               {formatDate(certification.completionDate)} {certification.completionDate ? '•' : ''} {certification.organization}
             </div>
           </li>

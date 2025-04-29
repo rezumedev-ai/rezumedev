@@ -41,6 +41,7 @@ export function FinalResumePreview({
   
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
   
+  // Standardized page style with font consistent with modern-professional
   const pageStyle = {
     padding: isMobile ? "0.4in" : template.style.spacing.margins.top,
     fontFamily: template.style.titleFont?.split(' ')[0].replace('font-', '') || 'sans'
