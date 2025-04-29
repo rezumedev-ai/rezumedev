@@ -107,7 +107,7 @@ export function DownloadOptionsDialog({
               sectionElement.style.marginBottom = '0.75rem';
             });
             
-            // Set height to match A4 aspect ratio while maximizing content display
+            // Set height to match US Legal aspect ratio for this template
             clonedResume.style.height = `${originalHeight * 0.95}px`;
             break;
             
@@ -143,7 +143,7 @@ export function DownloadOptionsDialog({
               containerEl.style.right = `${currentRight * 0.9}in`;
             }
             
-            // Set height to match A4 aspect ratio
+            // Set height to match US Legal aspect ratio for this template
             clonedResume.style.height = `${originalHeight * 0.95}px`;
             break;
             
@@ -587,12 +587,31 @@ export function DownloadOptionsDialog({
       
       document.body.removeChild(clonedResume);
 
-      // A4 dimensions in mm
-      const pdfWidth = 210; // A4 width in mm
-      const pdfHeight = 297; // A4 height in mm
+      // Define paper dimensions based on template
+      // A4 dimensions in mm: 210 x 297
+      // US Legal dimensions in mm: 216 x 356
+      const getPaperSizeForTemplate = (templateId: string) => {
+        // Use US Legal for templates with content overflow issues
+        if (templateId === 'minimal-elegant' || templateId === 'executive-clean') {
+          return {
+            width: 216, // US Legal width in mm
+            height: 356, // US Legal height in mm
+            format: 'legal'
+          };
+        }
+        
+        // Use A4 for all other templates
+        return {
+          width: 210, // A4 width in mm
+          height: 297, // A4 height in mm
+          format: 'a4'
+        };
+      };
+      
+      const paperSize = getPaperSizeForTemplate(templateId);
       
       const pdf = new jsPDF({
-        format: 'a4',
+        format: paperSize.format,
         unit: 'mm',
         orientation: 'portrait',
         compress: true
@@ -604,17 +623,17 @@ export function DownloadOptionsDialog({
       const applyTemplatePdfFitting = () => {
         // Calculate the canvas aspect ratio
         const canvasAspectRatio = canvas.width / canvas.height;
-        const a4AspectRatio = pdfWidth / pdfHeight;
+        const pageAspectRatio = paperSize.width / paperSize.height;
         
         // Template-specific PDF fitting adjustments
         switch(templateId) {
           case 'professional-navy':
             // Professional navy tends to have more vertical content
             // We need to ensure it fits within the height while maintaining proportions
-            const navyHeight = pdfHeight;
+            const navyHeight = paperSize.height;
             const navyWidth = navyHeight * canvasAspectRatio;
             // Center horizontally
-            const navyOffsetX = (pdfWidth - navyWidth) / 2;
+            const navyOffsetX = (paperSize.width - navyWidth) / 2;
             
             pdf.addImage(
               imgData,
@@ -630,10 +649,9 @@ export function DownloadOptionsDialog({
             
           case 'minimal-elegant':
           case 'executive-clean':
-            // These templates have white space issues
-            // We want to fill more of the page width while maintaining proportions
-            // Use full width and calculate appropriate height
-            const imgWidth = pdfWidth;
+            // For US Legal format, use full width and maintain aspect ratio
+            // This gives more vertical space to fit content
+            const imgWidth = paperSize.width;
             const imgHeight = imgWidth / canvasAspectRatio;
             
             pdf.addImage(
@@ -651,11 +669,11 @@ export function DownloadOptionsDialog({
           default:
             // Standard approach for other templates
             // Choose fitting strategy based on aspect ratio comparison
-            if (canvasAspectRatio < a4AspectRatio) {
-              // Content is taller than A4 proportions
-              const imgHeight = pdfHeight;
+            if (canvasAspectRatio < pageAspectRatio) {
+              // Content is taller than page proportions
+              const imgHeight = paperSize.height;
               const imgWidth = imgHeight * canvasAspectRatio;
-              const offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
+              const offsetX = (paperSize.width - imgWidth) / 2; // Center horizontally
               
               pdf.addImage(
                 imgData,
@@ -668,8 +686,8 @@ export function DownloadOptionsDialog({
                 'FAST'
               );
             } else {
-              // Content fits within A4 proportions or is wider
-              const imgWidth = pdfWidth;
+              // Content fits within page proportions or is wider
+              const imgWidth = paperSize.width;
               const imgHeight = imgWidth / canvasAspectRatio;
               
               pdf.addImage(
@@ -769,3 +787,4 @@ export function DownloadOptionsDialog({
     </>
   );
 }
+
