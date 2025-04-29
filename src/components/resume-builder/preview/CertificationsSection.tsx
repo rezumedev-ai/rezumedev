@@ -24,18 +24,18 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
   }
 
   // Check if we're using one of these templates for conditional rendering
-  const templateCondition = template?.id === "professional-navy" || template?.id === "modern-professional";
+  const templateCondition = template?.id === "professional-navy" || template?.id === "modern-split";
 
   return (
-    <section className="mb-4" data-section="certifications">
+    <section className="mb-4">
       <h3 className={template?.style?.sectionStyle || "text-base font-semibold mb-3"}>Certifications</h3>
-      <ul className="space-y-2 pdf-bullet-list" data-pdf-bullet-list="true">
+      <ul className="space-y-2">
         {certifications.map((certification, index) => (
-          <li key={index} className="mb-2" data-cert-item="true">
+          <li key={index} className="mb-2">
             <div className="font-semibold text-[14px] text-gray-900">{certification.name}</div>
             {templateCondition && <div className="text-[13px] text-gray-600">{certification.organization}</div>}
             <div className="text-[13px] text-gray-500">
-              {formatDate(certification.completionDate)} {certification.completionDate ? '•' : ''} {!templateCondition && certification.organization}
+              {formatDate(certification.completionDate)} {certification.completionDate ? '•' : ''} {certification.organization}
             </div>
           </li>
         ))}

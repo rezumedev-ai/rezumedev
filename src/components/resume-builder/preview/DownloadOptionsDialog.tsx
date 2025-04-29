@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -65,114 +64,89 @@ export function DownloadOptionsDialog({
 
       const loadingToast = toast.loading("Generating PDF...");
 
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Get the exact dimensions of the original element
+      const originalWidth = resumeElement.offsetWidth;
+      const originalHeight = resumeElement.offsetHeight;
+      
       // Get template ID to apply template-specific optimizations
       const templateId = resumeElement.getAttribute('data-template-id') || 'minimal-clean';
       
-      // Wait for fonts to load to prevent missing text in the PDF
-      await document.fonts.ready;
+      // Create a clone with exact A4 proportions to ensure consistency
+      const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
+      clonedResume.id = 'pdf-preparation-div';
+      clonedResume.style.position = 'absolute';
+      clonedResume.style.left = '-9999px';
+      // Set exact dimensions to match A4 aspect ratio while preserving content
+      clonedResume.style.width = `${originalWidth}px`;
+      clonedResume.style.height = `${originalHeight}px`;
+      clonedResume.style.margin = '0';
+      clonedResume.style.padding = '0';
+      clonedResume.style.overflow = 'hidden';
+      clonedResume.className = resumeElement.className + ' pdf-mode';
       
-      // Add a PDF generation class to make specific PDF optimizations via CSS
-      resumeElement.classList.add('pdf-generation-mode');
-      
-      // Apply template-specific optimizations
-      optimizeForPdf(resumeElement, templateId);
-      
-      // Improved capture settings for better quality
-      const pixelRatio = window.devicePixelRatio || 1;
-      const captureScale = getOptimalScaleForTemplate(templateId, pixelRatio);
-      
-      // Capture the resume content
-      const canvas = await html2canvas(resumeElement, {
-        scale: captureScale,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight,
-        // Ensure all fonts and images are loaded
-        onclone: (clonedDoc) => {
-          return new Promise<void>(resolve => {
-            setTimeout(resolve, 500);
+      document.body.appendChild(clonedResume);
+
+      // First check if we need to adjust font sizes for problematic templates
+      if (['minimal-elegant', 'executive-clean'].includes(templateId)) {
+        // Find sections that might cause overflow issues
+        const skillsSection = clonedResume.querySelector('[data-section="skills"]');
+        const certSection = clonedResume.querySelector('[data-section="certifications"]');
+        
+        if (skillsSection) {
+          // Adjust skills section font sizes if needed
+          const skillHeadings = skillsSection.querySelectorAll('h4');
+          skillHeadings.forEach(heading => {
+            const headingElem = heading as HTMLElement;
+            if (headingElem.style.fontSize) {
+              const currentSize = parseFloat(headingElem.style.fontSize);
+              headingElem.style.fontSize = `${Math.max(currentSize * 0.85, 10)}px`;
+            }
+          });
+          
+          // Find skill lists and adjust their text size
+          const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
+          skillLists.forEach(list => {
+            const listElem = list as HTMLElement;
+            const items = listElem.querySelectorAll('li');
+            items.forEach(item => {
+              const itemElem = item as HTMLElement;
+              itemElem.style.fontSize = '10px';
+              itemElem.style.lineHeight = '1.2';
+              itemElem.style.marginBottom = '2px';
+            });
           });
         }
-      }).catch(error => {
-        console.error("HTML2Canvas error:", error);
-        toast.error("Failed to generate PDF. Try a different template.");
-        throw error;
-      });
-      
-      // Remove the PDF generation class after capturing
-      resumeElement.classList.remove('pdf-generation-mode');
-      
-      // Create PDF with A4 dimensions
-      const pdf = new jsPDF({
-        format: 'a4',
-        unit: 'mm',
-        orientation: 'portrait',
-        compress: true
-      });
-      
-      // A4 dimensions in mm
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-      
-      // Calculate canvas aspect ratio for proper scaling
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const canvasAspectRatio = canvas.width / canvas.height;
-      const a4AspectRatio = pdfWidth / pdfHeight;
-      
-      // Add image to PDF with proper scaling
-      if (canvasAspectRatio < a4AspectRatio) {
-        // If canvas is taller than A4 proportionally, fit to height
-        const imgHeight = pdfHeight;
-        const imgWidth = imgHeight * canvasAspectRatio;
-        const offsetX = (pdfWidth - imgWidth) / 2;
         
-        pdf.addImage(imgData, 'JPEG', offsetX, 0, imgWidth, imgHeight, undefined, 'FAST');
-      } else {
-        // If canvas is wider than A4 proportionally, fit to width
-        const imgWidth = pdfWidth;
-        const imgHeight = imgWidth / canvasAspectRatio;
-        // Center vertically if there's extra space
-        const offsetY = Math.max(0, (pdfHeight - imgHeight) / 2);
+        if (certSection) {
+          // Adjust certification section font sizes
+          const certItems = certSection.querySelectorAll('div');
+          certItems.forEach(item => {
+            const itemElem = item as HTMLElement;
+            // Only adjust actual certification items, not containers
+            if (itemElem.classList.contains('flex')) {
+              const textElements = itemElem.querySelectorAll('span');
+              textElements.forEach(span => {
+                const spanElem = span as HTMLElement;
+                spanElem.style.fontSize = '10px';
+              });
+            }
+          });
+        }
         
-        pdf.addImage(imgData, 'JPEG', 0, offsetY, imgWidth, imgHeight, undefined, 'FAST');
+        // Check for any education section that might need adjustment
+        const educationSection = clonedResume.querySelector('[data-section="education"]');
+        if (educationSection) {
+          const dateTexts = educationSection.querySelectorAll('.text-gray-500');
+          dateTexts.forEach(date => {
+            const dateElem = date as HTMLElement;
+            dateElem.style.fontSize = '10px';
+          });
+        }
       }
-      
-      // Save the PDF
-      pdf.save('resume.pdf');
-      
-      toast.dismiss(loadingToast);
-      toast.success("PDF downloaded successfully!");
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      toast.error("Failed to generate PDF. Please try again.");
-    }
-  };
 
-  // Helper function to get optimal scale based on template
-  const getOptimalScaleForTemplate = (templateId: string, pixelRatio: number): number => {
-    switch(templateId) {
-      case 'minimal-elegant':
-      case 'executive-clean':
-        // Higher scale for text-heavy templates
-        return pixelRatio * 2.5;
-      case 'professional-navy':
-        return pixelRatio * 2.2;
-      case 'modern-professional':
-        return pixelRatio * 2;
-      default:
-        return pixelRatio * 2;
-    }
-  };
-
-  // Function to apply template-specific optimizations before PDF generation
-  const optimizeForPdf = (element: HTMLElement, templateId: string): void => {
-    // Replace SVG icons with text characters for better PDF compatibility
-    const replaceIconsWithSymbols = () => {
-      // Contact icons
-      const contactIcons = element.querySelectorAll('[data-pdf-contact-icon="true"]');
+      const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
       contactIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
         const svg = iconElement.querySelector('svg');
@@ -192,7 +166,10 @@ export function DownloadOptionsDialog({
           iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
           iconSpan.style.marginRight = '6px';
+          iconSpan.style.fontSize = '14px';
           iconSpan.style.display = 'inline-block';
+          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.lineHeight = '1';
           
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
@@ -200,8 +177,38 @@ export function DownloadOptionsDialog({
         }
       });
 
-      // Section icons
-      const sectionIcons = element.querySelectorAll('[data-pdf-section-icon="true"]');
+      const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
+      bulletPoints.forEach(bullet => {
+        const bulletElement = bullet as HTMLElement;
+        bulletElement.textContent = '•';
+        bulletElement.style.width = 'auto';
+        bulletElement.style.height = 'auto';
+        bulletElement.style.display = 'inline-block';
+        bulletElement.style.marginRight = '6px';
+        bulletElement.style.marginTop = '0';
+        bulletElement.style.fontSize = '16px';
+        bulletElement.style.lineHeight = '1';
+        bulletElement.style.verticalAlign = 'middle';
+        bulletElement.className = 'pdf-bullet-char';
+      });
+
+      const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
+      bulletLists.forEach(list => {
+        const listElement = list as HTMLElement;
+        listElement.style.marginLeft = '0';
+        listElement.style.paddingLeft = '0';
+        listElement.style.listStyle = 'none';
+      });
+
+      const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
+      bulletItems.forEach(item => {
+        const itemElement = item as HTMLElement;
+        itemElement.style.display = 'flex';
+        itemElement.style.alignItems = 'center';
+        itemElement.style.marginBottom = '4px';
+      });
+
+      const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
         const svg = iconElement.querySelector('svg');
@@ -216,6 +223,7 @@ export function DownloadOptionsDialog({
             case 'code': iconSymbol = '💻'; break;
             case 'file-text': iconSymbol = '📄'; break;
             case 'user': iconSymbol = '👤'; break;
+            case 'folder-kanban': iconSymbol = '📂'; break;
             default: iconSymbol = '•'; break;
           }
           
@@ -223,114 +231,153 @@ export function DownloadOptionsDialog({
           iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
           iconSpan.style.marginRight = '8px';
+          iconSpan.style.fontSize = '14px';
+          iconSpan.style.display = 'inline-block';
+          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.lineHeight = '1';
           
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
           }
         }
       });
-
-      // Bullet points
-      const bulletPoints = element.querySelectorAll('[data-pdf-bullet="true"]');
-      bulletPoints.forEach(bullet => {
-        const bulletElement = bullet as HTMLElement;
-        bulletElement.textContent = '•';
-        bulletElement.style.width = 'auto';
-        bulletElement.style.display = 'inline-block';
-        bulletElement.style.marginRight = '6px';
-      });
-
-      // Optimize bullet lists
-      const bulletLists = element.querySelectorAll('[data-pdf-bullet-list="true"]');
-      bulletLists.forEach(list => {
-        const listElement = list as HTMLElement;
-        listElement.style.marginLeft = '0';
-        listElement.style.paddingLeft = '0';
-        listElement.style.listStyle = 'none';
-      });
-    };
-    
-    // Apply template-specific styling optimizations
-    const applyTemplateSpecificOptimizations = () => {
-      // Basic optimizations for all templates
-      const sections = element.querySelectorAll('[data-section]');
-      sections.forEach(section => {
-        const sectionElement = section as HTMLElement;
-        sectionElement.style.pageBreakInside = 'avoid';
-        sectionElement.style.marginBottom = '0.5rem';
-      });
       
-      // Template-specific optimizations
-      switch(templateId) {
-        case 'minimal-elegant':
-        case 'executive-clean':
-          // These templates need more aggressive optimization
-          // Reduce spacing in experience sections
-          const expItems = element.querySelectorAll('[data-experience-item="true"]');
-          expItems.forEach(item => {
-            const itemEl = item as HTMLElement;
-            itemEl.style.marginBottom = '0.4rem';
-            
-            // Make responsibility lists more compact
-            const respList = itemEl.querySelector('ul');
-            if (respList) {
-              const listEl = respList as HTMLElement;
-              listEl.style.marginTop = '0.2rem';
-              listEl.style.marginBottom = '0.2rem';
+      // Check if we need to apply content length optimizations
+      const contentOptimization = () => {
+        // Find sections that might contain a lot of content
+        const experienceSection = clonedResume.querySelector('[data-section="experience"]');
+        if (experienceSection) {
+          const experienceItems = experienceSection.querySelectorAll('[data-experience-item="true"]');
+          
+          // If there are many experience items, we need to adjust spacing
+          if (experienceItems.length > 3) {
+            experienceItems.forEach(item => {
+              const itemElem = item as HTMLElement;
+              // Reduce margins between items
+              itemElem.style.marginBottom = '6px';
               
-              // Make list items more compact
-              const listItems = listEl.querySelectorAll('li');
-              listItems.forEach(li => {
-                const liElem = li as HTMLElement;
-                liElem.style.fontSize = '11px';
-                liElem.style.marginBottom = '0.1rem';
-                liElem.style.lineHeight = '1.2';
-              });
-            }
-          });
-          
-          // Optimize certifications
-          const certItems = element.querySelectorAll('[data-cert-item="true"]');
-          certItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.15rem';
-            
-            const textElements = itemElem.querySelectorAll('div');
-            textElements.forEach(div => {
-              const divElem = div as HTMLElement;
-              divElem.style.fontSize = '11px';
-              divElem.style.lineHeight = '1.2';
+              // Find responsibility lists and adjust their spacing
+              const respList = itemElem.querySelector('ul');
+              if (respList) {
+                const respListElem = respList as HTMLElement;
+                respListElem.style.marginTop = '2px';
+                
+                // Make responsibility text smaller
+                const listItems = respListElem.querySelectorAll('li');
+                listItems.forEach(li => {
+                  const liElem = li as HTMLElement;
+                  liElem.style.fontSize = '10px';
+                  liElem.style.marginBottom = '1px';
+                  liElem.style.lineHeight = '1.2';
+                });
+              }
             });
+          }
+        }
+        
+        // Handle long skills lists
+        const skillsList = clonedResume.querySelectorAll('[data-skill-item="true"]');
+        if (skillsList.length > 15) {
+          skillsList.forEach(skill => {
+            const skillElem = skill as HTMLElement;
+            skillElem.style.fontSize = '10px';
+            skillElem.style.lineHeight = '1.1';
           });
-          
-          // Optimize education items
-          const eduItems = element.querySelectorAll('[data-edu-item="true"]');
-          eduItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.15rem';
-            itemElem.style.paddingBottom = '0.1rem';
-          });
-          break;
-          
-        case 'professional-navy':
-          // Optimize the navy template
-          const navyTextElements = element.querySelectorAll('p, li, span, div:not([class*="grid"])');
-          navyTextElements.forEach(el => {
-            const elemStyle = (el as HTMLElement).style;
-            if (elemStyle.fontSize) {
-              const currentSize = parseFloat(elemStyle.fontSize);
-              elemStyle.fontSize = `${currentSize * 0.95}px`;
+        }
+      };
+      
+      // Apply content-based optimizations
+      contentOptimization();
+
+      // Improved canvas capture settings with higher resolution and quality
+      const pixelRatio = window.devicePixelRatio || 1;
+      
+      const captureSettings = {
+        scale: pixelRatio * 3, // Increased scale for better quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        imageTimeout: 15000,
+        logging: false, // Disable logging for better performance
+        windowWidth: document.documentElement.offsetWidth,
+        windowHeight: document.documentElement.offsetHeight,
+        onclone: (clonedDoc: Document) => {
+          return new Promise<void>(resolve => {
+            if ((document as any).fonts && (document as any).fonts.ready) {
+              (document as any).fonts.ready.then(() => {
+                setTimeout(resolve, 500);
+              });
+            } else {
+              setTimeout(resolve, 500);
             }
           });
-          break;
+        }
+      };
+
+      const canvas = await html2canvas(clonedResume, captureSettings);
+      
+      document.body.removeChild(clonedResume);
+
+      // A4 dimensions in mm
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
+      
+      const pdf = new jsPDF({
+        format: 'a4',
+        unit: 'mm',
+        orientation: 'portrait',
+        compress: true
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      
+      // Calculate the correct scaling from canvas to PDF to maintain aspect ratio
+      // and ensure content fills the width without unnecessary white space
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const a4AspectRatio = pdfWidth / pdfHeight;
+      
+      // Check if content is too tall for A4 height
+      if (canvasAspectRatio < a4AspectRatio) {
+        // Content is taller than A4 proportions - we need to scale to fit height
+        const imgHeight = pdfHeight;
+        const imgWidth = imgHeight * canvasAspectRatio;
+        const offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
+        
+        pdf.addImage(
+          imgData,
+          'JPEG',
+          offsetX, // Center horizontally
+          0, // Align to top
+          imgWidth,
+          imgHeight,
+          undefined,
+          'FAST'
+        );
+      } else {
+        // Content fits within A4 proportions or is wider - use full width
+        const imgWidth = pdfWidth;
+        const imgHeight = imgWidth / canvasAspectRatio;
+        
+        pdf.addImage(
+          imgData,
+          'JPEG',
+          0, // No horizontal offset - use full width
+          0, // No vertical offset - align to top
+          imgWidth,
+          imgHeight,
+          undefined,
+          'FAST'
+        );
       }
-    };
-    
-    // Replace icons with symbols for better PDF compatibility
-    replaceIconsWithSymbols();
-    
-    // Apply template-specific optimizations
-    applyTemplateSpecificOptimizations();
+
+      pdf.save('resume.pdf');
+      
+      toast.dismiss(loadingToast);
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error("Failed to generate PDF. Please try again.");
+    }
   };
 
   const navigateToPricing = () => {

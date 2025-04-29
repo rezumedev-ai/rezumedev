@@ -21,12 +21,12 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
   };
 
   return (
-    <div className="mt-1" data-section="education">
+    <div className="mt-1">
       {/* For ALL templates, always use SectionHeader which uses the template style.sectionStyle */}
       <SectionHeader title="Education" type="education" template={template} />
-      <div className="space-y-3 mt-2 pdf-bullet-list">
+      <div className="space-y-3 mt-2">
         {education.map((edu, index) => (
-          <div key={index} className="pb-3" data-edu-item="true">
+          <div key={index} className="pb-3">
             <div className="flex justify-between items-start">
               <div>
                 <div 
@@ -34,7 +34,6 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleFieldEdit(index, "degreeName", e)}
-                  data-field="degree-name"
                 >
                   {edu.degreeName}
                 </div>
@@ -43,14 +42,12 @@ export function EducationSection({ education, template, isEditing, onUpdate }: E
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleFieldEdit(index, "schoolName", e)}
-                  data-field="school-name"
                 >
                   {edu.schoolName}
                 </div>
               </div>
               <div 
                 className={`text-[13px] ${template.id === "modern-professional" ? 'text-emerald-600 font-medium' : template.id === "professional-navy" ? 'text-[#0F2B5B] font-medium' : 'text-gray-500'} whitespace-nowrap`}
-                data-field="education-date"
               >
                 {formatDateRange(edu.startDate, edu.endDate)}
               </div>

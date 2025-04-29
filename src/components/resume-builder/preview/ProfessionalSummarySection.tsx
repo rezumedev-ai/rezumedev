@@ -1,4 +1,3 @@
-
 import { ResumeTemplate } from "../templates";
 import { SectionHeader } from "./SectionHeader";
 
@@ -63,14 +62,13 @@ export function ProfessionalSummarySection({
 
   if (template.id === "modern-professional" || template.id === "professional-navy") {
     return (
-      <div className={currentStyle.section} data-section="summary">
+      <div className={currentStyle.section}>
         <SectionHeader title="Professional Summary" type="summary" template={template} />
         <div 
           className={`${currentStyle.content} outline-none`}
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleSummaryEdit}
-          data-field="summary-content"
         >
           {summary}
         </div>
@@ -80,7 +78,7 @@ export function ProfessionalSummarySection({
 
   // Standard rendering for other templates
   return (
-    <div className={currentStyle.section} data-section="summary">
+    <div className={currentStyle.section}>
       <h3 className={currentStyle.title}>
         Professional Summary
       </h3>
@@ -89,7 +87,6 @@ export function ProfessionalSummarySection({
         contentEditable={isEditing}
         suppressContentEditableWarning
         onBlur={handleSummaryEdit}
-        data-field="summary-content"
       >
         {summary}
       </div>
