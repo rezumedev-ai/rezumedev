@@ -65,320 +65,114 @@ export function DownloadOptionsDialog({
 
       const loadingToast = toast.loading("Generating PDF...");
 
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Get the exact dimensions of the original element
-      const originalWidth = resumeElement.offsetWidth;
-      const originalHeight = resumeElement.offsetHeight;
-      
       // Get template ID to apply template-specific optimizations
       const templateId = resumeElement.getAttribute('data-template-id') || 'minimal-clean';
       
-      // Create a clone with exact A4 proportions to ensure consistency
-      const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
-      clonedResume.id = 'pdf-preparation-div';
-      clonedResume.style.position = 'absolute';
-      clonedResume.style.left = '-9999px';
+      // Wait for fonts to load to prevent missing text in the PDF
+      await document.fonts.ready;
       
-      // Template-specific PDF optimizations
-      const applyTemplateSpecificOptimizations = () => {
-        // Base settings for all templates to match modern-professional's efficiency
-        clonedResume.style.width = `${originalWidth}px`;
-        clonedResume.style.margin = '0';
-        clonedResume.style.padding = '0';
-        clonedResume.style.overflow = 'hidden';
-        clonedResume.className = resumeElement.className + ' pdf-mode';
-        
-        // Template-specific optimizations
-        switch(templateId) {
-          case 'executive-clean':
-            // IMPROVED: More aggressive optimization to prevent content cutoff
-            const execCleanContent = clonedResume.querySelectorAll('[data-section]');
-            execCleanContent.forEach(section => {
-              const sectionElement = section as HTMLElement;
-              sectionElement.style.marginBottom = '0.5rem';
-              sectionElement.style.paddingBottom = '0';
-            });
-            
-            // Reduce spacing in experience sections
-            const execExperienceItems = clonedResume.querySelectorAll('[data-experience-item="true"]');
-            execExperienceItems.forEach(item => {
-              const itemEl = item as HTMLElement;
-              itemEl.style.marginBottom = '0.5rem';
-              
-              // Make responsibility lists more compact
-              const respList = itemEl.querySelector('ul');
-              if (respList) {
-                const listEl = respList as HTMLElement;
-                listEl.style.marginTop = '0.2rem';
-                listEl.style.marginBottom = '0.2rem';
-              }
-            });
-            
-            // Reduce font size of all text elements
-            const execAllTexts = clonedResume.querySelectorAll('p, li, div[contenteditable="true"]');
-            execAllTexts.forEach(text => {
-              const textEl = text as HTMLElement;
-              // Reduce font size by 8% to fit more content
-              if (textEl.style.fontSize) {
-                const currentSize = parseFloat(textEl.style.fontSize);
-                textEl.style.fontSize = `${currentSize * 0.92}px`;
-              }
-              // Tighten line height
-              textEl.style.lineHeight = '1.2';
-            });
-            
-            // Set height to prioritize content display
-            clonedResume.style.height = `${originalHeight}px`;
-            break;
-            
-          case 'minimal-elegant':
-            // IMPROVED: More aggressive optimization to prevent content cutoff
-            const minElegantContent = clonedResume.querySelectorAll('[data-section]');
-            minElegantContent.forEach(section => {
-              const sectionElement = section as HTMLElement;
-              sectionElement.style.marginBottom = '0.5rem';
-              sectionElement.style.paddingBottom = '0';
-            });
-            
-            // Reduce spacing in lists
-            const minElegantLists = clonedResume.querySelectorAll('ul, ol');
-            minElegantLists.forEach(list => {
-              const listEl = list as HTMLElement;
-              listEl.style.marginTop = '0.2rem';
-              listEl.style.marginBottom = '0.2rem';
-              
-              // Make list items more compact
-              const items = listEl.querySelectorAll('li');
-              items.forEach(item => {
-                const itemEl = item as HTMLElement;
-                itemEl.style.fontSize = '11px';
-                itemEl.style.marginBottom = '0.1rem';
-                itemEl.style.lineHeight = '1.2';
-              });
-            });
-            
-            // Reduce sections spacing
-            const minElegantSections = clonedResume.querySelectorAll('section, div[class*="space-y"], div[class*="mb-"]');
-            minElegantSections.forEach(section => {
-              const sectionEl = section as HTMLElement;
-              sectionEl.style.marginBottom = '0.5rem';
-              if (sectionEl.style.paddingBottom) {
-                sectionEl.style.paddingBottom = '0';
-              }
-            });
-            
-            // Reduce font size of all text elements
-            const allTextElements = clonedResume.querySelectorAll('p, li, span, div:not([class*="grid"])');
-            allTextElements.forEach(element => {
-              const el = element as HTMLElement;
-              if (el.style.fontSize) {
-                // If font size is specified, reduce it by 8%
-                const currentSize = parseFloat(el.style.fontSize);
-                el.style.fontSize = `${currentSize * 0.92}px`;
-              }
-              // Tighten line height
-              el.style.lineHeight = '1.2';
-            });
-            
-            // Set height to prioritize content display
-            clonedResume.style.height = `${originalHeight}px`;
-            break;
-            
-          case 'professional-navy':
-            // The professional-navy template needs special handling for content overflow
-            // Reduce font size of all text to fit more content
-            const navyTextElements = clonedResume.querySelectorAll('p, li, span, div:not([class*="grid"])');
-            navyTextElements.forEach(element => {
-              const el = element as HTMLElement;
-              if (el.style.fontSize) {
-                // If font size is specified, reduce it by 5%
-                const currentSize = parseFloat(el.style.fontSize);
-                el.style.fontSize = `${currentSize * 0.95}px`;
-              }
-            });
-            
-            // Compress spacing between sections to fit more content
-            const navySections = clonedResume.querySelectorAll('section, div[class*="space-y"], div[class*="mb-"]');
-            navySections.forEach(section => {
-              const sectionElement = section as HTMLElement;
-              if (sectionElement.style.marginBottom) {
-                const currentMargin = parseFloat(sectionElement.style.marginBottom);
-                sectionElement.style.marginBottom = `${currentMargin * 0.85}px`;
-              }
-              if (sectionElement.style.paddingBottom) {
-                const currentPadding = parseFloat(sectionElement.style.paddingBottom);
-                sectionElement.style.paddingBottom = `${currentPadding * 0.85}px`;
-              }
-            });
-            
-            // Reduce spacing in lists to fit more content
-            const navyLists = clonedResume.querySelectorAll('ul, ol');
-            navyLists.forEach(list => {
-              const listElement = list as HTMLElement;
-              listElement.style.marginBottom = '0.25rem';
-              
-              const items = listElement.querySelectorAll('li');
-              items.forEach(item => {
-                const itemElement = item as HTMLElement;
-                itemElement.style.marginBottom = '0.15rem';
-                itemElement.style.lineHeight = '1.25';
-              });
-            });
-            
-            // Set height to match A4 aspect ratio but account for more content
-            clonedResume.style.height = `${originalHeight}px`;
-            break;
-            
-          case 'modern-professional':
-            // Modern professional already works well, just preserve its settings
-            clonedResume.style.height = `${originalHeight}px`;
-            break;
-            
-          default:
-            // Default handling for other templates
-            clonedResume.style.height = `${originalHeight}px`;
-        }
-      };
+      // Add a PDF generation class to make specific PDF optimizations via CSS
+      resumeElement.classList.add('pdf-generation-mode');
       
-      // Apply template-specific PDF optimizations
-      applyTemplateSpecificOptimizations();
+      // Apply template-specific optimizations
+      optimizeForPdf(resumeElement, templateId);
       
-      document.body.appendChild(clonedResume);
+      // Improved capture settings for better quality
+      const pixelRatio = window.devicePixelRatio || 1;
+      const captureScale = getOptimalScaleForTemplate(templateId, pixelRatio);
       
-      // First check if we need to adjust font sizes for problematic templates
-      if (['minimal-elegant', 'executive-clean', 'professional-navy'].includes(templateId)) {
-        // IMPROVED: More aggressive optimization for sections that cause cutoff
-        const skillsSection = clonedResume.querySelector('[data-section="skills"]');
-        const certSection = clonedResume.querySelector('[data-section="certifications"]');
-        const summarySection = clonedResume.querySelector('[data-section="summary"]');
-        const educationSection = clonedResume.querySelector('[data-section="education"]');
-        const experienceSection = clonedResume.querySelector('[data-section="experience"]');
-        
-        // Adjust skills section font sizes and spacing
-        if (skillsSection) {
-          const skillHeadings = skillsSection.querySelectorAll('h4');
-          skillHeadings.forEach(heading => {
-            const headingElem = heading as HTMLElement;
-            headingElem.style.fontSize = '13px';
-            headingElem.style.marginBottom = '0.2rem';
-          });
-          
-          const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
-          skillLists.forEach(list => {
-            const listElem = list as HTMLElement;
-            listElem.style.marginTop = '0.2rem';
-            
-            const items = listElem.querySelectorAll('li');
-            items.forEach(item => {
-              const itemElem = item as HTMLElement;
-              itemElem.style.fontSize = '11px';
-              itemElem.style.lineHeight = '1.1';
-              itemElem.style.marginBottom = '0.1rem';
-            });
+      // Capture the resume content
+      const canvas = await html2canvas(resumeElement, {
+        scale: captureScale,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
+        // Ensure all fonts and images are loaded
+        onclone: (clonedDoc) => {
+          return new Promise<void>(resolve => {
+            setTimeout(resolve, 500);
           });
         }
+      }).catch(error => {
+        console.error("HTML2Canvas error:", error);
+        toast.error("Failed to generate PDF. Try a different template.");
+        throw error;
+      });
+      
+      // Remove the PDF generation class after capturing
+      resumeElement.classList.remove('pdf-generation-mode');
+      
+      // Create PDF with A4 dimensions
+      const pdf = new jsPDF({
+        format: 'a4',
+        unit: 'mm',
+        orientation: 'portrait',
+        compress: true
+      });
+      
+      // A4 dimensions in mm
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+      
+      // Calculate canvas aspect ratio for proper scaling
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const a4AspectRatio = pdfWidth / pdfHeight;
+      
+      // Add image to PDF with proper scaling
+      if (canvasAspectRatio < a4AspectRatio) {
+        // If canvas is taller than A4 proportionally, fit to height
+        const imgHeight = pdfHeight;
+        const imgWidth = imgHeight * canvasAspectRatio;
+        const offsetX = (pdfWidth - imgWidth) / 2;
         
-        // Optimize certifications display - significant improvements
-        if (certSection) {
-          const certItems = certSection.querySelectorAll('li');
-          certItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.1rem';
-            
-            const textElements = itemElem.querySelectorAll('div');
-            textElements.forEach(div => {
-              const divElem = div as HTMLElement;
-              divElem.style.fontSize = '11px';
-              divElem.style.lineHeight = '1.1';
-            });
-          });
-        }
+        pdf.addImage(imgData, 'JPEG', offsetX, 0, imgWidth, imgHeight, undefined, 'FAST');
+      } else {
+        // If canvas is wider than A4 proportionally, fit to width
+        const imgWidth = pdfWidth;
+        const imgHeight = imgWidth / canvasAspectRatio;
+        // Center vertically if there's extra space
+        const offsetY = Math.max(0, (pdfHeight - imgHeight) / 2);
         
-        // Optimize professional summary - reduced size
-        if (summarySection) {
-          const summaryText = summarySection.querySelector('div[contenteditable]') || summarySection.querySelector('p');
-          if (summaryText) {
-            const textElem = summaryText as HTMLElement;
-            textElem.style.fontSize = '11px';
-            textElem.style.lineHeight = '1.2';
-            textElem.style.marginBottom = '0.4rem';
-          }
-        }
-        
-        // Education section optimizations - more compact
-        if (educationSection) {
-          const eduItems = educationSection.querySelectorAll('div[data-edu-item="true"]');
-          eduItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.2rem';
-            itemElem.style.paddingBottom = '0.1rem';
-            
-            const titleElem = itemElem.querySelector('.font-semibold');
-            if (titleElem) {
-              (titleElem as HTMLElement).style.fontSize = '12px';
-            }
-            
-            const schoolElem = itemElem.querySelector('.text-gray-700');
-            if (schoolElem) {
-              (schoolElem as HTMLElement).style.fontSize = '11px';
-            }
-            
-            const dateElements = itemElem.querySelectorAll('.text-gray-500, .text-emerald-600, .text-[#0F2B5B]');
-            dateElements.forEach(date => {
-              (date as HTMLElement).style.fontSize = '10px';
-            });
-          });
-        }
-        
-        // IMPROVED: More aggressive optimization for experience section
-        if (experienceSection) {
-          const expItems = experienceSection.querySelectorAll('[data-experience-item="true"]');
-          expItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.3rem';
-            itemElem.style.paddingBottom = '0.2rem';
-            
-            // Make job title and company more compact
-            const jobElem = itemElem.querySelector('.font-semibold');
-            if (jobElem) {
-              (jobElem as HTMLElement).style.fontSize = '12px';
-              (jobElem as HTMLElement).style.marginBottom = '0.1rem';
-            }
-            
-            const companyElem = itemElem.querySelector('.text-gray-700, .text-gray-600');
-            if (companyElem) {
-              (companyElem as HTMLElement).style.fontSize = '11px';
-            }
-            
-            const dateElements = itemElem.querySelectorAll('.text-gray-500, .text-emerald-600, .text-[#0F2B5B]');
-            dateElements.forEach(date => {
-              (date as HTMLElement).style.fontSize = '10px';
-            });
-            
-            // Make responsibility lists very compact
-            const respList = itemElem.querySelector('ul');
-            if (respList) {
-              const listElem = respList as HTMLElement;
-              listElem.style.marginTop = '0.15rem';
-              listElem.style.marginBottom = '0.15rem';
-              
-              // Make responsibilities more compact
-              const listItems = listElem.querySelectorAll('li');
-              listItems.forEach(li => {
-                const liElem = li as HTMLElement;
-                liElem.style.fontSize = '10px';
-                liElem.style.marginBottom = '0.05rem';
-                liElem.style.lineHeight = '1.1';
-                liElem.style.paddingBottom = '0';
-              });
-            }
-          });
-        }
+        pdf.addImage(imgData, 'JPEG', 0, offsetY, imgWidth, imgHeight, undefined, 'FAST');
       }
+      
+      // Save the PDF
+      pdf.save('resume.pdf');
+      
+      toast.dismiss(loadingToast);
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error("Failed to generate PDF. Please try again.");
+    }
+  };
 
-      // Replace SVG icons with text characters for better PDF compatibility
-      const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
+  // Helper function to get optimal scale based on template
+  const getOptimalScaleForTemplate = (templateId: string, pixelRatio: number): number => {
+    switch(templateId) {
+      case 'minimal-elegant':
+      case 'executive-clean':
+        // Higher scale for text-heavy templates
+        return pixelRatio * 2.5;
+      case 'professional-navy':
+        return pixelRatio * 2.2;
+      case 'modern-professional':
+        return pixelRatio * 2;
+      default:
+        return pixelRatio * 2;
+    }
+  };
+
+  // Function to apply template-specific optimizations before PDF generation
+  const optimizeForPdf = (element: HTMLElement, templateId: string): void => {
+    // Replace SVG icons with text characters for better PDF compatibility
+    const replaceIconsWithSymbols = () => {
+      // Contact icons
+      const contactIcons = element.querySelectorAll('[data-pdf-contact-icon="true"]');
       contactIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
         const svg = iconElement.querySelector('svg');
@@ -398,10 +192,7 @@ export function DownloadOptionsDialog({
           iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
           iconSpan.style.marginRight = '6px';
-          iconSpan.style.fontSize = '14px';
           iconSpan.style.display = 'inline-block';
-          iconSpan.style.verticalAlign = 'middle';
-          iconSpan.style.lineHeight = '1';
           
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
@@ -409,45 +200,8 @@ export function DownloadOptionsDialog({
         }
       });
 
-      // Replace bullets with text characters for better PDF compatibility
-      const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
-      bulletPoints.forEach(bullet => {
-        const bulletElement = bullet as HTMLElement;
-        bulletElement.textContent = '•';
-        bulletElement.style.width = 'auto';
-        bulletElement.style.height = 'auto';
-        bulletElement.style.display = 'inline-block';
-        bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '0';
-        bulletElement.style.fontSize = '16px';
-        bulletElement.style.lineHeight = '1';
-        bulletElement.style.verticalAlign = 'middle';
-        bulletElement.className = 'pdf-bullet-char';
-      });
-
-      // Optimize bullet lists for PDF display
-      const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
-      bulletLists.forEach(list => {
-        const listElement = list as HTMLElement;
-        listElement.style.marginLeft = '0';
-        listElement.style.paddingLeft = '0';
-        listElement.style.listStyle = 'none';
-        listElement.style.marginTop = '0.25rem';
-        listElement.style.marginBottom = '0.25rem';
-      });
-
-      // Optimize bullet items for PDF display
-      const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
-      bulletItems.forEach(item => {
-        const itemElement = item as HTMLElement;
-        itemElement.style.display = 'flex';
-        itemElement.style.alignItems = 'center';
-        itemElement.style.marginBottom = '0.2rem';
-        itemElement.style.lineHeight = '1.2';
-      });
-
-      // Replace section icons with text symbols for better PDF compatibility
-      const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
+      // Section icons
+      const sectionIcons = element.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
         const svg = iconElement.querySelector('svg');
@@ -462,7 +216,6 @@ export function DownloadOptionsDialog({
             case 'code': iconSymbol = '💻'; break;
             case 'file-text': iconSymbol = '📄'; break;
             case 'user': iconSymbol = '👤'; break;
-            case 'folder-kanban': iconSymbol = '📂'; break;
             default: iconSymbol = '•'; break;
           }
           
@@ -470,331 +223,114 @@ export function DownloadOptionsDialog({
           iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
           iconSpan.style.marginRight = '8px';
-          iconSpan.style.fontSize = '14px';
-          iconSpan.style.display = 'inline-block';
-          iconSpan.style.verticalAlign = 'middle';
-          iconSpan.style.lineHeight = '1';
           
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
           }
         }
       });
-      
-      // Template-specific content length optimizations
-      // Separate from the initial optimization to make both aspects clearer
-      const optimizeContentLength = () => {
-        // If this is a template with potential content overflow
-        if (['minimal-elegant', 'executive-clean', 'professional-navy'].includes(templateId)) {
-          // IMPROVED: More aggressive optimization for content-heavy templates
-          
-          // Measure the actual content height to determine if scaling is needed
-          const contentHeight = clonedResume.scrollHeight;
-          const availableHeight = 1056; // A4 height in pixels at 96 DPI
-          const contentOverflow = contentHeight > availableHeight;
-          
-          if (contentOverflow) {
-            console.log(`Content overflow detected for ${templateId}: ${contentHeight}px > ${availableHeight}px`);
-            
-            // For templates with single column layout, apply more aggressive optimizations
-            if (templateId === 'minimal-elegant' || templateId === 'executive-clean') {
-              // Global font size reduction across all elements
-              const allElements = clonedResume.querySelectorAll('*');
-              allElements.forEach(elem => {
-                const el = elem as HTMLElement;
-                if (el.style && el.style.fontSize) {
-                  const currentSize = parseFloat(el.style.fontSize);
-                  // More aggressive scaling for minimal-elegant
-                  if (templateId === 'minimal-elegant') {
-                    el.style.fontSize = `${currentSize * 0.85}px`;
-                  } else {
-                    el.style.fontSize = `${currentSize * 0.9}px`;
-                  }
-                }
-                
-                // Reduce line heights globally
-                if (el.style) {
-                  el.style.lineHeight = '1.1';
-                  
-                  // Reduce margins and paddings
-                  if (el.style.marginBottom) {
-                    const currentMargin = parseFloat(el.style.marginBottom);
-                    el.style.marginBottom = `${currentMargin * 0.7}px`;
-                  }
-                  
-                  if (el.style.paddingBottom) {
-                    const currentPadding = parseFloat(el.style.paddingBottom);
-                    el.style.paddingBottom = `${currentPadding * 0.7}px`;
-                  }
-                }
-              });
-              
-              // Experience section extreme optimization
-              const expItems = clonedResume.querySelectorAll('[data-experience-item="true"]');
-              if (expItems.length > 2) {
-                expItems.forEach(item => {
-                  const itemElem = item as HTMLElement;
-                  itemElem.style.marginBottom = '0.2rem';
-                  itemElem.style.paddingBottom = '0.1rem';
-                  
-                  // Make responsibility lists extremely compact
-                  const respList = itemElem.querySelector('ul');
-                  if (respList) {
-                    const listElem = respList as HTMLElement;
-                    listElem.style.marginTop = '0.1rem';
-                    listElem.style.marginBottom = '0.1rem';
-                    
-                    // Extreme minimization of list items
-                    const listItems = listElem.querySelectorAll('li');
-                    listItems.forEach(li => {
-                      const liElem = li as HTMLElement;
-                      liElem.style.fontSize = '9.5px';
-                      liElem.style.marginBottom = '0.05rem';
-                      liElem.style.lineHeight = '1.05';
-                      liElem.style.paddingBottom = '0';
-                    });
-                  }
-                });
-              }
-              
-              // Education section extreme optimization
-              const eduItems = clonedResume.querySelectorAll('[data-edu-item="true"]');
-              if (eduItems.length > 1) {
-                eduItems.forEach(item => {
-                  const itemElem = item as HTMLElement;
-                  itemElem.style.marginBottom = '0.15rem';
-                  itemElem.style.paddingBottom = '0.1rem';
-                });
-              }
-            }
-            
-            // Special handling for professional-navy
-            if (templateId === 'professional-navy') {
-              // Force smaller font sizes for all elements
-              const allNavyElements = clonedResume.querySelectorAll('*');
-              allNavyElements.forEach(elem => {
-                const el = elem as HTMLElement;
-                if (el.style && el.style.fontSize) {
-                  const currentSize = parseFloat(el.style.fontSize);
-                  el.style.fontSize = `${currentSize * 0.85}px`;
-                }
-              });
-              
-              // Ultra-compact experience items
-              const expItems = clonedResume.querySelectorAll('[data-experience-item="true"]');
-              expItems.forEach(item => {
-                const itemElem = item as HTMLElement;
-                itemElem.style.marginBottom = '0.2rem';
-                
-                // Make responsibility lists extremely compact
-                const respList = itemElem.querySelector('ul');
-                if (respList) {
-                  const listElem = respList as HTMLElement;
-                  listElem.style.marginTop = '0.1rem';
-                  
-                  // Extreme minimization of list items
-                  const listItems = listElem.querySelectorAll('li');
-                  listItems.forEach(li => {
-                    const liElem = li as HTMLElement;
-                    liElem.style.fontSize = '9px';
-                    liElem.style.marginBottom = '0.05rem';
-                    liElem.style.lineHeight = '1';
-                  });
-                }
-              });
-            }
-          }
-        }
-      };
-      
-      // Apply content-specific optimizations
-      optimizeContentLength();
 
-      // Improved canvas capture settings with higher resolution and quality
-      const pixelRatio = window.devicePixelRatio || 1;
-      
-      // Template-specific capture settings
-      const getTemplateSpecificCaptureSettings = () => {
-        // Base settings for good quality
-        const baseSettings = {
-          scale: pixelRatio * 2.5, // Default scale factor
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: "#ffffff",
-          imageTimeout: 15000,
-          logging: false,
-          windowWidth: document.documentElement.offsetWidth,
-          windowHeight: document.documentElement.offsetHeight,
-          onclone: (clonedDoc: Document) => {
-            return new Promise<void>(resolve => {
-              if ((document as any).fonts && (document as any).fonts.ready) {
-                (document as any).fonts.ready.then(() => {
-                  setTimeout(resolve, 500);
-                });
-              } else {
-                setTimeout(resolve, 500);
-              }
-            });
-          }
-        };
-        
-        // Adjust scale factor based on template
-        switch(templateId) {
-          case 'professional-navy':
-            // Higher resolution for professional-navy to capture details
-            return {
-              ...baseSettings,
-              scale: pixelRatio * 3
-            };
-          case 'executive-clean':
-          case 'minimal-elegant':
-            // IMPROVED: Higher resolution for content-heavy templates to ensure text quality
-            return {
-              ...baseSettings,
-              scale: pixelRatio * 3.2
-            };
-          default:
-            return baseSettings;
-        }
-      };
-
-      const captureSettings = getTemplateSpecificCaptureSettings();
-      const canvas = await html2canvas(clonedResume, captureSettings);
-      
-      document.body.removeChild(clonedResume);
-
-      // A4 dimensions in mm
-      const pdfWidth = 210; // A4 width in mm
-      const pdfHeight = 297; // A4 height in mm
-      
-      const pdf = new jsPDF({
-        format: 'a4',
-        unit: 'mm',
-        orientation: 'portrait',
-        compress: true
+      // Bullet points
+      const bulletPoints = element.querySelectorAll('[data-pdf-bullet="true"]');
+      bulletPoints.forEach(bullet => {
+        const bulletElement = bullet as HTMLElement;
+        bulletElement.textContent = '•';
+        bulletElement.style.width = 'auto';
+        bulletElement.style.display = 'inline-block';
+        bulletElement.style.marginRight = '6px';
       });
 
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      // Optimize bullet lists
+      const bulletLists = element.querySelectorAll('[data-pdf-bullet-list="true"]');
+      bulletLists.forEach(list => {
+        const listElement = list as HTMLElement;
+        listElement.style.marginLeft = '0';
+        listElement.style.paddingLeft = '0';
+        listElement.style.listStyle = 'none';
+      });
+    };
+    
+    // Apply template-specific styling optimizations
+    const applyTemplateSpecificOptimizations = () => {
+      // Basic optimizations for all templates
+      const sections = element.querySelectorAll('[data-section]');
+      sections.forEach(section => {
+        const sectionElement = section as HTMLElement;
+        sectionElement.style.pageBreakInside = 'avoid';
+        sectionElement.style.marginBottom = '0.5rem';
+      });
       
-      // IMPROVED: Enhanced template-specific PDF fitting logic
-      const applyTemplatePdfFitting = () => {
-        // Calculate the canvas aspect ratio
-        const canvasAspectRatio = canvas.width / canvas.height;
-        const a4AspectRatio = pdfWidth / pdfHeight;
-        
-        // Template-specific PDF fitting adjustments
-        switch(templateId) {
-          case 'professional-navy':
-            // Professional navy tends to have more vertical content
-            // We need to ensure it fits within the height while maintaining proportions
-            const navyHeight = pdfHeight;
-            const navyWidth = navyHeight * canvasAspectRatio;
-            // Center horizontally
-            const navyOffsetX = (pdfWidth - navyWidth) / 2;
+      // Template-specific optimizations
+      switch(templateId) {
+        case 'minimal-elegant':
+        case 'executive-clean':
+          // These templates need more aggressive optimization
+          // Reduce spacing in experience sections
+          const expItems = element.querySelectorAll('[data-experience-item="true"]');
+          expItems.forEach(item => {
+            const itemEl = item as HTMLElement;
+            itemEl.style.marginBottom = '0.4rem';
             
-            pdf.addImage(
-              imgData,
-              'JPEG',
-              navyOffsetX,
-              0, // Align to top to ensure all content is visible
-              navyWidth,
-              navyHeight,
-              undefined,
-              'FAST'
-            );
-            break;
-            
-          case 'minimal-elegant':
-          case 'executive-clean':
-            // IMPROVED: For these templates prioritize content visibility
-            // We want to scale to fit all content in height while maintaining proportions
-            
-            // Use height scaling to ensure all content is visible
-            // Calculate scaled dimensions that preserve aspect ratio
-            const imgHeight = pdfHeight;
-            const imgWidth = imgHeight * canvasAspectRatio;
-            
-            // If width exceeds page width after height scaling, use width scaling instead
-            if (imgWidth > pdfWidth) {
-              const widthScaledHeight = pdfWidth / canvasAspectRatio;
+            // Make responsibility lists more compact
+            const respList = itemEl.querySelector('ul');
+            if (respList) {
+              const listEl = respList as HTMLElement;
+              listEl.style.marginTop = '0.2rem';
+              listEl.style.marginBottom = '0.2rem';
               
-              pdf.addImage(
-                imgData,
-                'JPEG',
-                0, // No horizontal offset - use full width
-                0, // No vertical offset
-                pdfWidth,
-                widthScaledHeight,
-                undefined,
-                'FAST'
-              );
-            } else {
-              // Center horizontally if there's extra space
-              const offsetX = (pdfWidth - imgWidth) / 2;
-              
-              pdf.addImage(
-                imgData,
-                'JPEG',
-                offsetX,
-                0, // Align to top to ensure all content is visible
-                imgWidth,
-                imgHeight,
-                undefined,
-                'FAST'
-              );
+              // Make list items more compact
+              const listItems = listEl.querySelectorAll('li');
+              listItems.forEach(li => {
+                const liElem = li as HTMLElement;
+                liElem.style.fontSize = '11px';
+                liElem.style.marginBottom = '0.1rem';
+                liElem.style.lineHeight = '1.2';
+              });
             }
-            break;
+          });
+          
+          // Optimize certifications
+          const certItems = element.querySelectorAll('[data-cert-item="true"]');
+          certItems.forEach(item => {
+            const itemElem = item as HTMLElement;
+            itemElem.style.marginBottom = '0.15rem';
             
-          default:
-            // Standard approach for other templates - prioritize height
-            // This ensures content isn't cut off at the bottom
-            if (canvasAspectRatio < a4AspectRatio) {
-              // Content is taller than A4 proportions - prioritize height
-              const imgHeight = pdfHeight;
-              const imgWidth = imgHeight * canvasAspectRatio;
-              const offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
-              
-              pdf.addImage(
-                imgData,
-                'JPEG',
-                offsetX,
-                0, // Align to top
-                imgWidth,
-                imgHeight,
-                undefined,
-                'FAST'
-              );
-            } else {
-              // Content fits within A4 proportions or is wider
-              // Prioritize width and accept potential vertical overflow
-              const imgWidth = pdfWidth;
-              const imgHeight = imgWidth / canvasAspectRatio;
-              
-              pdf.addImage(
-                imgData,
-                'JPEG',
-                0, // No horizontal offset - use full width
-                0, // No vertical offset
-                imgWidth,
-                imgHeight,
-                undefined,
-                'FAST'
-              );
+            const textElements = itemElem.querySelectorAll('div');
+            textElements.forEach(div => {
+              const divElem = div as HTMLElement;
+              divElem.style.fontSize = '11px';
+              divElem.style.lineHeight = '1.2';
+            });
+          });
+          
+          // Optimize education items
+          const eduItems = element.querySelectorAll('[data-edu-item="true"]');
+          eduItems.forEach(item => {
+            const itemElem = item as HTMLElement;
+            itemElem.style.marginBottom = '0.15rem';
+            itemElem.style.paddingBottom = '0.1rem';
+          });
+          break;
+          
+        case 'professional-navy':
+          // Optimize the navy template
+          const navyTextElements = element.querySelectorAll('p, li, span, div:not([class*="grid"])');
+          navyTextElements.forEach(el => {
+            const elemStyle = (el as HTMLElement).style;
+            if (elemStyle.fontSize) {
+              const currentSize = parseFloat(elemStyle.fontSize);
+              elemStyle.fontSize = `${currentSize * 0.95}px`;
             }
-        }
-      };
-      
-      // Apply template-specific PDF fitting
-      applyTemplatePdfFitting();
-
-      pdf.save('resume.pdf');
-      
-      toast.dismiss(loadingToast);
-      toast.success("PDF downloaded successfully!");
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      toast.error("Failed to generate PDF. Please try again.");
-    }
+          });
+          break;
+      }
+    };
+    
+    // Replace icons with symbols for better PDF compatibility
+    replaceIconsWithSymbols();
+    
+    // Apply template-specific optimizations
+    applyTemplateSpecificOptimizations();
   };
 
   const navigateToPricing = () => {
