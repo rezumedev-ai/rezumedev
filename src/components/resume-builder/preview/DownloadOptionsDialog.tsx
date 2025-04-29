@@ -92,66 +92,104 @@ export function DownloadOptionsDialog({
         // Template-specific optimizations
         switch(templateId) {
           case 'executive-clean':
-            // Reduce margins to maximize space usage
-            const execCleanContent = clonedResume.querySelector('[data-section="skills"], [data-section="education"], [data-section="experience"]');
-            if (execCleanContent) {
-              const contentElement = execCleanContent as HTMLElement;
-              contentElement.style.marginTop = '0.25rem';
-              contentElement.style.marginBottom = '0.25rem';
-            }
-            
-            // Adjust padding for executive-clean to reduce white space
-            const execCleanSections = clonedResume.querySelectorAll('section');
-            execCleanSections.forEach(section => {
+            // IMPROVED: More aggressive optimization to prevent content cutoff
+            const execCleanContent = clonedResume.querySelectorAll('[data-section]');
+            execCleanContent.forEach(section => {
               const sectionElement = section as HTMLElement;
-              sectionElement.style.marginBottom = '0.75rem';
+              sectionElement.style.marginBottom = '0.5rem';
+              sectionElement.style.paddingBottom = '0';
             });
             
-            // Set height to match A4 aspect ratio while maximizing content display
-            clonedResume.style.height = `${originalHeight * 0.95}px`;
+            // Reduce spacing in experience sections
+            const execExperienceItems = clonedResume.querySelectorAll('[data-experience-item="true"]');
+            execExperienceItems.forEach(item => {
+              const itemEl = item as HTMLElement;
+              itemEl.style.marginBottom = '0.5rem';
+              
+              // Make responsibility lists more compact
+              const respList = itemEl.querySelector('ul');
+              if (respList) {
+                const listEl = respList as HTMLElement;
+                listEl.style.marginTop = '0.2rem';
+                listEl.style.marginBottom = '0.2rem';
+              }
+            });
+            
+            // Reduce font size of all text elements
+            const execAllTexts = clonedResume.querySelectorAll('p, li, div[contenteditable="true"]');
+            execAllTexts.forEach(text => {
+              const textEl = text as HTMLElement;
+              // Reduce font size by 8% to fit more content
+              if (textEl.style.fontSize) {
+                const currentSize = parseFloat(textEl.style.fontSize);
+                textEl.style.fontSize = `${currentSize * 0.92}px`;
+              }
+              // Tighten line height
+              textEl.style.lineHeight = '1.2';
+            });
+            
+            // Set height to prioritize content display
+            clonedResume.style.height = `${originalHeight}px`;
             break;
             
           case 'minimal-elegant':
-            // Reduce white space by adjusting margins
-            const minElegantContent = clonedResume.querySelectorAll('section, div[class*="space-y"]');
-            minElegantContent.forEach(element => {
-              const el = element as HTMLElement;
-              // Reduce vertical spacing between sections
-              if (el.style.marginBottom) {
-                const currentMargin = parseFloat(el.style.marginBottom);
-                el.style.marginBottom = `${currentMargin * 0.8}px`;
-              }
+            // IMPROVED: More aggressive optimization to prevent content cutoff
+            const minElegantContent = clonedResume.querySelectorAll('[data-section]');
+            minElegantContent.forEach(section => {
+              const sectionElement = section as HTMLElement;
+              sectionElement.style.marginBottom = '0.5rem';
+              sectionElement.style.paddingBottom = '0';
+            });
+            
+            // Reduce spacing in lists
+            const minElegantLists = clonedResume.querySelectorAll('ul, ol');
+            minElegantLists.forEach(list => {
+              const listEl = list as HTMLElement;
+              listEl.style.marginTop = '0.2rem';
+              listEl.style.marginBottom = '0.2rem';
               
-              // Reduce spacing inside lists
-              const lists = el.querySelectorAll('ul, ol');
-              lists.forEach(list => {
-                const listElement = list as HTMLElement;
-                listElement.style.marginTop = '0.25rem';
-                listElement.style.marginBottom = '0.25rem';
+              // Make list items more compact
+              const items = listEl.querySelectorAll('li');
+              items.forEach(item => {
+                const itemEl = item as HTMLElement;
+                itemEl.style.fontSize = '11px';
+                itemEl.style.marginBottom = '0.1rem';
+                itemEl.style.lineHeight = '1.2';
               });
             });
             
-            // Reduce unnecessary horizontal spacing
-            const contentContainer = clonedResume.querySelector('div[style*="position: absolute"]');
-            if (contentContainer) {
-              const containerEl = contentContainer as HTMLElement;
-              const currentLeft = parseFloat(containerEl.style.left || '0.5in');
-              const currentRight = parseFloat(containerEl.style.right || '0.5in');
-              
-              // Reduce horizontal margins slightly to maximize content width
-              containerEl.style.left = `${currentLeft * 0.9}in`;
-              containerEl.style.right = `${currentRight * 0.9}in`;
-            }
+            // Reduce sections spacing
+            const minElegantSections = clonedResume.querySelectorAll('section, div[class*="space-y"], div[class*="mb-"]');
+            minElegantSections.forEach(section => {
+              const sectionEl = section as HTMLElement;
+              sectionEl.style.marginBottom = '0.5rem';
+              if (sectionEl.style.paddingBottom) {
+                sectionEl.style.paddingBottom = '0';
+              }
+            });
             
-            // Set height to match A4 aspect ratio
-            clonedResume.style.height = `${originalHeight * 0.95}px`;
+            // Reduce font size of all text elements
+            const allTextElements = clonedResume.querySelectorAll('p, li, span, div:not([class*="grid"])');
+            allTextElements.forEach(element => {
+              const el = element as HTMLElement;
+              if (el.style.fontSize) {
+                // If font size is specified, reduce it by 8%
+                const currentSize = parseFloat(el.style.fontSize);
+                el.style.fontSize = `${currentSize * 0.92}px`;
+              }
+              // Tighten line height
+              el.style.lineHeight = '1.2';
+            });
+            
+            // Set height to prioritize content display
+            clonedResume.style.height = `${originalHeight}px`;
             break;
             
           case 'professional-navy':
             // The professional-navy template needs special handling for content overflow
             // Reduce font size of all text to fit more content
-            const allTextElements = clonedResume.querySelectorAll('p, li, span, div:not([class*="grid"])');
-            allTextElements.forEach(element => {
+            const navyTextElements = clonedResume.querySelectorAll('p, li, span, div:not([class*="grid"])');
+            navyTextElements.forEach(element => {
               const el = element as HTMLElement;
               if (el.style.fontSize) {
                 // If font size is specified, reduce it by 5%
@@ -161,8 +199,8 @@ export function DownloadOptionsDialog({
             });
             
             // Compress spacing between sections to fit more content
-            const sections = clonedResume.querySelectorAll('section, div[class*="space-y"], div[class*="mb-"]');
-            sections.forEach(section => {
+            const navySections = clonedResume.querySelectorAll('section, div[class*="space-y"], div[class*="mb-"]');
+            navySections.forEach(section => {
               const sectionElement = section as HTMLElement;
               if (sectionElement.style.marginBottom) {
                 const currentMargin = parseFloat(sectionElement.style.marginBottom);
@@ -175,8 +213,8 @@ export function DownloadOptionsDialog({
             });
             
             // Reduce spacing in lists to fit more content
-            const lists = clonedResume.querySelectorAll('ul, ol');
-            lists.forEach(list => {
+            const navyLists = clonedResume.querySelectorAll('ul, ol');
+            navyLists.forEach(list => {
               const listElement = list as HTMLElement;
               listElement.style.marginBottom = '0.25rem';
               
@@ -210,104 +248,129 @@ export function DownloadOptionsDialog({
       
       // First check if we need to adjust font sizes for problematic templates
       if (['minimal-elegant', 'executive-clean', 'professional-navy'].includes(templateId)) {
-        // Find sections that might cause overflow issues
+        // IMPROVED: More aggressive optimization for sections that cause cutoff
         const skillsSection = clonedResume.querySelector('[data-section="skills"]');
         const certSection = clonedResume.querySelector('[data-section="certifications"]');
         const summarySection = clonedResume.querySelector('[data-section="summary"]');
+        const educationSection = clonedResume.querySelector('[data-section="education"]');
+        const experienceSection = clonedResume.querySelector('[data-section="experience"]');
         
-        // Adjust skills section font sizes for better space utilization
+        // Adjust skills section font sizes and spacing
         if (skillsSection) {
-          // Adjust skills section font sizes if needed
           const skillHeadings = skillsSection.querySelectorAll('h4');
           skillHeadings.forEach(heading => {
             const headingElem = heading as HTMLElement;
-            headingElem.style.fontSize = `14px`;
-            headingElem.style.marginBottom = '0.25rem';
+            headingElem.style.fontSize = '13px';
+            headingElem.style.marginBottom = '0.2rem';
           });
           
-          // Find skill lists and optimize their display
           const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
           skillLists.forEach(list => {
             const listElem = list as HTMLElement;
-            listElem.style.marginTop = '0.25rem';
+            listElem.style.marginTop = '0.2rem';
             
             const items = listElem.querySelectorAll('li');
             items.forEach(item => {
               const itemElem = item as HTMLElement;
-              itemElem.style.fontSize = '12px';
-              itemElem.style.lineHeight = '1.2';
-              itemElem.style.marginBottom = '0.15rem';
+              itemElem.style.fontSize = '11px';
+              itemElem.style.lineHeight = '1.1';
+              itemElem.style.marginBottom = '0.1rem';
             });
           });
         }
         
-        // Optimize certifications display
+        // Optimize certifications display - significant improvements
         if (certSection) {
-          // Make certification section more compact
           const certItems = certSection.querySelectorAll('li');
           certItems.forEach(item => {
             const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.25rem';
+            itemElem.style.marginBottom = '0.1rem';
             
-            // Adjust text size in certifications
             const textElements = itemElem.querySelectorAll('div');
             textElements.forEach(div => {
               const divElem = div as HTMLElement;
-              divElem.style.fontSize = '12px';
-              divElem.style.lineHeight = '1.2';
+              divElem.style.fontSize = '11px';
+              divElem.style.lineHeight = '1.1';
             });
           });
         }
         
-        // Optimize professional summary to be more space-efficient
+        // Optimize professional summary - reduced size
         if (summarySection) {
           const summaryText = summarySection.querySelector('div[contenteditable]') || summarySection.querySelector('p');
           if (summaryText) {
             const textElem = summaryText as HTMLElement;
-            textElem.style.fontSize = '12px';
-            textElem.style.lineHeight = '1.3';
-            textElem.style.marginBottom = '0.5rem';
+            textElem.style.fontSize = '11px';
+            textElem.style.lineHeight = '1.2';
+            textElem.style.marginBottom = '0.4rem';
           }
         }
         
-        // Check for education section that might need adjustment
-        const educationSection = clonedResume.querySelector('[data-section="education"]');
+        // Education section optimizations - more compact
         if (educationSection) {
-          const eduItems = educationSection.querySelectorAll('div[class*="flex"]');
+          const eduItems = educationSection.querySelectorAll('div[data-edu-item="true"]');
           eduItems.forEach(item => {
             const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.25rem';
-          });
-          
-          const dateTexts = educationSection.querySelectorAll('.text-gray-500');
-          dateTexts.forEach(date => {
-            const dateElem = date as HTMLElement;
-            dateElem.style.fontSize = '11px';
+            itemElem.style.marginBottom = '0.2rem';
+            itemElem.style.paddingBottom = '0.1rem';
+            
+            const titleElem = itemElem.querySelector('.font-semibold');
+            if (titleElem) {
+              (titleElem as HTMLElement).style.fontSize = '12px';
+            }
+            
+            const schoolElem = itemElem.querySelector('.text-gray-700');
+            if (schoolElem) {
+              (schoolElem as HTMLElement).style.fontSize = '11px';
+            }
+            
+            const dateElements = itemElem.querySelectorAll('.text-gray-500, .text-emerald-600, .text-[#0F2B5B]');
+            dateElements.forEach(date => {
+              (date as HTMLElement).style.fontSize = '10px';
+            });
           });
         }
         
-        // Optimize experience section for space efficiency
-        const experienceSection = clonedResume.querySelector('[data-section="experience"]');
+        // IMPROVED: More aggressive optimization for experience section
         if (experienceSection) {
-          // Reduce spacing between experience items
           const expItems = experienceSection.querySelectorAll('[data-experience-item="true"]');
           expItems.forEach(item => {
             const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '0.5rem';
+            itemElem.style.marginBottom = '0.3rem';
+            itemElem.style.paddingBottom = '0.2rem';
             
-            // Reduce list spacing
+            // Make job title and company more compact
+            const jobElem = itemElem.querySelector('.font-semibold');
+            if (jobElem) {
+              (jobElem as HTMLElement).style.fontSize = '12px';
+              (jobElem as HTMLElement).style.marginBottom = '0.1rem';
+            }
+            
+            const companyElem = itemElem.querySelector('.text-gray-700, .text-gray-600');
+            if (companyElem) {
+              (companyElem as HTMLElement).style.fontSize = '11px';
+            }
+            
+            const dateElements = itemElem.querySelectorAll('.text-gray-500, .text-emerald-600, .text-[#0F2B5B]');
+            dateElements.forEach(date => {
+              (date as HTMLElement).style.fontSize = '10px';
+            });
+            
+            // Make responsibility lists very compact
             const respList = itemElem.querySelector('ul');
             if (respList) {
               const listElem = respList as HTMLElement;
-              listElem.style.marginTop = '0.25rem';
+              listElem.style.marginTop = '0.15rem';
+              listElem.style.marginBottom = '0.15rem';
               
               // Make responsibilities more compact
               const listItems = listElem.querySelectorAll('li');
               listItems.forEach(li => {
                 const liElem = li as HTMLElement;
-                liElem.style.fontSize = '11px';
-                liElem.style.marginBottom = '0.1rem';
-                liElem.style.lineHeight = '1.2';
+                liElem.style.fontSize = '10px';
+                liElem.style.marginBottom = '0.05rem';
+                liElem.style.lineHeight = '1.1';
+                liElem.style.paddingBottom = '0';
               });
             }
           });
@@ -422,112 +485,124 @@ export function DownloadOptionsDialog({
       // Separate from the initial optimization to make both aspects clearer
       const optimizeContentLength = () => {
         // If this is a template with potential content overflow
-        if (templateId === 'professional-navy') {
-          // Find experience section which often causes overflow in professional-navy
-          const experienceSection = clonedResume.querySelector('[data-section="experience"]');
-          if (experienceSection) {
-            const experienceItems = experienceSection.querySelectorAll('[data-experience-item="true"]');
+        if (['minimal-elegant', 'executive-clean', 'professional-navy'].includes(templateId)) {
+          // IMPROVED: More aggressive optimization for content-heavy templates
+          
+          // Measure the actual content height to determine if scaling is needed
+          const contentHeight = clonedResume.scrollHeight;
+          const availableHeight = 1056; // A4 height in pixels at 96 DPI
+          const contentOverflow = contentHeight > availableHeight;
+          
+          if (contentOverflow) {
+            console.log(`Content overflow detected for ${templateId}: ${contentHeight}px > ${availableHeight}px`);
             
-            // More aggressive optimization for professional-navy with many items
-            if (experienceItems.length > 2) {
-              experienceItems.forEach(item => {
-                const itemElem = item as HTMLElement;
-                itemElem.style.marginBottom = '0.4rem';
+            // For templates with single column layout, apply more aggressive optimizations
+            if (templateId === 'minimal-elegant' || templateId === 'executive-clean') {
+              // Global font size reduction across all elements
+              const allElements = clonedResume.querySelectorAll('*');
+              allElements.forEach(elem => {
+                const el = elem as HTMLElement;
+                if (el.style && el.style.fontSize) {
+                  const currentSize = parseFloat(el.style.fontSize);
+                  // More aggressive scaling for minimal-elegant
+                  if (templateId === 'minimal-elegant') {
+                    el.style.fontSize = `${currentSize * 0.85}px`;
+                  } else {
+                    el.style.fontSize = `${currentSize * 0.9}px`;
+                  }
+                }
                 
-                // Reduce title and company font size
-                const titles = itemElem.querySelectorAll('div.font-semibold, div.text-gray-600');
-                titles.forEach(title => {
-                  const titleElem = title as HTMLElement;
-                  titleElem.style.fontSize = '11px';
-                  titleElem.style.marginBottom = '0.1rem';
+                // Reduce line heights globally
+                if (el.style) {
+                  el.style.lineHeight = '1.1';
+                  
+                  // Reduce margins and paddings
+                  if (el.style.marginBottom) {
+                    const currentMargin = parseFloat(el.style.marginBottom);
+                    el.style.marginBottom = `${currentMargin * 0.7}px`;
+                  }
+                  
+                  if (el.style.paddingBottom) {
+                    const currentPadding = parseFloat(el.style.paddingBottom);
+                    el.style.paddingBottom = `${currentPadding * 0.7}px`;
+                  }
+                }
+              });
+              
+              // Experience section extreme optimization
+              const expItems = clonedResume.querySelectorAll('[data-experience-item="true"]');
+              if (expItems.length > 2) {
+                expItems.forEach(item => {
+                  const itemElem = item as HTMLElement;
+                  itemElem.style.marginBottom = '0.2rem';
+                  itemElem.style.paddingBottom = '0.1rem';
+                  
+                  // Make responsibility lists extremely compact
+                  const respList = itemElem.querySelector('ul');
+                  if (respList) {
+                    const listElem = respList as HTMLElement;
+                    listElem.style.marginTop = '0.1rem';
+                    listElem.style.marginBottom = '0.1rem';
+                    
+                    // Extreme minimization of list items
+                    const listItems = listElem.querySelectorAll('li');
+                    listItems.forEach(li => {
+                      const liElem = li as HTMLElement;
+                      liElem.style.fontSize = '9.5px';
+                      liElem.style.marginBottom = '0.05rem';
+                      liElem.style.lineHeight = '1.05';
+                      liElem.style.paddingBottom = '0';
+                    });
+                  }
                 });
+              }
+              
+              // Education section extreme optimization
+              const eduItems = clonedResume.querySelectorAll('[data-edu-item="true"]');
+              if (eduItems.length > 1) {
+                eduItems.forEach(item => {
+                  const itemElem = item as HTMLElement;
+                  itemElem.style.marginBottom = '0.15rem';
+                  itemElem.style.paddingBottom = '0.1rem';
+                });
+              }
+            }
+            
+            // Special handling for professional-navy
+            if (templateId === 'professional-navy') {
+              // Force smaller font sizes for all elements
+              const allNavyElements = clonedResume.querySelectorAll('*');
+              allNavyElements.forEach(elem => {
+                const el = elem as HTMLElement;
+                if (el.style && el.style.fontSize) {
+                  const currentSize = parseFloat(el.style.fontSize);
+                  el.style.fontSize = `${currentSize * 0.85}px`;
+                }
+              });
+              
+              // Ultra-compact experience items
+              const expItems = clonedResume.querySelectorAll('[data-experience-item="true"]');
+              expItems.forEach(item => {
+                const itemElem = item as HTMLElement;
+                itemElem.style.marginBottom = '0.2rem';
                 
-                // Make responsibility lists much more compact
+                // Make responsibility lists extremely compact
                 const respList = itemElem.querySelector('ul');
                 if (respList) {
-                  const respListElem = respList as HTMLElement;
-                  respListElem.style.marginTop = '0.2rem';
-                  respListElem.style.marginBottom = '0.2rem';
+                  const listElem = respList as HTMLElement;
+                  listElem.style.marginTop = '0.1rem';
                   
-                  // Make responsibility text smaller and tighter
-                  const listItems = respListElem.querySelectorAll('li');
+                  // Extreme minimization of list items
+                  const listItems = listElem.querySelectorAll('li');
                   listItems.forEach(li => {
                     const liElem = li as HTMLElement;
-                    liElem.style.fontSize = '10px';
-                    liElem.style.marginBottom = '0.1rem';
-                    liElem.style.lineHeight = '1.1';
+                    liElem.style.fontSize = '9px';
+                    liElem.style.marginBottom = '0.05rem';
+                    liElem.style.lineHeight = '1';
                   });
                 }
               });
             }
-          }
-          
-          // Special handling for skill lists in professional-navy
-          const skillsSection = clonedResume.querySelector('[data-section="skills"]');
-          if (skillsSection) {
-            const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
-            skillLists.forEach(list => {
-              const listElem = list as HTMLElement;
-              
-              // Make skills more compact
-              const skills = listElem.querySelectorAll('[data-skill-item="true"]');
-              skills.forEach(skill => {
-                const skillElem = skill as HTMLElement;
-                skillElem.style.fontSize = '10px';
-                skillElem.style.lineHeight = '1.1';
-                skillElem.style.marginBottom = '0.1rem';
-              });
-            });
-          }
-        }
-        
-        // Special optimization for executive-clean if it has many sections
-        if (templateId === 'executive-clean') {
-          // Check if we have many experience items
-          const experienceItems = clonedResume.querySelectorAll('[data-experience-item="true"]');
-          if (experienceItems.length > 3) {
-            // Reduce spacing in experience items
-            experienceItems.forEach(item => {
-              const itemElem = item as HTMLElement;
-              itemElem.style.marginBottom = '0.4rem';
-              
-              // Reduce spacing in responsibilities
-              const respList = itemElem.querySelector('ul');
-              if (respList) {
-                const respListElem = respList as HTMLElement;
-                respListElem.style.marginTop = '0.2rem';
-                
-                // Make responsibilities more compact
-                const listItems = respListElem.querySelectorAll('li');
-                listItems.forEach(li => {
-                  const liElem = li as HTMLElement;
-                  liElem.style.fontSize = '11px';
-                  liElem.style.marginBottom = '0.1rem';
-                  liElem.style.lineHeight = '1.2';
-                });
-              }
-            });
-          }
-        }
-        
-        // Special optimization for minimal-elegant
-        if (templateId === 'minimal-elegant') {
-          // Reduce spacing in all sections to make better use of space
-          const sections = clonedResume.querySelectorAll('section');
-          sections.forEach(section => {
-            const sectionElem = section as HTMLElement;
-            sectionElem.style.marginBottom = '0.75rem';
-          });
-          
-          // Special handling for long skill lists
-          const skillItems = clonedResume.querySelectorAll('[data-skill-item="true"]');
-          if (skillItems.length > 10) {
-            skillItems.forEach(skill => {
-              const skillElem = skill as HTMLElement;
-              skillElem.style.fontSize = '11px';
-              skillElem.style.lineHeight = '1.1';
-              skillElem.style.marginBottom = '0.1rem';
-            });
           }
         }
       };
@@ -572,10 +647,11 @@ export function DownloadOptionsDialog({
               scale: pixelRatio * 3
             };
           case 'executive-clean':
-            // Higher resolution for executive-clean to ensure text quality
+          case 'minimal-elegant':
+            // IMPROVED: Higher resolution for content-heavy templates to ensure text quality
             return {
               ...baseSettings,
-              scale: pixelRatio * 2.8
+              scale: pixelRatio * 3.2
             };
           default:
             return baseSettings;
@@ -600,7 +676,7 @@ export function DownloadOptionsDialog({
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
-      // Enhanced template-specific PDF fitting logic
+      // IMPROVED: Enhanced template-specific PDF fitting logic
       const applyTemplatePdfFitting = () => {
         // Calculate the canvas aspect ratio
         const canvasAspectRatio = canvas.width / canvas.height;
@@ -630,29 +706,50 @@ export function DownloadOptionsDialog({
             
           case 'minimal-elegant':
           case 'executive-clean':
-            // These templates have white space issues
-            // We want to fill more of the page width while maintaining proportions
-            // Use full width and calculate appropriate height
-            const imgWidth = pdfWidth;
-            const imgHeight = imgWidth / canvasAspectRatio;
+            // IMPROVED: For these templates prioritize content visibility
+            // We want to scale to fit all content in height while maintaining proportions
             
-            pdf.addImage(
-              imgData,
-              'JPEG',
-              0, // No horizontal offset - use full width
-              0, // No vertical offset
-              imgWidth,
-              imgHeight,
-              undefined,
-              'FAST'
-            );
+            // Use height scaling to ensure all content is visible
+            // Calculate scaled dimensions that preserve aspect ratio
+            const imgHeight = pdfHeight;
+            const imgWidth = imgHeight * canvasAspectRatio;
+            
+            // If width exceeds page width after height scaling, use width scaling instead
+            if (imgWidth > pdfWidth) {
+              const widthScaledHeight = pdfWidth / canvasAspectRatio;
+              
+              pdf.addImage(
+                imgData,
+                'JPEG',
+                0, // No horizontal offset - use full width
+                0, // No vertical offset
+                pdfWidth,
+                widthScaledHeight,
+                undefined,
+                'FAST'
+              );
+            } else {
+              // Center horizontally if there's extra space
+              const offsetX = (pdfWidth - imgWidth) / 2;
+              
+              pdf.addImage(
+                imgData,
+                'JPEG',
+                offsetX,
+                0, // Align to top to ensure all content is visible
+                imgWidth,
+                imgHeight,
+                undefined,
+                'FAST'
+              );
+            }
             break;
             
           default:
-            // Standard approach for other templates
-            // Choose fitting strategy based on aspect ratio comparison
+            // Standard approach for other templates - prioritize height
+            // This ensures content isn't cut off at the bottom
             if (canvasAspectRatio < a4AspectRatio) {
-              // Content is taller than A4 proportions
+              // Content is taller than A4 proportions - prioritize height
               const imgHeight = pdfHeight;
               const imgWidth = imgHeight * canvasAspectRatio;
               const offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
@@ -669,6 +766,7 @@ export function DownloadOptionsDialog({
               );
             } else {
               // Content fits within A4 proportions or is wider
+              // Prioritize width and accept potential vertical overflow
               const imgWidth = pdfWidth;
               const imgHeight = imgWidth / canvasAspectRatio;
               

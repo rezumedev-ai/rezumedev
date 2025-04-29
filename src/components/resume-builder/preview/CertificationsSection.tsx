@@ -35,7 +35,7 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
             <div className="font-semibold text-[14px] text-gray-900">{certification.name}</div>
             {templateCondition && <div className="text-[13px] text-gray-600">{certification.organization}</div>}
             <div className="text-[13px] text-gray-500">
-              {formatDate(certification.completionDate)} {certification.completionDate ? '•' : ''} {certification.organization}
+              {formatDate(certification.completionDate)} {certification.completionDate ? '•' : ''} {!templateCondition && certification.organization}
             </div>
           </li>
         ))}

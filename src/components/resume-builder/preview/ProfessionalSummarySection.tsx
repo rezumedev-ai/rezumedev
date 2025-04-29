@@ -70,6 +70,7 @@ export function ProfessionalSummarySection({
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleSummaryEdit}
+          data-field="summary-content"
         >
           {summary}
         </div>
@@ -88,6 +89,7 @@ export function ProfessionalSummarySection({
         contentEditable={isEditing}
         suppressContentEditableWarning
         onBlur={handleSummaryEdit}
+        data-field="summary-content"
       >
         {summary}
       </div>
