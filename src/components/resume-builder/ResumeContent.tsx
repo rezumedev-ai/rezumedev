@@ -49,20 +49,24 @@ export function ResumeContent({
     if (template.id === "professional-navy") {
       return (
         <>
-          <PersonalSection 
-            fullName={resumeState.personal_info.fullName}
-            title={resumeState.professional_summary.title}
-            email={resumeState.personal_info.email}
-            phone={resumeState.personal_info.phone}
-            linkedin={resumeState.personal_info.linkedin}
-            website={resumeState.personal_info.website}
-            profileImageUrl={resumeState.personal_info.profileImageUrl}
-            template={template}
-            isEditing={isEditing}
-            resumeId={resumeId}
-            onUpdate={onPersonalInfoUpdate}
-            onImageUpdate={onProfileImageUpdate}
-          />
+          <div className="bg-[#0F2B5B] text-white pt-6 pb-6 mb-6 grid grid-cols-12 gap-6 w-full" data-navy-header="true">
+            <div className="col-span-12 px-8">
+              <PersonalSection 
+                fullName={resumeState.personal_info.fullName}
+                title={resumeState.professional_summary.title}
+                email={resumeState.personal_info.email}
+                phone={resumeState.personal_info.phone}
+                linkedin={resumeState.personal_info.linkedin}
+                website={resumeState.personal_info.website}
+                profileImageUrl={resumeState.personal_info.profileImageUrl}
+                template={template}
+                isEditing={isEditing}
+                resumeId={resumeId}
+                onUpdate={onPersonalInfoUpdate}
+                onImageUpdate={onProfileImageUpdate}
+              />
+            </div>
+          </div>
           
           <TwoColumnLayout 
             className="px-8"
