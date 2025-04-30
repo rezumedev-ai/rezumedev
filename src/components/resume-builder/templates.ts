@@ -202,7 +202,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     imageUrl: "/lovable-uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
     style: {
       titleFont: "font-sans text-[30px] font-bold tracking-tight text-white",
-      headerStyle: "bg-[#0F2B5B] text-white pt-6 pb-6 px-0 mb-6 grid grid-cols-12 gap-6 w-full",
+      headerStyle: "bg-[#0F2B5B] text-white pt-6 pb-6 px-8 mb-6 grid grid-cols-12 gap-6",
       sectionStyle: "text-[16px] font-bold uppercase tracking-wide text-[#0F2B5B] mb-3 pb-1 border-b-2 border-[#0F2B5B] flex items-center",
       contentStyle: "grid grid-cols-12 gap-6",
       layout: "creative",

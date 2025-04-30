@@ -88,66 +88,8 @@ export function DownloadOptionsDialog({
       
       document.body.appendChild(clonedResume);
 
-      // Navy header specific optimizations
-      if (templateId === 'professional-navy') {
-        // Fix the navy header to extend fully across
-        const navyHeader = clonedResume.querySelector('[data-navy-header="true"]');
-        if (navyHeader) {
-          const headerElement = navyHeader as HTMLElement;
-          headerElement.style.width = '100%';
-          headerElement.style.margin = '0';
-          headerElement.style.padding = '20px 40px';
-          headerElement.style.boxSizing = 'border-box';
-          
-          // Ensure proper content alignment
-          const headerContent = headerElement.querySelector('.col-span-12');
-          if (headerContent) {
-            (headerContent as HTMLElement).style.padding = '0';
-          }
-        }
-        
-        // Optimize two-column layout
-        const leftColumn = clonedResume.querySelector('.col-span-8');
-        const rightColumn = clonedResume.querySelector('.col-span-4');
-        
-        if (leftColumn) {
-          (leftColumn as HTMLElement).style.paddingRight = '10px';
-        }
-        
-        if (rightColumn) {
-          (rightColumn as HTMLElement).style.fontSize = '95%';
-          (rightColumn as HTMLElement).style.paddingLeft = '5px';
-          
-          // Reduce spacing in skills and certifications sections
-          const skillsList = rightColumn.querySelectorAll('li');
-          skillsList.forEach(item => {
-            (item as HTMLElement).style.marginBottom = '3px';
-            (item as HTMLElement).style.fontSize = '11px';
-          });
-          
-          // Apply font size reduction to certifications section
-          const certItems = rightColumn.querySelectorAll('[data-certification-item="true"]');
-          certItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            itemElem.style.marginBottom = '6px';
-            const fontElements = itemElem.querySelectorAll('div');
-            fontElements.forEach(div => {
-              (div as HTMLElement).style.fontSize = '11px';
-              (div as HTMLElement).style.lineHeight = '1.2';
-            });
-          });
-        }
-        
-        // Optimize the education and experience sections
-        const educationItems = clonedResume.querySelectorAll('[data-education-item="true"]');
-        educationItems.forEach(item => {
-          (item as HTMLElement).style.paddingBottom = '6px';
-          (item as HTMLElement).style.marginBottom = '0px';
-        });
-      }
-
       // First check if we need to adjust font sizes for problematic templates
-      if (['minimal-elegant', 'executive-clean', 'professional-navy'].includes(templateId)) {
+      if (['minimal-elegant', 'executive-clean'].includes(templateId)) {
         // Find sections that might cause overflow issues
         const skillsSection = clonedResume.querySelector('[data-section="skills"]');
         const certSection = clonedResume.querySelector('[data-section="certifications"]');
@@ -376,21 +318,12 @@ export function DownloadOptionsDialog({
       
       document.body.removeChild(clonedResume);
 
-      // Determine PDF dimensions based on template
-      let pdfWidth, pdfHeight;
-      
-      if (['minimal-elegant', 'executive-clean'].includes(templateId)) {
-        // US Legal dimensions in mm
-        pdfWidth = 216; // US Legal width in mm
-        pdfHeight = 356; // US Legal height in mm
-      } else {
-        // A4 dimensions in mm
-        pdfWidth = 210; // A4 width in mm
-        pdfHeight = 297; // A4 height in mm
-      }
+      // A4 dimensions in mm
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
       
       const pdf = new jsPDF({
-        format: ['minimal-elegant', 'executive-clean'].includes(templateId) ? 'legal' : 'a4',
+        format: 'a4',
         unit: 'mm',
         orientation: 'portrait',
         compress: true
@@ -401,11 +334,11 @@ export function DownloadOptionsDialog({
       // Calculate the correct scaling from canvas to PDF to maintain aspect ratio
       // and ensure content fills the width without unnecessary white space
       const canvasAspectRatio = canvas.width / canvas.height;
-      const pdfAspectRatio = pdfWidth / pdfHeight;
+      const a4AspectRatio = pdfWidth / pdfHeight;
       
-      // Check if content is too tall for PDF height
-      if (canvasAspectRatio < pdfAspectRatio) {
-        // Content is taller than PDF proportions - we need to scale to fit height
+      // Check if content is too tall for A4 height
+      if (canvasAspectRatio < a4AspectRatio) {
+        // Content is taller than A4 proportions - we need to scale to fit height
         const imgHeight = pdfHeight;
         const imgWidth = imgHeight * canvasAspectRatio;
         const offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
@@ -421,7 +354,7 @@ export function DownloadOptionsDialog({
           'FAST'
         );
       } else {
-        // Content fits within PDF proportions or is wider - use full width
+        // Content fits within A4 proportions or is wider - use full width
         const imgWidth = pdfWidth;
         const imgHeight = imgWidth / canvasAspectRatio;
         
