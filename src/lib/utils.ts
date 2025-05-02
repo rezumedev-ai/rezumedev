@@ -35,6 +35,7 @@ const PUBLIC_ROUTES = [
   "/",
   "/login",
   "/signup",
+  "/appsumo", // Added AppSumo route
   "/pricing",
   "/about",
   "/features",
@@ -69,3 +70,4 @@ export function isPublicRoute(path: string): boolean {
 }
 
 // Add any other utility functions here
+
