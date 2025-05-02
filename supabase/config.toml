@@ -1,14 +1,8 @@
 
-project_id = "xqkzmcudulutohnskcwt"
+xqkzmcudulutohnskcwt = "xqkzmcudulutohnskcwt"
 
-[functions.stripe-webhook]
-verify_jwt = false
+[functions.generate-appsumo-codes]
+verify_jwt = true
 
-[functions.create-checkout-session]
-verify_jwt = false
-
-[functions.reactivate-subscription]
-verify_jwt = false
-
-[functions.customer-portal]
+[functions.redeem-code]
 verify_jwt = true

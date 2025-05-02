@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -144,6 +145,12 @@ const SignUp = () => {
               <span className="text-gray-600">Already have an account? </span>
               <Link to="/login" className="font-medium text-primary hover:text-primary-hover">
                 Sign in
+              </Link>
+            </div>
+            
+            <div className="pt-4 border-t border-gray-200">
+              <Link to="/appsumo" className="block text-center py-3 px-4 rounded-md bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors">
+                AppSumo user? Click here to redeem your code
               </Link>
             </div>
           </form>

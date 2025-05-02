@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -29,6 +30,7 @@ import NewResume from "./pages/NewResume";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import AppSumoSignUp from "./pages/AppSumoSignUp"; // Add the new import
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +53,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/appsumo" element={<AppSumoSignUp />} /> {/* Add new AppSumo route */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />

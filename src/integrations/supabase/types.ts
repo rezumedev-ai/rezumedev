@@ -418,6 +418,36 @@ export type Database = {
         }
         Relationships: []
       }
+      redemption_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_redeemed: boolean
+          redeemed_at: string | null
+          redeemed_by: string | null
+          source: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_redeemed?: boolean
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          source?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_redeemed?: boolean
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       resume_content: {
         Row: {
           certifications: Json[]

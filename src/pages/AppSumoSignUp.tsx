@@ -4,14 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, User, Lock, Eye, EyeOff, Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
+const AppSumoSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,28 +21,56 @@ const Login = () => {
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const fullName = formData.get("fullName") as string;
+    const redemptionCode = formData.get("redemptionCode") as string;
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // First, sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in",
-      });
+      if (redemptionCode) {
+        // If a redemption code was provided, redeem it
+        const { error: redeemError } = await supabase.functions.invoke('redeem-code', {
+          body: { code: redemptionCode }
+        });
+
+        if (redeemError) {
+          toast({
+            variant: "destructive",
+            title: "Error redeeming code",
+            description: redeemError.message || "Please try again or contact support",
+          });
+        } else {
+          toast({
+            title: "Welcome AppSumo user!",
+            description: "Your account has been created with lifetime access.",
+          });
+        }
+      } else {
+        toast({
+          title: "Account created successfully!",
+          description: "Welcome to Rezume.dev",
+        });
+      }
       
-      // Clear any stale tokens from localStorage
-      localStorage.removeItem('supabase.auth.token');
+      // Navigate to dashboard (auth state change listener will handle if needed)
+      navigate("/dashboard");
       
     } catch (error) {
       console.error('Error:', error);
       toast({
         variant: "destructive",
-        title: "Error signing in",
+        title: "Error creating account",
         description: error instanceof Error ? error.message : "Please try again later",
       });
     } finally {
@@ -59,16 +88,33 @@ const Login = () => {
             </h1>
           </Link>
           <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            Welcome back
+            AppSumo Special Offer
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to continue building your resume
+            Create your account and redeem your lifetime access
           </p>
         </div>
         
         <div className="mt-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
+              <div>
+                <Label htmlFor="fullName">Full Name</Label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    required
+                    className="pl-10"
+                    placeholder="John Doe"
+                  />
+                </div>
+              </div>
+
               <div>
                 <Label htmlFor="email">Email</Label>
                 <div className="mt-1 relative">
@@ -99,6 +145,7 @@ const Login = () => {
                     required
                     className="pl-10"
                     placeholder="••••••••"
+                    minLength={6}
                   />
                   <button
                     type="button"
@@ -113,24 +160,36 @@ const Login = () => {
                   </button>
                 </div>
               </div>
+
+              <div className="bg-amber-50 p-4 rounded-md border border-amber-200">
+                <Label htmlFor="redemptionCode" className="flex items-center gap-2 text-amber-800">
+                  <Gift className="h-5 w-5" />
+                  AppSumo Redemption Code
+                </Label>
+                <div className="mt-1">
+                  <Input
+                    id="redemptionCode"
+                    name="redemptionCode"
+                    type="text"
+                    required
+                    className="bg-white border-amber-300"
+                    placeholder="Enter your AppSumo redemption code"
+                  />
+                </div>
+                <p className="mt-2 text-xs text-amber-700">
+                  Enter the code you received from AppSumo to activate your lifetime access.
+                </p>
+              </div>
             </div>
 
-            <div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
-            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create account & activate"}
+            </Button>
 
             <div className="text-center text-sm">
-              <span className="text-gray-600">Don't have an account? </span>
-              <Link to="/signup" className="font-medium text-primary hover:text-primary-hover">
-                Sign up
-              </Link>
-            </div>
-            
-            <div className="pt-4 border-t border-gray-200">
-              <Link to="/appsumo" className="block text-center py-3 px-4 rounded-md bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors">
-                AppSumo user? Click here to redeem your code
+              <span className="text-gray-600">Already have an account? </span>
+              <Link to="/login" className="font-medium text-primary hover:text-primary-hover">
+                Sign in
               </Link>
             </div>
           </form>
@@ -140,4 +199,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AppSumoSignUp;
