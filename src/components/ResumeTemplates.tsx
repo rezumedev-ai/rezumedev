@@ -17,13 +17,6 @@ export const ResumeTemplates = () => {
       color: "from-blue-500 to-blue-700"
     },
     {
-      id: "minimal-elegant",
-      name: "Minimal Elegant",
-      image: "/lovable-uploads/5e2cc0ed-eefe-4bbe-84bc-d4b2863a6b95.png",
-      description: "Clean and sophisticated design with perfect typography, optimized for creative professionals",
-      color: "from-emerald-500 to-emerald-700"
-    },
-    {
       id: "professional-executive",
       name: "Professional Executive",
       image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
