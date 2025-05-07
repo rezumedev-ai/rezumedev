@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 export default function Settings() {
   const { user } = useAuth();
@@ -22,6 +23,7 @@ export default function Settings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("profile");
+  const navigate = useNavigate();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -66,26 +68,8 @@ export default function Settings() {
     },
   });
 
-  const handlePasswordReset = async () => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(user?.email || '', {
-        redirectTo: `${window.location.origin}/settings`,
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Password reset email sent",
-        description: "Check your email for instructions to reset your password.",
-      });
-    } catch (error) {
-      console.error("Error sending password reset:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to send password reset email. Please try again.",
-      });
-    }
+  const handlePasswordChange = () => {
+    navigate('/change-password');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -344,7 +328,7 @@ export default function Settings() {
                                   <Button 
                                     type="button" 
                                     variant="outline" 
-                                    onClick={handlePasswordReset}
+                                    onClick={handlePasswordChange}
                                     className="whitespace-nowrap"
                                   >
                                     Change Password
