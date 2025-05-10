@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +43,7 @@ export default function Dashboard() {
       if (error) throw error;
       return data;
     },
+    enabled: !!user, // Only run query when user is available
   });
 
   const { data: resumes, isLoading } = useQuery({
@@ -62,6 +64,7 @@ export default function Dashboard() {
           : { title: '' }
       }));
     },
+    enabled: !!user, // Only run query when user is available
   });
 
   const handleCreateNew = () => {

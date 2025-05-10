@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [initialAuthCheckDone, setInitialAuthCheckDone] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -59,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Check if the user has seen the upgrade dialog this session
       const hasShownUpgradeDialog = sessionStorage.getItem('hasShownUpgradeDialog');
       
-      // Show dialog only if user is on free plan and hasn't seen it this session
+      // Show dialog immediately if user is on free plan and hasn't seen it this session
       if ((!data.subscription_plan || data.subscription_status !== 'active') && !hasShownUpgradeDialog) {
         setShowUpgradeDialog(true);
         // Mark that we've shown the dialog this session
@@ -108,6 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("🔴 ERROR: Error checking auth state:", error);
       } finally {
         setLoading(false);
+        setInitialAuthCheckDone(true);
       }
     };
 
@@ -130,8 +132,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Check user subscription status and show upgrade dialog if needed
           if (session?.user) {
             await checkUserSubscription(session.user.id);
+            
+            // Only navigate to dashboard if this is an actual sign-in event
+            // (not just a token refresh or initial auth check)
+            navigate('/dashboard', { replace: true });
           }
-          navigate('/dashboard', { replace: true });
           break;
         case 'SIGNED_OUT':
           // Only redirect to login if we're not trying to access a public route
