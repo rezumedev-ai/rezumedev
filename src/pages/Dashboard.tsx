@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { Json } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { UpgradeDialog } from "@/components/dashboard/UpgradeDialog";
 
 interface ResumeData {
   id: string;
@@ -29,6 +30,7 @@ export default function Dashboard() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -64,6 +66,21 @@ export default function Dashboard() {
     },
   });
 
+  // Check if the user is on a free plan when the profile data is loaded
+  useEffect(() => {
+    // Only show the upgrade dialog on initial load and if user is on free plan
+    if (profile && (!profile.subscription_plan || profile.subscription_status !== 'active')) {
+      // Check if we've shown the dialog during this session
+      const hasShownUpgradeDialog = sessionStorage.getItem('hasShownUpgradeDialog');
+      
+      if (!hasShownUpgradeDialog) {
+        setShowUpgradeDialog(true);
+        // Mark that we've shown the dialog this session
+        sessionStorage.setItem('hasShownUpgradeDialog', 'true');
+      }
+    }
+  }, [profile]);
+
   const handleCreateNew = () => {
     navigate("/new-resume");
   };
@@ -73,6 +90,10 @@ export default function Dashboard() {
       title: "Resume Pro Tips",
       description: "Keep your resume concise, customize for each job, and focus on achievements instead of duties.",
     });
+  };
+
+  const handleCloseUpgradeDialog = () => {
+    setShowUpgradeDialog(false);
   };
 
   const container = {
@@ -220,6 +241,12 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </div>
+
+      {/* Upgrade Dialog */}
+      <UpgradeDialog 
+        isOpen={showUpgradeDialog} 
+        onClose={handleCloseUpgradeDialog}
+      />
     </div>
   );
 }
