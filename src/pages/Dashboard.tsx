@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import { Json } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { UpgradeDialog } from "@/components/dashboard/UpgradeDialog";
 
 interface ResumeData {
   id: string;
@@ -24,7 +24,7 @@ interface ResumeData {
 }
 
 export default function Dashboard() {
-  const { user, showUpgradeDialog, closeUpgradeDialog, navigateToPricing } = useAuth();
+  const { user } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -42,7 +42,6 @@ export default function Dashboard() {
       if (error) throw error;
       return data;
     },
-    enabled: !!user, // Only run query if user is available
   });
 
   const { data: resumes, isLoading } = useQuery({
@@ -63,7 +62,6 @@ export default function Dashboard() {
           : { title: '' }
       }));
     },
-    enabled: !!user, // Only run query if user is available
   });
 
   const handleCreateNew = () => {
@@ -103,13 +101,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/20">
-      {/* Include the UpgradeDialog component */}
-      <UpgradeDialog 
-        isOpen={showUpgradeDialog} 
-        onClose={closeUpgradeDialog} 
-        onViewPricing={navigateToPricing}
-      />
-
       {isMobile && (
         <motion.div 
           className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 p-4 flex justify-between items-center"

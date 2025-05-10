@@ -11,9 +11,6 @@ type AuthContextType = {
   loading: boolean;
   signOut: () => Promise<void>;
   getAuthToken: () => Promise<string | null>;
-  showUpgradeDialog: boolean;
-  closeUpgradeDialog: () => void;
-  navigateToPricing: () => void;
 };
 
 const AuthContext = createContext<AuthContextType>({ 
@@ -21,28 +18,14 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signOut: async () => {},
   getAuthToken: async () => null,
-  showUpgradeDialog: false,
-  closeUpgradeDialog: () => {},
-  navigateToPricing: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialAuthCheckDone, setInitialAuthCheckDone] = useState(false);
-  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-
-  const closeUpgradeDialog = () => {
-    setShowUpgradeDialog(false);
-  };
-
-  const navigateToPricing = () => {
-    setShowUpgradeDialog(false);
-    navigate('/pricing');
-  };
 
   // Helper function to get current auth token
   const getAuthToken = async (): Promise<string | null> => {
@@ -54,32 +37,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error("🔴 ERROR: Failed to get auth token:", error);
       return null;
-    }
-  };
-
-  // Check if user is on free plan
-  const checkUserSubscription = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("subscription_plan, subscription_status")
-        .eq("id", userId)
-        .single();
-
-      if (error) throw error;
-      
-      const isFreePlan = !data.subscription_plan || data.subscription_status !== 'active';
-      
-      if (isFreePlan) {
-        console.log("🔑 AUTH: User is on free plan, showing upgrade dialog");
-        setShowUpgradeDialog(true);
-      } else {
-        console.log("🔑 AUTH: User has an active subscription");
-      }
-    } catch (error) {
-      console.error("🔴 ERROR: Failed to check user subscription:", error);
-      // Default to showing the dialog if there's an error checking subscription
-      setShowUpgradeDialog(true);
     }
   };
 
@@ -116,7 +73,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("🔴 ERROR: Error checking auth state:", error);
       } finally {
         setLoading(false);
-        setInitialAuthCheckDone(true);
       }
     };
 
@@ -136,11 +92,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Handle different auth events
       switch (event) {
         case 'SIGNED_IN':
-          // Check if the user is on a free plan and show upgrade dialog
-          if (session?.user) {
-            await checkUserSubscription(session.user.id);
-          }
-          
           navigate('/dashboard', { replace: true });
           break;
         case 'SIGNED_OUT':
@@ -194,15 +145,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      signOut, 
-      getAuthToken,
-      showUpgradeDialog,
-      closeUpgradeDialog,
-      navigateToPricing
-    }}>
+    <AuthContext.Provider value={{ user, loading, signOut, getAuthToken }}>
       {children}
     </AuthContext.Provider>
   );
