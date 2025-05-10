@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight, FileText } from "lucide-react";
@@ -135,6 +136,13 @@ function AnimatedHero() {
                 Build Your Resume Now <MoveRight className="w-4 h-4" />
               </RainbowButton>
             </Link>
+            
+            <motion.p 
+              className="text-sm text-muted-foreground animate-fade-in"
+              style={{ animationDelay: '300ms' }}
+            >
+              Try it for free — no credit card required
+            </motion.p>
             
             <div className="pt-8 text-center">
               <GradientHeading variant="secondary" size="xs" weight="semi">
