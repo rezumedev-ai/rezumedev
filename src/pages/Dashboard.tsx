@@ -1,8 +1,7 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
@@ -25,12 +24,11 @@ interface ResumeData {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, showUpgradeDialog, setShowUpgradeDialog } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -65,21 +63,6 @@ export default function Dashboard() {
       }));
     },
   });
-
-  // Check if the user is on a free plan when the profile data is loaded
-  useEffect(() => {
-    // Only show the upgrade dialog on initial load and if user is on free plan
-    if (profile && (!profile.subscription_plan || profile.subscription_status !== 'active')) {
-      // Check if we've shown the dialog during this session
-      const hasShownUpgradeDialog = sessionStorage.getItem('hasShownUpgradeDialog');
-      
-      if (!hasShownUpgradeDialog) {
-        setShowUpgradeDialog(true);
-        // Mark that we've shown the dialog this session
-        sessionStorage.setItem('hasShownUpgradeDialog', 'true');
-      }
-    }
-  }, [profile]);
 
   const handleCreateNew = () => {
     navigate("/new-resume");
