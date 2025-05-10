@@ -11,8 +11,6 @@ type AuthContextType = {
   loading: boolean;
   signOut: () => Promise<void>;
   getAuthToken: () => Promise<string | null>;
-  showUpgradeDialog: boolean;
-  setShowUpgradeDialog: (show: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({ 
@@ -20,15 +18,11 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signOut: async () => {},
   getAuthToken: async () => null,
-  showUpgradeDialog: false,
-  setShowUpgradeDialog: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
-  const [initialAuthCheckDone, setInitialAuthCheckDone] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -43,31 +37,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error("🔴 ERROR: Failed to get auth token:", error);
       return null;
-    }
-  };
-
-  // Helper function to check user subscription status
-  const checkUserSubscription = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("subscription_plan, subscription_status")
-        .eq("id", userId)
-        .single();
-      
-      if (error) throw error;
-      
-      // Check if the user has seen the upgrade dialog this session
-      const hasShownUpgradeDialog = sessionStorage.getItem('hasShownUpgradeDialog');
-      
-      // Show dialog immediately if user is on free plan and hasn't seen it this session
-      if ((!data.subscription_plan || data.subscription_status !== 'active') && !hasShownUpgradeDialog) {
-        setShowUpgradeDialog(true);
-        // Mark that we've shown the dialog this session
-        sessionStorage.setItem('hasShownUpgradeDialog', 'true');
-      }
-    } catch (error) {
-      console.error("Error checking subscription status:", error);
     }
   };
 
@@ -89,16 +58,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Check if token is stored in localStorage
           const hasLocalToken = localStorage.getItem('supabase.auth.token') !== null;
           console.log("🔑 AUTH: Token in localStorage:", hasLocalToken ? "Yes" : "No");
-          
-          // Set user and check subscription status
-          setUser(session.user);
-          
-          // Check user subscription status immediately
-          await checkUserSubscription(session.user.id);
         } else {
           console.log("🔑 AUTH: No active session found");
-          setUser(null);
         }
+        
+        setUser(session?.user ?? null);
         
         // Only redirect to login if we're not on a public route and there's no session
         const currentPath = location.pathname;
@@ -109,7 +73,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("🔴 ERROR: Error checking auth state:", error);
       } finally {
         setLoading(false);
-        setInitialAuthCheckDone(true);
       }
     };
 
@@ -129,14 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Handle different auth events
       switch (event) {
         case 'SIGNED_IN':
-          // Check user subscription status and show upgrade dialog if needed
-          if (session?.user) {
-            await checkUserSubscription(session.user.id);
-            
-            // Only navigate to dashboard if this is an actual sign-in event
-            // (not just a token refresh or initial auth check)
-            navigate('/dashboard', { replace: true });
-          }
+          navigate('/dashboard', { replace: true });
           break;
         case 'SIGNED_OUT':
           // Only redirect to login if we're not trying to access a public route
@@ -173,9 +129,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Clear any persisted tokens
       localStorage.removeItem('supabase.auth.token');
       
-      // Clear session storage items
-      sessionStorage.removeItem('hasShownUpgradeDialog');
-      
       // Ensure user is set to null
       setUser(null);
       
@@ -192,14 +145,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      signOut, 
-      getAuthToken,
-      showUpgradeDialog,
-      setShowUpgradeDialog
-    }}>
+    <AuthContext.Provider value={{ user, loading, signOut, getAuthToken }}>
       {children}
     </AuthContext.Provider>
   );

@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import { Json } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { UpgradeDialog } from "@/components/dashboard/UpgradeDialog";
 
 interface ResumeData {
   id: string;
@@ -25,7 +24,7 @@ interface ResumeData {
 }
 
 export default function Dashboard() {
-  const { user, showUpgradeDialog, setShowUpgradeDialog } = useAuth();
+  const { user } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -43,7 +42,6 @@ export default function Dashboard() {
       if (error) throw error;
       return data;
     },
-    enabled: !!user, // Only run query when user is available
   });
 
   const { data: resumes, isLoading } = useQuery({
@@ -64,7 +62,6 @@ export default function Dashboard() {
           : { title: '' }
       }));
     },
-    enabled: !!user, // Only run query when user is available
   });
 
   const handleCreateNew = () => {
@@ -76,10 +73,6 @@ export default function Dashboard() {
       title: "Resume Pro Tips",
       description: "Keep your resume concise, customize for each job, and focus on achievements instead of duties.",
     });
-  };
-
-  const handleCloseUpgradeDialog = () => {
-    setShowUpgradeDialog(false);
   };
 
   const container = {
@@ -227,12 +220,6 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </div>
-
-      {/* Upgrade Dialog */}
-      <UpgradeDialog 
-        isOpen={showUpgradeDialog} 
-        onClose={handleCloseUpgradeDialog}
-      />
     </div>
   );
 }
