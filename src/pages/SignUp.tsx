@@ -147,12 +147,6 @@ const SignUp = () => {
                 Sign in
               </Link>
             </div>
-            
-            <div className="pt-4 border-t border-gray-200">
-              <Link to="/appsumo" className="block text-center py-3 px-4 rounded-md bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors">
-                AppSumo user? Click here to redeem your code
-              </Link>
-            </div>
           </form>
         </div>
       </div>
