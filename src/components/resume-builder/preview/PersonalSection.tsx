@@ -38,6 +38,14 @@ export function PersonalSection({
     onUpdate(field, newValue);
   };
 
+  // Function to format URLs properly with https:// if missing
+  const formatUrl = (url: string): string => {
+    if (!url) return '';
+    return url.startsWith('http://') || url.startsWith('https://') 
+      ? url 
+      : `https://${url}`;
+  };
+
   const styles = {
     "executive-clean": {
       container: "mb-10 pb-6 border-b-2 border-gray-800",
@@ -92,11 +100,17 @@ export function PersonalSection({
     resetOffset
   } = useDraggableImage(imageDraggable);
 
+  // Define common link style for hyperlinks
+  const linkStyle = template.id === "professional-navy" 
+    ? "hover:underline text-white text-opacity-90 hover:text-opacity-100" 
+    : "hover:underline text-gray-600 hover:text-gray-900";
+
   if (template.id === "professional-navy") {
     return (
       <div className={template.style.headerStyle}>
         <div className={styles["professional-navy"].imageContainer}>
           <div className="w-32 h-32 rounded-full bg-white border-4 border-white overflow-hidden flex items-center justify-center relative select-none">
+            {/* ... keep existing code (profile image rendering) */}
             {profileImageUrl ? (
               <div
                 style={{
@@ -202,26 +216,50 @@ export function PersonalSection({
             </div>
             {linkedin && (
               <div>
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("linkedin", e)}
-                >
-                  {linkedin}
-                </span>
+                {isEditing ? (
+                  <span 
+                    className="outline-none"
+                    contentEditable={true}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit("linkedin", e)}
+                  >
+                    {linkedin}
+                  </span>
+                ) : (
+                  <a 
+                    href={formatUrl(linkedin)}
+                    className={linkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-pdf-link="true"
+                  >
+                    {linkedin}
+                  </a>
+                )}
               </div>
             )}
             {website && (
               <div>
-                <span 
-                  className="outline-none"
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("website", e)}
-                >
-                  {website}
-                </span>
+                {isEditing ? (
+                  <span 
+                    className="outline-none"
+                    contentEditable={true}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit("website", e)}
+                  >
+                    {website}
+                  </span>
+                ) : (
+                  <a 
+                    href={formatUrl(website)}
+                    className={linkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-pdf-link="true"
+                  >
+                    {website}
+                  </a>
+                )}
               </div>
             )}
           </div>
@@ -235,6 +273,7 @@ export function PersonalSection({
       <div className={currentStyle.container}>
         <div className={styles["modern-professional"].imageContainer}>
           <div className="w-40 h-40 rounded-full bg-emerald-100 border-4 border-emerald-500 overflow-hidden flex items-center justify-center relative select-none">
+            {/* ... keep existing code (profile image rendering) */}
             {profileImageUrl ? (
               <div
                 style={{
@@ -340,26 +379,50 @@ export function PersonalSection({
             </div>
             {linkedin && (
               <div>
-                <span
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("linkedin", e)}
-                  className="outline-none"
-                >
-                  {linkedin}
-                </span>
+                {isEditing ? (
+                  <span
+                    contentEditable={true}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit("linkedin", e)}
+                    className="outline-none"
+                  >
+                    {linkedin}
+                  </span>
+                ) : (
+                  <a 
+                    href={formatUrl(linkedin)}
+                    className={linkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-pdf-link="true"
+                  >
+                    {linkedin}
+                  </a>
+                )}
               </div>
             )}
             {website && (
               <div>
-                <span
-                  contentEditable={isEditing}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleContentEdit("website", e)}
-                  className="outline-none"
-                >
-                  {website}
-                </span>
+                {isEditing ? (
+                  <span
+                    contentEditable={true}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleContentEdit("website", e)}
+                    className="outline-none"
+                  >
+                    {website}
+                  </span>
+                ) : (
+                  <a 
+                    href={formatUrl(website)}
+                    className={linkStyle}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-pdf-link="true"
+                  >
+                    {website}
+                  </a>
+                )}
               </div>
             )}
           </div>
@@ -413,27 +476,51 @@ export function PersonalSection({
           {linkedin && (
             <div className="flex items-center gap-1">
               <Linkedin className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
-              <span 
-                className="text-xs text-gray-600 outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-              >
-                {linkedin}
-              </span>
+              {isEditing ? (
+                <span 
+                  className="text-xs text-gray-600 outline-none"
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                >
+                  {linkedin}
+                </span>
+              ) : (
+                <a 
+                  href={formatUrl(linkedin)}
+                  className="text-xs text-gray-600 hover:underline hover:text-gray-900"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {linkedin}
+                </a>
+              )}
             </div>
           )}
           {website && (
             <div className="flex items-center gap-1">
               <Globe className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
-              <span 
-                className="text-xs text-gray-600 outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-              >
-                {website}
-              </span>
+              {isEditing ? (
+                <span 
+                  className="text-xs text-gray-600 outline-none"
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                >
+                  {website}
+                </span>
+              ) : (
+                <a 
+                  href={formatUrl(website)}
+                  className="text-xs text-gray-600 hover:underline hover:text-gray-900"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {website}
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -467,26 +554,50 @@ export function PersonalSection({
           </div>
           {linkedin && (
             <div>
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-                className="outline-none"
-              >
-                {linkedin}
-              </span>
+              {isEditing ? (
+                <span
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                  className="outline-none"
+                >
+                  {linkedin}
+                </span>
+              ) : (
+                <a 
+                  href={formatUrl(linkedin)}
+                  className="hover:underline text-black"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {linkedin}
+                </a>
+              )}
             </div>
           )}
           {website && (
             <div>
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-                className="outline-none"
-              >
-                {website}
-              </span>
+              {isEditing ? (
+                <span
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                  className="outline-none"
+                >
+                  {website}
+                </span>
+              ) : (
+                <a 
+                  href={formatUrl(website)}
+                  className="hover:underline text-black"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {website}
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -518,26 +629,50 @@ export function PersonalSection({
           </div>
           {linkedin && (
             <div>
-              <div
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-                className="outline-none"
-              >
-                {linkedin}
-              </div>
+              {isEditing ? (
+                <div
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                  className="outline-none"
+                >
+                  {linkedin}
+                </div>
+              ) : (
+                <a 
+                  href={formatUrl(linkedin)}
+                  className="hover:underline text-gray-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {linkedin}
+                </a>
+              )}
             </div>
           )}
           {website && (
             <div>
-              <div
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-                className="outline-none"
-              >
-                {website}
-              </div>
+              {isEditing ? (
+                <div
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                  className="outline-none"
+                >
+                  {website}
+                </div>
+              ) : (
+                <a 
+                  href={formatUrl(website)}
+                  className="hover:underline text-gray-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {website}
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -571,27 +706,51 @@ export function PersonalSection({
         {linkedin && (
           <div className="flex items-center gap-1.5">
             <Linkedin className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("linkedin", e)}
-              className="outline-none"
-            >
-              {linkedin}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("linkedin", e)}
+                className="outline-none"
+              >
+                {linkedin}
+              </div>
+            ) : (
+              <a 
+                href={formatUrl(linkedin)}
+                className="hover:underline text-gray-600"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-pdf-link="true"
+              >
+                {linkedin}
+              </a>
+            )}
           </div>
         )}
         {website && (
           <div className="flex items-center gap-1.5">
             <Globe className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("website", e)}
-              className="outline-none"
-            >
-              {website}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("website", e)}
+                className="outline-none"
+              >
+                {website}
+              </div>
+            ) : (
+              <a 
+                href={formatUrl(website)}
+                className="hover:underline text-gray-600"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-pdf-link="true"
+              >
+                {website}
+              </a>
+            )}
           </div>
         )}
       </div>

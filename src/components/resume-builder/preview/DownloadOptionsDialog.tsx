@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FileDown, Lock } from "lucide-react";
@@ -145,6 +146,43 @@ export function DownloadOptionsDialog({
           });
         }
       }
+
+      // Find all hyperlinks in the cloned resume to add them to the PDF later
+      const links: { url: string, left: number, top: number, width: number, height: number }[] = [];
+      const pdfLinkElements = clonedResume.querySelectorAll('[data-pdf-link="true"]');
+      pdfLinkElements.forEach((linkElement, index) => {
+        const element = linkElement as HTMLElement;
+        // Replace link tag with span to avoid issues with html2canvas
+        const linkUrl = element.getAttribute('href') || '';
+        const linkText = element.textContent || '';
+        
+        // Collect link info for later
+        const rect = element.getBoundingClientRect();
+        const offsetTop = element.offsetTop;
+        const offsetLeft = element.offsetLeft;
+        const parent = element.parentElement;
+        
+        // Store link details
+        links.push({
+          url: linkUrl,
+          left: offsetLeft,
+          top: offsetTop,
+          width: rect.width,
+          height: rect.height
+        });
+        
+        // Replace link with span
+        const span = document.createElement('span');
+        span.innerText = linkText;
+        span.className = element.className + ' pdf-hyperlink';
+        span.style.color = '#0000EE'; // Standard link blue color
+        span.style.textDecoration = 'underline';
+        span.dataset.linkIndex = index.toString();
+        
+        if (parent) {
+          parent.replaceChild(span, element);
+        }
+      });
 
       const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
       contactIcons.forEach(icon => {
@@ -337,37 +375,46 @@ export function DownloadOptionsDialog({
       const a4AspectRatio = pdfWidth / pdfHeight;
       
       // Check if content is too tall for A4 height
+      let imgWidth, imgHeight, offsetX = 0;
+      
       if (canvasAspectRatio < a4AspectRatio) {
         // Content is taller than A4 proportions - we need to scale to fit height
-        const imgHeight = pdfHeight;
-        const imgWidth = imgHeight * canvasAspectRatio;
-        const offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
-        
-        pdf.addImage(
-          imgData,
-          'JPEG',
-          offsetX, // Center horizontally
-          0, // Align to top
-          imgWidth,
-          imgHeight,
-          undefined,
-          'FAST'
-        );
+        imgHeight = pdfHeight;
+        imgWidth = imgHeight * canvasAspectRatio;
+        offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
       } else {
         // Content fits within A4 proportions or is wider - use full width
-        const imgWidth = pdfWidth;
-        const imgHeight = imgWidth / canvasAspectRatio;
+        imgWidth = pdfWidth;
+        imgHeight = imgWidth / canvasAspectRatio;
+      }
+      
+      pdf.addImage(
+        imgData,
+        'JPEG',
+        offsetX, // Center horizontally if needed
+        0, // Align to top
+        imgWidth,
+        imgHeight,
+        undefined,
+        'FAST'
+      );
+
+      // Add hyperlinks to the PDF
+      if (links.length > 0) {
+        // Calculate scale ratio between canvas and PDF
+        const scaleX = imgWidth / originalWidth;
+        const scaleY = imgHeight / originalHeight;
         
-        pdf.addImage(
-          imgData,
-          'JPEG',
-          0, // No horizontal offset - use full width
-          0, // No vertical offset - align to top
-          imgWidth,
-          imgHeight,
-          undefined,
-          'FAST'
-        );
+        links.forEach(link => {
+          // Convert link position from original coordinates to PDF coordinates
+          const pdfX = offsetX + (link.left * scaleX);
+          const pdfY = link.top * scaleY;
+          const pdfWidth = link.width * scaleX;
+          const pdfHeight = link.height * scaleY;
+          
+          // Add clickable link area to the PDF
+          pdf.link(pdfX, pdfY, pdfWidth, pdfHeight, { url: link.url });
+        });
       }
 
       pdf.save('resume.pdf');
