@@ -187,54 +187,7 @@ export function useResumeProfiles() {
     }
   });
 
-  // Create initial profile if none exists
-  const createInitialProfile = async () => {
-    if (!user || isLoading) return;
-    
-    if (profiles && profiles.length === 0) {
-      // Create a default profile based on user data
-      try {
-        const { data: userData, error: userError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (userError) throw userError;
-
-        await createProfileMutation.mutateAsync({
-          name: 'Default Profile',
-          personal_info: {
-            fullName: userData?.full_name || '',
-            email: user.email || '',
-            phone: userData?.phone || '',
-            linkedin: userData?.linkedin_url || '',
-            website: userData?.website_url || ''
-          },
-          is_default: true
-        });
-
-      } catch (error) {
-        console.error("Error creating initial profile:", error);
-        // Create an empty profile if we couldn't get user data
-        await createProfileMutation.mutateAsync({
-          name: 'Default Profile',
-          personal_info: {
-            fullName: '',
-            email: user.email || '',
-            phone: '',
-          },
-          is_default: true
-        });
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (user && profiles && profiles.length === 0 && !isLoading) {
-      createInitialProfile();
-    }
-  }, [user, profiles, isLoading]);
+  // Removed createInitialProfile and its useEffect
 
   return {
     profiles: profiles || [],

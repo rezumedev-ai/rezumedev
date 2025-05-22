@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useResumeProfiles } from '@/hooks/use-resume-profiles';
 import { SimplifiedHeader } from '@/components/SimplifiedHeader';
@@ -33,12 +33,12 @@ export default function ProfileSelection() {
     isDeleting
   } = useResumeProfiles();
 
-  // Set selected profile to default if available
-  const defaultProfile = profiles.find(p => p.is_default);
-  
-  if (!selectedProfileId && defaultProfile && !isLoading) {
-    setSelectedProfileId(defaultProfile.id);
-  }
+  // Auto-select first profile if there is one and none is selected
+  useEffect(() => {
+    if (profiles.length > 0 && !selectedProfileId && !isLoading) {
+      setSelectedProfileId(profiles[0].id);
+    }
+  }, [profiles, selectedProfileId, isLoading]);
 
   const handleProfileSelect = (profileId: string) => {
     setSelectedProfileId(profileId);
@@ -61,7 +61,12 @@ export default function ProfileSelection() {
         ...profileData
       });
     } else {
-      createProfile(profileData);
+      // For first profile, also set as default
+      const isFirst = profiles.length === 0;
+      createProfile({
+        ...profileData,
+        is_default: isFirst ? true : profileData.is_default
+      });
     }
     setShowProfileDialog(false);
   };
@@ -106,6 +111,13 @@ export default function ProfileSelection() {
     }
   };
 
+  // Show the create profile dialog automatically if there are no profiles
+  useEffect(() => {
+    if (!isLoading && profiles.length === 0 && user) {
+      setShowProfileDialog(true);
+    }
+  }, [isLoading, profiles.length, user]);
+
   if (!user) {
     navigate('/login');
     return null;
@@ -116,44 +128,48 @@ export default function ProfileSelection() {
       <SimplifiedHeader />
       
       <motion.div 
-        className="max-w-5xl mx-auto pt-20 pb-10 px-4"
+        className="max-w-5xl mx-auto pt-16 sm:pt-20 pb-10 px-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
         <motion.div
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl font-bold mb-4 text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 text-white">
             Who's creating a resume?
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
             Select a profile or create a new one to get started
           </p>
         </motion.div>
 
-        <div className="flex justify-end mb-6">
-          <Button
-            variant={isEditing ? "default" : "outline"}
-            className={`transition-all ${isEditing ? "bg-green-500 hover:bg-green-600" : "bg-transparent"}`}
-            onClick={handleToggleEditing}
-          >
-            {isEditing ? (
-              <>
-                <CheckCheck className="w-4 h-4 mr-2" />
-                Done
-              </>
-            ) : (
-              <>
-                <PencilRuler className="w-4 h-4 mr-2" />
-                Edit Profiles
-              </>
-            )}
-          </Button>
-        </div>
+        {profiles.length > 0 && (
+          <div className="flex justify-end mb-6">
+            <Button
+              variant={isEditing ? "default" : "outline"}
+              className={`transition-all ${isEditing ? "bg-green-500 hover:bg-green-600" : "bg-transparent"}`}
+              onClick={handleToggleEditing}
+              size="sm"
+              aria-label={isEditing ? "Done editing" : "Edit profiles"}
+            >
+              {isEditing ? (
+                <>
+                  <CheckCheck className="w-4 h-4 mr-2" />
+                  Done
+                </>
+              ) : (
+                <>
+                  <PencilRuler className="w-4 h-4 mr-2" />
+                  Edit Profiles
+                </>
+              )}
+            </Button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-40">
@@ -161,13 +177,13 @@ export default function ProfileSelection() {
           </div>
         ) : (
           <motion.div 
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
             {profiles.map((profile) => (
-              <motion.div key={profile.id} variants={itemVariants}>
+              <motion.div key={profile.id} variants={itemVariants} className="w-full">
                 <ProfileCard
                   profile={profile}
                   isSelected={profile.id === selectedProfileId}
@@ -179,35 +195,43 @@ export default function ProfileSelection() {
             ))}
             
             {profiles.length < 5 && (
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="w-full">
                 <AddProfileCard onClick={handleAddProfile} />
               </motion.div>
             )}
           </motion.div>
         )}
 
-        <motion.div 
-          className="mt-12 flex justify-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Button
-            onClick={handleCreateResume}
-            className="min-w-[200px] py-6 text-lg transition-all duration-300 hover:shadow-lg hover:scale-105"
-            disabled={!selectedProfileId}
+        {profiles.length > 0 && (
+          <motion.div 
+            className="mt-8 sm:mt-12 flex justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
-            Create Resume
-          </Button>
-        </motion.div>
+            <Button
+              onClick={handleCreateResume}
+              className="min-w-[200px] py-5 sm:py-6 text-base sm:text-lg transition-all duration-300 hover:shadow-lg hover:scale-105"
+              disabled={!selectedProfileId}
+            >
+              Create Resume
+            </Button>
+          </motion.div>
+        )}
       </motion.div>
 
       <ProfileDialog
         isOpen={showProfileDialog}
-        onClose={() => setShowProfileDialog(false)}
+        onClose={() => {
+          setShowProfileDialog(false);
+          // If there are no profiles and user closes dialog, show it again
+          if (profiles.length === 0) {
+            setTimeout(() => setShowProfileDialog(true), 100);
+          }
+        }}
         onSave={handleSaveProfile}
         existingProfile={profileToEdit}
-        isDefault={profiles.length === 0}
+        isDefault={profiles.length === 0} // First profile will be default
       />
     </main>
   );

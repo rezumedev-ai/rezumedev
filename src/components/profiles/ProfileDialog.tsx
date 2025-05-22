@@ -30,7 +30,6 @@ export function ProfileDialog({
   isDefault = false
 }: ProfileDialogProps) {
   const { toast } = useToast();
-  const [name, setName] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -43,7 +42,6 @@ export function ProfileDialog({
   // Reset form when dialog opens/closes or profile changes
   useEffect(() => {
     if (existingProfile) {
-      setName(existingProfile.name || '');
       setFullName(existingProfile.personal_info.fullName || '');
       setEmail(existingProfile.personal_info.email || '');
       setPhone(existingProfile.personal_info.phone || '');
@@ -52,7 +50,6 @@ export function ProfileDialog({
       setAvatarUrl(existingProfile.avatar_url || null);
       setMakeDefault(existingProfile.is_default);
     } else {
-      setName('');
       setFullName('');
       setEmail('');
       setPhone('');
@@ -64,17 +61,17 @@ export function ProfileDialog({
   }, [existingProfile, isOpen, isDefault]);
 
   const handleSave = () => {
-    if (!name.trim()) {
+    if (!fullName.trim()) {
       toast({
-        title: "Profile name required",
-        description: "Please enter a name for this profile",
+        title: "Full name required",
+        description: "Please enter your full name to create a profile",
         variant: "destructive"
       });
       return;
     }
 
     const profileData = {
-      name,
+      name: fullName, // Use fullName as the profile name
       personal_info: {
         fullName,
         email,
@@ -143,11 +140,11 @@ export function ProfileDialog({
     setAvatarUrl(null);
   };
 
-  const initials = getInitials(fullName || name);
+  const initials = getInitials(fullName);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{existingProfile ? 'Edit Profile' : 'Create New Profile'}</DialogTitle>
           <DialogDescription>
@@ -200,23 +197,13 @@ export function ProfileDialog({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="name">Profile Name<span className="text-red-500">*</span></Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Professional, Creative, Academic"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
+            <Label htmlFor="fullName">Full Name<span className="text-red-500">*</span></Label>
             <Input
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your full name"
+              required
             />
           </div>
           
@@ -276,8 +263,8 @@ export function ProfileDialog({
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave}>
+          <Button variant="outline" onClick={onClose} className="sm:mt-0 mt-2">Cancel</Button>
+          <Button onClick={handleSave} className="sm:mt-0 mt-2">
             {existingProfile ? 'Update Profile' : 'Create Profile'}
           </Button>
         </DialogFooter>

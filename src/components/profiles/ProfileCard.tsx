@@ -24,13 +24,16 @@ export function ProfileCard({
 }: ProfileCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const initials = getInitials(profile.personal_info.fullName || profile.name);
+  
+  // Use the full name as the display name
+  const displayName = profile.personal_info.fullName || profile.name;
 
   return (
     <motion.div
       className={cn(
         "relative cursor-pointer rounded-lg overflow-hidden transition-all duration-300",
         "flex flex-col items-center justify-center p-2",
-        "w-full max-w-[180px] aspect-square mx-auto",
+        "w-full aspect-square mx-auto",
         isSelected ? "ring-4 ring-primary bg-accent/30" : 
           (isEditing ? "ring-2 ring-yellow-400" : "hover:ring-2 hover:ring-primary/50"),
         isEditing ? "cursor-default" : ""
@@ -41,19 +44,19 @@ export function ProfileCard({
       onMouseLeave={() => setIsHovered(false)}
       onClick={isEditing ? undefined : onSelect}
     >
-      <div className="flex flex-col items-center justify-center space-y-4 w-full h-full">
-        <Avatar className="w-24 h-24 border-4 border-background">
+      <div className="flex flex-col items-center justify-center space-y-3 w-full h-full">
+        <Avatar className="w-16 sm:w-20 h-16 sm:h-20 border-4 border-background">
           {profile.avatar_url ? (
-            <AvatarImage src={profile.avatar_url} alt={profile.name} />
+            <AvatarImage src={profile.avatar_url} alt={displayName} />
           ) : (
-            <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+            <AvatarFallback className="text-xl sm:text-2xl bg-primary text-primary-foreground">
               {initials}
             </AvatarFallback>
           )}
         </Avatar>
 
-        <h3 className="font-medium text-lg text-center line-clamp-1">
-          {profile.name}
+        <h3 className="font-medium text-base sm:text-lg text-center line-clamp-2 text-white px-1">
+          {displayName}
         </h3>
         
         {profile.is_default && (
