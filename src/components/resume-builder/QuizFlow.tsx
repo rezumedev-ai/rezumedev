@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -23,6 +22,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { PersonalInfoStep } from "./PersonalInfoStep";
+import { ResumeProfile } from "@/types/profile";
+import { isObject, getStringProperty } from "@/utils/type-guards";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -87,7 +88,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         return null;
       }
       
-      return data;
+      return data as ResumeProfile;
     },
     enabled: !!user
   });
@@ -102,16 +103,16 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   
   // Apply selected profile data to form
   useEffect(() => {
-    if (selectedProfile) {
+    if (selectedProfile && isObject(selectedProfile.personal_info)) {
       setFormData(prev => ({
         ...prev,
         personal_info: {
           ...prev.personal_info,
-          fullName: selectedProfile.personal_info.fullName || "",
-          email: selectedProfile.personal_info.email || "",
-          phone: selectedProfile.personal_info.phone || "",
-          linkedin: selectedProfile.personal_info.linkedin || "",
-          website: selectedProfile.personal_info.website || ""
+          fullName: getStringProperty(selectedProfile.personal_info, 'fullName', ''),
+          email: getStringProperty(selectedProfile.personal_info, 'email', ''),
+          phone: getStringProperty(selectedProfile.personal_info, 'phone', ''),
+          linkedin: getStringProperty(selectedProfile.personal_info, 'linkedin', ''),
+          website: getStringProperty(selectedProfile.personal_info, 'website', '')
         }
       }));
     }
