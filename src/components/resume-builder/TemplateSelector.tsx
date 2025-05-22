@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { TemplatePreview } from "./TemplatePreview";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ResumeProfile } from "@/types/profile";
 
 interface TemplateSelectorProps {
   onTemplateSelect?: (templateId: string) => void;
@@ -23,6 +24,9 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Get the selected profile ID from localStorage
+  const selectedProfileId = localStorage.getItem('selectedProfileId');
 
   // Fetch user profile to check subscription status
   const { data: profile } = useQuery({
@@ -44,6 +48,27 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     enabled: !!user
   });
 
+  // Fetch the selected resume profile
+  const { data: resumeProfile } = useQuery({
+    queryKey: ["resumeProfile", selectedProfileId],
+    queryFn: async () => {
+      if (!selectedProfileId || !user) return null;
+      const { data, error } = await supabase
+        .from("resume_profiles")
+        .select("*")
+        .eq("id", selectedProfileId)
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching resume profile:", error);
+        return null;
+      }
+      return data as ResumeProfile;
+    },
+    enabled: !!selectedProfileId && !!user
+  });
+
   // Get the count of existing resumes for free users
   const { data: resumeCount } = useQuery({
     queryKey: ["resumeCount", user?.id],
@@ -62,6 +87,13 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     },
     enabled: !!user
   });
+
+  // Redirect to profile selection if no profile is selected
+  useEffect(() => {
+    if (user && !selectedProfileId) {
+      navigate('/profiles');
+    }
+  }, [user, selectedProfileId, navigate]);
 
   const hasActiveSubscription = profile && 
     profile.subscription_plan && 
@@ -90,6 +122,16 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
       return;
     }
 
+    if (!resumeProfile) {
+      toast({
+        title: "Profile Required",
+        description: "Please select a profile to continue",
+        variant: "destructive"
+      });
+      navigate("/profiles");
+      return;
+    }
+
     // Check if user has an active subscription or this is their first resume
     if (!canCreateResume) {
       setShowSubscriptionDialog(true);
@@ -108,7 +150,8 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
             title: 'Untitled Resume',
             template_id: selectedTemplate,
             content: {},
-            current_step: 1
+            current_step: 1,
+            personal_info: resumeProfile.personal_info
           }
         ])
         .select()
@@ -142,6 +185,10 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     navigate("/pricing");
   };
 
+  const navigateToProfiles = () => {
+    navigate("/profiles");
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -168,17 +215,30 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <motion.div 
-        className="text-center mb-12"
+        className="flex justify-between items-center mb-8"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        transition={{ duration: 0.4 }}
       >
-        <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-          Choose Your Resume Template
-        </h2>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Select a professional template that best showcases your skills and experience
-        </p>
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+            Choose Your Resume Template
+          </h2>
+          <p className="text-muted-foreground">
+            Select a professional template for your resume
+          </p>
+        </div>
+        
+        {resumeProfile && (
+          <Button
+            variant="outline"
+            onClick={navigateToProfiles}
+            className="flex items-center gap-2"
+          >
+            Using {resumeProfile.name}
+            <span className="text-xs opacity-70">(Change)</span>
+          </Button>
+        )}
       </motion.div>
 
       <motion.div 

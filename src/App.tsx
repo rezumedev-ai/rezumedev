@@ -30,8 +30,9 @@ import NewResume from "./pages/NewResume";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import AppSumoSignUp from "./pages/AppSumoSignUp"; // Keep this import
-import ChangePassword from "./pages/ChangePassword"; // Add new import for ChangePassword page
+import AppSumoSignUp from "./pages/AppSumoSignUp"; 
+import ChangePassword from "./pages/ChangePassword";
+import ProfileSelection from "./pages/ProfileSelection"; // Add this import
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,7 +77,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/appsumo" element={<AppSumoSignUp />} /> {/* Keep AppSumo route */}
+                <Route path="/appsumo" element={<AppSumoSignUp />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
@@ -106,7 +107,6 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                {/* Add the new ChangePassword route */}
                 <Route
                   path="/change-password"
                   element={
@@ -120,6 +120,15 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Help />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Add profiles route */}
+                <Route
+                  path="/profiles"
+                  element={
+                    <ProtectedRoute>
+                      <ProfileSelection />
                     </ProtectedRoute>
                   }
                 />
