@@ -34,8 +34,8 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
-  const [useProfileData, setUseProfileData] = useState(false);
-  const [showRecipientStep, setShowRecipientStep] = useState(true);
+  const [useProfileData, setUseProfileData] = useState(true); // Default to using profile data
+  const [showRecipientStep, setShowRecipientStep] = useState(false); // Default to skipping recipient step
   const [showPersonalInfoStep, setShowPersonalInfoStep] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -63,6 +63,59 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   });
 
   const navigate = useNavigate();
+  
+  // Find the first professional summary question index (to start at job title)
+  const firstProfessionalSummaryIndex = questions.findIndex(q => q.type === "professional_summary");
+
+  // Fetch selected profile data
+  const { data: selectedProfile } = useQuery({
+    queryKey: ["selected-profile"],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const selectedProfileId = localStorage.getItem('selectedProfileId');
+      if (!selectedProfileId) return null;
+      
+      const { data, error } = await supabase
+        .from("resume_profiles")
+        .select("*")
+        .eq("id", selectedProfileId)
+        .single();
+        
+      if (error) {
+        console.error("Error fetching selected profile:", error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!user
+  });
+  
+  // Set initial question index
+  useEffect(() => {
+    // If we have a selected profile, start with professional summary questions
+    if (selectedProfile && firstProfessionalSummaryIndex !== -1) {
+      setCurrentQuestionIndex(firstProfessionalSummaryIndex);
+    }
+  }, [selectedProfile, firstProfessionalSummaryIndex]);
+  
+  // Apply selected profile data to form
+  useEffect(() => {
+    if (selectedProfile) {
+      setFormData(prev => ({
+        ...prev,
+        personal_info: {
+          ...prev.personal_info,
+          fullName: selectedProfile.personal_info.fullName || "",
+          email: selectedProfile.personal_info.email || "",
+          phone: selectedProfile.personal_info.phone || "",
+          linkedin: selectedProfile.personal_info.linkedin || "",
+          website: selectedProfile.personal_info.website || ""
+        }
+      }));
+    }
+  }, [selectedProfile]);
   
   // Fetch user profile data
   const { data: profileData } = useQuery({
@@ -756,4 +809,3 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     </div>
   );
 }
-
