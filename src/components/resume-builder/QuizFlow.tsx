@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [useProfileData, setUseProfileData] = useState(false);
   const [showRecipientStep, setShowRecipientStep] = useState(true);
+  const [showPersonalInfoStep, setShowPersonalInfoStep] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   const isMobile = useIsMobile();
@@ -196,15 +198,6 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           website: profileData.website_url || ""
         }
       }));
-      
-      // Skip personal info questions if using profile data
-      if (currentStep === 0 && currentQuestionIndex === 0) {
-        // Find the first non-personal info question
-        const firstNonPersonalIndex = questions.findIndex(q => q.type !== "personal_info");
-        if (firstNonPersonalIndex > 0) {
-          setCurrentQuestionIndex(firstNonPersonalIndex);
-        }
-      }
     }
   }, [useProfileData, profileData, user]);
 
@@ -247,23 +240,23 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         response: value
       });
 
-      if (currentQuestion.type === "professional_summary") {
+      if (field.includes("professional_summary")) {
         await supabase
           .from('resumes')
           .update({
             professional_summary: {
               ...formData.professional_summary,
-              [field]: value
+              [field.replace("professional_summary.", "")]: value
             }
           })
           .eq('id', resumeId);
-      } else {
+      } else if (field.includes("personal_info")) {
         await supabase
           .from('resumes')
           .update({
             personal_info: {
               ...formData.personal_info,
-              [field]: value
+              [field.replace("personal_info.", "")]: value
             }
           })
           .eq('id', resumeId);
@@ -297,7 +290,18 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       }));
     }
     
-    await saveQuizResponse(currentQuestion.field, value);
+    await saveQuizResponse(`${currentQuestion.type}.${currentQuestion.field}`, value);
+  };
+
+  const handlePersonalInfoChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      personal_info: {
+        ...prev.personal_info,
+        [field]: value
+      }
+    }));
+    saveQuizResponse(`personal_info.${field}`, value);
   };
 
   const handleNext = async () => {
@@ -311,12 +315,61 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             personal_info: formData.personal_info
           })
           .eq('id', resumeId);
+        
+        // Skip to the next step after personal info
+        setShowRecipientStep(false);
+        
+        // Find the first non-personal-info question
+        const firstNonPersonalIndex = questions.findIndex(q => q.type !== "personal_info");
+        if (firstNonPersonalIndex > -1) {
+          setCurrentQuestionIndex(firstNonPersonalIndex);
+        } else {
+          setCurrentStep(1); // Move to the work experience step if all are personal info
+        }
+      } else {
+        // Show the comprehensive personal info step
+        setShowRecipientStep(false);
+        setShowPersonalInfoStep(true);
       }
-      
-      setShowRecipientStep(false);
       return;
     }
     
+    // If we're showing the personal info step, move to next step after validating
+    if (showPersonalInfoStep) {
+      // Validate required fields
+      const requiredFields = ["fullName", "email", "phone"];
+      const missingFields = requiredFields.filter(field => !formData.personal_info[field as keyof typeof formData.personal_info]);
+      
+      if (missingFields.length > 0) {
+        toast({
+          title: "Required Fields Missing",
+          description: "Please fill out all required fields marked with *",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Save all personal info to the database
+      await supabase
+        .from('resumes')
+        .update({
+          personal_info: formData.personal_info
+        })
+        .eq('id', resumeId);
+      
+      setShowPersonalInfoStep(false);
+      
+      // Find the first non-personal-info question
+      const firstNonPersonalIndex = questions.findIndex(q => q.type !== "personal_info");
+      if (firstNonPersonalIndex > -1) {
+        setCurrentQuestionIndex(firstNonPersonalIndex);
+      } else {
+        setCurrentStep(1); // Move to the work experience step if all are personal info
+      }
+      return;
+    }
+    
+    // Handle the regular quiz questions
     const currentValue = currentQuestion.type === "professional_summary" 
       ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary]
       : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info];
@@ -334,27 +387,6 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       setCurrentStep(prev => prev + 1);
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
-      
-      // Skip personal info questions if using profile data
-      if (useProfileData) {
-        const nextQuestion = questions[currentQuestionIndex + 1];
-        if (nextQuestion && nextQuestion.type === "personal_info") {
-          let nextIndex = currentQuestionIndex + 2;
-          while (
-            nextIndex < questions.length && 
-            questions[nextIndex].type === "personal_info"
-          ) {
-            nextIndex++;
-          }
-          
-          // If we've gone past all questions, move to next step
-          if (nextIndex >= questions.length) {
-            setCurrentStep(prev => prev + 1);
-          } else {
-            setCurrentQuestionIndex(nextIndex);
-          }
-        }
-      }
     }
   };
 
@@ -453,6 +485,12 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   };
 
   const handleBack = () => {
+    if (showPersonalInfoStep) {
+      setShowPersonalInfoStep(false);
+      setShowRecipientStep(true);
+      return;
+    }
+    
     if (showPreview) {
       setShowPreview(false);
     } else if (currentQuestionIndex > 0) {
@@ -561,62 +599,55 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       );
     }
     
+    // When the user chooses to enter new information, show the comprehensive personal info step
+    if (showPersonalInfoStep) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="p-6"
+        >
+          <h2 className="text-xl font-bold mb-6 text-center">Personal Information</h2>
+          
+          <PersonalInfoStep
+            formData={formData.personal_info}
+            onChange={handlePersonalInfoChange}
+            useProfileData={false}
+          />
+        </motion.div>
+      );
+    }
+    
     switch (quizSteps[currentStep].type) {
       case "personal_info":
-        if (useProfileData && profileData) {
-          // Skip personal info questions if we're using profile data
+        // For the "professional_summary" questions, use the QuestionForm component
+        // For other question types in this step (which are personal_info), they should be skipped
+        // since we either used profile data or gathered info in the PersonalInfoStep
+        if (currentQuestion.type === "professional_summary") {
           return (
             <AnimatePresence mode="wait">
               <QuestionForm
                 question={currentQuestion}
-                value={
-                  currentQuestion.type === "professional_summary"
-                    ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary] as string
-                    : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info] as string
-                }
+                value={formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary] as string}
                 onChange={handleInputChange}
               />
             </AnimatePresence>
           );
-        } else {
-          // For the personal_info step, use the PersonalInfoStep component instead
+        } else if (!useProfileData && !showPersonalInfoStep) {
+          // If we didn't use profile data and are not showing PersonalInfoStep,
+          // we're on the question flow, so show the question
           return (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <PersonalInfoStep
-                formData={formData.personal_info}
-                onChange={(field, value) => {
-                  setFormData(prev => ({
-                    ...prev,
-                    personal_info: {
-                      ...prev.personal_info,
-                      [field]: value
-                    }
-                  }));
-                  saveQuizResponse(field, value);
-                }}
-                useProfileData={useProfileData}
+            <AnimatePresence mode="wait">
+              <QuestionForm
+                question={currentQuestion}
+                value={formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info] as string}
+                onChange={handleInputChange}
               />
-            </motion.div>
+            </AnimatePresence>
           );
         }
-      case "professional_summary":
-        return (
-          <AnimatePresence mode="wait">
-            <QuestionForm
-              question={currentQuestion}
-              value={
-                currentQuestion.type === "professional_summary"
-                  ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary] as string
-                  : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info] as string
-              }
-              onChange={handleInputChange}
-            />
-          </AnimatePresence>
-        );
+        return null;
       case "work_experience":
         return (
           <motion.div
@@ -688,7 +719,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             <Button
               variant="outline"
               onClick={handleBack}
-              disabled={(currentStep === 0 && currentQuestionIndex === 0 && !showRecipientStep) || (showRecipientStep)}
+              disabled={(currentStep === 0 && currentQuestionIndex === 0 && !showPersonalInfoStep && !showRecipientStep)}
               className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[90px] sm:min-w-[100px]"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
@@ -703,10 +734,10 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             </Button>
           </div>
           <Button 
-            onClick={currentQuestionIndex === questions.length - 1 && !showRecipientStep ? handleStepComplete : handleNext}
+            onClick={currentQuestionIndex === questions.length - 1 && !showRecipientStep && !showPersonalInfoStep ? handleStepComplete : handleNext}
             className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md h-11 min-w-[90px] sm:min-w-[100px] w-full sm:w-auto mt-2 sm:mt-0"
           >
-            {showRecipientStep ? "Continue" : (currentStep === quizSteps.length - 1 ? "Complete" : "Next")}
+            {showRecipientStep || showPersonalInfoStep ? "Continue" : (currentStep === quizSteps.length - 1 ? "Complete" : "Next")}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </motion.div>
@@ -725,3 +756,4 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     </div>
   );
 }
+
