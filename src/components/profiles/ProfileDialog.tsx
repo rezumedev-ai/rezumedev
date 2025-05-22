@@ -13,7 +13,6 @@ import { Switch } from '@/components/ui/switch';
 import { getInitials } from '@/utils/format-names';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { v4 as uuidv4 } from '@supabase/supabase-js/dist/main';
 
 interface ProfileDialogProps {
   isOpen: boolean;
@@ -109,7 +108,7 @@ export function ProfileDialog({
       
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
       const filePath = `profile-avatars/${fileName}`;
       
       const { data, error } = await supabase.storage
