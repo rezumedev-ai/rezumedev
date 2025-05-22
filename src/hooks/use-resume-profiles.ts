@@ -25,7 +25,6 @@ export function useResumeProfiles() {
         .from('resume_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .order('is_default', { ascending: false })
         .order('created_at', { ascending: false });
         
       if (error) {
@@ -34,36 +33,6 @@ export function useResumeProfiles() {
       }
       
       return data as ResumeProfile[];
-    },
-    enabled: !!user
-  });
-
-  // Fetch default profile
-  const {
-    data: defaultProfile,
-    isLoading: isDefaultProfileLoading
-  } = useQuery({
-    queryKey: ['defaultResumeProfile', user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-      
-      const { data, error } = await supabase
-        .from('resume_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_default', true)
-        .single();
-        
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // No default profile found, this is not an error
-          return null;
-        }
-        console.error('Error fetching default profile:', error);
-        throw error;
-      }
-      
-      return data as ResumeProfile;
     },
     enabled: !!user
   });
@@ -91,7 +60,6 @@ export function useResumeProfiles() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumeProfiles', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['defaultResumeProfile', user?.id] });
       toast.success('Profile created successfully');
     },
     onError: (error) => {
@@ -121,7 +89,6 @@ export function useResumeProfiles() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumeProfiles', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['defaultResumeProfile', user?.id] });
       toast.success('Profile updated successfully');
     },
     onError: (error) => {
@@ -149,7 +116,6 @@ export function useResumeProfiles() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumeProfiles', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['defaultResumeProfile', user?.id] });
       toast.success('Profile deleted successfully');
     },
     onError: (error) => {
@@ -157,49 +123,14 @@ export function useResumeProfiles() {
     }
   });
 
-  // Set a profile as default
-  const setDefaultProfileMutation = useMutation({
-    mutationFn: async (id: string) => {
-      if (!user) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
-        .from('resume_profiles')
-        .update({ is_default: true })
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .select()
-        .single();
-        
-      if (error) {
-        console.error('Error setting default profile:', error);
-        throw error;
-      }
-      
-      return data as ResumeProfile;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resumeProfiles', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['defaultResumeProfile', user?.id] });
-      toast.success('Default profile updated');
-    },
-    onError: (error) => {
-      toast.error(`Failed to update default profile: ${error.message}`);
-    }
-  });
-
-  // Removed createInitialProfile and its useEffect
-
   return {
     profiles: profiles || [],
-    defaultProfile,
     isLoading,
-    isDefaultProfileLoading,
     error,
     refetchProfiles: refetch,
     createProfile: createProfileMutation.mutate,
     updateProfile: updateProfileMutation.mutate,
     deleteProfile: deleteProfileMutation.mutate,
-    setDefaultProfile: setDefaultProfileMutation.mutate,
     isCreating: createProfileMutation.isPending,
     isUpdating: updateProfileMutation.isPending,
     isDeleting: deleteProfileMutation.isPending

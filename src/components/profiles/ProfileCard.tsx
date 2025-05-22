@@ -4,13 +4,12 @@ import { ResumeProfile } from '@/types/profile';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Check, Pencil } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { getInitials } from '@/utils/format-names';
 
 interface ProfileCardProps {
   profile: ResumeProfile;
   isSelected: boolean;
-  isEditing: boolean;
   onSelect: () => void;
   onEdit: () => void;
 }
@@ -18,7 +17,6 @@ interface ProfileCardProps {
 export function ProfileCard({ 
   profile, 
   isSelected,
-  isEditing,
   onSelect,
   onEdit 
 }: ProfileCardProps) {
@@ -34,61 +32,52 @@ export function ProfileCard({
         "relative cursor-pointer rounded-lg overflow-hidden transition-all duration-300",
         "flex flex-col items-center justify-center p-2",
         "w-full aspect-square mx-auto",
-        isSelected ? "ring-4 ring-primary bg-accent/30" : 
-          (isEditing ? "ring-2 ring-yellow-400" : "hover:ring-2 hover:ring-primary/50"),
-        isEditing ? "cursor-default" : ""
+        isSelected ? "ring-4 ring-primary bg-accent/30" : "hover:ring-2 hover:ring-primary/50"
       )}
-      whileHover={!isEditing ? { scale: 1.05 } : {}}
-      whileTap={!isEditing ? { scale: 0.98 } : {}}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.98 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={isEditing ? undefined : onSelect}
+      onClick={onSelect}
     >
       <div className="flex flex-col items-center justify-center space-y-3 w-full h-full">
         <Avatar className="w-16 sm:w-20 h-16 sm:h-20 border-4 border-background">
-          {profile.avatar_url ? (
-            <AvatarImage src={profile.avatar_url} alt={displayName} />
-          ) : (
-            <AvatarFallback className="text-xl sm:text-2xl bg-primary text-primary-foreground">
-              {initials}
-            </AvatarFallback>
-          )}
+          <AvatarFallback className="text-xl sm:text-2xl bg-primary text-primary-foreground">
+            {initials}
+          </AvatarFallback>
         </Avatar>
 
         <h3 className="font-medium text-base sm:text-lg text-center line-clamp-2 text-white px-1">
           {displayName}
         </h3>
-        
-        {profile.is_default && (
-          <span className="text-xs text-primary font-medium">Default</span>
-        )}
       </div>
 
-      {isSelected && !isEditing && (
+      {isSelected && (
         <motion.div
           className="absolute top-2 right-2 bg-primary text-white p-1 rounded-full"
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "spring", stiffness: 500, damping: 15 }}
         >
-          <Check className="w-4 h-4" />
+          <div className="w-4 h-4 bg-primary rounded-full" />
         </motion.div>
       )}
 
-      {isEditing && (
+      {/* Edit button that appears on hover */}
+      {isHovered && (
         <motion.div
-          className="absolute inset-0 bg-black/40 flex items-center justify-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="absolute top-2 right-2 cursor-pointer"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 500, damping: 15 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
         >
-          <motion.button
-            className="bg-white text-black p-3 rounded-full"
-            onClick={onEdit}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Pencil className="w-5 h-5" />
-          </motion.button>
+          <div className="bg-white/90 text-gray-800 p-2 rounded-full hover:bg-white">
+            <Pencil className="w-3.5 h-3.5" />
+          </div>
         </motion.div>
       )}
     </motion.div>

@@ -7,27 +7,22 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { ResumeProfile, CreateResumeProfileParams, UpdateResumeProfileParams } from '@/types/profile';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Trash2, Upload } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getInitials } from '@/utils/format-names';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (profileData: CreateResumeProfileParams | UpdateResumeProfileParams) => void;
   existingProfile?: ResumeProfile;
-  isDefault?: boolean;
 }
 
 export function ProfileDialog({
   isOpen,
   onClose,
   onSave,
-  existingProfile,
-  isDefault = false
+  existingProfile
 }: ProfileDialogProps) {
   const { toast } = useToast();
   const [fullName, setFullName] = useState('');
@@ -35,9 +30,6 @@ export function ProfileDialog({
   const [phone, setPhone] = useState('');
   const [linkedin, setLinkedin] = useState('');
   const [website, setWebsite] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [makeDefault, setMakeDefault] = useState(isDefault);
   
   // Reset form when dialog opens/closes or profile changes
   useEffect(() => {
@@ -47,18 +39,14 @@ export function ProfileDialog({
       setPhone(existingProfile.personal_info.phone || '');
       setLinkedin(existingProfile.personal_info.linkedin || '');
       setWebsite(existingProfile.personal_info.website || '');
-      setAvatarUrl(existingProfile.avatar_url || null);
-      setMakeDefault(existingProfile.is_default);
     } else {
       setFullName('');
       setEmail('');
       setPhone('');
       setLinkedin('');
       setWebsite('');
-      setAvatarUrl(null);
-      setMakeDefault(isDefault);
     }
-  }, [existingProfile, isOpen, isDefault]);
+  }, [existingProfile, isOpen]);
 
   const handleSave = () => {
     if (!fullName.trim()) {
@@ -79,65 +67,10 @@ export function ProfileDialog({
         linkedin,
         website
       },
-      avatar_url: avatarUrl,
-      is_default: makeDefault
+      is_default: false // No more default profiles
     };
 
     onSave(profileData);
-  };
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // File size validation (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Image must be less than 2MB",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      setIsUploading(true);
-      
-      // Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      const filePath = `profile-avatars/${fileName}`;
-      
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-        
-      if (error) throw error;
-      
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-        
-      setAvatarUrl(publicUrlData.publicUrl);
-      
-      toast({
-        title: "Avatar uploaded",
-        description: "Your profile image was uploaded successfully"
-      });
-    } catch (error: any) {
-      toast({
-        title: "Upload failed",
-        description: error.message || "Failed to upload image",
-        variant: "destructive"
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleRemoveAvatar = () => {
-    setAvatarUrl(null);
   };
 
   const initials = getInitials(fullName);
@@ -157,43 +90,10 @@ export function ProfileDialog({
         <div className="grid gap-6 py-4">
           <div className="flex flex-col items-center gap-4">
             <Avatar className="w-24 h-24 border-2 border-muted">
-              {avatarUrl ? (
-                <AvatarImage src={avatarUrl} alt="Profile avatar" />
-              ) : (
-                <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                  {initials}
-                </AvatarFallback>
-              )}
+              <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+                {initials}
+              </AvatarFallback>
             </Avatar>
-            
-            <div className="flex gap-2">
-              <Label 
-                htmlFor="avatar-upload" 
-                className="cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
-              >
-                <Upload className="w-4 h-4" />
-                {isUploading ? 'Uploading...' : 'Upload'}
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handleAvatarUpload}
-                  disabled={isUploading}
-                />
-              </Label>
-              
-              {avatarUrl && (
-                <Button 
-                  variant="destructive" 
-                  size="sm" 
-                  onClick={handleRemoveAvatar}
-                  disabled={isUploading}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
           </div>
           
           <div className="space-y-2">
@@ -204,6 +104,7 @@ export function ProfileDialog({
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your full name"
               required
+              className="transition-all focus:ring-2 focus:ring-primary/50"
             />
           </div>
           
@@ -216,6 +117,7 @@ export function ProfileDialog({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
+                className="transition-all focus:ring-2 focus:ring-primary/50"
               />
             </div>
             
@@ -226,6 +128,7 @@ export function ProfileDialog({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Your phone number"
+                className="transition-all focus:ring-2 focus:ring-primary/50"
               />
             </div>
           </div>
@@ -238,6 +141,7 @@ export function ProfileDialog({
                 value={linkedin}
                 onChange={(e) => setLinkedin(e.target.value)}
                 placeholder="LinkedIn profile URL"
+                className="transition-all focus:ring-2 focus:ring-primary/50"
               />
             </div>
             
@@ -248,23 +152,24 @@ export function ProfileDialog({
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="Personal website URL"
+                className="transition-all focus:ring-2 focus:ring-primary/50"
               />
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="default-profile"
-              checked={makeDefault}
-              onCheckedChange={setMakeDefault}
-            />
-            <Label htmlFor="default-profile">Set as default profile</Label>
           </div>
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} className="sm:mt-0 mt-2">Cancel</Button>
-          <Button onClick={handleSave} className="sm:mt-0 mt-2">
+          <Button 
+            variant="outline" 
+            onClick={onClose} 
+            className="sm:mt-0 mt-2 transition-all hover:bg-accent/80"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            className="sm:mt-0 mt-2 transition-all hover:scale-105"
+          >
             {existingProfile ? 'Update Profile' : 'Create Profile'}
           </Button>
         </DialogFooter>

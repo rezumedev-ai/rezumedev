@@ -9,7 +9,6 @@ import { ProfileCard } from '@/components/profiles/ProfileCard';
 import { AddProfileCard } from '@/components/profiles/AddProfileCard';
 import { ProfileDialog } from '@/components/profiles/ProfileDialog';
 import { ResumeProfile } from '@/types/profile';
-import { PencilRuler, X, CheckCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -17,7 +16,6 @@ export default function ProfileSelection() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [profileToEdit, setProfileToEdit] = useState<ResumeProfile | undefined>(undefined);
   
@@ -26,11 +24,8 @@ export default function ProfileSelection() {
     isLoading,
     createProfile,
     updateProfile,
-    deleteProfile,
-    setDefaultProfile,
     isCreating,
-    isUpdating,
-    isDeleting
+    isUpdating
   } = useResumeProfiles();
 
   // Auto-select first profile if there is one and none is selected
@@ -61,11 +56,9 @@ export default function ProfileSelection() {
         ...profileData
       });
     } else {
-      // For first profile, also set as default
-      const isFirst = profiles.length === 0;
       createProfile({
         ...profileData,
-        is_default: isFirst ? true : profileData.is_default
+        is_default: false // Never set as default
       });
     }
     setShowProfileDialog(false);
@@ -82,10 +75,6 @@ export default function ProfileSelection() {
     
     // Navigate to template selection
     navigate('/new-resume');
-  };
-
-  const handleToggleEditing = () => {
-    setIsEditing(!isEditing);
   };
 
   const containerVariants = {
@@ -134,7 +123,7 @@ export default function ProfileSelection() {
         transition={{ duration: 0.5 }}
       >
         <motion.div
-          className="text-center mb-8 sm:mb-10"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -146,30 +135,6 @@ export default function ProfileSelection() {
             Select a profile or create a new one to get started
           </p>
         </motion.div>
-
-        {profiles.length > 0 && (
-          <div className="flex justify-end mb-6">
-            <Button
-              variant={isEditing ? "default" : "outline"}
-              className={`transition-all ${isEditing ? "bg-green-500 hover:bg-green-600" : "bg-transparent"}`}
-              onClick={handleToggleEditing}
-              size="sm"
-              aria-label={isEditing ? "Done editing" : "Edit profiles"}
-            >
-              {isEditing ? (
-                <>
-                  <CheckCheck className="w-4 h-4 mr-2" />
-                  Done
-                </>
-              ) : (
-                <>
-                  <PencilRuler className="w-4 h-4 mr-2" />
-                  Edit Profiles
-                </>
-              )}
-            </Button>
-          </div>
-        )}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-40">
@@ -187,7 +152,6 @@ export default function ProfileSelection() {
                 <ProfileCard
                   profile={profile}
                   isSelected={profile.id === selectedProfileId}
-                  isEditing={isEditing}
                   onSelect={() => handleProfileSelect(profile.id)}
                   onEdit={() => handleEditProfile(profile)}
                 />
@@ -231,7 +195,6 @@ export default function ProfileSelection() {
         }}
         onSave={handleSaveProfile}
         existingProfile={profileToEdit}
-        isDefault={profiles.length === 0} // First profile will be default
       />
     </main>
   );
