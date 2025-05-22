@@ -345,7 +345,9 @@ export type Database = {
           email_notifications: boolean | null
           full_name: string | null
           id: string
+          linkedin_url: string | null
           payment_method: string | null
+          phone: string | null
           resume_preferences: Json | null
           stripe_customer_id: string | null
           subscription_end_date: string | null
@@ -353,6 +355,7 @@ export type Database = {
           subscription_plan: string | null
           subscription_status: string | null
           updated_at: string
+          website_url: string | null
         }
         Insert: {
           created_at?: string
@@ -361,7 +364,9 @@ export type Database = {
           email_notifications?: boolean | null
           full_name?: string | null
           id: string
+          linkedin_url?: string | null
           payment_method?: string | null
+          phone?: string | null
           resume_preferences?: Json | null
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
@@ -369,6 +374,7 @@ export type Database = {
           subscription_plan?: string | null
           subscription_status?: string | null
           updated_at?: string
+          website_url?: string | null
         }
         Update: {
           created_at?: string
@@ -377,7 +383,9 @@ export type Database = {
           email_notifications?: boolean | null
           full_name?: string | null
           id?: string
+          linkedin_url?: string | null
           payment_method?: string | null
+          phone?: string | null
           resume_preferences?: Json | null
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
@@ -385,6 +393,7 @@ export type Database = {
           subscription_plan?: string | null
           subscription_status?: string | null
           updated_at?: string
+          website_url?: string | null
         }
         Relationships: []
       }

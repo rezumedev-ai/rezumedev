@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, User, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { WorkExperienceStep } from "./WorkExperienceStep";
@@ -17,6 +17,11 @@ import { LoadingState } from "./LoadingState";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { PersonalInfoStep } from "./PersonalInfoStep";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -28,7 +33,10 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [useProfileData, setUseProfileData] = useState(false);
+  const [showRecipientStep, setShowRecipientStep] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
   const isMobile = useIsMobile();
   
   const [formData, setFormData] = useState<ResumeData>({
@@ -53,6 +61,28 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   });
 
   const navigate = useNavigate();
+  
+  // Fetch user profile data
+  const { data: profileData } = useQuery({
+    queryKey: ["user-profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+        
+      if (error) {
+        console.error("Error fetching user profile:", error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!user
+  });
 
   const convertWorkExperience = (json: Json[] | null): WorkExperience[] => {
     if (!Array.isArray(json)) return [];
@@ -152,6 +182,32 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     }
   });
 
+  // Apply profile data if user chooses to use it
+  useEffect(() => {
+    if (useProfileData && profileData) {
+      setFormData(prev => ({
+        ...prev,
+        personal_info: {
+          ...prev.personal_info,
+          fullName: profileData.full_name || "",
+          email: user?.email || "",
+          phone: profileData.phone || "",
+          linkedin: profileData.linkedin_url || "",
+          website: profileData.website_url || ""
+        }
+      }));
+      
+      // Skip personal info questions if using profile data
+      if (currentStep === 0 && currentQuestionIndex === 0) {
+        // Find the first non-personal info question
+        const firstNonPersonalIndex = questions.findIndex(q => q.type !== "personal_info");
+        if (firstNonPersonalIndex > 0) {
+          setCurrentQuestionIndex(firstNonPersonalIndex);
+        }
+      }
+    }
+  }, [useProfileData, profileData, user]);
+
   useEffect(() => {
     if (existingData?.resume) {
       const resume = existingData.resume;
@@ -172,6 +228,11 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         if (questionIndex !== -1) {
           setCurrentQuestionIndex(questionIndex);
         }
+      }
+      
+      // If resume is already in progress, skip the recipient step
+      if (resume.current_step > 1) {
+        setShowRecipientStep(false);
       }
     }
   }, [existingData]);
@@ -240,6 +301,22 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   };
 
   const handleNext = async () => {
+    if (showRecipientStep) {
+      // Save the user's choice about using profile data
+      if (useProfileData) {
+        // Update resume with profile data
+        await supabase
+          .from('resumes')
+          .update({
+            personal_info: formData.personal_info
+          })
+          .eq('id', resumeId);
+      }
+      
+      setShowRecipientStep(false);
+      return;
+    }
+    
     const currentValue = currentQuestion.type === "professional_summary" 
       ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary]
       : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info];
@@ -257,6 +334,27 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       setCurrentStep(prev => prev + 1);
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
+      
+      // Skip personal info questions if using profile data
+      if (useProfileData) {
+        const nextQuestion = questions[currentQuestionIndex + 1];
+        if (nextQuestion && nextQuestion.type === "personal_info") {
+          let nextIndex = currentQuestionIndex + 2;
+          while (
+            nextIndex < questions.length && 
+            questions[nextIndex].type === "personal_info"
+          ) {
+            nextIndex++;
+          }
+          
+          // If we've gone past all questions, move to next step
+          if (nextIndex >= questions.length) {
+            setCurrentStep(prev => prev + 1);
+          } else {
+            setCurrentQuestionIndex(nextIndex);
+          }
+        }
+      }
     }
   };
 
@@ -396,8 +494,115 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   }
 
   const renderStep = () => {
+    if (showRecipientStep && user) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="p-6"
+        >
+          <h2 className="text-2xl font-bold mb-4 text-center">Who is this resume for?</h2>
+          
+          <RadioGroup 
+            defaultValue="me" 
+            className="mt-6 space-y-4"
+            onValueChange={(value) => setUseProfileData(value === "me")}
+          >
+            <div>
+              <Card className={`p-4 ${useProfileData ? 'border-primary' : 'border-gray-200'} cursor-pointer hover:border-primary transition-all duration-300`}
+                onClick={() => setUseProfileData(true)}>
+                <div className="flex items-start space-x-4">
+                  <RadioGroupItem value="me" id="me" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="me" className="text-lg font-medium cursor-pointer">Me</Label>
+                      <User className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Use my personal information stored in my profile
+                    </p>
+                    
+                    {profileData && (
+                      <div className="mt-3 bg-gray-50 p-3 rounded-md">
+                        <div className="grid grid-cols-1 gap-1 text-sm">
+                          <div><span className="font-medium">Name:</span> {profileData.full_name || 'Not set'}</div>
+                          <div><span className="font-medium">Email:</span> {user?.email || 'Not set'}</div>
+                          <div><span className="font-medium">Phone:</span> {profileData.phone || 'Not set'}</div>
+                          <div><span className="font-medium">LinkedIn:</span> {profileData.linkedin_url || 'Not set'}</div>
+                          <div><span className="font-medium">Website:</span> {profileData.website_url || 'Not set'}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            </div>
+            
+            <div>
+              <Card className={`p-4 ${!useProfileData ? 'border-primary' : 'border-gray-200'} cursor-pointer hover:border-primary transition-all duration-300`}
+                onClick={() => setUseProfileData(false)}>
+                <div className="flex items-start space-x-4">
+                  <RadioGroupItem value="other" id="other" className="mt-1" />
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="other" className="text-lg font-medium cursor-pointer">Someone else</Label>
+                      <UserPlus className="h-4 w-4 text-green-500" />
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Enter new information for this resume
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </RadioGroup>
+        </motion.div>
+      );
+    }
+    
     switch (quizSteps[currentStep].type) {
       case "personal_info":
+        if (useProfileData && profileData) {
+          // Skip personal info questions if we're using profile data
+          return (
+            <AnimatePresence mode="wait">
+              <QuestionForm
+                question={currentQuestion}
+                value={
+                  currentQuestion.type === "professional_summary"
+                    ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary] as string
+                    : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info] as string
+                }
+                onChange={handleInputChange}
+              />
+            </AnimatePresence>
+          );
+        } else {
+          // For the personal_info step, use the PersonalInfoStep component instead
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <PersonalInfoStep
+                formData={formData.personal_info}
+                onChange={(field, value) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    personal_info: {
+                      ...prev.personal_info,
+                      [field]: value
+                    }
+                  }));
+                  saveQuizResponse(field, value);
+                }}
+                useProfileData={useProfileData}
+              />
+            </motion.div>
+          );
+        }
       case "professional_summary":
         return (
           <AnimatePresence mode="wait">
@@ -460,7 +665,9 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white overflow-x-hidden">
       <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6">
-        <QuizProgress currentStep={currentStep} steps={quizSteps} />
+        {!showRecipientStep && (
+          <QuizProgress currentStep={currentStep} steps={quizSteps} />
+        )}
 
         <motion.div
           className="relative bg-white rounded-xl shadow-xl p-4 sm:p-8 backdrop-blur-sm bg-opacity-90 border border-indigo-100 overflow-hidden"
@@ -481,7 +688,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             <Button
               variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 0 && currentQuestionIndex === 0}
+              disabled={(currentStep === 0 && currentQuestionIndex === 0 && !showRecipientStep) || (showRecipientStep)}
               className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[90px] sm:min-w-[100px]"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
@@ -496,22 +703,24 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             </Button>
           </div>
           <Button 
-            onClick={currentQuestionIndex === questions.length - 1 ? handleStepComplete : handleNext}
+            onClick={currentQuestionIndex === questions.length - 1 && !showRecipientStep ? handleStepComplete : handleNext}
             className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md h-11 min-w-[90px] sm:min-w-[100px] w-full sm:w-auto mt-2 sm:mt-0"
           >
-            {currentStep === quizSteps.length - 1 ? "Complete" : "Next"}
+            {showRecipientStep ? "Continue" : (currentStep === quizSteps.length - 1 ? "Complete" : "Next")}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </motion.div>
 
-        <motion.div 
-          className="mt-4 text-center text-sm text-gray-500"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          Step {currentStep + 1} of {quizSteps.length}
-        </motion.div>
+        {!showRecipientStep && (
+          <motion.div 
+            className="mt-4 text-center text-sm text-gray-500"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            Step {currentStep + 1} of {quizSteps.length}
+          </motion.div>
+        )}
       </div>
     </div>
   );

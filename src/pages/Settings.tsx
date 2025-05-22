@@ -1,10 +1,11 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
-import { Menu, Save, User, Bell, Shield, Lock, EyeOff, FileText } from "lucide-react";
+import { Menu, Save, User, Bell, Shield, Lock, EyeOff, FileText, Linkedin, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -81,6 +82,9 @@ export default function Settings() {
       full_name: formData.get("fullName"),
       email_notifications: formData.get("emailNotifications") === "on",
       desktop_notifications: formData.get("desktopNotifications") === "on",
+      phone: formData.get("phone"),
+      linkedin_url: formData.get("linkedin"),
+      website_url: formData.get("website")
     });
   };
 
@@ -229,7 +233,7 @@ export default function Settings() {
                         <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-lg transition-all duration-300">
                           <div className="space-y-4">
                             <div className="flex items-center">
-                              <FileText className="w-5 h-5 text-primary mr-2" />
+                              <User className="w-5 h-5 text-primary mr-2" />
                               <h3 className="text-lg font-medium">Personal Information</h3>
                             </div>
                             <div className="space-y-4">
@@ -253,6 +257,60 @@ export default function Settings() {
                                   className="bg-gray-50"
                                 />
                                 <p className="text-sm text-gray-500">Your email address is managed through your account settings.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+
+                        <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-lg transition-all duration-300">
+                          <div className="space-y-4">
+                            <div className="flex items-center">
+                              <FileText className="w-5 h-5 text-primary mr-2" />
+                              <h3 className="text-lg font-medium">Resume Information</h3>
+                              <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">New</span>
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              These details will be available as default information when creating new resumes.
+                            </p>
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="phone">Phone Number</Label>
+                                <Input 
+                                  id="phone"
+                                  name="phone"
+                                  type="tel"
+                                  defaultValue={profile?.phone || ''}
+                                  placeholder="Enter your phone number"
+                                  className="transition-all duration-300 focus:border-primary/50 focus:ring-primary/50"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex items-center">
+                                  <Linkedin className="w-4 h-4 text-blue-600 mr-2" />
+                                  <Label htmlFor="linkedin">LinkedIn Profile URL</Label>
+                                </div>
+                                <Input 
+                                  id="linkedin"
+                                  name="linkedin"
+                                  type="url"
+                                  defaultValue={profile?.linkedin_url || ''}
+                                  placeholder="https://www.linkedin.com/in/yourprofile"
+                                  className="transition-all duration-300 focus:border-primary/50 focus:ring-primary/50"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex items-center">
+                                  <Globe className="w-4 h-4 text-green-600 mr-2" />
+                                  <Label htmlFor="website">Portfolio/Website URL</Label>
+                                </div>
+                                <Input 
+                                  id="website"
+                                  name="website"
+                                  type="url"
+                                  defaultValue={profile?.website_url || ''}
+                                  placeholder="https://www.yourportfolio.com"
+                                  className="transition-all duration-300 focus:border-primary/50 focus:ring-primary/50"
+                                />
                               </div>
                             </div>
                           </div>
