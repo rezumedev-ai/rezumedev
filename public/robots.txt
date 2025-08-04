@@ -1,0 +1,21 @@
+# Robots.txt for Rezume.dev
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://rezume.dev/sitemap.xml
+Sitemap: https://rezume.dev/rss.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Disallow certain paths if needed
+Disallow: /api/
+Disallow: /.well-known/
+Disallow: /admin/
+
+# Allow important pages
+Allow: /blog/
+Allow: /guides/
+Allow: /pricing
+Allow: /features

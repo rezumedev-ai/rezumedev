@@ -2,9 +2,17 @@
 import { Helmet } from 'react-helmet';
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { BlogHeader } from "@/components/blog/BlogHeader";
 import { BlogContent } from "@/components/blog/BlogContent";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const blogPosts = {
   "1": {
@@ -670,27 +678,64 @@ const BlogPost = () => {
         <meta name="description" content={post.metaDescription || post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
         <meta name="keywords" content={`${post.category.toLowerCase()}, resume tips, career advice, professional resume, job search, ${post.title.toLowerCase()}`} />
         <link rel="canonical" href={`https://rezume.dev/blog/${id}`} />
-        {/* Article structured data */}
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content={post.seoTitle || post.title} />
+        <meta property="og:description" content={post.metaDescription || post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
+        <meta property="og:image" content={post.image} />
+        <meta property="og:url" content={`https://rezume.dev/blog/${id}`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="Rezume.dev" />
+        
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.seoTitle || post.title} />
+        <meta name="twitter:description" content={post.metaDescription || post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
+        <meta name="twitter:image" content={post.image} />
+        
+        {/* Article-specific meta tags */}
+        <meta name="author" content={post.author} />
+        <meta property="article:published_time" content={new Date(post.date).toISOString()} />
+        <meta property="article:modified_time" content={new Date(post.date).toISOString()} />
+        <meta property="article:author" content={post.author} />
+        <meta property="article:section" content={post.category} />
+        <meta property="article:tag" content={post.category} />
+        
+        {/* RSS Feed */}
+        <link rel="alternate" type="application/rss+xml" title="Rezume.dev Blog RSS" href="/rss.xml" />
+        
+        {/* Article Schema Markup */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
             "headline": post.title,
-            "image": post.image,
-            "author": post.author,
+            "description": post.metaDescription || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
+            "image": [post.image],
+            "datePublished": new Date(post.date).toISOString(),
+            "dateModified": new Date(post.date).toISOString(),
+            "author": {
+              "@type": "Person",
+              "name": post.author
+            },
             "publisher": {
               "@type": "Organization",
               "name": "Rezume.dev",
               "logo": {
                 "@type": "ImageObject",
                 "url": "https://rezume.dev/custom-favicon.svg"
-               }
+              },
+              "url": "https://rezume.dev"
             },
-            "datePublished": post.date,
             "mainEntityOfPage": {
               "@type": "WebPage",
               "@id": `https://rezume.dev/blog/${id}`
-            }
+            },
+            "url": `https://rezume.dev/blog/${id}`,
+            "articleSection": post.category,
+            "keywords": `${post.category.toLowerCase()}, resume tips, career advice`,
+            "wordCount": post.content.split(' ').length,
+            "timeRequired": `PT${post.readTime.replace(' min read', '')}M`
           })}
         </script>
       </Helmet>
@@ -698,6 +743,26 @@ const BlogPost = () => {
         <Header />
         <main className="py-24">
           <div className="container mx-auto px-4 max-w-4xl">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb className="mb-6">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link to="/">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link to="/blog">Blog</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{post?.title}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
             <BlogHeader 
               title={post.title}
               author={post.author}
