@@ -10,6 +10,8 @@ const Blog = () => {
     {
       id: 1,
       title: "10 Essential Tips for Crafting a Winning Resume",
+      seoTitle: "Resume Writing Tips 2025 | 10 Expert Strategies That Get You Hired | Rezume.dev",
+      metaDescription: "Master professional resume writing with 10 expert tips that get you noticed by hiring managers. Boost your job search success rate today!",
       excerpt: "Learn how to make your resume stand out from the crowd with these expert tips on formatting, content, and presentation.",
       category: "Resume Tips",
       image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
@@ -20,6 +22,8 @@ const Blog = () => {
     {
       id: 2,
       title: "Mastering the Art of Job Search in 2024",
+      seoTitle: "Job Search Strategy Guide | Master 2024's Market & Land Your Dream Job | Rezume.dev",
+      metaDescription: "Navigate 2024's competitive job market with proven strategies. LinkedIn optimization, networking tips, and interview preparation included.",
       excerpt: "Discover effective strategies for navigating the modern job market, from leveraging LinkedIn to networking like a pro.",
       category: "Job Search",
       image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
@@ -30,6 +34,8 @@ const Blog = () => {
     {
       id: 3,
       title: "What Hiring Managers Really Look For",
+      seoTitle: "What Recruiters Want | Inside Hiring Manager Secrets Revealed | Rezume.dev",
+      metaDescription: "Get inside tips from experienced recruiters on what makes candidates stand out. Learn hiring manager secrets that boost interview success.",
       excerpt: "Inside tips from experienced recruiters on what makes a candidate stand out during the hiring process.",
       category: "Hiring Tips",
       image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
@@ -40,6 +46,8 @@ const Blog = () => {
     {
       id: 4,
       title: "How to Write a Resume for Remote Jobs",
+      seoTitle: "Remote Job Resume Guide | Stand Out in Virtual Job Applications | Rezume.dev",
+      metaDescription: "Learn specific strategies for remote job resumes. Highlight key skills and experiences that remote employers want to see in 2025.",
       excerpt: "Specific strategies and resume elements to highlight when applying for remote positions in today's digital workplace.",
       category: "Remote Work",
       image: "https://images.unsplash.com/photo-1552960562-daf630e9278b",
@@ -50,6 +58,8 @@ const Blog = () => {
     {
       id: 5,
       title: "Cover Letter vs Resume: Do You Still Need Both?",
+      seoTitle: "Cover Letter vs Resume 2025 | When You Need Both & When to Skip | Rezume.dev",
+      metaDescription: "Discover when cover letters are essential vs optional. Learn how to make both documents work together for maximum application impact.",
       excerpt: "Uncover when a cover letter is essential, when it's optional, and how to make both documents work together effectively.",
       category: "Application Tips",
       image: "https://images.unsplash.com/photo-1586473219010-2ffc57b0d282",
@@ -60,6 +70,8 @@ const Blog = () => {
     {
       id: 6,
       title: "From Zero to Hired: How I Landed My Dream Job with Rezume.dev",
+      seoTitle: "Success Story | From Unemployed to Dream Job Using Rezume.dev Resume Builder",
+      metaDescription: "Real customer success story: How one job seeker transformed their career using Rezume.dev's AI resume builder and landed their dream job.",
       excerpt: "A customer success story detailing how using Rezume.dev transformed one job seeker's application process and career trajectory.",
       category: "Success Story",
       image: "https://images.unsplash.com/photo-1579389083078-4e7018379f7e",
@@ -70,6 +82,8 @@ const Blog = () => {
     {
       id: 7,
       title: "Best AI resume builders of 2025: How to create an ATS-friendly resume for free",
+      seoTitle: "Best AI Resume Builder 2025 | Free ATS-Friendly Tools Compared | Rezume.dev",
+      metaDescription: "Compare top free AI resume builders in 2025. Create ATS-friendly resumes that beat applicant tracking systems and land more interviews.",
       excerpt: "Discover the top AI-powered resume builders that help you create professional, ATS-optimized resumes in minutes. Compare features, pricing, and effectiveness of leading platforms.",
       category: "AI Tools",
       image: "https://images.unsplash.com/photo-1677442136019-21780ecad995",

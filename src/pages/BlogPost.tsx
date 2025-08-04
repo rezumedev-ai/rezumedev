@@ -9,6 +9,8 @@ import { BlogContent } from "@/components/blog/BlogContent";
 const blogPosts = {
   "1": {
     title: "10 Essential Tips for Crafting a Winning Resume",
+    seoTitle: "Resume Writing Tips 2025 | 10 Expert Strategies That Get You Hired | Rezume.dev",
+    metaDescription: "Master professional resume writing with 10 expert tips that get you noticed by hiring managers. Boost your job search success rate today!",
     content: `
       <h2 class="text-2xl font-semibold text-secondary mb-6 mt-8">1. Start with a Strong Professional Summary</h2>
       <p class="mb-8 leading-relaxed text-gray-700">Your professional summary is the first thing recruiters see. Make it count by highlighting your most relevant skills and achievements in 3-4 impactful sentences. Focus on what makes you unique and valuable to potential employers.</p>
@@ -52,6 +54,8 @@ const blogPosts = {
   },
   "2": {
     title: "Mastering the Art of Job Search in 2024",
+    seoTitle: "Job Search Strategy Guide | Master 2024's Market & Land Your Dream Job | Rezume.dev",
+    metaDescription: "Navigate 2024's competitive job market with proven strategies. LinkedIn optimization, networking tips, and interview preparation included.",
     content: `
       <h2 class="text-2xl font-semibold text-secondary mb-6">Understanding the Modern Job Market</h2>
       <p class="mb-8 leading-relaxed text-gray-700">The job market has evolved significantly in recent years. Remote work, artificial intelligence, and changing employer preferences have transformed how we search for and secure employment opportunities.</p>
@@ -115,6 +119,8 @@ const blogPosts = {
   },
   "3": {
     title: "What Hiring Managers Really Look For",
+    seoTitle: "What Recruiters Want | Inside Hiring Manager Secrets Revealed | Rezume.dev",
+    metaDescription: "Get inside tips from experienced recruiters on what makes candidates stand out. Learn hiring manager secrets that boost interview success.",
     content: `
       <h2 class="text-2xl font-semibold text-secondary mb-6">The Hidden Factors in Hiring Decisions</h2>
       <p class="mb-8 leading-relaxed text-gray-700">As hiring managers evaluate candidates, they look beyond just skills and experience. Understanding these key factors can give you a significant advantage in your job search.</p>
@@ -176,6 +182,8 @@ const blogPosts = {
   },
   "4": {
     title: "How to Write a Resume for Remote Jobs",
+    seoTitle: "Remote Job Resume Guide | Stand Out in Virtual Job Applications | Rezume.dev",
+    metaDescription: "Learn specific strategies for remote job resumes. Highlight key skills and experiences that remote employers want to see in 2025.",
     content: `
       <h2 class="text-2xl font-semibold text-secondary mb-6">The Remote Work Revolution</h2>
       <p class="mb-8 leading-relaxed text-gray-700">Remote work has transformed from a rare perk to a standard option for many roles. To stand out in this competitive landscape, your resume needs specific elements that demonstrate your ability to excel in a virtual environment.</p>
@@ -247,6 +255,8 @@ const blogPosts = {
   },
   "5": {
     title: "Cover Letter vs Resume: Do You Still Need Both?",
+    seoTitle: "Cover Letter vs Resume 2025 | When You Need Both & When to Skip | Rezume.dev",
+    metaDescription: "Discover when cover letters are essential vs optional. Learn how to make both documents work together for maximum application impact.",
     content: `
       <h2 class="text-2xl font-semibold text-secondary mb-6">The Traditional Application Package</h2>
       <p class="mb-8 leading-relaxed text-gray-700">For decades, job seekers have been told that a complete application requires both a resume and a cover letter. But in today's digital-first job market, is this still true? Let's break down the current landscape.</p>
@@ -330,6 +340,8 @@ const blogPosts = {
   },
   "6": {
     title: "From Zero to Hired: How I Landed My Dream Job with Rezume.dev",
+    seoTitle: "Success Story | From Unemployed to Dream Job Using Rezume.dev Resume Builder",
+    metaDescription: "Real customer success story: How one job seeker transformed their career using Rezume.dev's AI resume builder and landed their dream job.",
     content: `
       <h2 class="text-2xl font-semibold text-secondary mb-6">My Job Search Struggle</h2>
       <p class="mb-8 leading-relaxed text-gray-700">Eight months. That's how long I had been searching for a product management role at a tech company after being laid off. With each passing week, my confidence was eroding as quickly as my savings account. I had submitted over 120 applications with only a handful of first-round interviews to show for it.</p>
@@ -408,6 +420,8 @@ const blogPosts = {
   },
   "7": {
     title: "Best AI resume builders of 2025: How to create an ATS-friendly resume for free",
+    seoTitle: "Best AI Resume Builder 2025 | Free ATS-Friendly Tools Compared | Rezume.dev",
+    metaDescription: "Compare top free AI resume builders in 2025. Create ATS-friendly resumes that beat applicant tracking systems and land more interviews.",
     content: `
       <h2 class="text-2xl font-semibold text-secondary mb-6">Introduction: The AI Revolution in Resume Building</h2>
       <p class="mb-8 leading-relaxed text-gray-700">The job market in 2025 has become increasingly competitive, with artificial intelligence transforming how both employers and job seekers approach the hiring process. Modern Applicant Tracking Systems (ATS) now process over 75% of resumes before a human ever sees them, making ATS optimization crucial for career success.</p>
@@ -652,8 +666,8 @@ const BlogPost = () => {
   return (
     <>
       <Helmet>
-        <title>{post.title} | Rezume.dev Blog</title>
-        <meta name="description" content={post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
+        <title>{post.seoTitle || post.title}</title>
+        <meta name="description" content={post.metaDescription || post.content.substring(0, 160).replace(/<[^>]*>/g, '')} />
         <meta name="keywords" content={`${post.category.toLowerCase()}, resume tips, career advice, professional resume, job search, ${post.title.toLowerCase()}`} />
         <link rel="canonical" href={`https://rezume.dev/blog/${id}`} />
         {/* Article structured data */}
