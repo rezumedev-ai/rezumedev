@@ -44,6 +44,7 @@ const PUBLIC_ROUTES = [
   "/terms",
   "/cookies",
   "/help",
+  "/faq",
   "/blog",
   "/guides",
   "/careers"
