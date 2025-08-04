@@ -100,34 +100,82 @@ const Index = () => {
               "mainEntity": [
                 {
                   "@type": "Question",
-                  "name": "Is Rezume.dev free to use?",
+                  "name": "What is an ATS-friendly resume?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Rezume.dev offers both free and premium plans. The free plan allows you to create basic resumes, while premium plans offer advanced features like ATS optimization, multiple templates, and unlimited downloads."
+                    "text": "An ATS-friendly resume is designed to be easily read by Applicant Tracking Systems (ATS) that 98% of Fortune 500 companies use to screen resumes. These systems scan for specific keywords, proper formatting, and clear section headers. Our AI resume builder automatically creates ATS-optimized resumes with the right keywords, clean formatting, and industry-standard sections to ensure your resume passes through ATS filters and reaches hiring managers."
                   }
                 },
                 {
                   "@type": "Question",
-                  "name": "Are Rezume.dev resumes ATS-friendly?",
+                  "name": "How do I create an ATS-friendly resume?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Yes, all Rezume.dev templates are designed to be ATS-friendly, ensuring your resume gets past automated screening systems and into the hands of recruiters."
+                    "text": "To create an ATS-friendly resume, use standard section headers (Work Experience, Education, Skills), include relevant keywords from the job description, avoid complex graphics or tables, and use a clean, simple format. Our AI resume builder automatically handles all these requirements, analyzing job descriptions to suggest the right keywords and formatting your resume to meet ATS standards while maintaining visual appeal."
                   }
                 },
                 {
                   "@type": "Question",
-                  "name": "Can I download my resume in different formats?",
+                  "name": "What are the best resume templates for 2024?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Yes, you can download your resume in PDF, DOCX, and other formats, allowing you to submit your application in whatever format is required."
+                    "text": "The best resume templates for 2024 focus on clean, modern designs with clear hierarchy and ATS compatibility. Popular styles include minimalist single-column layouts, professional two-column designs, and creative templates for design roles. Our platform offers 20+ professional resume templates that are both visually appealing and ATS-friendly, updated regularly to match current hiring trends and employer preferences."
                   }
                 },
                 {
                   "@type": "Question",
-                  "name": "How does the AI help with my resume?",
+                  "name": "Can I download my resume for free?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Our AI analyzes your input and job descriptions to suggest improvements, optimize keywords, and enhance content to make your resume more effective for specific job applications."
+                    "text": "Yes! Rezume.dev offers free resume downloads in PDF format. You can create, customize, and download professional resumes without any cost. Our free plan includes access to multiple templates, basic customization options, and unlimited downloads. Premium features like advanced AI suggestions and premium templates are available for users who want additional functionality."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How long should my resume be?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "For most professionals, a one-page resume is ideal, especially for those with less than 10 years of experience. Senior professionals with extensive experience may use two pages, but never exceed two pages unless you're in academia or research. Our AI resume builder automatically optimizes content length, helping you prioritize the most relevant information while maintaining the appropriate length for your experience level."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What should I include in my professional summary?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A professional summary should be 3-4 lines highlighting your years of experience, key skills, and main achievements. Include industry-specific keywords, quantifiable results, and your career focus. For example: 'Marketing professional with 5+ years driving 40% revenue growth through digital campaigns and data-driven strategies.' Our AI analyzes your background to create compelling, keyword-rich professional summaries tailored to your target roles."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How do I tailor my resume for specific jobs?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Tailor your resume by analyzing the job description for keywords, required skills, and qualifications, then adjusting your professional summary, skills section, and work experience descriptions to match. Use the same terminology as the job posting and highlight relevant achievements. Our AI resume builder can analyze job descriptions and automatically suggest content modifications to improve your match rate with specific positions."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What resume format do employers prefer?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Employers prefer chronological resume format (most recent experience first) as it's easy to scan and shows career progression clearly. This format works for 90% of job seekers. Functional or combination formats may be used for career changers or those with employment gaps. Our platform defaults to the chronological format while offering flexibility to adjust based on your unique situation and industry requirements."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How can I make my resume stand out?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Make your resume stand out by quantifying achievements (increased sales by 25%), using action verbs, including relevant keywords, and maintaining clean formatting. Add a compelling professional summary and ensure your contact information is prominent. Our AI resume builder helps you identify impactful metrics, suggests powerful action verbs, and optimizes formatting to create resumes that catch recruiters' attention while passing ATS screening."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is Rezume.dev completely free to use?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Rezume.dev offers a robust free plan that includes resume creation, basic templates, and PDF downloads. You can build professional, ATS-friendly resumes without paying anything. We also offer premium features like advanced AI suggestions, exclusive templates, and enhanced customization options for users who want additional functionality to further optimize their job search success."
                   }
                 }
               ]
