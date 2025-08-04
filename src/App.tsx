@@ -33,6 +33,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import AppSumoSignUp from "./pages/AppSumoSignUp"; 
 import ChangePassword from "./pages/ChangePassword";
 import ProfileSelection from "./pages/ProfileSelection"; // Add this import
+import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,6 +92,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/guides" element={<Guides />} />
+                <Route path="/faq" element={<FAQ />} />
                 <Route
                   path="/dashboard"
                   element={
