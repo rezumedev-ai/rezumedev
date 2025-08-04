@@ -67,6 +67,16 @@ const Blog = () => {
       slug: "rezume-success-story",
       keywords: "success story, job hunting success, resume transformation, career change"
     },
+    {
+      id: 7,
+      title: "Best AI resume builders of 2025: How to create an ATS-friendly resume for free",
+      excerpt: "Discover the top AI-powered resume builders that help you create professional, ATS-optimized resumes in minutes. Compare features, pricing, and effectiveness of leading platforms.",
+      category: "AI Tools",
+      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+      readTime: "12 min read",
+      slug: "best-ai-resume-builders-2025",
+      keywords: "AI resume builder, ATS friendly resume, free resume builder 2025, artificial intelligence resume, automated resume optimization, machine learning resume"
+    },
   ];
 
   return (
