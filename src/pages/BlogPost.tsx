@@ -447,7 +447,7 @@ const BlogPost = () => {
         <h3>Quantify When Possible</h3>
         <p>Combine niche keywords with specific metrics and results to create powerful, credible statements that demonstrate real impact.</p>
 
-        <h2>Call to Action</h2>
+        <h2>Ready to Transform Your Career?</h2>
         <p>Ready to transform your resume with powerful niche keywords? Don't let generic terminology hold back your career advancement. The job market rewards specificity and specialized expertise, and your resume should reflect this reality.</p>
 
         <p>Start by identifying 5-10 niche keywords most relevant to your target roles, then strategically integrate them into your resume using the techniques outlined in this guide. Remember, the goal isn't just to pass ATS systems—it's to immediately communicate your value to hiring managers who are looking for candidates with your exact expertise.</p>
