@@ -29,6 +29,8 @@ const BlogPost = () => {
       readTime: "5 min read",
       slug: "essential-resume-tips",
       keywords: "resume writing, resume tips, professional resume, resume formatting, ATS resume",
+      author: "Sarah Mitchell",
+      date: "February 3, 2025",
       content: `
         <h2>Introduction</h2>
         <p>In today's competitive job market, your resume is often the first impression you make on potential employers. A well-crafted resume can be the difference between landing an interview and having your application overlooked. This comprehensive guide will provide you with 10 essential tips to create a winning resume that stands out from the crowd.</p>
@@ -71,15 +73,17 @@ const BlogPost = () => {
     },
     {
       id: 2,
-      title: "Mastering the Art of Job Search in 2024",
-      seoTitle: "Job Search Strategy Guide | Master 2024's Market & Land Your Dream Job | Rezume.dev",
-      metaDescription: "Navigate 2024's competitive job market with proven strategies. LinkedIn optimization, networking tips, and interview preparation included.",
+      title: "Mastering the Art of Job Search in 2025",
+      seoTitle: "Job Search Strategy Guide | Master 2025's Market & Land Your Dream Job | Rezume.dev",
+      metaDescription: "Navigate 2025's competitive job market with proven strategies. LinkedIn optimization, networking tips, and interview preparation included.",
       excerpt: "Discover effective strategies for navigating the modern job market, from leveraging LinkedIn to networking like a pro.",
       category: "Job Search",
       image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
       readTime: "7 min read",
       slug: "job-search-strategies",
       keywords: "job search, job application, LinkedIn optimization, networking, career development",
+      author: "David Chen",
+      date: "February 19, 2025",
       content: `
         <h2>The Modern Job Search Landscape</h2>
         <p>The job search process has evolved dramatically in recent years. With remote work becoming mainstream and digital platforms dominating recruitment, job seekers need to adapt their strategies to stand out in today's competitive market.</p>
@@ -113,6 +117,8 @@ const BlogPost = () => {
       readTime: "6 min read",
       slug: "hiring-manager-insights",
       keywords: "hiring process, interview tips, recruiter advice, stand out to employers",
+      author: "Emily Rodriguez",
+      date: "March 2, 2025",
       content: `
         <h2>The Hiring Manager's Perspective</h2>
         <p>Understanding what hiring managers prioritize can give you a significant advantage in your job search. We've interviewed dozens of hiring managers across various industries to bring you these insider insights.</p>
@@ -146,6 +152,8 @@ const BlogPost = () => {
       readTime: "8 min read",
       slug: "remote-job-resume",
       keywords: "remote work resume, virtual jobs, work from home, remote job application, remote career",
+      author: "Michael Thompson",
+      date: "March 16, 2025",
       content: `
         <h2>The Remote Work Revolution</h2>
         <p>Remote work has become a permanent fixture in the modern workplace. To succeed in landing remote positions, your resume needs to demonstrate specific skills and experiences that prove you can thrive in a distributed work environment.</p>
@@ -182,6 +190,8 @@ const BlogPost = () => {
       readTime: "6 min read",
       slug: "cover-letter-resume-comparison",
       keywords: "cover letter, resume comparison, job application documents, cover letter tips",
+      author: "Jennifer Walsh",
+      date: "March 30, 2025",
       content: `
         <h2>The Great Cover Letter Debate</h2>
         <p>In today's digital job market, the necessity of cover letters is hotly debated. While some employers consider them essential, others barely glance at them. Understanding when and how to use cover letters can give you a strategic advantage.</p>
@@ -215,6 +225,8 @@ const BlogPost = () => {
       readTime: "9 min read",
       slug: "rezume-success-story",
       keywords: "success story, job hunting success, resume transformation, career change",
+      author: "Alex Johnson",
+      date: "April 13, 2025",
       content: `
         <h2>My Job Search Struggle</h2>
         <p>After being laid off from my marketing role at a startup, I spent months applying to jobs with minimal success. My outdated resume wasn't getting past ATS systems, and I was starting to lose confidence in my abilities.</p>
@@ -248,6 +260,8 @@ const BlogPost = () => {
       readTime: "12 min read",
       slug: "best-ai-resume-builders-2025",
       keywords: "AI resume builder, ATS friendly resume, free resume builder 2025, artificial intelligence resume, automated resume optimization, machine learning resume",
+      author: "Rachel Kim",
+      date: "April 27, 2025",
       content: `
         <h2>The AI Resume Revolution</h2>
         <p>Artificial intelligence has transformed how we create resumes. Modern AI resume builders can analyze job descriptions, optimize keywords, and format content to pass ATS systems – all while maintaining professional quality.</p>
@@ -302,6 +316,8 @@ const BlogPost = () => {
       readTime: "12 min read",
       slug: "niche-resume-keywords-2025",
       keywords: "niche resume keywords 2025, long-tail keywords for resume, ATS resume keywords, remote resume keywords, industry specific resume keywords",
+      author: "Marcus Foster",
+      date: "May 11, 2025",
       content: `
         <h2>Introduction</h2>
         <p>In 2025's hyper-competitive job market, generic resume keywords like "team player" and "detail-oriented" no longer cut it. Today's applicant tracking systems (ATS) and hiring managers are looking for specific, niche keywords that demonstrate deep industry knowledge and specialized expertise. This comprehensive guide reveals 10 powerful niche resume keywords that will help you stand out from the crowd and land more interviews.</p>
@@ -498,7 +514,7 @@ const BlogPost = () => {
         <title>{post.seoTitle}</title>
         <meta name="description" content={post.metaDescription} />
         <meta name="keywords" content={post.keywords} />
-        <meta name="author" content="Rezume.dev Expert" />
+        <meta name="author" content={post.author} />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <link rel="canonical" href={`https://rezume.dev/blog/${post.id}`} />
         <link rel="icon" type="image/x-icon" href="/custom-favicon.ico" />
@@ -519,7 +535,7 @@ const BlogPost = () => {
         <meta property="og:site_name" content="Rezume.dev" />
         <meta property="article:published_time" content="2024-03-20T08:00:00+08:00" />
         <meta property="article:modified_time" content="2025-04-12T10:00:00+08:00" />
-        <meta property="article:author" content="Rezume.dev Expert" />
+        <meta property="article:author" content={post.author} />
         <meta property="article:section" content={post.category} />
         <meta property="article:tag" content={post.keywords} />
         
@@ -544,7 +560,7 @@ const BlogPost = () => {
             "dateModified": "2025-04-12T10:00:00+08:00",
             "author": {
               "@type": "Person",
-              "name": "Rezume.dev Expert",
+              "name": post.author,
               "url": "https://rezume.dev/about"
             },
             "publisher": {
@@ -617,7 +633,7 @@ const BlogPost = () => {
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    March 20, 2024
+                    {post.date}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
@@ -625,7 +641,7 @@ const BlogPost = () => {
                   </span>
                   <span className="flex items-center gap-1">
                     <User className="w-4 h-4" />
-                    Rezume.dev Expert
+                    {post.author}
                   </span>
                 </div>
               </div>

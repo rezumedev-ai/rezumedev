@@ -17,19 +17,23 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
       readTime: "5 min read",
       slug: "essential-resume-tips",
-      keywords: "resume writing, resume tips, professional resume, resume formatting, ATS resume"
+      keywords: "resume writing, resume tips, professional resume, resume formatting, ATS resume",
+      author: "Sarah Mitchell",
+      date: "February 3, 2025"
     },
     {
       id: 2,
-      title: "Mastering the Art of Job Search in 2024",
-      seoTitle: "Job Search Strategy Guide | Master 2024's Market & Land Your Dream Job | Rezume.dev",
-      metaDescription: "Navigate 2024's competitive job market with proven strategies. LinkedIn optimization, networking tips, and interview preparation included.",
+      title: "Mastering the Art of Job Search in 2025",
+      seoTitle: "Job Search Strategy Guide | Master 2025's Market & Land Your Dream Job | Rezume.dev",
+      metaDescription: "Navigate 2025's competitive job market with proven strategies. LinkedIn optimization, networking tips, and interview preparation included.",
       excerpt: "Discover effective strategies for navigating the modern job market, from leveraging LinkedIn to networking like a pro.",
       category: "Job Search",
       image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
       readTime: "7 min read",
       slug: "job-search-strategies",
-      keywords: "job search, job application, LinkedIn optimization, networking, career development"
+      keywords: "job search, job application, LinkedIn optimization, networking, career development",
+      author: "David Chen",
+      date: "February 19, 2025"
     },
     {
       id: 3,
@@ -41,7 +45,9 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
       readTime: "6 min read",
       slug: "hiring-manager-insights",
-      keywords: "hiring process, interview tips, recruiter advice, stand out to employers"
+      keywords: "hiring process, interview tips, recruiter advice, stand out to employers",
+      author: "Emily Rodriguez",
+      date: "March 2, 2025"
     },
     {
       id: 4,
@@ -53,7 +59,9 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1552960562-daf630e9278b",
       readTime: "8 min read",
       slug: "remote-job-resume",
-      keywords: "remote work resume, virtual jobs, work from home, remote job application, remote career"
+      keywords: "remote work resume, virtual jobs, work from home, remote job application, remote career",
+      author: "Michael Thompson",
+      date: "March 16, 2025"
     },
     {
       id: 5,
@@ -65,7 +73,9 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1586473219010-2ffc57b0d282",
       readTime: "6 min read",
       slug: "cover-letter-resume-comparison",
-      keywords: "cover letter, resume comparison, job application documents, cover letter tips"
+      keywords: "cover letter, resume comparison, job application documents, cover letter tips",
+      author: "Jennifer Walsh",
+      date: "March 30, 2025"
     },
     {
       id: 6,
@@ -77,7 +87,9 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1579389083078-4e7018379f7e",
       readTime: "9 min read",
       slug: "rezume-success-story",
-      keywords: "success story, job hunting success, resume transformation, career change"
+      keywords: "success story, job hunting success, resume transformation, career change",
+      author: "Alex Johnson",
+      date: "April 13, 2025"
     },
     {
       id: 7,
@@ -89,7 +101,9 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
       readTime: "12 min read",
       slug: "best-ai-resume-builders-2025",
-      keywords: "AI resume builder, ATS friendly resume, free resume builder 2025, artificial intelligence resume, automated resume optimization, machine learning resume"
+      keywords: "AI resume builder, ATS friendly resume, free resume builder 2025, artificial intelligence resume, automated resume optimization, machine learning resume",
+      author: "Rachel Kim",
+      date: "April 27, 2025"
     },
     {
       id: 8,
@@ -101,7 +115,9 @@ const Blog = () => {
       image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4",
       readTime: "12 min read",
       slug: "niche-resume-keywords-2025",
-      keywords: "niche resume keywords 2025, long-tail keywords for resume, ATS resume keywords, remote resume keywords, industry specific resume keywords"
+      keywords: "niche resume keywords 2025, long-tail keywords for resume, ATS resume keywords, remote resume keywords, industry specific resume keywords",
+      author: "Marcus Foster",
+      date: "May 11, 2025"
     },
   ];
 
@@ -174,9 +190,9 @@ const Blog = () => {
               "image": post.image,
               "datePublished": "2024-03-20T08:00:00+08:00",
               "dateModified": "2025-04-12T10:00:00+08:00",
-              "author": {
+               "author": {
                 "@type": "Person",
-                "name": "Rezume.dev Expert"
+                "name": post.author
               },
               "publisher": {
                 "@type": "Organization",
