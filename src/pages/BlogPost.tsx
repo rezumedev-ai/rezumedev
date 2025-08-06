@@ -5,14 +5,6 @@ import { Footer } from "@/components/Footer";
 import { ArrowLeft, Calendar, Clock, User, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BlogContent } from "@/components/blog/BlogContent";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -589,28 +581,6 @@ const BlogPost = () => {
       <div className="min-h-screen bg-white">
         <Header />
         
-        {/* Breadcrumb Navigation */}
-        <div className="container mx-auto px-4 py-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/blog">Blog</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="line-clamp-1">{post.title}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
         
         <main className="py-8 md:py-16">
           <div className="container mx-auto px-4 max-w-4xl">
