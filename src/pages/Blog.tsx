@@ -91,6 +91,18 @@ const Blog = () => {
       slug: "best-ai-resume-builders-2025",
       keywords: "AI resume builder, ATS friendly resume, free resume builder 2025, artificial intelligence resume, automated resume optimization, machine learning resume"
     },
+    {
+      id: 8,
+      title: "10 Powerful Niche Resume Keywords for 2025 - And How to Use Them to Get More Interviews",
+      seoTitle: "Niche Resume Keywords 2025 | 10 Long-Tail Keywords That Get Interviews | Rezume.dev",
+      metaDescription: "Discover 10 powerful niche resume keywords for 2025. Master industry-specific, long-tail keywords for ATS optimization and remote job success.",
+      excerpt: "Master the art of using niche, industry-specific resume keywords to bypass ATS filters and capture hiring managers' attention in 2025's competitive job market.",
+      category: "ATS Optimization",
+      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4",
+      readTime: "12 min read",
+      slug: "niche-resume-keywords-2025",
+      keywords: "niche resume keywords 2025, long-tail keywords for resume, ATS resume keywords, remote resume keywords, industry specific resume keywords"
+    },
   ];
 
   return (
