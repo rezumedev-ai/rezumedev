@@ -526,28 +526,43 @@ FORMAT
       const experience = resumeData.work_experience[i];
       console.log(`Processing job experience ${i+1}: ${experience.jobTitle} at ${experience.companyName}`);
       
-      const responsibilitiesPrompt = `
-Write 4 bullet points for a ${experience.jobTitle} at ${experience.companyName}.
+      const industry = (domainAreas[0] || jobTitle || '').trim();
+      const keyProjects = achievements.join('; ');
+      const tools = relevantTools.join(', ');
+      const keywords = industryKeywords.join(', ');
+      const companyContext = experience.companyName || '';
 
-ACTION VERBS LIST (use different verbs for each bullet)
+      const responsibilitiesPrompt = `
+Write 4 professional resume bullet points for a ${experience.jobTitle} at ${experience.companyName}.
+
+CONTEXT:
+• Industry: ${industry}
+• Key Projects/Responsibilities: ${keyProjects}
+• Tools/Technologies: ${tools}
+• Target Keywords: ${keywords}
+• Company Overview: ${companyContext}
+
+ACTION VERBS LIST (use different verbs for each bullet):
 Developed, Implemented, Managed, Coordinated, Designed, Established, Created, Executed,
 Launched, Spearheaded, Streamlined, Enhanced, Transformed, Revamped, Orchestrated,
-Pioneered, Formulated, Generated, Initiated, Oversaw
+Pioneered, Formulated, Generated, Initiated, Oversaw, Optimized, Engineered, Deployed
 
-REQUIREMENTS
+REQUIREMENTS:
 • Each bullet MUST start with a different action verb from the list above
-• No metrics or numbers
-• Focus on impact and achievements
-• 60‑80 characters per bullet
-• No period at end
-• Avoid generic descriptions
-• Must be specific to the role and company
+• Include at least one target keyword per bullet, woven in naturally
+• Prefer quantified achievements; if none provided, infer realistic measurable outcomes (e.g., "increased efficiency by 15%")
+• Reflect the company’s industry, products, or services in the phrasing
+• Length: 70–110 characters per bullet
+• No periods at the end
+• Use past tense, professional tone, and ATS-friendly language
+• Avoid generic duties or filler phrases
+• Be specific about tools, technologies, or methods used
 
-FORMATTING
-• Return as array: ["point 1", "point 2", ...]
-• Proper capitalization
-• Past tense only
-• Professional tone`;
+FORMATTING:
+• Output ONLY as a JSON array: ["point 1", "point 2", "point 3", "point 4"]
+• No additional explanation or formatting outside the array
+`;
+
 
       const responsibilitiesResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -560,11 +575,11 @@ FORMATTING
           messages: [
             { 
               role: 'system', 
-              content: 'Generate resume bullet points with unique action verbs. Each bullet must start with a different verb. Ensure professional tone and specificity to the role. Return only the JSON array of points.'
+              content: 'You are an elite resume writer and ATS optimization expert. Your task is to generate achievement-oriented bullet points that showcase specific, high-impact contributions for the given role. Each bullet must start with a unique, powerful action verb, integrate industry-relevant keywords naturally, and convey measurable or clearly inferred impact. Return only the JSON array of bullet points with no explanation or formatting outside the array.'
             },
             { role: 'user', content: responsibilitiesPrompt }
           ],
-          temperature: 0.7,
+          temperature: 0.6,
         }),
       });
 
@@ -591,7 +606,7 @@ FORMATTING
         // Basic formatting cleanup
         responsibilities = responsibilities
           .map(resp => resp.trim())
-          .filter(resp => resp.length >= 30 && resp.length <= 100);
+          .filter(resp => resp.length >= 70 && resp.length <= 110);
 
         responsibilities = responsibilities.slice(0, 4);
         
