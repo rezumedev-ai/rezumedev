@@ -87,7 +87,7 @@ export const AnimatedTestimonialsSection = () => {
           <Testimonials 
             testimonials={testimonials} 
             title="Trusted by job seekers worldwide"
-            description="Join over 100,000+ professionals worldwide who've transformed their careers using our AI-powered resume builder"
+            description="We're a small team helping job seekers craft clear, ATS-friendly resumes that get noticed."
           />
         </motion.div>
       </div>
