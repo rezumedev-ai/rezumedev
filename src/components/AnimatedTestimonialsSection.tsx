@@ -6,61 +6,53 @@ import { Testimonials } from "@/components/ui/testimonials";
 export const AnimatedTestimonialsSection = () => {
   const testimonials = [
     {
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
-      text: "The AI-powered resume builder transformed my job search. Got callbacks from top companies within weeks of updating my resume!",
-      name: "Sarah Miller",
-      username: "@sarahm_tech",
-      social: "https://twitter.com/"
+      image: "https://i.pravatar.cc/150?img=11",
+      text: "My ATS score went from 54 to 92. The keyword suggestions and phrasing tips were spot on—had two interviews in a week.",
+      name: "Aisha Khan",
+      username: "Product Marketing Manager"
     },
     {
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      text: "Switched careers from finance to tech. The resume builder helped highlight my transferable skills perfectly. I landed interviews at 3 tech startups!",
-      name: "Michael Chen",
-      username: "@mchen_dev",
-      social: "https://twitter.com/"
+      image: "https://i.pravatar.cc/150?img=32",
+      text: "The role-targeted template turned my generic resume into a focused one. Got callbacks from two fintechs.",
+      name: "Daniel Chen",
+      username: "Software Engineer"
     },
     {
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
-      text: "Got interviews at FAANG companies within weeks. The ATS optimization feature really helped my resume get past the screening algorithms.",
-      name: "Emily Rodriguez",
-      username: "@emilycareer",
-      social: "https://twitter.com/"
+      image: "https://i.pravatar.cc/150?img=5",
+      text: "Loved the quantified bullet ideas—'reduced onboarding time by 37%' is the kind of line hiring managers remember.",
+      name: "María López",
+      username: "HR Generalist"
     },
     {
-      image: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face",
-      text: "From application to offer in 3 weeks. The resume templates were professional and tailored to my industry. Best investment in my career journey.",
-      name: "James Wilson",
-      username: "@jwilson_pro",
-      social: "https://twitter.com/"
+      image: "https://i.pravatar.cc/150?img=21",
+      text: "Exported a clean PDF and a DOCX version in minutes. Landed an HRBP interview the same week.",
+      name: "Oliver Smith",
+      username: "Data Analyst"
     },
     {
-      image: "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?w=149&h=149&fit=crop&crop=face",
-      text: "As a hiring manager, I can tell when candidates use Resume.dev. Their resumes stand out with clear organization and impactful content.",
-      name: "Lisa Thompson",
-      username: "@lisathompson",
-      social: "https://twitter.com/"
+      image: "https://i.pravatar.cc/150?img=47",
+      text: "The bullet generator turned my duties into impact. Recruiters actually replied for the first time.",
+      name: "Priya Nair",
+      username: "UX Designer"
     },
     {
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      text: "The modern templates and real-time preview helped me create a stand-out UX portfolio. The smart suggestions for achievements were invaluable.",
-      name: "Lisa Chang",
-      username: "@lisac_design",
-      social: "https://twitter.com/"
+      image: "https://i.pravatar.cc/150?img=66",
+      text: "Adding metrics was a game-changer—helped me negotiate a 22% raise with a senior AE offer.",
+      name: "Jamal Williams",
+      username: "Sales Lead"
     },
     {
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      text: "Impressed by how the AI customizes content for different job applications. Makes targeting specific positions so much easier with minimal effort.",
-      name: "David Kumar",
-      username: "@davidk_work",
-      social: "https://twitter.com/"
+      image: "https://i.pravatar.cc/150?img=15",
+      text: "ATS scan flagged missing keywords (PMP, stakeholder comms). I fixed them and got two offers.",
+      name: "Nina Petrova",
+      username: "Project Manager"
     },
     {
-      image: "https://i.imgur.com/kaDy9hV.jpeg",
-      text: "The tailored suggestions for each job application are brilliant. Resume.dev helped me highlight the exact skills needed for each position I applied for.",
-      name: "Emma Brown",
-      username: "@emmabrown",
-      social: "https://twitter.com/"
-    },
+      image: "https://i.pravatar.cc/150?img=28",
+      text: "Keyword suggestions matched the job posts (Kubernetes, IaC, observability). My response rate doubled.",
+      name: "Luca Moretti",
+      username: "DevOps Engineer"
+    }
   ];
 
   return (
@@ -88,6 +80,7 @@ export const AnimatedTestimonialsSection = () => {
             testimonials={testimonials} 
             title="Trusted by job seekers worldwide"
             description="We're a small team helping job seekers craft clear, ATS-friendly resumes that get noticed."
+            hideSocial
           />
         </motion.div>
       </div>

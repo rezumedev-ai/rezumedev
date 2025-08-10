@@ -12,7 +12,7 @@ interface Testimonial {
   name: string
   username: string
   text: string
-  social: string
+  social?: string
 }
 
 interface TestimonialsProps {
@@ -21,6 +21,7 @@ interface TestimonialsProps {
   title?: string
   description?: string
   maxDisplayed?: number
+  hideSocial?: boolean
 }
 
 export function Testimonials({
@@ -29,6 +30,7 @@ export function Testimonials({
   title = "Read what people are saying",
   description = "Dummy feedback from virtual customers using our component library.",
   maxDisplayed = 6,
+  hideSocial = false,
 }: TestimonialsProps) {
   const [showAll, setShowAll] = useState(false)
 
@@ -90,12 +92,15 @@ export function Testimonials({
                     {testimonial.text}
                   </p>
                 </div>
-                <button
-                  onClick={() => openInNewTab(testimonial.social)}
-                  className="absolute top-4 right-4 hover:opacity-80 transition-opacity"
-                >
-                  <Icons.twitter className="h-4 w-4" aria-hidden="true" />
-                </button>
+                {!hideSocial && testimonial.social && (
+                  <button
+                    onClick={() => openInNewTab(testimonial.social!)}
+                    className="absolute top-4 right-4 hover:opacity-80 transition-opacity"
+                    aria-label={`View ${testimonial.name}'s post`}
+                  >
+                    <Icons.twitter className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                )}
               </Card>
             ))}
         </div>
