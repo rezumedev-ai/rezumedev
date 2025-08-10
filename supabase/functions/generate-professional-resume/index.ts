@@ -627,23 +627,38 @@ FORMATTING:
       }
     }
     
+    const industryContext = domainAreas.join(', ');
+    const tools = relevantTools.join(', ');
+
     const skillsPrompt = `
-Generate skills for a ${jobTitle} resume.
+Generate a skills list for a ${jobTitle} resume.
 
-AVAILABLE KEYWORDS
-${industryKeywords.join(', ')}
+CONTEXT:
+• Target Job Title: ${jobTitle}
+• Available Keywords: ${industryKeywords.join(', ')}
+• Industry Context: ${industryContext}
+• Tools/Technologies: ${tools}
 
-REQUIREMENTS
-• 6 technical/hard skills
-• 4 soft skills
-• Use full words (no abbreviations)
-• Capitalize properly
+REQUIREMENTS:
+• 6 hard skills (technical, industry-specific, or tools) — must reflect the most in-demand skills for the role
+• 4 soft skills (role-relevant interpersonal, leadership, or organizational abilities)
+• Hard skills must include at least 3 from the Available Keywords list, integrated naturally
+• Allow widely recognized abbreviations (e.g., SQL, AWS, API) but write them in ATS-friendly form if applicable (“Amazon Web Services (AWS)”) 
+• Soft skills must be specific and relevant to the role, not generic (e.g., “Technical Communication” instead of “Communication”)
+• Order each category with the most important skills for the role first
+• Capitalize each skill correctly
 
-OUTPUT FORMAT
+OUTPUT FORMAT:
 {
   "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
   "soft_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"]
-}`;
+}
+
+ABSOLUTE RULES:
+• Output JSON only, no extra formatting or explanation
+• Ensure every skill is ATS-optimized and job-relevant
+`;
+
 
     const skillsResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -656,11 +671,11 @@ OUTPUT FORMAT
         messages: [
           { 
             role: 'system', 
-            content: 'Generate a JSON object with skills for a resume. Return only the JSON.'
+            content: 'You are an elite resume writer and ATS optimization expert. Your task is to generate a JSON object of the most relevant skills for the given job title, ensuring ATS keyword alignment, proper categorization, and professional capitalization. Return only the JSON with no additional explanation or formatting.'
           },
           { role: 'user', content: skillsPrompt }
         ],
-        temperature: 0.7,
+        temperature: 0.6,
       }),
     });
 
