@@ -364,26 +364,29 @@ serve(async (req) => {
     
     if (targetJobDescription) {
       keywordsPrompt = `
-Extract keywords for a ${jobTitle} résumé from this job description:
+Extract 15 highly relevant keywords and phrases for a ${jobTitle} résumé based on the following job description:
 
 """
 ${targetJobDescription}
 """
 
-RULES
-• Extract 15 important keywords & phrases
-• Prioritize specific skills, tools, technologies
-• Skip generic phrases ("team player")
-• Output format: ["keyword1", "keyword2", ...]`;
+RULES:
+• Include exact terms, tools, technologies, and certifications used in the job description.
+• Include synonyms or common variations for critical terms (e.g., "project management" and "PM").
+• Avoid generic soft skills ("team player", "hardworking").
+• Maintain the same casing as in the job description (e.g., "JavaScript" not "javascript").
+• Output ONLY as a JSON array of strings, e.g.: ["keyword1", "keyword2", "keyword3", ...]
+`;
     } else {
       keywordsPrompt = `
-Generate keywords for a standard ${jobTitle} résumé.
+Generate 15 highly relevant keywords and phrases for a standard ${jobTitle} résumé.
 
-RULES
-• List 15 important keywords & phrases
-• Focus on industry‑standard skills & competencies
-• Include technical & soft skills
-• Output format: ["keyword1", "keyword2", ...]`;
+RULES:
+• Use industry-standard technical skills, certifications, and core competencies.
+• Include both technical and role-specific terminology.
+• Avoid generic soft skills.
+• Output ONLY as a JSON array of strings, e.g.: ["keyword1", "keyword2", "keyword3", ...]
+`;
     }
 
     console.log(targetJobDescription 
@@ -401,11 +404,11 @@ RULES
         messages: [
           { 
             role: 'system', 
-            content: 'Extract or generate keywords that will help this resume pass ATS systems. Return only the array of keywords.'
+            content: 'You are an ATS (Applicant Tracking System) optimization specialist. Your task is to extract or generate only the most relevant keywords and key phrases that will improve the chances of a resume passing ATS filters. Always return them as an exact array of strings with no extra explanation.'
           },
           { role: 'user', content: keywordsPrompt }
         ],
-        temperature: 0.5,
+        temperature: 0.3,
       }),
     });
 
