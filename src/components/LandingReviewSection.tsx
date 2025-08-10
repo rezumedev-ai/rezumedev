@@ -1,6 +1,6 @@
 
 import React from "react";
-import { StarIcon, UserIcon, ThumbsUpIcon, UsersIcon } from "lucide-react";
+import { StarIcon } from "lucide-react";
 
 export const LandingReviewSection = () => (
   <section className="py-12 sm:py-14 bg-gradient-to-b from-white to-accent/30">
@@ -35,24 +35,6 @@ export const LandingReviewSection = () => (
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#F1F0FB] rounded-xl py-6 flex flex-col items-center shadow">
-          <UsersIcon className="w-6 h-6 mb-2 text-primary" />
-          <div className="text-md text-muted-foreground mb-1 font-medium">Total Users</div>
-          <div className="text-2xl md:text-3xl font-bold text-[#7E69AB]">212,400+</div>
-        </div>
-        <div className="bg-[#F1F0FB] rounded-xl py-6 flex flex-col items-center shadow">
-          <ThumbsUpIcon className="w-6 h-6 mb-2 text-primary" />
-          <div className="text-md text-muted-foreground mb-1 font-medium">Interview Rate</div>
-          <div className="text-2xl md:text-3xl font-bold text-[#9B87F5]">64.7%</div>
-        </div>
-        <div className="bg-[#F1F0FB] rounded-xl py-6 flex flex-col items-center shadow">
-          <StarIcon className="w-6 h-6 mb-2 text-[#FEC6A1] fill-[#FEC6A1]" />
-          <div className="text-md text-muted-foreground mb-1 font-medium">Avg. User Review</div>
-          <div className="text-2xl md:text-3xl font-bold text-[#403E43]">8.8/10</div>
-        </div>
-      </div>
     </div>
   </section>
 );
