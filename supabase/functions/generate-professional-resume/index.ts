@@ -461,26 +461,31 @@ CONTEXT
 • Target Keywords: ${industryKeywords.join(', ')}
 
 REQUIREMENTS
-1. Structure (70-90 words total):
-   • Headline: Include job title and key specialization
-   • Experience Statement: "${experienceString}" with focus in [domain areas]
-   • Achievement Hook: Include one quantified achievement from provided list
-   • Value Statement: Combine leadership soft-skill with target impact
+
+1. Structure (75–85 words total):
+   • Headline: Include job title + a key specialization + a differentiator.
+   • Experience Statement: "${experienceString}" with a natural reference to 2–3 domain expertise areas.
+   • Achievement Hook: Include one quantified achievement (always use a numeric value; if missing, create a realistic, role-appropriate metric).
+   • Value Statement: Highlight leadership or collaboration skills with a measurable business or team impact.
+
 2. Technical Elements:
-   • Incorporate 1-2 relevant tools/technologies from provided list
-   • Reference 2-3 domain expertise areas naturally
-   • Use 2-3 target keywords from context
+   • Seamlessly integrate 1–2 tools/technologies from the provided list.
+   • Incorporate 2–3 target keywords from the provided list organically (never as a raw list).
+   • Preserve exact casing for technical terms (e.g., JavaScript, AWS).
+
 3. Writing Style:
-   • Active voice
-   • Professional tone
-   • No clichés ("results-driven," "proven track record")
-   • Omit personal pronouns
+   • Use active voice.
+   • Keep sentences concise and impactful.
+   • Ban cliché phrases like "results-driven," "proven track record," "passionate."
+   • Avoid personal pronouns ("I", "my", "we").
 
 FORMAT
-• Write in paragraph form with headline
-• Focus on specialization and expertise
-• Must include exact experience duration: "${experienceString}"
-• Include one clear, quantified achievement`;
+• One single paragraph beginning with the headline.
+• Balance technical, leadership, and business impact elements.
+• Never exceed 85 words, never go below 75 words.
+• Output only the final summary text without labels or formatting.
+`;
+
 
     console.log('Calling OpenAI API for enhanced professional summary...');
     
@@ -495,11 +500,11 @@ FORMAT
         messages: [
           { 
             role: 'system', 
-            content: 'Write a professional resume summary that includes domain expertise, quantified achievements, relevant tools, and leadership value. Return only the summary text. Ensure achievements are specific and varied.'
+            content: 'You are an elite professional resume writer and ATS optimization specialist. Your task is to write a high-impact professional resume summary that highlights domain expertise, quantified achievements, relevant tools, and leadership value. Your audience is Fortune 500 recruiters and hiring managers. If any contextual information is missing, intelligently infer industry-appropriate content without stating assumptions. Return only the summary text with no extra commentary. Ensure the tone is professional, the language is precise, and the result feels tailored for an executive-level review.'
           },
           { role: 'user', content: summaryPrompt }
         ],
-        temperature: 0.8,
+        temperature: 0.6,
       }),
     });
 
