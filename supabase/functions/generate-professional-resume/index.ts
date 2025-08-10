@@ -521,6 +521,7 @@ FORMAT
     console.log('Clean summary:', cleanSummary);
     
     const enhancedExperiences = [];
+    const usedActionVerbs = new Set<string>();
     
     for (let i = 0; i < resumeData.work_experience.length; i++) {
       const experience = resumeData.work_experience[i];
@@ -531,9 +532,10 @@ FORMAT
       const tools = relevantTools.join(', ');
       const keywords = industryKeywords.join(', ');
       const companyContext = experience.companyName || '';
+      const previouslyUsedVerbs = Array.from(usedActionVerbs).join(', ');
 
       const responsibilitiesPrompt = `
-Write 4 professional resume bullet points for a ${experience.jobTitle} at ${experience.companyName}.
+Write EXACTLY 4 achievement-focused resume bullet points for a ${experience.jobTitle} at ${experience.companyName}.
 
 CONTEXT:
 • Industry: ${industry}
@@ -541,26 +543,19 @@ CONTEXT:
 • Tools/Technologies: ${tools}
 • Target Keywords: ${keywords}
 • Company Overview: ${companyContext}
-
-ACTION VERBS LIST (use different verbs for each bullet):
-Developed, Implemented, Managed, Coordinated, Designed, Established, Created, Executed,
-Launched, Spearheaded, Streamlined, Enhanced, Transformed, Revamped, Orchestrated,
-Pioneered, Formulated, Generated, Initiated, Oversaw, Optimized, Engineered, Deployed
+• Previously used action verbs across other roles (do NOT use any of these): ${previouslyUsedVerbs || 'None'}
 
 REQUIREMENTS:
-• Each bullet MUST start with a different action verb from the list above
-• Include at least one target keyword per bullet, woven in naturally
-• Prefer quantified achievements; if none provided, infer realistic measurable outcomes (e.g., "increased efficiency by 15%")
-• Reflect the company’s industry, products, or services in the phrasing
-• Length: 70–110 characters per bullet
-• No periods at the end
-• Use past tense, professional tone, and ATS-friendly language
-• Avoid generic duties or filler phrases
-• Be specific about tools, technologies, or methods used
+• Start each bullet with a UNIQUE action verb (no repeats within this role)
+• Do NOT use any verb listed in "Previously used..."
+• Each bullet must be 90–150 characters
+• Integrate at least one relevant keyword and one tool/technology where natural
+• Use past tense, professional, ATS-optimized language; no first-person
+• Be specific, measurable when possible (add realistic metrics if missing); avoid fluff
+• No ending periods; no semicolons; no emoji
 
-FORMATTING:
-• Output ONLY as a JSON array: ["point 1", "point 2", "point 3", "point 4"]
-• No additional explanation or formatting outside the array
+OUTPUT:
+• Return ONLY a JSON array of 4 strings: ["...","...","...","..."]
 `;
 
 
@@ -592,38 +587,93 @@ FORMATTING:
       try {
         const respData = await responsibilitiesResponse.json();
         const responseContent = respData.choices[0].message.content.trim();
-        let responsibilities = [];
+        let responsibilities: string[] = [];
 
-        if (responseContent.includes('[') && responseContent.includes(']')) {
-          const match = responseContent.match(/\[([^\]]+)\]/);
-          if (match) {
-            responsibilities = JSON.parse(`[${match[1]}]`);
+        const parseArray = (text: string): string[] => {
+          try {
+            if (text.includes('[') && text.includes(']')) {
+              const match = text.match(/\[([\s\S]*?)\]/);
+              if (match) return JSON.parse(`[${match[1]}]`);
+            }
+          } catch {}
+          return text
+            .split(/\n|\r|\u2022|\-/)
+            .map((r) => r.replace(/^[•\-\d.]\s*/, '').trim())
+            .filter(Boolean);
+        };
+
+        responsibilities = parseArray(responseContent);
+
+        const clean = (s: string) => s.replace(/[.\s]+$/, '').trim();
+        responsibilities = responsibilities.map(clean);
+
+        const withinLength = (s: string) => s.length >= 90 && s.length <= 150;
+        let filtered = responsibilities.filter(withinLength);
+
+        // Retry once if we didn't get exactly 4 bullets
+        if (filtered.length !== 4) {
+          const fixPrompt = `You previously generated the following bullets (may be too short/long or wrong count):\n${JSON.stringify(responsibilities)}\n\nRewrite and return EXACTLY 4 achievement bullets for ${experience.jobTitle} at ${experience.companyName} following the same constraints as before. Avoid these verbs: ${previouslyUsedVerbs || 'None'}. Output JSON array of 4 strings only.`;
+
+          const retryResp = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${openAIApiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [
+                { role: 'system', content: 'Rewrite the bullets to meet constraints. Output only a JSON array of four strings.' },
+                { role: 'user', content: fixPrompt }
+              ],
+              temperature: 0.5,
+            }),
+          });
+
+          if (retryResp.ok) {
+            const retryData = await retryResp.json();
+            const retryContent = retryData.choices[0].message.content.trim();
+            filtered = parseArray(retryContent).map(clean).filter(withinLength);
           }
-        } else {
-          responsibilities = responseContent.split('\n').map(r => r.replace(/^[•\-\d.]\s*/, '').trim());
         }
 
-        // Basic formatting cleanup
-        responsibilities = responsibilities
-          .map(resp => resp.trim())
-          .filter(resp => resp.length >= 70 && resp.length <= 110);
+        // Fallbacks: ensure exactly 4 items
+        let finalBullets = filtered.length >= 4
+          ? filtered.slice(0, 4)
+          : responsibilities.slice(0, 4).map(clean);
 
-        responsibilities = responsibilities.slice(0, 4);
-        
-        if (responsibilities.length > 0) {
-          enhancedExperiences.push({
-            ...experience,
-            responsibilities
-          });
-          
-          console.log(`Generated ${responsibilities.length} responsibilities for ${experience.jobTitle}`);
+        // Enforce verb uniqueness tracking across roles
+        const extractVerb = (s: string) => s.split(/\s+/)[0].replace(/[^A-Za-z]/g, '').toLowerCase();
+        const hasDupWithin = new Set<string>();
+        finalBullets = finalBullets.filter((b) => {
+          const v = extractVerb(b);
+          if (usedActionVerbs.has(v) || hasDupWithin.has(v)) return false;
+          hasDupWithin.add(v);
+          return true;
+        });
+
+        // If we removed some due to duplicates, backfill from original list
+        if (finalBullets.length < 4) {
+          for (const b of responsibilities) {
+            if (finalBullets.length >= 4) break;
+            const v = extractVerb(b);
+            if (!usedActionVerbs.has(v) && !hasDupWithin.has(v)) {
+              finalBullets.push(clean(b));
+              hasDupWithin.add(v);
+            }
+          }
+        }
+
+        // Update used verbs set
+        finalBullets.forEach((b) => usedActionVerbs.add(extractVerb(b)));
+
+        if (finalBullets.length === 4) {
+          enhancedExperiences.push({ ...experience, responsibilities: finalBullets });
+          console.log(`Generated ${finalBullets.length} responsibilities for ${experience.jobTitle}`);
         } else {
-          enhancedExperiences.push({...experience});
+          enhancedExperiences.push({ ...experience });
           console.log(`Using original responsibilities for ${experience.jobTitle}`);
         }
       } catch (e) {
         console.error(`Error processing responsibilities for ${experience.jobTitle}:`, e);
-        enhancedExperiences.push({...experience});
+        enhancedExperiences.push({ ...experience });
       }
     }
     
