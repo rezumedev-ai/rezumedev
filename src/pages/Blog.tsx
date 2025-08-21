@@ -119,6 +119,20 @@ const Blog = () => {
       author: "Marcus Foster",
       date: "May 11, 2025"
     },
+    {
+      id: 9,
+      title: "How to Use AI Resume Builders for Career Transitions: Your Complete Guide",
+      seoTitle: "AI Resume Builder Career Change Guide | Complete 2025 Transition Strategy | Rezume.dev",
+      metaDescription: "Discover how to effectively use AI resume builders for career transitions, including benefits, step-by-step guidance, and real-life examples.",
+      excerpt: "Master career transitions with AI resume builders. Learn proven strategies, avoid common mistakes, and leverage technology for career change success.",
+      category: "AI Tools",
+      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+      readTime: "12 min read",
+      slug: "ai-resume-builders-career-transitions",
+      keywords: "AI resume builder, career transition, career change, resume optimization, ATS optimization, transferable skills",
+      author: "Michael Thompson",
+      date: "March 15, 2025"
+    }
   ];
 
   return (
