@@ -32,10 +32,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data } = await supabase.auth.getSession();
       const token = data.session?.access_token || null;
-      console.log("🔑 AUTH: Retrieved token:", token ? `${token.substring(0, 10)}...` : "No token found");
+      // console.debug("AUTH: Token retrieved");
       return token;
     } catch (error) {
-      console.error("🔴 ERROR: Failed to get auth token:", error);
+      console.error("Error retrieving auth token");
       return null;
     }
   };
@@ -51,15 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         // Log session info for debugging
         if (session) {
-          console.log("🔑 AUTH: Active session found for:", session.user.email);
-          console.log("🔑 AUTH: Token expires at:", new Date(session.expires_at * 1000).toLocaleString());
-          console.log("🔑 AUTH: Token available:", session.access_token ? "Yes" : "No");
-          
-          // Check if token is stored in localStorage
-          const hasLocalToken = localStorage.getItem('supabase.auth.token') !== null;
-          console.log("🔑 AUTH: Token in localStorage:", hasLocalToken ? "Yes" : "No");
-        } else {
-          console.log("🔑 AUTH: No active session found");
+          // Session active
         }
         
         setUser(session?.user ?? null);
@@ -70,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           navigate('/login', { replace: true });
         }
       } catch (error) {
-        console.error("🔴 ERROR: Error checking auth state:", error);
+        console.error("Error initializing auth");
       } finally {
         setLoading(false);
       }
@@ -80,14 +72,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Listen for changes on auth state (signed in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("🔑 AUTH: Auth state changed:", event, "User:", session?.user?.email);
+      // Handle auth state changes
       setUser(session?.user ?? null);
-      
-      // Log token information whenever auth state changes
-      if (session) {
-        console.log("🔑 AUTH: New token available:", session.access_token ? "Yes" : "No");
-        console.log("🔑 AUTH: Token expires at:", new Date(session.expires_at * 1000).toLocaleString());
-      }
       
       // Handle different auth events
       switch (event) {
@@ -102,7 +88,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           break;
         case 'TOKEN_REFRESHED':
           // Session has been refreshed, update the user
-          console.log("🔑 AUTH: Token was refreshed");
           setUser(session?.user ?? null);
           break;
         case 'USER_UPDATED':
@@ -135,11 +120,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Navigate to login page
       navigate('/login', { replace: true });
     } catch (error) {
-      console.error('🔴 ERROR: Error signing out:', error);
+      console.error('Error signing out');
       toast({
         variant: "destructive",
         title: "Error signing out",
-        description: error instanceof Error ? error.message : "An error occurred while signing out",
+        description: "An error occurred while signing out",
       });
     }
   };

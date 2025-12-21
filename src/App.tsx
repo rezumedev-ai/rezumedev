@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignUp from "./pages/SignUp";
@@ -30,10 +30,11 @@ import NewResume from "./pages/NewResume";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import AppSumoSignUp from "./pages/AppSumoSignUp"; 
+import AppSumoSignUp from "./pages/AppSumoSignUp";
 import ChangePassword from "./pages/ChangePassword";
 import ProfileSelection from "./pages/ProfileSelection"; // Add this import
 import FAQ from "./pages/FAQ";
+import { MetaPixelPageTracker } from "@/components/analytics/MetaPixelTracker";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,26 +45,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Meta Pixel page view tracker component
-const MetaPixelPageTracker = () => {
-  const location = useLocation();
-  
-  useEffect(() => {
-    // Track PageView on route change
-    if (window.fbq) {
-      window.fbq('track', 'PageView');
-    }
-  }, [location.pathname]);
-  
-  return null;
-};
 
-// Declare fbq for TypeScript
-declare global {
-  interface Window {
-    fbq: any;
-  }
-}
 
 function App() {
   return (
