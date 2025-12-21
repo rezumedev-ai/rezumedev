@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -24,11 +24,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 
 interface ProfileDialogProps {
   isOpen: boolean;
@@ -54,7 +50,8 @@ export function ProfileDialog({
   const [city, setCity] = useState('');
   const [linkedin, setLinkedin] = useState('');
   const [website, setWebsite] = useState('');
-  const [openCountry, setOpenCountry] = useState(false);
+  const [showCountryDialog, setShowCountryDialog] = useState(false);
+  const [tempSearch, setTempSearch] = useState('');
 
   // Reset form when dialog opens/closes or profile changes
   useEffect(() => {
@@ -82,7 +79,7 @@ export function ProfileDialog({
   // Auto-fill phone code when country changes
   const handleCountrySelect = (currentValue: string) => {
     setCountry(currentValue);
-    setOpenCountry(false);
+    setShowCountryDialog(false);
 
     // Only set phone code if phone is empty or just has a different code
     const selectedCountry = countries.find(c => c.name === currentValue);
@@ -123,7 +120,8 @@ export function ProfileDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 bg-white border border-gray-100 shadow-2xl">
+      {/* Added z-[150] and bg-white explicit to DialogContent */}
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 bg-white border border-gray-100 shadow-2xl z-[150]">
 
         {/* Header Section */}
         <div className="bg-gradient-to-r from-gray-50 to-white p-6 pb-8 border-b border-gray-100">
@@ -199,33 +197,36 @@ export function ProfileDialog({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col">
                   <Label className="text-xs font-bold text-gray-500 uppercase mb-2">Country</Label>
-                  <Popover open={openCountry} onOpenChange={setOpenCountry} modal={true}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={openCountry}
-                        className="w-full justify-between pl-3 text-left font-normal border-gray-200 bg-gray-50/50 hover:bg-white"
-                      >
-                        {country ? (
-                          <span className="flex items-center gap-2 truncate">
-                            <Globe className="h-4 w-4 text-gray-400 shrink-0" />
-                            {country}
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-2 text-muted-foreground">
-                            <Globe className="h-4 w-4 text-gray-400 shrink-0" />
-                            Select Country
-                          </span>
-                        )}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 z-[9999]" align="start">
-                      <Command>
-                        <CommandInput placeholder="Search country..." />
-                        <CommandList>
-                          <CommandEmpty>No country found.</CommandEmpty>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    onClick={() => setShowCountryDialog(true)}
+                    className="w-full justify-between pl-3 text-left font-normal border-gray-200 bg-gray-50/50 hover:bg-white"
+                  >
+                    {country ? (
+                      <span className="flex items-center gap-2 truncate">
+                        <Globe className="h-4 w-4 text-gray-400 shrink-0" />
+                        {country}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <Globe className="h-4 w-4 text-gray-400 shrink-0" />
+                        Select Country
+                      </span>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+
+                  {/* Dedicated Country Selection Dialog */}
+                  <Dialog open={showCountryDialog} onOpenChange={setShowCountryDialog}>
+                    <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden z-[200] gap-0 bg-white">
+                      <DialogHeader className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+                        <DialogTitle className="text-base font-medium text-gray-900">Select Country</DialogTitle>
+                      </DialogHeader>
+                      <Command className="bg-white">
+                        <CommandInput placeholder="Search country..." className="bg-white border-none focus:ring-0" />
+                        <CommandList className="max-h-[300px] overflow-y-auto p-1">
+                          <CommandEmpty className="py-6 text-center text-sm text-gray-500">No country found.</CommandEmpty>
                           <CommandGroup>
                             {countries.map((c) => (
                               <CommandItem
@@ -234,11 +235,12 @@ export function ProfileDialog({
                                 onSelect={(currentValue) => {
                                   handleCountrySelect(currentValue);
                                 }}
+                                className="cursor-pointer aria-selected:bg-blue-50 aria-selected:text-blue-700"
                               >
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    country === c.name ? "opacity-100" : "opacity-0"
+                                    country === c.name ? "opacity-100 text-blue-600" : "opacity-0"
                                   )}
                                 />
                                 {c.name}
@@ -247,8 +249,8 @@ export function ProfileDialog({
                           </CommandGroup>
                         </CommandList>
                       </Command>
-                    </PopoverContent>
-                  </Popover>
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="city" className="text-xs font-bold text-gray-500 uppercase">City</Label>
