@@ -19,7 +19,7 @@ export const LandingReviewSection = () => (
         {/* Reviewer Row */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <img
-            src="/lovable-uploads/086e725c-a5de-402d-bfd0-4a1a620b0b4f.png"
+            src="/uploads/086e725c-a5de-402d-bfd0-4a1a620b0b4f.png"
             alt="Jessica Lee - HR Thought Leader"
             className="rounded-full w-14 h-14 object-cover border-4 border-accent"
             style={{ boxShadow: "0 0 0 4px #E5DEFF" }}

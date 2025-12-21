@@ -1,69 +1,49 @@
-# Welcome to your Lovable project
+# Rezume.dev - Professional AI Resume Builder
 
-## Project info
+**URL**: [https://rezume.dev](https://rezume.dev)
 
-**URL**: https://lovable.dev/projects/b504d68c-6a88-4287-a711-cb2990113a84
+Clean, professional, and ATS-friendly resume builder built with modern web technologies.
 
-## How can I edit this code?
+## Tech Stack
+- **Framework**: React / Vite
+- **Language**: TypeScript
+- **UI**: shadcn/ui + Tailwind CSS
+- **Icons**: Lucide React
+- **Backend/Auth**: Supabase
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+1. **Clone the repository**
+   ```bash
+   git clone <YOUR_GIT_URL>
+   cd rezume-dev
+   ```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b504d68c-6a88-4287-a711-cb2990113a84) and start prompting.
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   bun install
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+3. **Start the development server**
+   ```bash
+   npm run dev
+   # or
+   bun run dev
+   ```
 
-**Use your preferred IDE**
+## Key Features
+- **AI-Powered Builder**: Smart content suggestions.
+- **ATS Friendly**: Templates optimized for tracking systems.
+- **PDF Export**: Generate high-quality PDFs.
+- **Real-time Preview**: See changes instantly.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Project Structure
+- `/src/components`: UI components and feature blocks.
+- `/src/pages`: Application routes and views.
+- `/src/lib`: Utilities and helpers.
+- `/src/contexts`: Global state (Auth, etc.).
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b504d68c-6a88-4287-a711-cb2990113a84) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## License
+Proprietary software. All rights reserved.
