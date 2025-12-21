@@ -18,13 +18,13 @@ interface CheckoutButtonProps {
 }
 
 // Environment detection - determines if we're in production or development
-const isProduction = window.location.hostname !== "localhost" && 
-                    !window.location.hostname.includes("127.0.0.1") &&
-                    !window.location.hostname.includes(".netlify.app");
+const isProduction = window.location.hostname !== "localhost" &&
+  !window.location.hostname.includes("127.0.0.1") &&
+  !window.location.hostname.includes(".netlify.app");
 
-// Stripe publishable keys - safe to expose in client-side code
-const STRIPE_TEST_PUBLISHABLE_KEY = "pk_test_51R0coQHK7YurnN3DGE0WvJK4EcelweO5ocXBF4Dsuxbna5HtitiQOzbb6Bk1IJZEbN5IauFwrdF9Y49bPzRpDkUP00wB2KRlZi";
-const STRIPE_LIVE_PUBLISHABLE_KEY = "pk_live_51R0coQHK7YurnN3DQgm2RmqaJSXZs7bllvHjZyEGpGXaISvABbT59vNxwZ8fqwYe6VHsj5Eoe7lm1G3cq9ZsJ9I100RcqmMbkH";
+// Stripe publishable keys - loaded from environment variables
+const STRIPE_TEST_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_TEST_PUBLISHABLE_KEY;
+const STRIPE_LIVE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_LIVE_PUBLISHABLE_KEY;
 
 export const CheckoutButton = ({
   planType,
@@ -52,15 +52,15 @@ export const CheckoutButton = ({
     try {
       // Get the current session for authentication
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
+
       if (sessionError || !session) {
         console.error("Authentication error:", sessionError || "No session found");
         throw new Error("Authentication error. Please try logging in again.");
       }
-      
+
       // Get current timestamp for caching prevention
       const timestamp = new Date().getTime();
-      
+
       // Make the request to create a checkout session
       const { data: sessionData, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
@@ -85,16 +85,16 @@ export const CheckoutButton = ({
       // Redirect to Stripe checkout
       toast.success("Redirecting to Stripe");
       window.location.href = sessionData.url;
-      
+
     } catch (error) {
       console.error("Checkout error:", error);
-      
+
       let errorMessage = "Failed to start checkout process. Please try again later.";
-      
+
       if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast.error("Checkout Error", {
         description: errorMessage
       });
