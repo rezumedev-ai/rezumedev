@@ -90,62 +90,8 @@ export function DownloadOptionsDialog({
       document.body.appendChild(clonedResume);
 
       // First check if we need to adjust font sizes for problematic templates
-      if (['minimal-elegant', 'executive-clean'].includes(templateId)) {
-        // Find sections that might cause overflow issues
-        const skillsSection = clonedResume.querySelector('[data-section="skills"]');
-        const certSection = clonedResume.querySelector('[data-section="certifications"]');
+      // Template specific font adjustments removed to ensure consistency with preview
 
-        if (skillsSection) {
-          // Adjust skills section font sizes if needed
-          const skillHeadings = skillsSection.querySelectorAll('h4');
-          skillHeadings.forEach(heading => {
-            const headingElem = heading as HTMLElement;
-            if (headingElem.style.fontSize) {
-              const currentSize = parseFloat(headingElem.style.fontSize);
-              headingElem.style.fontSize = `${Math.max(currentSize * 0.85, 10)}px`;
-            }
-          });
-
-          // Find skill lists and adjust their text size
-          const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
-          skillLists.forEach(list => {
-            const listElem = list as HTMLElement;
-            const items = listElem.querySelectorAll('li');
-            items.forEach(item => {
-              const itemElem = item as HTMLElement;
-              itemElem.style.fontSize = '10px';
-              itemElem.style.lineHeight = '1.2';
-              itemElem.style.marginBottom = '2px';
-            });
-          });
-        }
-
-        if (certSection) {
-          // Adjust certification section font sizes
-          const certItems = certSection.querySelectorAll('div');
-          certItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            // Only adjust actual certification items, not containers
-            if (itemElem.classList.contains('flex')) {
-              const textElements = itemElem.querySelectorAll('span');
-              textElements.forEach(span => {
-                const spanElem = span as HTMLElement;
-                spanElem.style.fontSize = '10px';
-              });
-            }
-          });
-        }
-
-        // Check for any education section that might need adjustment
-        const educationSection = clonedResume.querySelector('[data-section="education"]');
-        if (educationSection) {
-          const dateTexts = educationSection.querySelectorAll('.text-gray-500');
-          dateTexts.forEach(date => {
-            const dateElem = date as HTMLElement;
-            dateElem.style.fontSize = '10px';
-          });
-        }
-      }
 
       // Find all hyperlinks in the cloned resume to add them to the PDF later
       const links: { url: string, left: number, top: number, width: number, height: number }[] = [];
