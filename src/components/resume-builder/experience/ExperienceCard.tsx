@@ -94,7 +94,7 @@ export function ExperienceCard({
                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-[200] bg-white shadow-xl rounded-lg border border-gray-100" align="start">
+            <PopoverContent className="w-auto p-0 bg-white" align="start">
               <Calendar
                 mode="single"
                 selected={experience.startDate ? new Date(experience.startDate) : undefined}
@@ -106,7 +106,11 @@ export function ExperienceCard({
                 fromYear={1960}
                 toYear={new Date().getFullYear()}
                 initialFocus
-                className="bg-white rounded-lg"
+                className="rounded-md border shadow-lg bg-white"
+                classNames={{
+                  caption_dropdowns: "flex justify-center gap-1",
+                  dropdown: "h-8 border-gray-200 rounded px-2 py-1 text-sm bg-gray-50 hover:bg-white"
+                }}
               />
             </PopoverContent>
           </Popover>
@@ -137,7 +141,7 @@ export function ExperienceCard({
                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-[200] bg-white shadow-xl rounded-lg border border-gray-100" align="start">
+            <PopoverContent className="w-auto p-0 bg-white" align="start">
               <Calendar
                 mode="single"
                 selected={experience.endDate ? new Date(experience.endDate) : undefined}
@@ -149,7 +153,12 @@ export function ExperienceCard({
                 fromYear={1960}
                 toYear={new Date().getFullYear()}
                 initialFocus
-                className="bg-white rounded-lg"
+                className="rounded-md border shadow-lg bg-white"
+                classNames={{
+                  // Custom override to fix potential layout issues specifically in this context
+                  caption_dropdowns: "flex justify-center gap-1",
+                  dropdown: "h-8 border-gray-200 rounded px-2 py-1 text-sm bg-gray-50 hover:bg-white"
+                }}
               />
             </PopoverContent>
           </Popover>
