@@ -11,8 +11,8 @@ interface BulletPointProps {
   type?: "skills" | "experience";
 }
 
-export function BulletPoint({ 
-  children, 
+export function BulletPoint({
+  children,
   className,
   bulletClassName,
   textClassName,
@@ -32,9 +32,9 @@ export function BulletPoint({
 
   return (
     <li className={cn("flex items-start gap-2 pdf-bullet-item", className)}>
-      <div 
+      <div
         className={cn(
-          "inline-flex items-center justify-center shrink-0 translate-y-[5px] pdf-bullet-marker",
+          "inline-flex items-center justify-center shrink-0 pdf-bullet-marker",
           bulletStyle[template as keyof typeof bulletStyle] || bulletStyle.default,
           bulletClassName
         )}
