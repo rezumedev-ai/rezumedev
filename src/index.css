@@ -130,33 +130,11 @@
   }
 
   .pdf-mode #resume-content .pdf-bullet-marker {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    align-self: flex-start !important;
-    /* Align to top of line */
-    width: 5px !important;
-    height: 5px !important;
-    min-width: 5px !important;
-    min-height: 5px !important;
-    border-radius: 50% !important;
     background-color: currentColor !important;
-    transform: none !important;
   }
 
   .pdf-mode #resume-content .pdf-bullet-text {
-    display: inline-block !important;
     flex: 1 !important;
-    line-height: 1.4 !important;
-  }
-
-  .pdf-mode #resume-content .pdf-bullet-char {
-    display: inline-block !important;
-    margin-right: 6px !important;
-    flex-shrink: 0 !important;
-    align-self: flex-start !important;
-    /* No manual vertical alignment or margin hacks */
   }
 
   /* Improve contact icons in PDF */
