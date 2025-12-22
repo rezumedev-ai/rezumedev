@@ -216,13 +216,15 @@ export function DownloadOptionsDialog({
       });
 
       // Force alignment fix for html2canvas
-      // Target the WRAPPER span to lift the entire bullet unit
+      // Remove manual lift - rely on structural alignment
+      /*
       const bulletWrappers = clonedResume.querySelectorAll('[data-pdf-wrapper="true"]');
       bulletWrappers.forEach(wrapper => {
         const el = wrapper as HTMLElement;
         el.style.position = 'relative';
-        el.style.top = '-4px'; // Lift the entire wrapper line-height block
+        el.style.top = '-4px'; 
       });
+      */
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
@@ -235,9 +237,9 @@ export function DownloadOptionsDialog({
       const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
-        // Don't override flex alignment - let CSS handle it (items-start)
-        // itemElement.style.display = 'flex';
-        // itemElement.style.alignItems = 'center';
+        // Explicitly enforce flex-start to ensure the line-height wrapper sits at the top
+        itemElement.style.display = 'flex';
+        itemElement.style.alignItems = 'flex-start';
         itemElement.style.marginBottom = '4px';
       });
 
