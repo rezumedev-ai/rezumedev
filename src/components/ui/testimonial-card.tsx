@@ -15,14 +15,14 @@ export interface TestimonialCardProps {
   className?: string
 }
 
-export function TestimonialCard({ 
+export function TestimonialCard({
   author,
   text,
   href,
   className
 }: TestimonialCardProps) {
   const Card = href ? 'a' : 'div'
-  
+
   return (
     <Card
       {...(href ? { href } : {})}
@@ -31,7 +31,7 @@ export function TestimonialCard({
         "bg-gradient-to-b from-muted/50 to-muted/10",
         "p-4 text-start sm:p-6",
         "hover:from-muted/60 hover:to-muted/20",
-        "max-w-[320px] sm:max-w-[320px]",
+        "w-[280px] sm:w-[320px] shrink-0",
         "transition-colors duration-300",
         className
       )}
