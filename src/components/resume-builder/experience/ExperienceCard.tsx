@@ -94,7 +94,7 @@ export function ExperienceCard({
                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 z-[200] bg-white shadow-xl rounded-lg border border-gray-100" align="start">
               <Calendar
                 mode="single"
                 selected={experience.startDate ? new Date(experience.startDate) : undefined}
@@ -102,7 +102,11 @@ export function ExperienceCard({
                 disabled={(date) =>
                   date > new Date() || date < new Date("1900-01-01")
                 }
+                captionLayout="dropdown-buttons"
+                fromYear={1960}
+                toYear={new Date().getFullYear()}
                 initialFocus
+                className="bg-white rounded-lg"
               />
             </PopoverContent>
           </Popover>
@@ -133,7 +137,7 @@ export function ExperienceCard({
                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 z-[200] bg-white shadow-xl rounded-lg border border-gray-100" align="start">
               <Calendar
                 mode="single"
                 selected={experience.endDate ? new Date(experience.endDate) : undefined}
@@ -141,7 +145,11 @@ export function ExperienceCard({
                 disabled={(date) =>
                   date > new Date() || date < new Date("1900-01-01")
                 }
+                captionLayout="dropdown-buttons"
+                fromYear={1960}
+                toYear={new Date().getFullYear()}
                 initialFocus
+                className="bg-white rounded-lg"
               />
             </PopoverContent>
           </Popover>
