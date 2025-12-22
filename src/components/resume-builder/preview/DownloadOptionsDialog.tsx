@@ -43,18 +43,18 @@ export function DownloadOptionsDialog({
     enabled: !!user
   });
 
-  const hasActiveSubscription = profile && 
-    profile.subscription_plan && 
+  const hasActiveSubscription = profile &&
+    profile.subscription_plan &&
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
   const handleDownloadPDF = async () => {
     setOpen(false);
-    
+
     if (!hasActiveSubscription) {
       setShowSubscriptionDialog(true);
       return;
     }
-    
+
     try {
       const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
@@ -70,10 +70,10 @@ export function DownloadOptionsDialog({
       // Get the exact dimensions of the original element
       const originalWidth = resumeElement.offsetWidth;
       const originalHeight = resumeElement.offsetHeight;
-      
+
       // Get template ID to apply template-specific optimizations
       const templateId = resumeElement.getAttribute('data-template-id') || 'minimal-clean';
-      
+
       // Create a clone with exact A4 proportions to ensure consistency
       const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
       clonedResume.id = 'pdf-preparation-div';
@@ -86,7 +86,7 @@ export function DownloadOptionsDialog({
       clonedResume.style.padding = '0';
       clonedResume.style.overflow = 'hidden';
       clonedResume.className = resumeElement.className + ' pdf-mode';
-      
+
       document.body.appendChild(clonedResume);
 
       // First check if we need to adjust font sizes for problematic templates
@@ -94,7 +94,7 @@ export function DownloadOptionsDialog({
         // Find sections that might cause overflow issues
         const skillsSection = clonedResume.querySelector('[data-section="skills"]');
         const certSection = clonedResume.querySelector('[data-section="certifications"]');
-        
+
         if (skillsSection) {
           // Adjust skills section font sizes if needed
           const skillHeadings = skillsSection.querySelectorAll('h4');
@@ -105,7 +105,7 @@ export function DownloadOptionsDialog({
               headingElem.style.fontSize = `${Math.max(currentSize * 0.85, 10)}px`;
             }
           });
-          
+
           // Find skill lists and adjust their text size
           const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
           skillLists.forEach(list => {
@@ -119,7 +119,7 @@ export function DownloadOptionsDialog({
             });
           });
         }
-        
+
         if (certSection) {
           // Adjust certification section font sizes
           const certItems = certSection.querySelectorAll('div');
@@ -135,7 +135,7 @@ export function DownloadOptionsDialog({
             }
           });
         }
-        
+
         // Check for any education section that might need adjustment
         const educationSection = clonedResume.querySelector('[data-section="education"]');
         if (educationSection) {
@@ -155,13 +155,13 @@ export function DownloadOptionsDialog({
         // Replace link tag with span to avoid issues with html2canvas
         const linkUrl = element.getAttribute('href') || '';
         const linkText = element.textContent || '';
-        
+
         // Collect link info for later
         const rect = element.getBoundingClientRect();
         const offsetTop = element.offsetTop;
         const offsetLeft = element.offsetLeft;
         const parent = element.parentElement;
-        
+
         // Store link details
         links.push({
           url: linkUrl,
@@ -170,7 +170,7 @@ export function DownloadOptionsDialog({
           width: rect.width,
           height: rect.height
         });
-        
+
         // Replace link with span
         const span = document.createElement('span');
         span.innerText = linkText;
@@ -178,7 +178,7 @@ export function DownloadOptionsDialog({
         span.style.color = '#0000EE'; // Standard link blue color
         span.style.textDecoration = 'underline';
         span.dataset.linkIndex = index.toString();
-        
+
         if (parent) {
           parent.replaceChild(span, element);
         }
@@ -191,7 +191,7 @@ export function DownloadOptionsDialog({
         if (svg) {
           const iconType = svg.getAttribute('data-lucide') || '';
           let iconSymbol = '';
-          
+
           switch (iconType.toLowerCase()) {
             case 'mail': iconSymbol = '✉'; break;
             case 'phone': iconSymbol = '☎'; break;
@@ -199,7 +199,7 @@ export function DownloadOptionsDialog({
             case 'globe': iconSymbol = '🌐'; break;
             default: iconSymbol = '•'; break;
           }
-          
+
           const iconSpan = document.createElement('span');
           iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
@@ -208,7 +208,7 @@ export function DownloadOptionsDialog({
           iconSpan.style.display = 'inline-block';
           iconSpan.style.verticalAlign = 'middle';
           iconSpan.style.lineHeight = '1';
-          
+
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
           }
@@ -223,10 +223,9 @@ export function DownloadOptionsDialog({
         bulletElement.style.height = 'auto';
         bulletElement.style.display = 'inline-block';
         bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '0';
+        // Let CSS handle alignment and spacing
         bulletElement.style.fontSize = '16px';
         bulletElement.style.lineHeight = '1';
-        bulletElement.style.verticalAlign = 'middle';
         bulletElement.className = 'pdf-bullet-char';
       });
 
@@ -253,7 +252,7 @@ export function DownloadOptionsDialog({
         if (svg) {
           const iconType = svg.getAttribute('data-lucide') || '';
           let iconSymbol = '';
-          
+
           switch (iconType.toLowerCase()) {
             case 'briefcase': iconSymbol = '💼'; break;
             case 'graduation-cap': iconSymbol = '🎓'; break;
@@ -264,7 +263,7 @@ export function DownloadOptionsDialog({
             case 'folder-kanban': iconSymbol = '📂'; break;
             default: iconSymbol = '•'; break;
           }
-          
+
           const iconSpan = document.createElement('span');
           iconSpan.textContent = iconSymbol;
           iconSpan.className = 'pdf-icon-text';
@@ -273,33 +272,33 @@ export function DownloadOptionsDialog({
           iconSpan.style.display = 'inline-block';
           iconSpan.style.verticalAlign = 'middle';
           iconSpan.style.lineHeight = '1';
-          
+
           if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
           }
         }
       });
-      
+
       // Check if we need to apply content length optimizations
       const contentOptimization = () => {
         // Find sections that might contain a lot of content
         const experienceSection = clonedResume.querySelector('[data-section="experience"]');
         if (experienceSection) {
           const experienceItems = experienceSection.querySelectorAll('[data-experience-item="true"]');
-          
+
           // If there are many experience items, we need to adjust spacing
           if (experienceItems.length > 3) {
             experienceItems.forEach(item => {
               const itemElem = item as HTMLElement;
               // Reduce margins between items
               itemElem.style.marginBottom = '6px';
-              
+
               // Find responsibility lists and adjust their spacing
               const respList = itemElem.querySelector('ul');
               if (respList) {
                 const respListElem = respList as HTMLElement;
                 respListElem.style.marginTop = '2px';
-                
+
                 // Make responsibility text smaller
                 const listItems = respListElem.querySelectorAll('li');
                 listItems.forEach(li => {
@@ -312,7 +311,7 @@ export function DownloadOptionsDialog({
             });
           }
         }
-        
+
         // Handle long skills lists
         const skillsList = clonedResume.querySelectorAll('[data-skill-item="true"]');
         if (skillsList.length > 15) {
@@ -323,13 +322,13 @@ export function DownloadOptionsDialog({
           });
         }
       };
-      
+
       // Apply content-based optimizations
       contentOptimization();
 
       // Improved canvas capture settings with higher resolution and quality
       const pixelRatio = window.devicePixelRatio || 1;
-      
+
       const captureSettings = {
         scale: pixelRatio * 3, // Increased scale for better quality
         useCORS: true,
@@ -353,13 +352,13 @@ export function DownloadOptionsDialog({
       };
 
       const canvas = await html2canvas(clonedResume, captureSettings);
-      
+
       document.body.removeChild(clonedResume);
 
       // A4 dimensions in mm
       const pdfWidth = 210; // A4 width in mm
       const pdfHeight = 297; // A4 height in mm
-      
+
       const pdf = new jsPDF({
         format: 'a4',
         unit: 'mm',
@@ -368,15 +367,15 @@ export function DownloadOptionsDialog({
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      
+
       // Calculate the correct scaling from canvas to PDF to maintain aspect ratio
       // and ensure content fills the width without unnecessary white space
       const canvasAspectRatio = canvas.width / canvas.height;
       const a4AspectRatio = pdfWidth / pdfHeight;
-      
+
       // Check if content is too tall for A4 height
       let imgWidth, imgHeight, offsetX = 0;
-      
+
       if (canvasAspectRatio < a4AspectRatio) {
         // Content is taller than A4 proportions - we need to scale to fit height
         imgHeight = pdfHeight;
@@ -387,7 +386,7 @@ export function DownloadOptionsDialog({
         imgWidth = pdfWidth;
         imgHeight = imgWidth / canvasAspectRatio;
       }
-      
+
       pdf.addImage(
         imgData,
         'JPEG',
@@ -404,21 +403,21 @@ export function DownloadOptionsDialog({
         // Calculate scale ratio between canvas and PDF
         const scaleX = imgWidth / originalWidth;
         const scaleY = imgHeight / originalHeight;
-        
+
         links.forEach(link => {
           // Convert link position from original coordinates to PDF coordinates
           const pdfX = offsetX + (link.left * scaleX);
           const pdfY = link.top * scaleY;
           const pdfWidth = link.width * scaleX;
           const pdfHeight = link.height * scaleY;
-          
+
           // Add clickable link area to the PDF
           pdf.link(pdfX, pdfY, pdfWidth, pdfHeight, { url: link.url });
         });
       }
 
       pdf.save('resume.pdf');
-      
+
       toast.dismiss(loadingToast);
       toast.success("PDF downloaded successfully!");
     } catch (error) {
@@ -435,8 +434,8 @@ export function DownloadOptionsDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           size="sm"
           onClick={() => setOpen(true)}
           disabled={isDownloading}
@@ -450,8 +449,8 @@ export function DownloadOptionsDialog({
             <DialogTitle>Download Resume</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               onClick={handleDownloadPDF}
               disabled={isDownloading}
             >
@@ -485,7 +484,7 @@ export function DownloadOptionsDialog({
             >
               Maybe Later
             </Button>
-            <Button 
+            <Button
               onClick={navigateToPricing}
               className="sm:w-auto w-full bg-gradient-to-r from-primary to-primary-hover"
             >
