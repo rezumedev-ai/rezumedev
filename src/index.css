@@ -136,8 +136,6 @@
     flex-shrink: 0 !important;
     align-self: flex-start !important;
     /* Align to top of line */
-    margin-top: 0.4em !important;
-    /* Relative spacing for visual center against text */
     width: 5px !important;
     height: 5px !important;
     min-width: 5px !important;
