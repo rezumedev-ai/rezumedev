@@ -216,15 +216,14 @@ export function DownloadOptionsDialog({
       });
 
       // Force alignment fix for html2canvas
-      // Remove manual lift - rely on structural alignment
-      /*
+      // "Sitting high" -> Push it DOWN. 
+      // Using 2.5px based on visual estimation of the "too high" error.
       const bulletWrappers = clonedResume.querySelectorAll('[data-pdf-wrapper="true"]');
       bulletWrappers.forEach(wrapper => {
         const el = wrapper as HTMLElement;
         el.style.position = 'relative';
-        el.style.top = '-4px'; 
+        el.style.top = '2.5px'; // Positive value pushes it DOWN
       });
-      */
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
