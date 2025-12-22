@@ -215,12 +215,13 @@ export function DownloadOptionsDialog({
         }
       });
 
-      // Force alignment fix for html2canvas which renders flex-centered items too low
-      const bulletMarkers = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
-      bulletMarkers.forEach(marker => {
-        const el = marker as HTMLElement;
+      // Force alignment fix for html2canvas
+      // Target the WRAPPER span to lift the entire bullet unit
+      const bulletWrappers = clonedResume.querySelectorAll('[data-pdf-wrapper="true"]');
+      bulletWrappers.forEach(wrapper => {
+        const el = wrapper as HTMLElement;
         el.style.position = 'relative';
-        el.style.top = '-3px'; // Manual lift for PDF only
+        el.style.top = '-4px'; // Lift the entire wrapper line-height block
       });
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');

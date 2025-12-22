@@ -32,7 +32,7 @@ export function BulletPoint({
 
   return (
     <li className={cn("flex items-start gap-2 pdf-bullet-item", className)}>
-      <span className="flex items-center justify-center shrink-0 h-[1.4em]" aria-hidden="true">
+      <span className="flex items-center justify-center shrink-0 h-[1.4em]" aria-hidden="true" data-pdf-wrapper="true">
         <div
           className={cn(
             "pdf-bullet-marker",
