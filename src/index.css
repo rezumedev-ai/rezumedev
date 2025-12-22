@@ -218,10 +218,10 @@
     aspect-ratio: 1/1 !important;
   }
 
-  /* Other fixes from previous implementation */
-  #resume-content ul.list-disc li,
-  #resume-content ul.space-y-1 li,
-  #resume-content ul[class~="space-y-1.5"] li {
+  /* Other fixes from previous implementation - Scoped to PDF */
+  .pdf-mode #resume-content ul.list-disc li,
+  .pdf-mode #resume-content ul.space-y-1 li,
+  .pdf-mode #resume-content ul[class~="space-y-1.5"] li {
     page-break-inside: avoid;
     display: flex !important;
     align-items: flex-start !important;
@@ -234,22 +234,22 @@
     break-inside: avoid !important;
   }
 
-  /* Improved list and bullet point styling */
-  #resume-content ul.list-disc li,
-  #resume-content ul.space-y-1 li,
-  #resume-content ul[class~="space-y-1.5"] li {
+  /* Improved list and bullet point styling - Scoped to PDF */
+  .pdf-mode #resume-content ul.list-disc li,
+  .pdf-mode #resume-content ul.space-y-1 li,
+  .pdf-mode #resume-content ul[class~="space-y-1.5"] li {
     page-break-inside: avoid;
     display: flex !important;
     align-items: center !important;
     line-height: 1.4 !important;
   }
 
-  #resume-content .rounded-full {
+  .pdf-mode #resume-content .rounded-full {
     border-radius: 50% !important;
     overflow: hidden !important;
   }
 
-  #resume-content .rounded-full img {
+  .pdf-mode #resume-content .rounded-full img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
@@ -257,9 +257,9 @@
     aspect-ratio: 1/1 !important;
   }
 
-  /* Ensure proper alignment of bullet points */
-  #resume-content li .inline-block,
-  #resume-content li .inline-flex {
+  /* Ensure proper alignment of bullet points - Scoped to PDF */
+  .pdf-mode #resume-content li .inline-block,
+  .pdf-mode #resume-content li .inline-flex {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -268,20 +268,9 @@
     flex-shrink: 0 !important;
   }
 
-  /* Fix for arrow bullet points */
-  #resume-content [class~="space-y-1.5"] li span:first-child,
-  #resume-content .space-y-1 li span:first-child {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    vertical-align: middle !important;
-    margin-top: 0 !important;
-    transform: translateY(0) !important;
-  }
-
-  /* Professional Navy template specific fixes */
-  #resume-content .professional-navy-contact-icon {
+  /* Fix for arrow bullet points - Scoped to PDF */
+  .pdf-mode #resume-content [class~="space-y-1.5"] li span:first-child,
+  .pdf-mode #resume-content .space-y-1 li span:first-child {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -291,7 +280,18 @@
     transform: translateY(0) !important;
   }
 
-  #resume-content .professional-navy-bullet {
+  /* Professional Navy template specific fixes - Scoped to PDF */
+  .pdf-mode #resume-content .professional-navy-contact-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    vertical-align: middle !important;
+    margin-top: 0 !important;
+    transform: translateY(0) !important;
+  }
+
+  .pdf-mode #resume-content .professional-navy-bullet {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -307,7 +307,7 @@
     transform: translateY(0) !important;
   }
 
-  #resume-content .professional-navy-work-item li {
+  .pdf-mode #resume-content .professional-navy-work-item li {
     display: flex !important;
     align-items: center !important;
     margin-bottom: 6px !important;
