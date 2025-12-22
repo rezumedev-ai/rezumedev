@@ -221,7 +221,7 @@
   /* Other fixes from previous implementation */
   #resume-content ul.list-disc li,
   #resume-content ul.space-y-1 li,
-  #resume-content ul.space-y-1.5 li {
+  #resume-content ul[class~="space-y-1.5"] li {
     page-break-inside: avoid;
     display: flex !important;
     align-items: flex-start !important;
@@ -237,7 +237,7 @@
   /* Improved list and bullet point styling */
   #resume-content ul.list-disc li,
   #resume-content ul.space-y-1 li,
-  #resume-content ul.space-y-1.5 li {
+  #resume-content ul[class~="space-y-1.5"] li {
     page-break-inside: avoid;
     display: flex !important;
     align-items: center !important;
@@ -269,7 +269,7 @@
   }
 
   /* Fix for arrow bullet points */
-  #resume-content .space-y-1.5 li span:first-child,
+  #resume-content [class~="space-y-1.5"] li span:first-child,
   #resume-content .space-y-1 li span:first-child {
     display: inline-flex !important;
     align-items: center !important;
