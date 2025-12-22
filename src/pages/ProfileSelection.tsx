@@ -11,6 +11,16 @@ import { ProfileDialog } from '@/components/profiles/ProfileDialog';
 import { ResumeProfile } from '@/types/profile';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ProfileSelection() {
   const { user } = useAuth();
@@ -18,15 +28,32 @@ export default function ProfileSelection() {
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [profileToEdit, setProfileToEdit] = useState<ResumeProfile | undefined>(undefined);
-  
+  const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
+
   const {
     profiles,
     isLoading,
     createProfile,
     updateProfile,
+    deleteProfile,
     isCreating,
-    isUpdating
+    isUpdating,
+    isDeleting
   } = useResumeProfiles();
+
+  const handleConfirmDelete = () => {
+    if (profileToDelete) {
+      deleteProfile(profileToDelete, {
+        onSuccess: () => {
+          setProfileToDelete(null);
+          // If the deleted profile was selected, clear selection
+          if (selectedProfileId === profileToDelete) {
+            setSelectedProfileId(null);
+          }
+        }
+      });
+    }
+  };
 
   // Auto-select first profile if there is one and none is selected
   useEffect(() => {
@@ -72,7 +99,7 @@ export default function ProfileSelection() {
 
     // Save the selected profile ID to localStorage
     localStorage.setItem('selectedProfileId', selectedProfileId);
-    
+
     // Navigate to template selection
     navigate('/new-resume');
   };
@@ -115,8 +142,8 @@ export default function ProfileSelection() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <SimplifiedHeader />
-      
-      <motion.div 
+
+      <motion.div
         className="max-w-5xl mx-auto pt-16 sm:pt-20 pb-10 px-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -141,7 +168,7 @@ export default function ProfileSelection() {
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <motion.div 
+          <motion.div
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"
             variants={containerVariants}
             initial="hidden"
@@ -154,10 +181,11 @@ export default function ProfileSelection() {
                   isSelected={profile.id === selectedProfileId}
                   onSelect={() => handleProfileSelect(profile.id)}
                   onEdit={() => handleEditProfile(profile)}
+                  onDelete={() => setProfileToDelete(profile.id)}
                 />
               </motion.div>
             ))}
-            
+
             {profiles.length < 5 && (
               <motion.div variants={itemVariants} className="w-full">
                 <AddProfileCard onClick={handleAddProfile} />
@@ -167,7 +195,7 @@ export default function ProfileSelection() {
         )}
 
         {profiles.length > 0 && (
-          <motion.div 
+          <motion.div
             className="mt-8 sm:mt-12 flex justify-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -196,6 +224,27 @@ export default function ProfileSelection() {
         onSave={handleSaveProfile}
         existingProfile={profileToEdit}
       />
+
+      <AlertDialog open={!!profileToDelete} onOpenChange={(open) => !open && setProfileToDelete(null)}>
+        <AlertDialogContent className="bg-white border-gray-100">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-gray-900">Delete Profile?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-500">
+              This action cannot be undone. This will permanently delete your profile and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-900">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white border-none"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Profile"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }

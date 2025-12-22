@@ -4,7 +4,7 @@ import { ResumeProfile } from '@/types/profile';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { getInitials } from '@/utils/format-names';
 
 interface ProfileCardProps {
@@ -12,17 +12,19 @@ interface ProfileCardProps {
   isSelected: boolean;
   onSelect: () => void;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
-export function ProfileCard({ 
-  profile, 
+export function ProfileCard({
+  profile,
   isSelected,
   onSelect,
-  onEdit 
+  onEdit,
+  onDelete
 }: ProfileCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const initials = getInitials(profile.personal_info.fullName || profile.name);
-  
+
   // Use the full name as the display name
   const displayName = profile.personal_info.fullName || profile.name;
 
@@ -65,20 +67,39 @@ export function ProfileCard({
 
       {/* Edit button that appears on hover */}
       {isHovered && (
-        <motion.div
-          className="absolute top-2 right-2 cursor-pointer"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", stiffness: 500, damping: 15 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit();
-          }}
-        >
-          <div className="bg-white/90 text-gray-800 p-2 rounded-full hover:bg-white">
-            <Pencil className="w-3.5 h-3.5" />
-          </div>
-        </motion.div>
+        <>
+          <motion.div
+            className="absolute top-2 right-2 cursor-pointer z-10"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 15 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            title="Edit Profile"
+          >
+            <div className="bg-white/90 text-gray-700 p-2 rounded-full hover:bg-white hover:text-primary transition-colors shadow-sm">
+              <Pencil className="w-4 h-4" />
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="absolute top-2 left-2 cursor-pointer z-10"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.05 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            title="Delete Profile"
+          >
+            <div className="bg-white/90 text-red-500 p-2 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm">
+              <Trash2 className="w-4 h-4" />
+            </div>
+          </motion.div>
+        </>
       )}
     </motion.div>
   );
