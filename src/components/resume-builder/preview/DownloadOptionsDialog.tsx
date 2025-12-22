@@ -242,8 +242,9 @@ export function DownloadOptionsDialog({
       const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
-        itemElement.style.display = 'flex';
-        itemElement.style.alignItems = 'center';
+        // Don't override flex alignment - let CSS handle it (items-start)
+        // itemElement.style.display = 'flex';
+        // itemElement.style.alignItems = 'center';
         itemElement.style.marginBottom = '4px';
       });
 
