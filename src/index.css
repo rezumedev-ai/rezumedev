@@ -112,7 +112,7 @@
 
   /* PDF-specific styling */
   .pdf-mode {
-    padding: 32px 32px 0 32px !important; /* Increased padding: Top, right, bottom, left padding for PDF export */
+    /* Padding is handled by inline styles from the template */
     box-sizing: border-box !important;
   }
   
