@@ -108,8 +108,13 @@ export function ExperienceCard({
                 initialFocus
                 className="rounded-md border shadow-lg bg-white"
                 classNames={{
-                  caption_dropdowns: "flex justify-center gap-1",
-                  dropdown: "h-8 border-gray-200 rounded px-2 py-1 text-sm bg-gray-50 hover:bg-white"
+                  caption_dropdowns: "flex justify-center gap-3 pt-1 items-center",
+                  dropdown: "h-9 border-gray-200 rounded-md px-2 py-1 text-sm bg-gray-50 hover:bg-white focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer font-medium transition-colors",
+                  nav: "hidden"
+                }}
+                labels={{
+                  labelMonthDropdown: () => null,
+                  labelYearDropdown: () => null
                 }}
               />
             </PopoverContent>
@@ -155,9 +160,13 @@ export function ExperienceCard({
                 initialFocus
                 className="rounded-md border shadow-lg bg-white"
                 classNames={{
-                  // Custom override to fix potential layout issues specifically in this context
-                  caption_dropdowns: "flex justify-center gap-1",
-                  dropdown: "h-8 border-gray-200 rounded px-2 py-1 text-sm bg-gray-50 hover:bg-white"
+                  caption_dropdowns: "flex justify-center gap-3 pt-1 items-center",
+                  dropdown: "h-9 border-gray-200 rounded-md px-2 py-1 text-sm bg-gray-50 hover:bg-white focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer font-medium transition-colors",
+                  nav: "hidden"
+                }}
+                labels={{
+                  labelMonthDropdown: () => null,
+                  labelYearDropdown: () => null
                 }}
               />
             </PopoverContent>
