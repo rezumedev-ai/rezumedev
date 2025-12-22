@@ -215,21 +215,13 @@ export function DownloadOptionsDialog({
         }
       });
 
-      /*
-      const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
-      bulletPoints.forEach(bullet => {
-        const bulletElement = bullet as HTMLElement;
-        bulletElement.textContent = '•';
-        bulletElement.style.width = 'auto';
-        bulletElement.style.height = 'auto';
-        bulletElement.style.display = 'inline-block';
-        bulletElement.style.marginRight = '6px';
-        // Let CSS handle alignment and spacing
-        bulletElement.style.fontSize = '16px';
-        bulletElement.style.lineHeight = '1';
-        bulletElement.className = 'pdf-bullet-char';
+      // Force alignment fix for html2canvas which renders flex-centered items too low
+      const bulletMarkers = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
+      bulletMarkers.forEach(marker => {
+        const el = marker as HTMLElement;
+        el.style.position = 'relative';
+        el.style.top = '-3px'; // Manual lift for PDF only
       });
-      */
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
