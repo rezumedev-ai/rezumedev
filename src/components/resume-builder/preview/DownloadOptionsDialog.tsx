@@ -216,13 +216,13 @@ export function DownloadOptionsDialog({
       });
 
       // Force alignment fix for html2canvas
-      // "Sitting high" -> Push it DOWN. 
-      // Using 2.5px based on visual estimation of the "too high" error.
+      // "Still High" with 2.5px -> Push it DOWN MORE.
+      // Increasing to 4.5px to firmly lower the bullet to visual center.
       const bulletWrappers = clonedResume.querySelectorAll('[data-pdf-wrapper="true"]');
       bulletWrappers.forEach(wrapper => {
         const el = wrapper as HTMLElement;
         el.style.position = 'relative';
-        el.style.top = '2.5px'; // Positive value pushes it DOWN
+        el.style.top = '4.5px'; // Stronger push down
       });
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
