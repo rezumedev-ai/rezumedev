@@ -222,7 +222,7 @@ export function DownloadOptionsDialog({
       bulletWrappers.forEach(wrapper => {
         const el = wrapper as HTMLElement;
         el.style.position = 'relative';
-        el.style.top = '6px'; // Major push down
+        el.style.top = '10px'; // Increased from 6px to fix alignment issues where bullets sit too high
       });
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
