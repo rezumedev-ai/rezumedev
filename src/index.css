@@ -129,8 +129,12 @@
     break-inside: avoid !important;
   }
 
+  /* HTML2Canvas Force Fix: The engine renders flex-centered items too low. */
   .pdf-mode #resume-content .pdf-bullet-marker {
     background-color: currentColor !important;
+    position: relative !important;
+    top: -3px !important;
+    /* Brute force lift */
   }
 
   .pdf-mode #resume-content .pdf-bullet-text {
