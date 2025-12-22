@@ -215,6 +215,7 @@ export function DownloadOptionsDialog({
         }
       });
 
+      /*
       const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
       bulletPoints.forEach(bullet => {
         const bulletElement = bullet as HTMLElement;
@@ -228,6 +229,7 @@ export function DownloadOptionsDialog({
         bulletElement.style.lineHeight = '1';
         bulletElement.className = 'pdf-bullet-char';
       });
+      */
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
       bulletLists.forEach(list => {
