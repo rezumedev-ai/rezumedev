@@ -78,13 +78,24 @@ export function ProfileDialog({
 
   // Auto-fill phone code when country changes
   const handleCountrySelect = (currentValue: string) => {
+    const previousCountry = countries.find(c => c.name === country);
+    const selectedCountry = countries.find(c => c.name === currentValue);
+
     setCountry(currentValue);
     setShowCountryDialog(false);
 
-    // Only set phone code if phone is empty or just has a different code
-    const selectedCountry = countries.find(c => c.name === currentValue);
-    if (selectedCountry && (!phone || phone.length < 5)) {
-      setPhone(selectedCountry.code + ' ');
+    if (selectedCountry) {
+      if (!phone || !phone.trim()) {
+        // If empty, just set the new code
+        setPhone(selectedCountry.code + ' ');
+      } else if (previousCountry && phone.startsWith(previousCountry.code)) {
+        // If it starts with the old country code, replace it
+        // We use replace to swap just the prefix, preserving the rest of the numbers
+        const newPhone = phone.replace(previousCountry.code, selectedCountry.code);
+        setPhone(newPhone);
+      }
+      // If the phone number doesn't start with the old country code (user edited it manually),
+      // we leave it alone to respect the user's input.
     }
   };
 
