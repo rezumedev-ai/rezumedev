@@ -152,7 +152,7 @@ export function DownloadOptionsDialog({
           iconSpan.style.marginRight = '6px';
           iconSpan.style.fontSize = '14px';
           iconSpan.style.display = 'inline-block';
-          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.verticalAlign = '-2px'; // Adjusted from middle to fix PDF alignment
           iconSpan.style.lineHeight = '1';
 
           if (iconElement.contains(svg)) {
@@ -213,7 +213,7 @@ export function DownloadOptionsDialog({
           iconSpan.style.marginRight = '8px';
           iconSpan.style.fontSize = '14px';
           iconSpan.style.display = 'inline-block';
-          iconSpan.style.verticalAlign = 'middle';
+          iconSpan.style.verticalAlign = '-2px'; // Adjusted from middle to fix PDF alignment
           iconSpan.style.lineHeight = '1';
 
           if (iconElement.contains(svg)) {
