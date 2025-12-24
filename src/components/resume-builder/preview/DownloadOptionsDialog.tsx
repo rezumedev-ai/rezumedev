@@ -138,34 +138,11 @@ export function DownloadOptionsDialog({
         let svg = iconElement.tagName.toLowerCase() === 'svg' ? iconElement : iconElement.querySelector('svg');
 
         if (svg) {
-          const iconType = svg.getAttribute('data-lucide') || '';
-          let iconSymbol = '';
-
-          switch (iconType.toLowerCase()) {
-            case 'mail': iconSymbol = '✉'; break;
-            case 'phone': iconSymbol = '☎'; break;
-            case 'linkedin': iconSymbol = 'in'; break;
-            case 'globe': iconSymbol = '🌐'; break;
-            default: iconSymbol = '•'; break;
-          }
-
-          const iconSpan = document.createElement('span');
-          iconSpan.textContent = iconSymbol;
-          iconSpan.className = 'pdf-icon-text';
-          iconSpan.style.marginRight = '6px';
-          iconSpan.style.fontSize = '14px';
-          iconSpan.style.display = 'inline-block';
-          // Use transform + relative positioning for robust alignment in html2canvas
-          iconSpan.style.position = 'relative';
-          iconSpan.style.transform = 'translateY(2px)';
-          iconSpan.style.lineHeight = '1';
-
-          // Replacement logic
-          if (iconElement === svg) {
-            iconElement.replaceWith(iconSpan);
-          } else if (iconElement.contains(svg)) {
-            iconElement.replaceChild(iconSpan, svg);
-          }
+          // Instead of replacing with text, we apply the alignment fix directly to the SVG
+          // This keeps the professional vector look while fixing the vertical alignment
+          svg.style.position = 'relative';
+          svg.style.transform = 'translateY(2px)';
+          svg.style.display = 'inline-block';
         }
       });
 
@@ -201,33 +178,11 @@ export function DownloadOptionsDialog({
         const iconElement = icon as HTMLElement;
         const svg = iconElement.querySelector('svg');
         if (svg) {
-          const iconType = svg.getAttribute('data-lucide') || '';
-          let iconSymbol = '';
-
-          switch (iconType.toLowerCase()) {
-            case 'briefcase': iconSymbol = '💼'; break;
-            case 'graduation-cap': iconSymbol = '🎓'; break;
-            case 'award': iconSymbol = '🏆'; break;
-            case 'code': iconSymbol = '💻'; break;
-            case 'file-text': iconSymbol = '📄'; break;
-            case 'user': iconSymbol = '👤'; break;
-            case 'folder-kanban': iconSymbol = '📂'; break;
-            default: iconSymbol = '•'; break;
-          }
-
-          const iconSpan = document.createElement('span');
-          iconSpan.textContent = iconSymbol;
-          iconSpan.className = 'pdf-icon-text';
-          iconSpan.style.marginRight = '8px';
-          iconSpan.style.fontSize = '14px';
-          iconSpan.style.display = 'inline-block';
-          iconSpan.style.position = 'relative';
-          iconSpan.style.top = '1.5px'; // Force downward shift using position
-          iconSpan.style.lineHeight = '1';
-
-          if (iconElement.contains(svg)) {
-            iconElement.replaceChild(iconSpan, svg);
-          }
+          // Apply same alignment fix to section icons, keeping the SVG
+          // Section icons usually sit inside a wrapper div
+          svg.style.position = 'relative';
+          svg.style.transform = 'translateY(2px)';
+          svg.style.display = 'inline-block';
         }
       });
 
