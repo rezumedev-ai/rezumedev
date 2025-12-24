@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { useState, useRef, useEffect } from "react";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +20,19 @@ export function ResponsibilityInput({
 }: ResponsibilityInputProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const { toast } = useToast();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+  }, [value]);
 
   const handleAiEnhance = async () => {
     if (!value.trim()) {
@@ -64,19 +77,21 @@ export function ResponsibilityInput({
   };
 
   return (
-    <div className="flex items-center gap-2 mt-2">
+    <div className="flex items-start gap-2 mt-2">
       <div className="relative flex-1">
-        <Input
+        <Textarea
+          ref={textareaRef}
           value={value}
           onChange={(e) => onChange(index, e.target.value)}
           placeholder="Describe a key responsibility or achievement"
-          className="pr-10"
+          className="pr-10 min-h-[40px] resize-none overflow-hidden py-2 leading-relaxed"
+          rows={1}
         />
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50"
+          className="absolute right-1 top-1 h-8 w-8 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50"
           onClick={handleAiEnhance}
           disabled={isEnhancing}
           title="AI Magic Rewrite"
@@ -93,7 +108,7 @@ export function ResponsibilityInput({
         variant="ghost"
         size="icon"
         onClick={() => onRemove(index)}
-        className="text-gray-400 hover:text-red-500"
+        className="text-gray-400 hover:text-red-500 mt-1"
       >
         <Trash2 className="h-4 w-4" />
       </Button>
