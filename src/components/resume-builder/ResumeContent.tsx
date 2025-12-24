@@ -36,20 +36,20 @@ export function ResumeContent({
   onCertificationUpdate,
   onExperienceUpdate
 }: ResumeContentProps) {
-  
+
   // Create a function to handle the WorkExperience array updates for the ExperienceSection
   const handleExperienceArrayUpdate = (experiences: WorkExperience[]) => {
     // Since we're replacing the entire array, we don't need index or field
     // We'll just update the resume state with the new array
     resumeState.work_experience = experiences;
   };
-  
+
   const renderSpecialTemplate = () => {
     // Special handling for Professional Navy template
     if (template.id === "professional-navy") {
       return (
         <>
-          <PersonalSection 
+          <PersonalSection
             fullName={resumeState.personal_info.fullName}
             title={resumeState.professional_summary.title}
             email={resumeState.personal_info.email}
@@ -63,27 +63,27 @@ export function ResumeContent({
             onUpdate={onPersonalInfoUpdate}
             onImageUpdate={onProfileImageUpdate}
           />
-          
-          <TwoColumnLayout 
+
+          <TwoColumnLayout
             className="px-8"
             leftContent={
               <>
-                <ProfessionalSummarySection 
-                  summary={resumeState.professional_summary.summary} 
+                <ProfessionalSummarySection
+                  summary={resumeState.professional_summary.summary}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={onSummaryUpdate}
                 />
-                
-                <ExperienceSection 
-                  experiences={resumeState.work_experience} 
+
+                <ExperienceSection
+                  experiences={resumeState.work_experience}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={handleExperienceArrayUpdate}
                 />
-                
-                <EducationSection 
-                  education={resumeState.education} 
+
+                <EducationSection
+                  education={resumeState.education}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={onEducationUpdate}
@@ -92,15 +92,15 @@ export function ResumeContent({
             }
             rightContent={
               <>
-                <SkillsSection 
-                  hardSkills={resumeState.skills.hard_skills} 
-                  softSkills={resumeState.skills.soft_skills} 
+                <SkillsSection
+                  hardSkills={resumeState.skills.hard_skills}
+                  softSkills={resumeState.skills.soft_skills}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={onSkillsUpdate}
                 />
-                
-                <CertificationsSection 
+
+                <CertificationsSection
                   resumeData={resumeState}
                   template={template}
                   isEditing={isEditing}
@@ -110,14 +110,17 @@ export function ResumeContent({
             }
           />
         </>
+
+
       );
     }
-    
-    // Modern Professional layout has a special two-column layout
-    if (template.id === "modern-professional") {
+
+    // Creative Portfolio Layout (Sidebar/Grid)
+    if (template.id === "creative-portfolio") {
       return (
         <>
-          <PersonalSection 
+          {/* Header spans full width */}
+          <PersonalSection
             fullName={resumeState.personal_info.fullName}
             title={resumeState.professional_summary.title}
             email={resumeState.personal_info.email}
@@ -131,26 +134,26 @@ export function ResumeContent({
             onUpdate={onPersonalInfoUpdate}
             onImageUpdate={onProfileImageUpdate}
           />
-          
-          <ProfessionalSummarySection 
-            summary={resumeState.professional_summary.summary} 
-            template={template}
-            isEditing={isEditing}
-            onUpdate={onSummaryUpdate}
-          />
-          
+
           <TwoColumnLayout
             leftContent={
               <>
-                <ExperienceSection 
-                  experiences={resumeState.work_experience} 
+                <ProfessionalSummarySection
+                  summary={resumeState.professional_summary.summary}
+                  template={template}
+                  isEditing={isEditing}
+                  onUpdate={onSummaryUpdate}
+                />
+
+                <ExperienceSection
+                  experiences={resumeState.work_experience}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={handleExperienceArrayUpdate}
                 />
-                
-                <EducationSection 
-                  education={resumeState.education} 
+
+                <EducationSection
+                  education={resumeState.education}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={onEducationUpdate}
@@ -159,15 +162,15 @@ export function ResumeContent({
             }
             rightContent={
               <>
-                <SkillsSection 
-                  hardSkills={resumeState.skills.hard_skills} 
-                  softSkills={resumeState.skills.soft_skills} 
+                <SkillsSection
+                  hardSkills={resumeState.skills.hard_skills}
+                  softSkills={resumeState.skills.soft_skills}
                   template={template}
                   isEditing={isEditing}
                   onUpdate={onSkillsUpdate}
                 />
-                
-                <CertificationsSection 
+
+                <CertificationsSection
                   resumeData={resumeState}
                   template={template}
                   isEditing={isEditing}
@@ -179,15 +182,82 @@ export function ResumeContent({
         </>
       );
     }
-    
+
+    // Modern Professional layout has a special two-column layout
+    if (template.id === "modern-professional") {
+      return (
+        <>
+          <PersonalSection
+            fullName={resumeState.personal_info.fullName}
+            title={resumeState.professional_summary.title}
+            email={resumeState.personal_info.email}
+            phone={resumeState.personal_info.phone}
+            linkedin={resumeState.personal_info.linkedin}
+            website={resumeState.personal_info.website}
+            profileImageUrl={resumeState.personal_info.profileImageUrl}
+            template={template}
+            isEditing={isEditing}
+            resumeId={resumeId}
+            onUpdate={onPersonalInfoUpdate}
+            onImageUpdate={onProfileImageUpdate}
+          />
+
+          <ProfessionalSummarySection
+            summary={resumeState.professional_summary.summary}
+            template={template}
+            isEditing={isEditing}
+            onUpdate={onSummaryUpdate}
+          />
+
+          <TwoColumnLayout
+            leftContent={
+              <>
+                <ExperienceSection
+                  experiences={resumeState.work_experience}
+                  template={template}
+                  isEditing={isEditing}
+                  onUpdate={handleExperienceArrayUpdate}
+                />
+
+                <EducationSection
+                  education={resumeState.education}
+                  template={template}
+                  isEditing={isEditing}
+                  onUpdate={onEducationUpdate}
+                />
+              </>
+            }
+            rightContent={
+              <>
+                <SkillsSection
+                  hardSkills={resumeState.skills.hard_skills}
+                  softSkills={resumeState.skills.soft_skills}
+                  template={template}
+                  isEditing={isEditing}
+                  onUpdate={onSkillsUpdate}
+                />
+
+                <CertificationsSection
+                  resumeData={resumeState}
+                  template={template}
+                  isEditing={isEditing}
+                  onUpdate={onCertificationUpdate}
+                />
+              </>
+            }
+          />
+        </>
+      );
+    }
+
     return null;
   };
-  
+
   // For regular templates with a standard layout
   const renderStandardTemplate = () => {
     return (
       <>
-        <PersonalSection 
+        <PersonalSection
           fullName={resumeState.personal_info.fullName}
           title={resumeState.professional_summary.title}
           email={resumeState.personal_info.email}
@@ -201,37 +271,37 @@ export function ResumeContent({
           onUpdate={onPersonalInfoUpdate}
           onImageUpdate={onProfileImageUpdate}
         />
-        
-        <ProfessionalSummarySection 
-          summary={resumeState.professional_summary.summary} 
+
+        <ProfessionalSummarySection
+          summary={resumeState.professional_summary.summary}
           template={template}
           isEditing={isEditing}
           onUpdate={onSummaryUpdate}
         />
-        
-        <ExperienceSection 
-          experiences={resumeState.work_experience} 
+
+        <ExperienceSection
+          experiences={resumeState.work_experience}
           template={template}
           isEditing={isEditing}
           onUpdate={handleExperienceArrayUpdate}
         />
-        
-        <EducationSection 
-          education={resumeState.education} 
+
+        <EducationSection
+          education={resumeState.education}
           template={template}
           isEditing={isEditing}
           onUpdate={onEducationUpdate}
         />
-        
-        <SkillsSection 
-          hardSkills={resumeState.skills.hard_skills} 
-          softSkills={resumeState.skills.soft_skills} 
+
+        <SkillsSection
+          hardSkills={resumeState.skills.hard_skills}
+          softSkills={resumeState.skills.soft_skills}
           template={template}
           isEditing={isEditing}
           onUpdate={onSkillsUpdate}
         />
-        
-        <CertificationsSection 
+
+        <CertificationsSection
           resumeData={resumeState}
           template={template}
           isEditing={isEditing}
@@ -240,13 +310,13 @@ export function ResumeContent({
       </>
     );
   };
-  
+
   // First check if we need to render a special template layout
   const specialTemplate = renderSpecialTemplate();
   if (specialTemplate) {
     return specialTemplate;
   }
-  
+
   // Otherwise use the standard layout
   return renderStandardTemplate();
 }

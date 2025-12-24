@@ -13,14 +13,20 @@ export function SectionHeader({ title, type, template }: SectionHeaderProps) {
     // Don't show icons for professional-navy template
     if (!template.style.icons.sections || template.id === "professional-navy") return null;
 
-    let iconClass = template.id === "professional-navy" 
-      ? "w-4 h-4 mr-2 text-[#0F2B5B] flex-shrink-0"
-      : "w-5 h-5 mr-2 text-emerald-600 flex-shrink-0";
+    let iconClass = "w-5 h-5 mr-2 flex-shrink-0 ";
+
+    if (template.id === "professional-navy") {
+      iconClass += "text-[#0F2B5B]";
+    } else if (template.id === "creative-portfolio") {
+      iconClass += "text-indigo-600";
+    } else {
+      iconClass += "text-emerald-600";
+    }
 
     // Create a container with data attributes for PDF export
     const iconContainer = (icon: React.ReactNode) => (
-      <div 
-        className="pdf-section-icon inline-flex items-center justify-center" 
+      <div
+        className="pdf-section-icon inline-flex items-center justify-center"
         data-pdf-section-icon="true"
         data-icon-type={type}
       >
