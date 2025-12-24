@@ -4,10 +4,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ResponsibilityInputProps {
   value: string;
   index: number;
+  jobTitle?: string;
   onChange: (index: number, value: string) => void;
   onRemove: (index: number) => void;
 }
@@ -15,6 +17,7 @@ interface ResponsibilityInputProps {
 export function ResponsibilityInput({
   value,
   index,
+  jobTitle,
   onChange,
   onRemove
 }: ResponsibilityInputProps) {
@@ -46,29 +49,38 @@ export function ResponsibilityInput({
 
     setIsEnhancing(true);
 
-    // Simulate AI API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('Calling enhance-responsibility with:', { text: value, jobTitle });
 
-      // specific rewrite logic simulation
-      let enhanced = value;
-      // Simple mock logic to demonstrate "AI" improvement
-      if (!value.includes("successfully")) enhanced = "Successfully " + enhanced.charAt(0).toLowerCase() + enhanced.slice(1);
-      if (!value.includes("resulted in") && !enhanced.includes("resulted in")) {
-        if (enhanced.endsWith('.')) enhanced = enhanced.slice(0, -1);
-        enhanced += ", which resulted in significant operational improvements.";
+      const { data, error } = await supabase.functions.invoke('enhance-responsibility', {
+        body: {
+          text: value,
+          jobTitle: jobTitle
+        }
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
       }
 
-      onChange(index, enhanced);
+      console.log('AI Response:', data);
 
-      toast({
-        title: "Enhanced!",
-        description: "Rewrote using professional action verbs.",
-      });
+      if (data && data.enhancedText) {
+        onChange(index, data.enhancedText);
+
+        toast({
+          title: "Enhanced!",
+          description: "Rewrote using professional action verbs.",
+        });
+      } else {
+        throw new Error('No enhancement returned');
+      }
     } catch (error) {
+      console.error('Enhance error:', error);
       toast({
         title: "Error",
-        description: "Failed to enhance text.",
+        description: "Failed to enhance text. Please try again.",
         variant: "destructive",
       });
     } finally {
