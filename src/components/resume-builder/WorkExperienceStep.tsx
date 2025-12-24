@@ -49,7 +49,6 @@ export function WorkExperienceStep({ formData, onChange, hideAiSuggestions = fal
           index={index}
           onUpdate={(field, value) => updateExperience(index, field, value)}
           onRemove={() => removeExperience(index)}
-          hideResponsibilities={true}
         />
       ))}
 
