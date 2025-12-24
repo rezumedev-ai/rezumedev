@@ -133,7 +133,10 @@ export function DownloadOptionsDialog({
       const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
       contactIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
-        const svg = iconElement.querySelector('svg');
+        // Check if the element itself is an SVG (which is true for Lucide icons) 
+        // or if it contains one (legacy/wrapped)
+        let svg = iconElement.tagName.toLowerCase() === 'svg' ? iconElement : iconElement.querySelector('svg');
+
         if (svg) {
           const iconType = svg.getAttribute('data-lucide') || '';
           let iconSymbol = '';
@@ -152,11 +155,15 @@ export function DownloadOptionsDialog({
           iconSpan.style.marginRight = '6px';
           iconSpan.style.fontSize = '14px';
           iconSpan.style.display = 'inline-block';
+          // Use transform + relative positioning for robust alignment in html2canvas
           iconSpan.style.position = 'relative';
-          iconSpan.style.top = '1.5px'; // Force downward shift using position
+          iconSpan.style.transform = 'translateY(2px)';
           iconSpan.style.lineHeight = '1';
 
-          if (iconElement.contains(svg)) {
+          // Replacement logic
+          if (iconElement === svg) {
+            iconElement.replaceWith(iconSpan);
+          } else if (iconElement.contains(svg)) {
             iconElement.replaceChild(iconSpan, svg);
           }
         }

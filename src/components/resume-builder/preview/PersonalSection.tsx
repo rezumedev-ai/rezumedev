@@ -697,78 +697,80 @@ export function PersonalSection({
 
     return (
       <div className={currentStyle.contactContainer}>
-        <div className="flex items-center gap-1.5">
-          <Mail className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("email", e)}
-            className="outline-none"
-          >
-            {email}
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Phone className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("phone", e)}
-            className="outline-none"
-          >
-            {phone}
-          </div>
-        </div>
-        {linkedin && (
+        <div className={currentStyle.contactContainer}>
           <div className="flex items-center gap-1.5">
-            <Linkedin className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-            {isEditing ? (
-              <div
-                contentEditable={true}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
-                className="outline-none"
-              >
-                {linkedin}
-              </div>
-            ) : (
-              <a
-                href={formatUrl(linkedin)}
-                className="hover:underline text-gray-600"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-pdf-link="true"
-              >
-                {linkedin}
-              </a>
-            )}
+            <Mail className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="mail" />
+            <div
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("email", e)}
+              className="outline-none"
+            >
+              {email}
+            </div>
           </div>
-        )}
-        {website && (
           <div className="flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-            {isEditing ? (
-              <div
-                contentEditable={true}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
-                className="outline-none"
-              >
-                {website}
-              </div>
-            ) : (
-              <a
-                href={formatUrl(website)}
-                className="hover:underline text-gray-600"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-pdf-link="true"
-              >
-                {website}
-              </a>
-            )}
+            <Phone className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="phone" />
+            <div
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleContentEdit("phone", e)}
+              className="outline-none"
+            >
+              {phone}
+            </div>
           </div>
-        )}
+          {linkedin && (
+            <div className="flex items-center gap-1.5">
+              <Linkedin className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="linkedin" />
+              {isEditing ? (
+                <div
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                  className="outline-none"
+                >
+                  {linkedin}
+                </div>
+              ) : (
+                <a
+                  href={formatUrl(linkedin)}
+                  className="hover:underline text-gray-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {linkedin}
+                </a>
+              )}
+            </div>
+          )}
+          {website && (
+            <div className="flex items-center gap-1.5">
+              <Globe className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="globe" />
+              {isEditing ? (
+                <div
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                  className="outline-none"
+                >
+                  {website}
+                </div>
+              ) : (
+                <a
+                  href={formatUrl(website)}
+                  className="hover:underline text-gray-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {website}
+                </a>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
