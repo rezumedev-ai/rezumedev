@@ -243,5 +243,104 @@ export const resumeTemplates: ResumeTemplate[] = [
         circularImage: true
       }
     }
+  },
+
+  {
+    id: "ivy-league",
+    name: "The Ivy",
+    description: "Prestigious academic layout with serif typography and dense content structure",
+    imageUrl: "/uploads/ivy-preview.png", // distinct placeholder
+    style: {
+      titleFont: "font-serif text-[42px] font-bold tracking-tight text-gray-900 border-b-2 border-black pb-4",
+      headerStyle: "text-center mb-8",
+      sectionStyle: "text-[18px] font-bold uppercase tracking-widest text-black mb-4 border-b border-black pb-1",
+      contentStyle: "space-y-3",
+      layout: "classic",
+      colors: {
+        primary: "#000000",
+        secondary: "#333333",
+        text: "#1a1a1a",
+        border: "#000000",
+        background: "#FFFFFF"
+      },
+      spacing: {
+        sectionGap: "1.25rem",
+        itemGap: "0.75rem",
+        contentPadding: "2.5rem",
+        headerHeight: "auto",
+        margins: {
+          top: "0.5in",
+          right: "0.75in",
+          bottom: "0.5in",
+          left: "0.75in"
+        }
+      },
+      dimensions: {
+        maxWidth: "8.5in",
+        minHeight: "11in"
+      },
+      typography: {
+        titleSize: "42px",
+        subtitleSize: "16px",
+        bodySize: "12px", // dense
+        lineHeight: "1.3"
+      },
+      icons: {
+        sections: false,
+        contact: false, // Text only for ivy
+        bullets: "dot",
+        circularImage: false
+      }
+    }
+  },
+
+  {
+    id: "creative-portfolio",
+    name: "The Creative",
+    description: "Bold, high-impact design with accent colors for creative professionals",
+    imageUrl: "/uploads/creative-preview.png", // distinct placeholder
+    style: {
+      titleFont: "font-sans text-[48px] font-black tracking-tighter text-gray-900 leading-none",
+      headerStyle: "mb-8 grid grid-cols-12 gap-8 items-end",
+      sectionStyle: "text-[24px] font-black tracking-tight text-indigo-600 mb-6 flex items-center gap-2",
+      contentStyle: "grid grid-cols-12 gap-8",
+      layout: "creative",
+      colors: {
+        primary: "#4F46E5", // Indigo-600
+        secondary: "#818CF8",
+        text: "#1F2937",
+        border: "#E0E7FF",
+        background: "#FFFFFF",
+        accent: "#4F46E5"
+      },
+      spacing: {
+        sectionGap: "2rem",
+        itemGap: "1.5rem",
+        contentPadding: "2rem",
+        headerHeight: "auto",
+        margins: {
+          top: "0.5in",
+          right: "0.5in",
+          bottom: "0.5in",
+          left: "0.5in"
+        }
+      },
+      dimensions: {
+        maxWidth: "8.5in",
+        minHeight: "11in"
+      },
+      typography: {
+        titleSize: "48px",
+        subtitleSize: "20px",
+        bodySize: "15px",
+        lineHeight: "1.6"
+      },
+      icons: {
+        sections: true,
+        contact: true,
+        bullets: "arrow",
+        circularImage: true
+      }
+    }
   }
 ];
