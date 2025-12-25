@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,10 +34,10 @@ const Login = () => {
         title: "Welcome back!",
         description: "You have successfully logged in",
       });
-      
+
       // Clear any stale tokens from localStorage
       localStorage.removeItem('supabase.auth.token');
-      
+
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -65,7 +66,7 @@ const Login = () => {
             Sign in to continue building your resume
           </p>
         </div>
-        
+
         <div className="mt-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
@@ -120,6 +121,8 @@ const Login = () => {
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </div>
+
+            <SocialAuthButtons mode="login" />
 
             <div className="text-center text-sm">
               <span className="text-gray-600">Don't have an account? </span>

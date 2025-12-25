@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Mail, User, Lock, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,7 @@ const SignUp = () => {
         title: "Account created successfully!",
         description: "Welcome to Rezume.dev",
       });
-      
+
       // Auth state change listener will handle navigation
     } catch (error) {
       console.error('Error:', error);
@@ -69,7 +70,7 @@ const SignUp = () => {
             Start crafting your professional resume today
           </p>
         </div>
-        
+
         <div className="mt-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
@@ -140,6 +141,8 @@ const SignUp = () => {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
+
+            <SocialAuthButtons mode="signup" />
 
             <div className="text-center text-sm">
               <span className="text-gray-600">Already have an account? </span>
