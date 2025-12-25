@@ -38,10 +38,10 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
         <div className="flex flex-col gap-4 w-full">
             <div className="relative my-2">
                 <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-white/10" />
+                    <span className="w-full border-t border-gray-200" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-transparent px-2 text-white/40">
+                    <span className="bg-white px-2 text-gray-500 font-medium">
                         Or {mode === "login" ? "continue" : "start"} with
                     </span>
                 </div>
@@ -52,7 +52,7 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
                 type="button"
                 disabled={isLoading}
                 onClick={handleGoogleLogin}
-                className="w-full bg-white text-black hover:bg-gray-100 border-none h-11 font-medium relative transition-transform active:scale-[0.98]"
+                className="w-full bg-white text-gray-700 hover:bg-gray-50 border-gray-300 h-11 font-medium relative transition-transform active:scale-[0.98] shadow-sm"
             >
                 {isLoading ? (
                     <span className="animate-pulse">Connecting...</span>

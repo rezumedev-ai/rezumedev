@@ -53,15 +53,15 @@ const Login = () => {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to continue building your resume"
+      subtitle="Sign in to your account"
     >
       <div className="mt-6">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-white/80">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium">Email address</Label>
               <div className="mt-1 relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-white text-white/40">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                   <Mail className="h-5 w-5" />
                 </div>
                 <Input
@@ -69,24 +69,24 @@ const Login = () => {
                   name="email"
                   type="email"
                   required
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:bg-white/10 focus:border-white/30 transition-all duration-300 h-11"
-                  placeholder="you@example.com"
+                  className="pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all duration-300 h-11"
+                  placeholder="name@company.com"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <Label htmlFor="password" className="text-white/80">Password</Label>
+                <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-white/50 hover:text-white transition-colors"
+                  className="text-xs text-primary hover:text-primary-hover font-medium transition-colors"
                 >
                   Forgot password?
                 </Link>
               </div>
               <div className="mt-1 relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-white text-white/40">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                   <Lock className="h-5 w-5" />
                 </div>
                 <Input
@@ -94,12 +94,12 @@ const Login = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:bg-white/10 focus:border-white/30 transition-all duration-300 h-11"
+                  className="pl-10 pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all duration-300 h-11"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/40 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -115,7 +115,7 @@ const Login = () => {
           <div>
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white border-0 h-11 font-medium shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)] transition-all duration-300"
+              className="w-full bg-primary hover:bg-primary-hover text-white h-11 font-medium shadow-md hover:shadow-lg transition-all duration-300"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -130,9 +130,9 @@ const Login = () => {
           <SocialAuthButtons mode="login" />
 
           <div className="text-center text-sm pt-2">
-            <span className="text-white/40">Don't have an account? </span>
-            <Link to="/signup" className="font-medium text-white hover:text-blue-400 transition-colors">
-              create one
+            <span className="text-gray-500">Don't have an account? </span>
+            <Link to="/signup" className="font-semibold text-primary hover:text-primary-hover transition-colors">
+              Create an account
             </Link>
           </div>
         </form>
