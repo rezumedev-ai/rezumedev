@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,12 +58,12 @@ const SignUp = () => {
       title="Create account"
       subtitle="Start building your professional resume"
     >
-      <div className="mt-6">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-4">
+      <div className="mt-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-3.5">
             <div>
-              <Label htmlFor="fullName" className="text-gray-700 font-medium">Full Name</Label>
-              <div className="mt-1 relative group">
+              <Label htmlFor="fullName" className="text-gray-700 font-medium text-sm">Full Name</Label>
+              <div className="mt-1.5 relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                   <User className="h-5 w-5" />
                 </div>
@@ -80,8 +79,8 @@ const SignUp = () => {
             </div>
 
             <div>
-              <Label htmlFor="email" className="text-gray-700 font-medium">Email address</Label>
-              <div className="mt-1 relative group">
+              <Label htmlFor="email" className="text-gray-700 font-medium text-sm">Email address</Label>
+              <div className="mt-1.5 relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                   <Mail className="h-5 w-5" />
                 </div>
@@ -97,8 +96,8 @@ const SignUp = () => {
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
-              <div className="mt-1 relative group">
+              <Label htmlFor="password" className="text-gray-700 font-medium text-sm">Password</Label>
+              <div className="mt-1.5 relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                   <Lock className="h-5 w-5" />
                 </div>
@@ -126,7 +125,7 @@ const SignUp = () => {
             </div>
           </div>
 
-          <div>
+          <div className="pt-1">
             <Button
               type="submit"
               className="w-full bg-primary hover:bg-primary-hover text-white h-11 font-medium shadow-md hover:shadow-lg transition-all duration-300"
@@ -143,7 +142,7 @@ const SignUp = () => {
 
           <SocialAuthButtons mode="signup" />
 
-          <div className="text-center text-sm pt-2">
+          <div className="text-center text-sm pt-1">
             <span className="text-gray-500">Already have an account? </span>
             <Link to="/login" className="font-semibold text-primary hover:text-primary-hover transition-colors">
               Sign in

@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,12 +54,12 @@ const Login = () => {
       title="Welcome back"
       subtitle="Sign in to your account"
     >
-      <div className="mt-6">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-4">
+      <div className="mt-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-3.5">
             <div>
-              <Label htmlFor="email" className="text-gray-700 font-medium">Email address</Label>
-              <div className="mt-1 relative group">
+              <Label htmlFor="email" className="text-gray-700 font-medium text-sm">Email address</Label>
+              <div className="mt-1.5 relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                   <Mail className="h-5 w-5" />
                 </div>
@@ -76,8 +75,8 @@ const Login = () => {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
+              <div className="flex items-center justify-between mb-1.5">
+                <Label htmlFor="password" className="text-gray-700 font-medium text-sm">Password</Label>
                 <Link
                   to="/forgot-password"
                   className="text-xs text-primary hover:text-primary-hover font-medium transition-colors"
@@ -85,7 +84,7 @@ const Login = () => {
                   Forgot password?
                 </Link>
               </div>
-              <div className="mt-1 relative group">
+              <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                   <Lock className="h-5 w-5" />
                 </div>
@@ -112,7 +111,7 @@ const Login = () => {
             </div>
           </div>
 
-          <div>
+          <div className="pt-1">
             <Button
               type="submit"
               className="w-full bg-primary hover:bg-primary-hover text-white h-11 font-medium shadow-md hover:shadow-lg transition-all duration-300"
@@ -129,7 +128,7 @@ const Login = () => {
 
           <SocialAuthButtons mode="login" />
 
-          <div className="text-center text-sm pt-2">
+          <div className="text-center text-sm pt-1">
             <span className="text-gray-500">Don't have an account? </span>
             <Link to="/signup" className="font-semibold text-primary hover:text-primary-hover transition-colors">
               Create an account
