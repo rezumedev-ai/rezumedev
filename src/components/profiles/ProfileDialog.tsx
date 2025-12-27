@@ -161,8 +161,8 @@ export function ProfileDialog({
           </div>
         </div>
 
-        {/* Form Content */}
-        <ScrollArea className="flex-1 p-6 max-h-[60vh] bg-white">
+        {/* Form Content - Fixed scrolling */}
+        <div className="flex-1 overflow-y-auto p-6 bg-white" style={{ maxHeight: 'calc(90vh - 280px)' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             {/* Personal Details Group */}
@@ -342,7 +342,7 @@ export function ProfileDialog({
             </div>
 
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer */}
         <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-lg">

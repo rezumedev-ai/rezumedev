@@ -36,6 +36,20 @@ export const ResumeTemplates = () => {
       image: "/uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
       description: "Contemporary design with creative accents, ideal for forward-thinking professionals in modern industries",
       color: "from-teal-500 to-teal-700"
+    },
+    {
+      id: "ivy-league",
+      name: "The Ivy",
+      image: "/uploads/ivy-preview.png",
+      description: "Prestigious academic layout with serif typography and dense content structure, perfect for academia and research positions",
+      color: "from-gray-700 to-gray-900"
+    },
+    {
+      id: "creative-portfolio",
+      name: "The Creative",
+      image: "/uploads/creative-preview.png",
+      description: "Bold, high-impact design with accent colors for creative professionals in design, marketing, and tech industries",
+      color: "from-indigo-500 to-indigo-700"
     }
   ];
 
