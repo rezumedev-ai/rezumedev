@@ -79,18 +79,70 @@ export function DownloadOptionsDialog({
       clonedResume.id = 'pdf-preparation-div';
       clonedResume.style.position = 'absolute';
       clonedResume.style.left = '-9999px';
-      // Set exact dimensions to match A4 aspect ratio while preserving content
+      // Use original dimensions to prevent content cutoff
       clonedResume.style.width = `${originalWidth}px`;
-      clonedResume.style.height = `${originalHeight}px`;
+      clonedResume.style.height = 'auto'; // Allow height to grow with content
+      clonedResume.style.minHeight = `${originalHeight}px`;
       clonedResume.style.margin = '0';
       clonedResume.style.padding = '0';
-      clonedResume.style.overflow = 'hidden';
+      clonedResume.style.overflow = 'visible'; // Changed from hidden to visible
+      clonedResume.style.transform = 'none';
+      clonedResume.style.scale = '1';
       clonedResume.className = resumeElement.className + ' pdf-mode';
 
       document.body.appendChild(clonedResume);
 
-      // First check if we need to adjust font sizes for problematic templates
-      // Template specific font adjustments removed to ensure consistency with preview
+      // Creative template-specific fixes for pixel-perfect PDF export
+      if (templateId === 'creative-portfolio') {
+        // Reset padding to use full page width
+        clonedResume.style.padding = '0.5in';
+        clonedResume.style.paddingLeft = '0.5in';
+        clonedResume.style.paddingRight = '0.5in';
+
+        // Fix title font rendering
+        const titleElements = clonedResume.querySelectorAll('h1');
+        titleElements.forEach(title => {
+          const el = title as HTMLElement;
+          if (el.className.includes('text-5xl') || el.className.includes('text-indigo')) {
+            el.style.fontSize = '48px';
+            el.style.fontWeight = '900';
+            el.style.letterSpacing = '-0.05em';
+            el.style.lineHeight = '1';
+            el.style.color = '#4338ca'; // indigo-700
+          }
+        });
+
+        // Fix section headers
+        const sectionHeaders = clonedResume.querySelectorAll('h2, h3');
+        sectionHeaders.forEach(header => {
+          const el = header as HTMLElement;
+          if (el.className.includes('text-indigo') || el.className.includes('text-2xl')) {
+            el.style.fontSize = '24px';
+            el.style.fontWeight = '900';
+            el.style.color = '#4F46E5'; // indigo-600
+            el.style.letterSpacing = '-0.025em';
+          }
+        });
+
+        // Fix grid containers
+        const gridContainers = clonedResume.querySelectorAll('[class*="grid-cols-12"]');
+        gridContainers.forEach(container => {
+          const el = container as HTMLElement;
+          el.style.display = 'grid';
+          el.style.gridTemplateColumns = 'repeat(12, 1fr)';
+          el.style.gap = '2rem';
+        });
+
+        // Fix body text
+        const bodyText = clonedResume.querySelectorAll('p, li, span');
+        bodyText.forEach(text => {
+          const el = text as HTMLElement;
+          if (!el.className.includes('text-') || el.className.includes('text-base')) {
+            el.style.fontSize = '15px';
+            el.style.lineHeight = '1.6';
+          }
+        });
+      }
 
 
       // Find all hyperlinks in the cloned resume to add them to the PDF later
@@ -235,9 +287,11 @@ export function DownloadOptionsDialog({
 
       // Improved canvas capture settings with higher resolution and quality
       const pixelRatio = window.devicePixelRatio || 1;
+      // Use higher scale for creative template to capture fine details
+      const scaleMultiplier = templateId === 'creative-portfolio' ? 4 : 3;
 
       const captureSettings = {
-        scale: pixelRatio * 3, // Increased scale for better quality
+        scale: pixelRatio * scaleMultiplier, // Increased scale for better quality
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",

@@ -779,6 +779,7 @@ export function PersonalSection({
     <div className={currentStyle.container}>
       <div className={template.id === "minimal-elegant" ? "text-center" : ""}>
         <h1
+          data-resume-title="true"
           className={`${currentStyle.name} outline-none`}
           contentEditable={isEditing}
           suppressContentEditableWarning

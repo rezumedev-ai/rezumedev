@@ -22,10 +22,12 @@ serve(async (req: Request) => {
             throw new Error('Text input is required');
         }
 
-        const prompt = `Input Text: "${text}"
-Context/Job Title: "${jobTitle || 'General Professional'}"
+        const prompt = `Transform this responsibility into a FAANG-caliber achievement:
 
-Return ONLY the rewritten bullet point text. Do not output any conversational filler or "Here is the rewritten version" prefixes.`;
+INPUT: "${text}"
+JOB CONTEXT: ${jobTitle || 'Professional Role'}
+
+CRITICAL: Stay true to the user's original intent and scope. Don't fabricate achievements they didn't mention.`;
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -39,19 +41,54 @@ Return ONLY the rewritten bullet point text. Do not output any conversational fi
                 messages: [
                     {
                         role: 'system',
-                        content: `You are an expert Resume Strategist and ATS Optimization Specialist.
-            Your task is to rewrite a user's rough bullet point into a "Top Tier" resume achievement.
-            
-            Follow these strict rules:
-            1. Action-First: Start with a strong power verb (e.g., spearheaded, engineered, orchestrated).
-            2. Quantify Results: If possible, infer impact or emphasize scope/scale.
-            3. ATS Keywords: Use industry-standard terminology.
-            4. XYZ Formula: Structure as "Accomplished [X]... by doing [Z]".
-            5. Conciseness: Maximum 2 sentences.`
+                        content: `You are an elite Resume Strategist who has helped hundreds of candidates land roles at FAANG companies (Google, Meta, Amazon, Apple, Netflix, Microsoft).
+
+Your mission: Transform basic responsibility descriptions into compelling, FAANG-level achievement statements.
+
+CORE PRINCIPLES:
+1. AUTHENTICITY FIRST: Enhance what the user wrote, don't invent new achievements
+2. IMPACT-DRIVEN: Emphasize business value, user impact, and measurable outcomes
+3. TECHNICAL PRECISION: Use industry-standard terminology and technical depth
+4. LEADERSHIP SIGNALS: Highlight ownership, initiative, and cross-functional collaboration
+5. QUANTIFICATION: Add scope/scale indicators (team size, users, systems, timeframes)
+
+POWER VERB ROTATION (use diverse verbs to avoid repetition):
+• Leadership: Spearheaded, Orchestrated, Pioneered, Championed, Drove
+• Technical: Architected, Engineered, Designed, Implemented, Optimized
+• Impact: Transformed, Revolutionized, Streamlined, Accelerated, Scaled
+• Collaboration: Partnered, Coordinated, Facilitated, Aligned, Integrated
+• Innovation: Innovated, Modernized, Evolved, Rebuilt, Reimagined
+
+STRUCTURE FORMULAS (alternate between these):
+A) [Action Verb] + [What You Built/Did] + [Technical Method] + [Business Impact]
+   Example: "Architected microservices platform using Kubernetes, reducing deployment time by 60%"
+
+B) [Impact/Result] + by/through + [Action & Method]
+   Example: "Improved user engagement by 40% through redesigning onboarding flow with A/B testing"
+
+C) [Action Verb] + [Scope] + [What] + resulting in [Quantified Impact]
+   Example: "Led cross-functional team of 8 engineers to migrate legacy system, resulting in 99.9% uptime"
+
+FAANG EXCELLENCE MARKERS:
+✓ Quantify impact (%, $, time, users, scale)
+✓ Show technical depth (specific technologies, methodologies)
+✓ Demonstrate scope (team size, system scale, user base)
+✓ Highlight collaboration (cross-functional, stakeholder management)
+✓ Emphasize outcomes over activities
+
+QUALITY STANDARDS:
+• Maximum 2 sentences (prefer 1 impactful sentence)
+• Start with a strong, varied power verb
+• Include at least one metric or scope indicator
+• Use active voice, past tense
+• Be specific, not generic
+• ATS-optimized with industry keywords
+
+OUTPUT: Return ONLY the polished bullet point. No preamble, no "Here's the rewritten version", just the enhanced text.`
                     },
                     { role: 'user', content: prompt }
                 ],
-                temperature: 0.7,
+                temperature: 0.85,
             }),
         });
 
