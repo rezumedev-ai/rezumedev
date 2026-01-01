@@ -165,7 +165,13 @@ export function DownloadOptionsDialog({
         });
       }
 
-      // Ivy template - preserve preview styling, no padding overrides needed
+      // Ivy template - reduce excessive margins for professional PDF appearance
+      if (templateId === 'ivy-league') {
+        clonedResume.style.paddingLeft = '0.4in';
+        clonedResume.style.paddingRight = '0.4in';
+        clonedResume.style.paddingTop = '0.4in';
+        clonedResume.style.paddingBottom = '0.4in';
+      }
 
       // Modern Professional template - add more horizontal margins for professional appearance
       if (templateId === 'modern-professional') {
