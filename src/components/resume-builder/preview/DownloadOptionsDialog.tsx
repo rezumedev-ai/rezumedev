@@ -170,11 +170,16 @@ export function DownloadOptionsDialog({
         // Reset overrides first to be safe
         clonedResume.style.border = 'none';
 
+        // Force width to standard A4 pixel width to avoid scaling issues
+        clonedResume.style.width = '816px';
+
         // Use setProperty with !important to guarantee application
-        clonedResume.style.setProperty('padding-left', '0.5in', 'important');
-        clonedResume.style.setProperty('padding-right', '0.5in', 'important');
-        clonedResume.style.setProperty('padding-top', '0.5in', 'important');
-        clonedResume.style.setProperty('padding-bottom', '0.5in', 'important');
+        // Reduced to 0.4in to slightly tighten it further than Navy if needed, or stick to 0.5in
+        // User complained about "loads" of margin, so let's try 0.4in to be sure it's tight enough
+        clonedResume.style.setProperty('padding-left', '0.4in', 'important');
+        clonedResume.style.setProperty('padding-right', '0.4in', 'important');
+        clonedResume.style.setProperty('padding-top', '0.4in', 'important');
+        clonedResume.style.setProperty('padding-bottom', '0.4in', 'important');
 
         // Ensure margins are zero
         clonedResume.style.margin = '0';
@@ -379,18 +384,12 @@ export function DownloadOptionsDialog({
       const a4AspectRatio = pdfWidth / pdfHeight;
 
       // Check if content is too tall for A4 height
+      // Force content to fit page width (A4 width)
+      // This prevents "shrink to fit height" behavior which creates side margins
       let imgWidth, imgHeight, offsetX = 0;
-
-      if (canvasAspectRatio < a4AspectRatio) {
-        // Content is taller than A4 proportions - we need to scale to fit height
-        imgHeight = pdfHeight;
-        imgWidth = imgHeight * canvasAspectRatio;
-        offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
-      } else {
-        // Content fits within A4 proportions or is wider - use full width
-        imgWidth = pdfWidth;
-        imgHeight = imgWidth / canvasAspectRatio;
-      }
+      imgWidth = pdfWidth;
+      imgHeight = imgWidth / canvasAspectRatio;
+      offsetX = 0; // No horizontal offset needed as we fill width
 
       pdf.addImage(
         imgData,
