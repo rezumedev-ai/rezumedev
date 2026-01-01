@@ -9,7 +9,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
-import Onboarding from "./pages/Onboarding";
+import { OnboardingFlow } from "./components/onboarding/OnboardingFlow";
+import { OnboardingGuard } from "./components/onboarding/OnboardingGuard";
 import Dashboard from "./pages/Dashboard";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import ResumePreview from "./pages/ResumePreview";
@@ -79,7 +80,9 @@ function App() {
                   path="/dashboard"
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <OnboardingGuard>
+                        <Dashboard />
+                      </OnboardingGuard>
                     </ProtectedRoute>
                   }
                 />
@@ -144,7 +147,7 @@ function App() {
                   path="/onboarding"
                   element={
                     <ProtectedRoute>
-                      <Onboarding />
+                      <OnboardingFlow />
                     </ProtectedRoute>
                   }
                 />
