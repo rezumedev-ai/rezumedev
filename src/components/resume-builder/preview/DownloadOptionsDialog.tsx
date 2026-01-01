@@ -281,7 +281,9 @@ export function DownloadOptionsDialog({
       // A4 height in pixels at 96 DPI is approx 1123px (11in * 96)
       const A4_HEIGHT_PX = 1080; // slightly less than 1123 for safety buffer
 
-      if (clonedResume.scrollHeight > A4_HEIGHT_PX) {
+      const excludedFromCompression = ['modern-professional', 'professional-navy'];
+
+      if (!excludedFromCompression.includes(templateId) && clonedResume.scrollHeight > A4_HEIGHT_PX) {
         console.log(`[${templateId}] Content too tall for A4 (${clonedResume.scrollHeight}px), applying global smart vertical compression...`);
 
         let attempts = 0;
