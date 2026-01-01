@@ -162,9 +162,11 @@ export function DownloadOptionsDialog({
         });
       }
 
-      // Ivy template - preserve preview styling, only adjust padding for A4 fit
+      // Ivy template - use standard 0.5in padding for professional look
       if (templateId === 'ivy-league') {
-        clonedResume.style.padding = '0.35in';
+        clonedResume.style.padding = '0.5in';
+        clonedResume.style.paddingLeft = '0.5in';
+        clonedResume.style.paddingRight = '0.5in';
       }
 
       // Modern Professional template - add more horizontal margins for professional appearance
