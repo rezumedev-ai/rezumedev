@@ -162,11 +162,13 @@ export function DownloadOptionsDialog({
         });
       }
 
-      // Ivy template - use standard 0.5in padding for professional look
+      // Ivy template - minimize margins to reduce white space
       if (templateId === 'ivy-league') {
-        clonedResume.style.padding = '0.5in';
-        clonedResume.style.paddingLeft = '0.5in';
-        clonedResume.style.paddingRight = '0.5in';
+        clonedResume.style.padding = '0.25in';
+        clonedResume.style.paddingLeft = '0.25in';
+        clonedResume.style.paddingRight = '0.25in';
+        clonedResume.style.paddingTop = '0.3in';
+        clonedResume.style.paddingBottom = '0.3in';
       }
 
       // Modern Professional template - add more horizontal margins for professional appearance
