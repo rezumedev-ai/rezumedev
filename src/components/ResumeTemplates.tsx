@@ -40,7 +40,7 @@ export const ResumeTemplates = () => {
     {
       id: "ivy-league",
       name: "The Ivy",
-      image: "/uploads/ivy-preview.png",
+      image: "/uploads/ivy-preview-new.png",
       description: "Prestigious academic layout with serif typography and dense content structure, perfect for academia and research positions",
       color: "from-gray-700 to-gray-900"
     },

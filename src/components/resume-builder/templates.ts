@@ -249,7 +249,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "ivy-league",
     name: "The Ivy",
     description: "Prestigious academic layout with serif typography and dense content structure",
-    imageUrl: "/uploads/ivy-preview.png", // distinct placeholder
+    imageUrl: "/uploads/ivy-preview-new.png",
     style: {
       titleFont: "font-serif text-[42px] font-bold tracking-tight text-gray-900 border-b-2 border-black pb-4",
       headerStyle: "text-center mb-8",
