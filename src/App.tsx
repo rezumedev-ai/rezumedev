@@ -121,6 +121,14 @@ function App() {
                   }
                 />
                 <Route
+                  path="/profile-selection"
+                  element={
+                    <ProtectedRoute>
+                      <ProfileSelection />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/new-resume"
                   element={
                     <ProtectedRoute>
