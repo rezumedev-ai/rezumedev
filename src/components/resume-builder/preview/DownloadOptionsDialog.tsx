@@ -84,7 +84,10 @@ export function DownloadOptionsDialog({
       clonedResume.style.height = 'auto'; // Allow height to grow with content
       clonedResume.style.minHeight = `${originalHeight}px`;
       clonedResume.style.margin = '0';
-      clonedResume.style.padding = '0';
+      // Don't reset padding for Ivy template - preserve preview styling
+      if (templateId !== 'ivy-league') {
+        clonedResume.style.padding = '0';
+      }
       clonedResume.style.overflow = 'visible'; // Changed from hidden to visible
       clonedResume.style.transform = 'none';
       clonedResume.style.scale = '1';
@@ -162,14 +165,7 @@ export function DownloadOptionsDialog({
         });
       }
 
-      // Ivy template - minimize margins to reduce white space
-      if (templateId === 'ivy-league') {
-        clonedResume.style.padding = '0.25in';
-        clonedResume.style.paddingLeft = '0.25in';
-        clonedResume.style.paddingRight = '0.25in';
-        clonedResume.style.paddingTop = '0.3in';
-        clonedResume.style.paddingBottom = '0.3in';
-      }
+      // Ivy template - preserve preview styling, no padding overrides needed
 
       // Modern Professional template - add more horizontal margins for professional appearance
       if (templateId === 'modern-professional') {
