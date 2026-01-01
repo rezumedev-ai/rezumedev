@@ -144,6 +144,16 @@ export function DownloadOptionsDialog({
         });
       }
 
+      // Ivy template - preserve preview styling, only adjust padding for A4 fit
+      if (templateId === 'ivy-league') {
+        clonedResume.style.padding = '0.35in';
+      }
+
+      // Modern Professional template - add more horizontal margins for professional appearance
+      if (templateId === 'modern-professional') {
+        clonedResume.style.paddingLeft = '0.6in';
+        clonedResume.style.paddingRight = '0.6in';
+      }
 
       // Find all hyperlinks in the cloned resume to add them to the PDF later
       const links: { url: string, left: number, top: number, width: number, height: number }[] = [];
@@ -287,8 +297,8 @@ export function DownloadOptionsDialog({
 
       // Improved canvas capture settings with higher resolution and quality
       const pixelRatio = window.devicePixelRatio || 1;
-      // Use higher scale for creative template to capture fine details
-      const scaleMultiplier = templateId === 'creative-portfolio' ? 4 : 3;
+      // Use higher scale for creative and ivy templates to capture fine details
+      const scaleMultiplier = (templateId === 'creative-portfolio' || templateId === 'ivy-league') ? 4 : 3;
 
       const captureSettings = {
         scale: pixelRatio * scaleMultiplier, // Increased scale for better quality
