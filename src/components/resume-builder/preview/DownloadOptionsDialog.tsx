@@ -283,7 +283,7 @@ export function DownloadOptionsDialog({
         console.log("Content too tall for A4, applying smart vertical compression...");
 
         let attempts = 0;
-        const maxAttempts = 5;
+        const maxAttempts = 10;
 
         // Loop to progressively compress content until it fits
         while (clonedResume.scrollHeight > A4_HEIGHT_PX && attempts < maxAttempts) {
@@ -291,13 +291,12 @@ export function DownloadOptionsDialog({
 
           if (attempts === 0) {
             // Level 1: Reduce section gaps slightly
-            const sections = clonedResume.querySelectorAll('h3'); // headings
+            const sections = clonedResume.querySelectorAll('h3');
             sections.forEach(el => {
-              (el as HTMLElement).style.marginBottom = '8px'; // standard is usually higher
+              (el as HTMLElement).style.marginBottom = '8px';
             });
             const margins = clonedResume.querySelectorAll('.mb-4, .mb-6, .mb-8');
             margins.forEach(el => {
-              const currentMb = (el as HTMLElement).style.marginBottom;
               (el as HTMLElement).style.marginBottom = '8px';
             });
           }
@@ -310,22 +309,61 @@ export function DownloadOptionsDialog({
             // Level 3: Reduce line heights for body text
             const textElements = clonedResume.querySelectorAll('p, li, span, div');
             textElements.forEach(el => {
-              if (window.getComputedStyle(el).fontSize.includes('px')) { // simple check
+              if (window.getComputedStyle(el).fontSize.includes('px')) {
                 (el as HTMLElement).style.lineHeight = '1.3';
               }
             });
           }
           else if (attempts === 3) {
-            // Level 4: Reduce font size slightly (last resort)
+            // Level 4: Reduce font size to 13px
             const textElements = clonedResume.querySelectorAll('p, li');
             textElements.forEach(el => {
-              (el as HTMLElement).style.fontSize = '13px'; // slightly smaller than 14/15
+              (el as HTMLElement).style.fontSize = '13px';
             });
           }
           else if (attempts === 4) {
             // Level 5: Aggressive padding reduction
             clonedResume.style.setProperty('padding-top', '0.25in', 'important');
             clonedResume.style.setProperty('padding-bottom', '0.25in', 'important');
+          }
+          else if (attempts === 5) {
+            // Level 6: Tighter section margins
+            const sections = clonedResume.querySelectorAll('h3');
+            sections.forEach(el => {
+              (el as HTMLElement).style.marginBottom = '4px';
+            });
+            const margins = clonedResume.querySelectorAll('.mb-4, .mb-6, .mb-8');
+            margins.forEach(el => {
+              (el as HTMLElement).style.marginBottom = '4px';
+            });
+          }
+          else if (attempts === 6) {
+            // Level 7: Tighter line height
+            const textElements = clonedResume.querySelectorAll('p, li, span, div');
+            textElements.forEach(el => {
+              if (window.getComputedStyle(el).fontSize.includes('px')) {
+                (el as HTMLElement).style.lineHeight = '1.2';
+              }
+            });
+          }
+          else if (attempts === 7) {
+            // Level 8: Reduce font size to 12px
+            const textElements = clonedResume.querySelectorAll('p, li');
+            textElements.forEach(el => {
+              (el as HTMLElement).style.fontSize = '12px';
+            });
+          }
+          else if (attempts === 8) {
+            // Level 9: Minimal padding (0.15in)
+            clonedResume.style.setProperty('padding-top', '0.15in', 'important');
+            clonedResume.style.setProperty('padding-bottom', '0.15in', 'important');
+          }
+          else if (attempts === 9) {
+            // Level 10: Reduce font size to 11px (Last Resort)
+            const textElements = clonedResume.querySelectorAll('p, li');
+            textElements.forEach(el => {
+              (el as HTMLElement).style.fontSize = '11px';
+            });
           }
 
           attempts++;
