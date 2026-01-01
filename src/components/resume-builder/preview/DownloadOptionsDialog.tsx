@@ -171,7 +171,7 @@ export function DownloadOptionsDialog({
 
       // 1. Templates needing specific padding/margins for A4 pdf stability
       // (Minimal Elegant, Executive Clean, Creative Portfolio, Ivy League)
-      const templatesNeedingSafetyPadding = ['minimal-elegant', 'professional-executive', 'creative-portfolio', 'ivy-league'];
+      const templatesNeedingSafetyPadding = ['minimal-elegant', 'executive-clean', 'creative-portfolio', 'ivy-league'];
 
       if (templatesNeedingSafetyPadding.includes(templateId)) {
         // Reset overrides first to be safe
