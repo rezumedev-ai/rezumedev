@@ -165,30 +165,32 @@ export function DownloadOptionsDialog({
         });
       }
 
-      // Ivy template - force imitate Professional Navy margin/padding settings
-      if (templateId === 'ivy-league') {
+      // ----------------------------------------------------------------------
+      // GLOBAL SAFEGUARDS: Margin & Padding Logic
+      // ----------------------------------------------------------------------
+
+      // 1. Templates needing specific padding/margins for A4 pdf stability
+      // (Minimal Elegant, Executive Clean, Creative Portfolio, Ivy League)
+      const templatesNeedingSafetyPadding = ['minimal-elegant', 'professional-executive', 'creative-portfolio', 'ivy-league'];
+
+      if (templatesNeedingSafetyPadding.includes(templateId)) {
         // Reset overrides first to be safe
         clonedResume.style.border = 'none';
 
         // Force width to standard A4 pixel width to avoid scaling issues
         clonedResume.style.width = '816px';
-
-        // Use setProperty with !important to guarantee application
-        // Reduced to 0.4in to slightly tighten it further than Navy if needed, or stick to 0.5in
-        // User complained about "loads" of margin, so let's try 0.4in to be sure it's tight enough
-        clonedResume.style.setProperty('padding-left', '0.4in', 'important');
-        clonedResume.style.setProperty('padding-right', '0.4in', 'important');
-        clonedResume.style.setProperty('padding-top', '0.4in', 'important');
-        clonedResume.style.setProperty('padding-bottom', '0.4in', 'important');
-
-        // Ensure margins are zero
+        clonedResume.style.boxSizing = 'border-box';
         clonedResume.style.margin = '0';
 
-        // Ensure sizing is correct
-        clonedResume.style.boxSizing = 'border-box';
+        // Force 0.4in padding to prevent edge cutoff
+        const paddingVal = '0.4in';
+        clonedResume.style.setProperty('padding-left', paddingVal, 'important');
+        clonedResume.style.setProperty('padding-right', paddingVal, 'important');
+        clonedResume.style.setProperty('padding-top', paddingVal, 'important');
+        clonedResume.style.setProperty('padding-bottom', paddingVal, 'important');
       }
 
-      // Modern Professional template - add more horizontal margins for professional appearance
+      // 2. Modern Professional (Custom handling - keep existing preference)
       if (templateId === 'modern-professional') {
         clonedResume.style.paddingLeft = '0.6in';
         clonedResume.style.paddingRight = '0.6in';
@@ -279,8 +281,8 @@ export function DownloadOptionsDialog({
       // A4 height in pixels at 96 DPI is approx 1123px (11in * 96)
       const A4_HEIGHT_PX = 1080; // slightly less than 1123 for safety buffer
 
-      if (templateId === 'ivy-league' && clonedResume.scrollHeight > A4_HEIGHT_PX) {
-        console.log("Content too tall for A4, applying smart vertical compression...");
+      if (clonedResume.scrollHeight > A4_HEIGHT_PX) {
+        console.log(`[${templateId}] Content too tall for A4 (${clonedResume.scrollHeight}px), applying global smart vertical compression...`);
 
         let attempts = 0;
         const maxAttempts = 10;
