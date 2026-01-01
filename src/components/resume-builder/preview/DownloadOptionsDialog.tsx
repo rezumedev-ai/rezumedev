@@ -274,6 +274,64 @@ export function DownloadOptionsDialog({
         itemElement.style.marginBottom = '4px';
       });
 
+      // SMART COMPRESSION: Auto-fit content to A4 page height for Ivy template
+      // Only apply this logic if the template is Ivy League and content is taller than A4
+      // A4 height in pixels at 96 DPI is approx 1123px (11in * 96)
+      const A4_HEIGHT_PX = 1080; // slightly less than 1123 for safety buffer
+
+      if (templateId === 'ivy-league' && clonedResume.scrollHeight > A4_HEIGHT_PX) {
+        console.log("Content too tall for A4, applying smart vertical compression...");
+
+        let attempts = 0;
+        const maxAttempts = 5;
+
+        // Loop to progressively compress content until it fits
+        while (clonedResume.scrollHeight > A4_HEIGHT_PX && attempts < maxAttempts) {
+          console.log(`Compression Level ${attempts + 1}: Current Height = ${clonedResume.scrollHeight}px`);
+
+          if (attempts === 0) {
+            // Level 1: Reduce section gaps slightly
+            const sections = clonedResume.querySelectorAll('h3'); // headings
+            sections.forEach(el => {
+              (el as HTMLElement).style.marginBottom = '8px'; // standard is usually higher
+            });
+            const margins = clonedResume.querySelectorAll('.mb-4, .mb-6, .mb-8');
+            margins.forEach(el => {
+              const currentMb = (el as HTMLElement).style.marginBottom;
+              (el as HTMLElement).style.marginBottom = '8px';
+            });
+          }
+          else if (attempts === 1) {
+            // Level 2: Reduce top/bottom page padding
+            clonedResume.style.setProperty('padding-top', '0.3in', 'important');
+            clonedResume.style.setProperty('padding-bottom', '0.3in', 'important');
+          }
+          else if (attempts === 2) {
+            // Level 3: Reduce line heights for body text
+            const textElements = clonedResume.querySelectorAll('p, li, span, div');
+            textElements.forEach(el => {
+              if (window.getComputedStyle(el).fontSize.includes('px')) { // simple check
+                (el as HTMLElement).style.lineHeight = '1.3';
+              }
+            });
+          }
+          else if (attempts === 3) {
+            // Level 4: Reduce font size slightly (last resort)
+            const textElements = clonedResume.querySelectorAll('p, li');
+            textElements.forEach(el => {
+              (el as HTMLElement).style.fontSize = '13px'; // slightly smaller than 14/15
+            });
+          }
+          else if (attempts === 4) {
+            // Level 5: Aggressive padding reduction
+            clonedResume.style.setProperty('padding-top', '0.25in', 'important');
+            clonedResume.style.setProperty('padding-bottom', '0.25in', 'important');
+          }
+
+          attempts++;
+        }
+      }
+
       const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
