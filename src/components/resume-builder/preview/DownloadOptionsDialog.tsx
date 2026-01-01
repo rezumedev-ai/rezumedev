@@ -190,10 +190,12 @@ export function DownloadOptionsDialog({
         clonedResume.style.setProperty('padding-bottom', paddingVal, 'important');
       }
 
-      // 2. Modern Professional (Custom handling - keep existing preference)
+      // 2. Modern Professional (Custom handling - keep existing preference + add top padding)
       if (templateId === 'modern-professional') {
         clonedResume.style.paddingLeft = '0.6in';
         clonedResume.style.paddingRight = '0.6in';
+        // Add extra top padding to increase white space from top
+        clonedResume.style.setProperty('padding-top', '0.5in', 'important');
       }
 
       // Find all hyperlinks in the cloned resume to add them to the PDF later
