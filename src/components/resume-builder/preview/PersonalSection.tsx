@@ -211,24 +211,44 @@ export function PersonalSection({
           </div>
           <div className={currentStyle.contactContainer}>
             <div>
-              <span
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("email", e)}
-              >
-                {email}
-              </span>
+              {isEditing ? (
+                <span
+                  className="outline-none"
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("email", e)}
+                >
+                  {email}
+                </span>
+              ) : (
+                <a
+                  href={`mailto:${email}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {email}
+                </a>
+              )}
             </div>
             <div>
-              <span
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("phone", e)}
-              >
-                {phone}
-              </span>
+              {isEditing ? (
+                <span
+                  className="outline-none"
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("phone", e)}
+                >
+                  {phone}
+                </span>
+              ) : (
+                <a
+                  href={`tel:${phone}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {phone}
+                </a>
+              )}
             </div>
             {linkedin && (
               <div>
@@ -374,24 +394,44 @@ export function PersonalSection({
           </div>
           <div className={currentStyle.contactContainer}>
             <div>
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("email", e)}
-                className="outline-none"
-              >
-                {email}
-              </span>
+              {isEditing ? (
+                <span
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("email", e)}
+                  className="outline-none"
+                >
+                  {email}
+                </span>
+              ) : (
+                <a
+                  href={`mailto:${email}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {email}
+                </a>
+              )}
             </div>
             <div>
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("phone", e)}
-                className="outline-none"
-              >
-                {phone}
-              </span>
+              {isEditing ? (
+                <span
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("phone", e)}
+                  className="outline-none"
+                >
+                  {phone}
+                </span>
+              ) : (
+                <a
+                  href={`tel:${phone}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {phone}
+                </a>
+              )}
             </div>
             {linkedin && (
               <div>
@@ -469,25 +509,45 @@ export function PersonalSection({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
           <div className="flex items-center gap-1">
             <Mail className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
-            <span
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-            >
-              {email}
-            </span>
+            {isEditing ? (
+              <span
+                className="text-xs text-gray-600 outline-none"
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+              >
+                {email}
+              </span>
+            ) : (
+              <a
+                href={`mailto:${email}`}
+                className={`text-xs text-gray-600 ${linkStyle}`}
+                data-pdf-link="true"
+              >
+                {email}
+              </a>
+            )}
           </div>
           <div className="flex items-center gap-1">
             <Phone className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
-            <span
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-            >
-              {phone}
-            </span>
+            {isEditing ? (
+              <span
+                className="text-xs text-gray-600 outline-none"
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+              >
+                {phone}
+              </span>
+            ) : (
+              <a
+                href={`tel:${phone}`}
+                className={`text-xs text-gray-600 ${linkStyle}`}
+                data-pdf-link="true"
+              >
+                {phone}
+              </a>
+            )}
           </div>
           {linkedin && (
             <div className="flex items-center gap-1">
@@ -549,24 +609,44 @@ export function PersonalSection({
       return (
         <div className={currentStyle.contactContainer}>
           <div>
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
-            >
-              {email}
-            </span>
+            {isEditing ? (
+              <span
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+                className="outline-none"
+              >
+                {email}
+              </span>
+            ) : (
+              <a
+                href={`mailto:${email}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {email}
+              </a>
+            )}
           </div>
           <div>
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
-            >
-              {phone}
-            </span>
+            {isEditing ? (
+              <span
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+                className="outline-none"
+              >
+                {phone}
+              </span>
+            ) : (
+              <a
+                href={`tel:${phone}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {phone}
+              </a>
+            )}
           </div>
           {linkedin && (
             <div>
@@ -624,24 +704,44 @@ export function PersonalSection({
       return (
         <div className={currentStyle.contactContainer}>
           <div>
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
-            >
-              {email}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+                className="outline-none"
+              >
+                {email}
+              </div>
+            ) : (
+              <a
+                href={`mailto:${email}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {email}
+              </a>
+            )}
           </div>
           <div>
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
-            >
-              {phone}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+                className="outline-none"
+              >
+                {phone}
+              </div>
+            ) : (
+              <a
+                href={`tel:${phone}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {phone}
+              </a>
+            )}
           </div>
           {linkedin && (
             <div>
@@ -700,25 +800,45 @@ export function PersonalSection({
         <div className={currentStyle.contactContainer}>
           <div className="flex items-center gap-1.5">
             <Mail className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="mail" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
-            >
-              {email}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+                className="outline-none"
+              >
+                {email}
+              </div>
+            ) : (
+              <a
+                href={`mailto:${email}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {email}
+              </a>
+            )}
           </div>
           <div className="flex items-center gap-1.5">
             <Phone className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="phone" />
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
-            >
-              {phone}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+                className="outline-none"
+              >
+                {phone}
+              </div>
+            ) : (
+              <a
+                href={`tel:${phone}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {phone}
+              </a>
+            )}
           </div>
           {linkedin && (
             <div className="flex items-center gap-1.5">
