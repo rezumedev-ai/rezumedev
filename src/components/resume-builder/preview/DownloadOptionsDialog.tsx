@@ -165,12 +165,22 @@ export function DownloadOptionsDialog({
         });
       }
 
-      // Ivy template - reduce excessive margins for professional PDF appearance
+      // Ivy template - force imitate Professional Navy margin/padding settings
       if (templateId === 'ivy-league') {
-        clonedResume.style.paddingLeft = '0.4in';
-        clonedResume.style.paddingRight = '0.4in';
-        clonedResume.style.paddingTop = '0.4in';
-        clonedResume.style.paddingBottom = '0.4in';
+        // Reset overrides first to be safe
+        clonedResume.style.border = 'none';
+
+        // Use setProperty with !important to guarantee application
+        clonedResume.style.setProperty('padding-left', '0.5in', 'important');
+        clonedResume.style.setProperty('padding-right', '0.5in', 'important');
+        clonedResume.style.setProperty('padding-top', '0.5in', 'important');
+        clonedResume.style.setProperty('padding-bottom', '0.5in', 'important');
+
+        // Ensure margins are zero
+        clonedResume.style.margin = '0';
+
+        // Ensure sizing is correct
+        clonedResume.style.boxSizing = 'border-box';
       }
 
       // Modern Professional template - add more horizontal margins for professional appearance
