@@ -47,7 +47,7 @@ export const ResumeTemplates = () => {
     {
       id: "creative-portfolio",
       name: "The Creative",
-      image: "/uploads/creative-preview.png",
+      image: "/uploads/creative-preview-new.png",
       description: "Bold, high-impact design with accent colors for creative professionals in design, marketing, and tech industries",
       color: "from-indigo-500 to-indigo-700"
     }

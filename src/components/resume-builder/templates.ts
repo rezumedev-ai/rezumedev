@@ -298,7 +298,7 @@ export const resumeTemplates: ResumeTemplate[] = [
     id: "creative-portfolio",
     name: "The Creative",
     description: "Bold, high-impact design with accent colors for creative professionals",
-    imageUrl: "/uploads/creative-preview.png", // distinct placeholder
+    imageUrl: "/uploads/creative-preview-new.png", // distinct placeholder
     style: {
       titleFont: "font-sans text-[48px] font-black tracking-tighter text-gray-900 leading-none",
       headerStyle: "mb-8 grid grid-cols-12 gap-8 items-end",
