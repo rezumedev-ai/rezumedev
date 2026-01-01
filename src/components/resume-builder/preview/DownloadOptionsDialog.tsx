@@ -122,6 +122,15 @@ export function DownloadOptionsDialog({
           el.style.color = '#4F46E5'; // indigo-600
           el.style.letterSpacing = '-0.025em';
           el.style.marginBottom = '1.5rem';
+
+          // Also style any spans/divs inside the h3 to ensure they inherit the size
+          const headerContent = el.querySelectorAll('span, div');
+          headerContent.forEach(content => {
+            const contentEl = content as HTMLElement;
+            contentEl.style.fontSize = '24px';
+            contentEl.style.fontWeight = '900';
+            contentEl.style.color = '#4F46E5';
+          });
         });
 
         // Fix grid containers
@@ -133,11 +142,20 @@ export function DownloadOptionsDialog({
           el.style.gap = '2rem';
         });
 
-        // Fix body text
-        const bodyText = clonedResume.querySelectorAll('p, li, span');
+        // Fix body text - but exclude spans/divs inside h3 elements
+        const bodyText = clonedResume.querySelectorAll('p, li');
         bodyText.forEach(text => {
           const el = text as HTMLElement;
-          if (!el.className.includes('text-') || el.className.includes('text-base')) {
+          el.style.fontSize = '15px';
+          el.style.lineHeight = '1.6';
+        });
+
+        // Fix spans that are NOT inside h3 elements
+        const allSpans = clonedResume.querySelectorAll('span');
+        allSpans.forEach(span => {
+          const el = span as HTMLElement;
+          // Only apply if not inside an h3
+          if (!el.closest('h3')) {
             el.style.fontSize = '15px';
             el.style.lineHeight = '1.6';
           }
