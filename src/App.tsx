@@ -11,6 +11,7 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import { OnboardingFlow } from "./components/onboarding/OnboardingFlow";
 import { OnboardingGuard } from "./components/onboarding/OnboardingGuard";
+import { OnboardingErrorBoundary } from "./components/onboarding/ErrorBoundary";
 import Dashboard from "./pages/Dashboard";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import ResumePreview from "./pages/ResumePreview";
