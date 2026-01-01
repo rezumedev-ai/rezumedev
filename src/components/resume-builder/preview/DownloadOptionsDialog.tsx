@@ -112,16 +112,16 @@ export function DownloadOptionsDialog({
           }
         });
 
-        // Fix section headers
-        const sectionHeaders = clonedResume.querySelectorAll('h2, h3');
+        // Fix section headers - apply to ALL h3 elements for consistency
+        const sectionHeaders = clonedResume.querySelectorAll('h3');
         sectionHeaders.forEach(header => {
           const el = header as HTMLElement;
-          if (el.className.includes('text-indigo') || el.className.includes('text-2xl')) {
-            el.style.fontSize = '24px';
-            el.style.fontWeight = '900';
-            el.style.color = '#4F46E5'; // indigo-600
-            el.style.letterSpacing = '-0.025em';
-          }
+          // Apply consistent styling to all section headers
+          el.style.fontSize = '24px';
+          el.style.fontWeight = '900';
+          el.style.color = '#4F46E5'; // indigo-600
+          el.style.letterSpacing = '-0.025em';
+          el.style.marginBottom = '1.5rem';
         });
 
         // Fix grid containers
