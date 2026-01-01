@@ -28,17 +28,20 @@ export const AIPreviewStep = ({ data, updateData, onContinue, onBack }: AIPrevie
         setIsLoading(true);
         try {
             const { data: result, error } = await supabase.functions.invoke('enhance-responsibility', {
-                body: { responsibility: input }
+                body: {
+                    text: input,
+                    jobTitle: 'Professional'
+                }
             });
 
             if (error) throw error;
 
-            if (result?.enhanced) {
-                setOutput(result.enhanced);
+            if (result?.enhancedText) {
+                setOutput(result.enhancedText);
                 updateData({
                     aiDemoUsed: true,
                     aiDemoInput: input,
-                    aiDemoOutput: result.enhanced
+                    aiDemoOutput: result.enhancedText
                 });
                 toast.success('Enhanced successfully!');
             }
