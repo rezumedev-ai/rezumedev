@@ -57,7 +57,7 @@ export default function Dashboard() {
 
       return (data || []).map((resume: ResumeData) => ({
         ...resume,
-        professional_summary: typeof resume.professional_summary === 'object' 
+        professional_summary: typeof resume.professional_summary === 'object'
           ? resume.professional_summary as { title: string }
           : { title: '' }
       }));
@@ -65,7 +65,7 @@ export default function Dashboard() {
   });
 
   const handleCreateNew = () => {
-    navigate("/new-resume");
+    navigate("/profile-selection");
   };
 
   const handleQuickTips = () => {
@@ -88,8 +88,8 @@ export default function Dashboard() {
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { 
-      opacity: 1, 
+    show: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
@@ -102,7 +102,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/20">
       {isMobile && (
-        <motion.div 
+        <motion.div
           className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 p-4 flex justify-between items-center"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -125,14 +125,14 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      <Sidebar 
+      <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
       <div className={`${isMobile ? 'pt-20 px-4' : 'ml-64'} transition-all duration-300 ease-in-out`}>
         <div className="max-w-6xl mx-auto space-y-8 md:space-y-12 pb-12">
-          <motion.div 
+          <motion.div
             className="flex flex-col md:flex-row justify-between items-start gap-6"
             variants={container}
             initial="hidden"
@@ -154,17 +154,17 @@ export default function Dashboard() {
                     </span>
                   </h1>
                 </div>
-                
-                <p className="text-base md:text-lg text-gray-600 max-w-2xl" 
+
+                <p className="text-base md:text-lg text-gray-600 max-w-2xl"
                   style={{ animationDelay: '100ms' }}>
-                  Create and manage your professional resumes with our AI-powered platform. 
+                  Create and manage your professional resumes with our AI-powered platform.
                   Stand out from the crowd with beautifully crafted resumes.
                 </p>
               </div>
             </motion.div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             variants={container}
             initial="hidden"
             animate="show"
@@ -182,7 +182,7 @@ export default function Dashboard() {
                 <ResumeList resumes={resumes || []} onCreateNew={handleCreateNew} />
               )}
             </motion.div>
-            
+
             <motion.div variants={item} className="space-y-6">
               <Card className="p-6 bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-lg transition-all duration-300">
                 <div className="space-y-4">
@@ -193,7 +193,7 @@ export default function Dashboard() {
                       More Tips
                     </Button>
                   </div>
-                  
+
                   <ul className="space-y-3">
                     <li className="flex items-start gap-2">
                       <div className="rounded-full bg-green-100 p-1 mt-0.5">
