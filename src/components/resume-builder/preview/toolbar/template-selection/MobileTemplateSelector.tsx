@@ -82,7 +82,18 @@ export function MobileTemplateSelector({
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                        className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white overflow-hidden flex flex-col"
+                        className="fixed inset-0 bg-gradient-to-br from-gray-50 to-white overflow-hidden flex flex-col"
+                        style={{
+                            width: '100vw',
+                            height: '100vh',
+                            maxWidth: '100vw',
+                            maxHeight: '100vh',
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0
+                        }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
