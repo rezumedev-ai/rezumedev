@@ -91,16 +91,18 @@ export const OnboardingFlow = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-32">
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
             <ProgressBar current={currentStep} total={totalSteps} progress={progress} />
-            <div className="container mx-auto px-4 py-8">
+
+            {/* Main Content Area - Grows to fill space */}
+            <div className="flex-1 container mx-auto px-4 py-8">
                 {renderStep()}
             </div>
 
-            {/* Did You Know Tab - Visible on all steps except Welcome (optional) or maybe all steps */}
-            {/* Adding padding-bottom to body/wrapper to prevent overlap is handled by pb-32 above */}
-            <DidYouKnowTab />
+            {/* Sticky Footer - Part of the flow, pushes content up but stays reachable */}
+            <div className="sticky bottom-0 z-10 w-full mt-auto">
+                <DidYouKnowTab />
+            </div>
         </div>
     );
 };
-
