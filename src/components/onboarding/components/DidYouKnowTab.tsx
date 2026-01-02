@@ -66,8 +66,8 @@ export const DidYouKnowTab = () => {
     };
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-40 p-4 pointer-events-none">
-            <div className="container mx-auto max-w-3xl pointer-events-auto">
+        <div className="w-full p-4 bg-gradient-to-t from-white via-white to-transparent">
+            <div className="container mx-auto max-w-3xl">
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -116,14 +116,6 @@ export const DidYouKnowTab = () => {
                                 </motion.p>
                             </AnimatePresence>
                         </div>
-
-                        {/* Optional Close Button (Small X) */}
-                        {/* <button 
-                            onClick={() => setIsVisible(false)}
-                            className="text-gray-400 hover:text-gray-600 p-1"
-                        >
-                            <X className="w-4 h-4" />
-                        </button> */}
                     </div>
                 </motion.div>
             </div>
