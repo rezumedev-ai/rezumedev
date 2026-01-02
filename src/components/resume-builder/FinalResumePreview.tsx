@@ -16,15 +16,15 @@ interface FinalResumePreviewProps {
   resumeId: string;
 }
 
-export function FinalResumePreview({ 
-  resumeData, 
+export function FinalResumePreview({
+  resumeData,
   resumeId
 }: FinalResumePreviewProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [resumeScale, setResumeScale] = useState(isMobile ? 0.35 : 1);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const {
     resumeState,
     isEditing,
@@ -38,9 +38,9 @@ export function FinalResumePreview({
     handleExperienceUpdate,
     handleTemplateChange
   } = useResumePreview(resumeData, resumeId);
-  
+
   const template = resumeTemplates.find(t => t.id === resumeState.template_id) || resumeTemplates[0];
-  
+
   // Standardized page style with font consistent with modern-professional
   const pageStyle = {
     padding: isMobile ? "0.4in" : template.style.spacing.margins.top,
@@ -49,7 +49,7 @@ export function FinalResumePreview({
 
   const handleTemplateSwitching = (templateId: string) => {
     if (templateId === resumeState.template_id) return;
-    
+
     handleTemplateChange(templateId);
     toast.success(`Template updated to ${resumeTemplates.find(t => t.id === templateId)?.name || 'new template'}`);
   };
@@ -57,27 +57,27 @@ export function FinalResumePreview({
   useEffect(() => {
     const updateScale = () => {
       if (!containerRef.current) return;
-      
+
       // Get container dimensions
       const containerWidth = containerRef.current.clientWidth;
       const containerHeight = containerRef.current.clientHeight;
-      
+
       // A4 dimensions (in pixels at 96 DPI)
       const pageWidth = 21 * 37.8; // ~793px
       const pageHeight = 29.7 * 37.8; // ~1122px
-      
+
       if (isMobile) {
-        // For mobile, set a fixed initial scale that shows the full resume
-        setResumeScale(0.35);
+        // Keep resume at full size on mobile, let user pinch-zoom
+        setResumeScale(1.0);
       } else {
         // For desktop, optimize the scale to use more space
         const availableWidth = containerWidth - 48; // 48px padding
         const availableHeight = containerHeight - 120; // 120px for toolbar and padding
-        
+
         // Calculate scale based on available dimensions
         const widthScale = availableWidth / pageWidth;
         const heightScale = availableHeight / pageHeight;
-        
+
         // Use the smaller scale to ensure the entire resume fits, but give it a minimum scale
         const newScale = Math.max(Math.min(widthScale, heightScale, 1), 0.65);
         setResumeScale(newScale);
@@ -85,26 +85,26 @@ export function FinalResumePreview({
     };
 
     updateScale();
-    
+
     // Add event listeners for screen rotation and resize
     window.addEventListener('resize', updateScale);
     window.addEventListener('orientationchange', updateScale);
-    
+
     return () => {
       window.removeEventListener('resize', updateScale);
       window.removeEventListener('orientationchange', updateScale);
     };
   }, [isMobile]);
-  
+
   return (
-    <motion.div 
+    <motion.div
       ref={containerRef}
       className="flex flex-col items-center min-h-screen bg-white py-4 relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <ResumePreviewToolbar 
+      <ResumePreviewToolbar
         currentTemplateId={template.id}
         templates={resumeTemplates}
         resumeId={resumeId}
@@ -115,9 +115,9 @@ export function FinalResumePreview({
         onProfileImageUpdate={handleProfileImageUpdate}
         currentProfileImageUrl={resumeState.personal_info.profileImageUrl}
       />
-      
-      <motion.div 
-        id="resume-content" 
+
+      <motion.div
+        id="resume-content"
         className="w-[21cm] min-h-[29.7cm] bg-white shadow-xl mx-auto mb-6 relative overflow-hidden"
         style={{
           ...pageStyle,
@@ -132,7 +132,7 @@ export function FinalResumePreview({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <ResumeContent 
+        <ResumeContent
           resumeState={resumeState}
           template={template}
           isEditing={isEditing}
@@ -146,7 +146,7 @@ export function FinalResumePreview({
           onExperienceUpdate={handleExperienceUpdate}
         />
       </motion.div>
-      
+
       {isMobile && (
         <div className="text-center text-xs text-gray-500 mb-4 px-4">
           <p>Pinch to zoom or adjust view as needed</p>
