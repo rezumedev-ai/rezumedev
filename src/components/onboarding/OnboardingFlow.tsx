@@ -8,7 +8,7 @@ import { AIPreviewStep } from './steps/AIPreviewStep';
 import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { SubscriptionStep } from './steps/SubscriptionStep';
 
-import { DidYouKnowTab } from './components/DidYouKnowTab';
+
 
 export const OnboardingFlow = () => {
     const {
@@ -91,17 +91,10 @@ export const OnboardingFlow = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
             <ProgressBar current={currentStep} total={totalSteps} progress={progress} />
-
-            {/* Main Content Area - Grows to fill space */}
-            <div className="flex-1 container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8">
                 {renderStep()}
-            </div>
-
-            {/* Sticky Footer - Part of the flow, pushes content up but stays reachable */}
-            <div className="sticky bottom-0 z-10 w-full mt-auto">
-                <DidYouKnowTab />
             </div>
         </div>
     );
