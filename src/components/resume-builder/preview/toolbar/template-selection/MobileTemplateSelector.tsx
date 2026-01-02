@@ -20,32 +20,58 @@ export function MobileTemplateSelector({
     onTemplateChange
 }: MobileTemplateSelectorProps) {
     const [selectedId, setSelectedId] = useState(currentTemplateId);
-    const [dimensions, setDimensions] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight
+    // State for visual viewport
+    const [viewport, setViewport] = useState({
+        width: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.width : window.innerWidth,
+        height: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.height : window.innerHeight,
+        scale: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.scale : 1,
+        offsetLeft: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.offsetLeft : 0,
+        offsetTop: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.offsetTop : 0,
     });
+
+    useEffect(() => {
+        const updateViewport = () => {
+            if (window.visualViewport) {
+                setViewport({
+                    width: window.visualViewport.width,
+                    height: window.visualViewport.height,
+                    scale: window.visualViewport.scale,
+                    offsetLeft: window.visualViewport.offsetLeft,
+                    offsetTop: window.visualViewport.offsetTop,
+                });
+            } else {
+                // Fallback
+                setViewport(prev => ({
+                    ...prev,
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    scale: 1,
+                    offsetLeft: 0,
+                    offsetTop: 0
+                }));
+            }
+        };
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateViewport);
+            window.visualViewport.addEventListener('scroll', updateViewport);
+        }
+        window.addEventListener('resize', updateViewport);
+        window.addEventListener('orientationchange', updateViewport);
+
+        return () => {
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', updateViewport);
+                window.visualViewport.removeEventListener('scroll', updateViewport);
+            }
+            window.removeEventListener('resize', updateViewport);
+            window.removeEventListener('orientationchange', updateViewport);
+        };
+    }, []);
 
     useEffect(() => {
         setSelectedId(currentTemplateId);
     }, [currentTemplateId]);
-
-    // Update dimensions on window resize or orientation change
-    useEffect(() => {
-        const updateDimensions = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight
-            });
-        };
-
-        window.addEventListener('resize', updateDimensions);
-        window.addEventListener('orientationchange', updateDimensions);
-
-        return () => {
-            window.removeEventListener('resize', updateDimensions);
-            window.removeEventListener('orientationchange', updateDimensions);
-        };
-    }, []);
 
     // Prevent body scroll when open
     useEffect(() => {
@@ -89,6 +115,35 @@ export function MobileTemplateSelector({
         return () => window.removeEventListener('keydown', handleEscape);
     }, [isOpen]);
 
+    // Calculate inverse styles
+    // Outer container: positions exactly over the visible area
+    const outerStyle: React.CSSProperties = {
+        position: 'fixed', // Fixed relative to layout viewport, needing offset adjustment if using VV offsets
+        // Actually, with fixed postioning, left/top are relative to the viewport.
+        // However, mobile browsers behave differently with fixed + zoom.
+        // The most robust way for "fixed" overlay on zoomed mobile is often Absolute relative to the document
+        // OR modifying left/top/width/height based on visualViewport.
+        // If we use fixed:
+        // left: viewport.offsetLeft
+        // top: viewport.offsetTop
+        // width: viewport.width
+        // height: viewport.height 
+        // This places the div exactly over the visual viewport.
+        left: `${viewport.offsetLeft}px`,
+        top: `${viewport.offsetTop}px`,
+        width: `${viewport.width}px`,
+        height: `${viewport.height}px`,
+        zIndex: 50,
+    };
+
+    // Inner container: scales up dimensions and scales down content
+    const innerStyle: React.CSSProperties = {
+        width: `${viewport.width * viewport.scale}px`,
+        height: `${viewport.height * viewport.scale}px`,
+        transform: `scale(${1 / viewport.scale})`,
+        transformOrigin: 'top left',
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -96,14 +151,8 @@ export function MobileTemplateSelector({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-                    style={{
-                        width: `${dimensions.width}px`,
-                        height: `${dimensions.height}px`,
-                        position: 'fixed',
-                        top: 0,
-                        left: 0
-                    }}
+                    className="bg-black/50 backdrop-blur-sm"
+                    style={outerStyle}
                     onClick={handleClose}
                 >
                     <motion.div
@@ -112,13 +161,7 @@ export function MobileTemplateSelector({
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
                         className="bg-gradient-to-br from-gray-50 to-white overflow-hidden flex flex-col"
-                        style={{
-                            width: `${dimensions.width}px`,
-                            height: `${dimensions.height}px`,
-                            position: 'fixed',
-                            top: 0,
-                            left: 0
-                        }}
+                        style={innerStyle}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
