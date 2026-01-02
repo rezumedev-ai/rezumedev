@@ -789,7 +789,7 @@ CRITICAL CONSTRAINTS:
           },
           { role: 'user', content: summaryPrompt }
         ],
-        max_completion_tokens: 500,
+        max_completion_tokens: 750,
       }),
     });
 
