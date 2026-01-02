@@ -15,7 +15,7 @@ export default function ResumeBuilder() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  
+
   const { data: resume, isLoading, error } = useQuery({
     queryKey: ['resume', id],
     queryFn: async () => {
@@ -30,7 +30,7 @@ export default function ResumeBuilder() {
         console.error('Error fetching resume:', error);
         throw error;
       }
-      console.log("Resume data fetched:", data);
+
       return data;
     },
     enabled: !!id,
@@ -38,7 +38,7 @@ export default function ResumeBuilder() {
   });
 
   if (!id) {
-    console.log("No resume ID provided, redirecting to new-resume");
+
     navigate('/new-resume');
     return null;
   }
@@ -70,7 +70,7 @@ export default function ResumeBuilder() {
   };
 
   if (isLoading) {
-    console.log("Resume data is loading...");
+
     return <LoadingState status="loading" />;
   }
 
@@ -96,8 +96,7 @@ export default function ResumeBuilder() {
     return null;
   }
 
-  console.log("Resume completion status:", resume.completion_status);
-  console.log("Showing resume builder with data:", resume);
+
 
   if (!resume.completion_status || resume.completion_status === 'draft') {
     return (

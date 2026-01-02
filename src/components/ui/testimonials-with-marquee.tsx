@@ -13,11 +13,11 @@ interface TestimonialsSectionProps {
   className?: string
 }
 
-export function TestimonialsSection({ 
+export function TestimonialsSection({
   title,
   description,
   testimonials,
-  className 
+  className
 }: TestimonialsSectionProps) {
   return (
     <section className={cn(
@@ -36,11 +36,11 @@ export function TestimonialsSection({
         </div>
 
         <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-          <div className="group flex overflow-hidden p-2 [--gap:1rem] [gap:var(--gap)] flex-row [--duration:40s]">
+          <div className="group flex overflow-hidden p-2 [--gap:1rem] [gap:var(--gap)] flex-row [--duration:80s]">
             <div className="flex shrink-0 justify-around [gap:var(--gap)] animate-marquee flex-row group-hover:[animation-play-state:paused]">
               {[...Array(4)].map((_, setIndex) => (
                 testimonials.map((testimonial, i) => (
-                  <TestimonialCard 
+                  <TestimonialCard
                     key={`${setIndex}-${i}`}
                     {...testimonial}
                   />

@@ -9,6 +9,9 @@ export interface ResumeProfile {
     phone: string;
     linkedin?: string;
     website?: string;
+    country?: string;
+    city?: string;
+    jobTitle?: string;
   };
   avatar_url?: string;
   is_default: boolean;
@@ -24,6 +27,9 @@ export interface CreateResumeProfileParams {
     phone: string;
     linkedin?: string;
     website?: string;
+    country?: string;
+    city?: string;
+    jobTitle?: string;
   };
   avatar_url?: string;
   is_default?: boolean;
@@ -37,6 +43,9 @@ export interface UpdateResumeProfileParams {
     phone?: string;
     linkedin?: string;
     website?: string;
+    country?: string;
+    city?: string;
+    jobTitle?: string;
   };
   avatar_url?: string | null;
   is_default?: boolean;

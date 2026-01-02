@@ -7,10 +7,30 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -342,6 +362,60 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_responses: {
+        Row: {
+          ai_demo_input: string | null
+          ai_demo_output: string | null
+          ai_demo_used: boolean | null
+          career_stage: string | null
+          completed_at: string | null
+          conversion_time_seconds: number | null
+          created_at: string
+          id: string
+          pain_points: string[] | null
+          primary_goal: string | null
+          subscription_chosen: string | null
+          template_selected: string | null
+          timeline: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_demo_input?: string | null
+          ai_demo_output?: string | null
+          ai_demo_used?: boolean | null
+          career_stage?: string | null
+          completed_at?: string | null
+          conversion_time_seconds?: number | null
+          created_at?: string
+          id?: string
+          pain_points?: string[] | null
+          primary_goal?: string | null
+          subscription_chosen?: string | null
+          template_selected?: string | null
+          timeline?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_demo_input?: string | null
+          ai_demo_output?: string | null
+          ai_demo_used?: boolean | null
+          career_stage?: string | null
+          completed_at?: string | null
+          conversion_time_seconds?: number | null
+          created_at?: string
+          id?: string
+          pain_points?: string[] | null
+          primary_goal?: string | null
+          subscription_chosen?: string | null
+          template_selected?: string | null
+          timeline?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -351,6 +425,7 @@ export type Database = {
           full_name: string | null
           id: string
           linkedin_url: string | null
+          onboarding_completed: boolean | null
           payment_method: string | null
           phone: string | null
           resume_preferences: Json | null
@@ -370,6 +445,7 @@ export type Database = {
           full_name?: string | null
           id: string
           linkedin_url?: string | null
+          onboarding_completed?: boolean | null
           payment_method?: string | null
           phone?: string | null
           resume_preferences?: Json | null
@@ -389,6 +465,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           linkedin_url?: string | null
+          onboarding_completed?: boolean | null
           payment_method?: string | null
           phone?: string | null
           resume_preferences?: Json | null
@@ -808,6 +885,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       quiz_question_type: [
@@ -819,3 +899,4 @@ export const Constants = {
     },
   },
 } as const
+

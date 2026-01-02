@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -112,10 +111,10 @@
 
   /* PDF-specific styling */
   .pdf-mode {
-    padding: 32px 32px 0 32px !important; /* Increased padding: Top, right, bottom, left padding for PDF export */
+    /* Padding is handled by inline styles from the template */
     box-sizing: border-box !important;
   }
-  
+
   .pdf-mode #resume-content .pdf-bullet-list {
     margin: 0 !important;
     padding: 0 !important;
@@ -130,35 +129,17 @@
     break-inside: avoid !important;
   }
 
-  .pdf-mode #resume-content .pdf-bullet-marker {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    align-self: flex-start !important;
-    margin-top: 5px !important;
-    width: 5px !important;
-    height: 5px !important;
-    min-width: 5px !important;
-    min-height: 5px !important;
-    border-radius: 50% !important;
+  /* HTML2Canvas Force Fix: The engine renders flex-centered items too low. */
+  /* HTML2Canvas Force Fix: The engine renders flex-centered items too low. */
+  .pdf-mode .pdf-bullet-marker {
     background-color: currentColor !important;
-    vertical-align: top !important;
-    transform: translateY(2px) !important;
+    position: relative !important;
+    top: -2px !important;
+    /* Fixed selector & adjusted lift */
   }
 
   .pdf-mode #resume-content .pdf-bullet-text {
-    display: inline-block !important;
     flex: 1 !important;
-    line-height: 1.4 !important;
-  }
-
-  .pdf-mode #resume-content .pdf-bullet-char {
-    transform: translateY(0) !important;
-    display: inline-block !important;
-    margin-right: 6px !important; 
-    margin-top: 0 !important;
-    vertical-align: middle !important;
   }
 
   /* Improve contact icons in PDF */
@@ -218,10 +199,10 @@
     aspect-ratio: 1/1 !important;
   }
 
-  /* Other fixes from previous implementation */
-  #resume-content ul.list-disc li,
-  #resume-content ul.space-y-1 li,
-  #resume-content ul.space-y-1.5 li {
+  /* Other fixes from previous implementation - Scoped to PDF */
+  .pdf-mode #resume-content ul.list-disc li,
+  .pdf-mode #resume-content ul.space-y-1 li,
+  .pdf-mode #resume-content ul[class~="space-y-1.5"] li {
     page-break-inside: avoid;
     display: flex !important;
     align-items: flex-start !important;
@@ -233,23 +214,23 @@
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
-  
-  /* Improved list and bullet point styling */
-  #resume-content ul.list-disc li,
-  #resume-content ul.space-y-1 li,
-  #resume-content ul.space-y-1.5 li {
+
+  /* Improved list and bullet point styling - Scoped to PDF */
+  .pdf-mode #resume-content ul.list-disc li,
+  .pdf-mode #resume-content ul.space-y-1 li,
+  .pdf-mode #resume-content ul[class~="space-y-1.5"] li {
     page-break-inside: avoid;
     display: flex !important;
     align-items: center !important;
     line-height: 1.4 !important;
   }
 
-  #resume-content .rounded-full {
+  .pdf-mode #resume-content .rounded-full {
     border-radius: 50% !important;
     overflow: hidden !important;
   }
 
-  #resume-content .rounded-full img {
+  .pdf-mode #resume-content .rounded-full img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
@@ -257,9 +238,9 @@
     aspect-ratio: 1/1 !important;
   }
 
-  /* Ensure proper alignment of bullet points */
-  #resume-content li .inline-block,
-  #resume-content li .inline-flex {
+  /* Ensure proper alignment of bullet points - Scoped to PDF */
+  .pdf-mode #resume-content li .inline-block,
+  .pdf-mode #resume-content li .inline-flex {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -268,9 +249,9 @@
     flex-shrink: 0 !important;
   }
 
-  /* Fix for arrow bullet points */
-  #resume-content .space-y-1.5 li span:first-child,
-  #resume-content .space-y-1 li span:first-child {
+  /* Fix for arrow bullet points - Scoped to PDF */
+  .pdf-mode #resume-content [class~="space-y-1.5"] li span:first-child,
+  .pdf-mode #resume-content .space-y-1 li span:first-child {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -279,9 +260,9 @@
     margin-top: 0 !important;
     transform: translateY(0) !important;
   }
-  
-  /* Professional Navy template specific fixes */
-  #resume-content .professional-navy-contact-icon {
+
+  /* Professional Navy template specific fixes - Scoped to PDF */
+  .pdf-mode #resume-content .professional-navy-contact-icon {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -290,10 +271,10 @@
     margin-top: 0 !important;
     transform: translateY(0) !important;
   }
-  
-  #resume-content .professional-navy-bullet {
+
+  .pdf-mode #resume-content .professional-navy-bullet {
     display: inline-flex !important;
-    align-items: center !important; 
+    align-items: center !important;
     justify-content: center !important;
     min-width: 6px !important;
     min-height: 6px !important;
@@ -306,8 +287,8 @@
     margin-top: 0 !important;
     transform: translateY(0) !important;
   }
-  
-  #resume-content .professional-navy-work-item li {
+
+  .pdf-mode #resume-content .professional-navy-work-item li {
     display: flex !important;
     align-items: center !important;
     margin-bottom: 6px !important;
@@ -339,7 +320,8 @@
     @apply text-xl md:text-2xl font-semibold text-secondary mt-6 mb-3;
   }
 
-  .prose ul, .prose ol {
+  .prose ul,
+  .prose ol {
     @apply my-4 pl-6;
   }
 
@@ -357,27 +339,35 @@
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
+
   100% {
     transform: translateY(0px);
   }
 }
 
 @keyframes soft-bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
 }
 
 @keyframes glow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -388,6 +378,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -399,6 +390,7 @@
     transform: scale(0.95);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -445,8 +437,13 @@
 
 /* Add rainbow animation */
 @keyframes rainbow {
-  0% { background-position: 0%; }
-  100% { background-position: 200%; }
+  0% {
+    background-position: 0%;
+  }
+
+  100% {
+    background-position: 200%;
+  }
 }
 
 .animate-rainbow {

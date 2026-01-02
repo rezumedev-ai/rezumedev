@@ -24,6 +24,8 @@ import { Card } from "@/components/ui/card";
 import { PersonalInfoStep } from "./PersonalInfoStep";
 import { ResumeProfile } from "@/types/profile";
 import { isObject, getStringProperty } from "@/utils/type-guards";
+import { ResumeScoreProvider } from "@/contexts/ResumeScoreContext";
+import { ResumeStrengthIndicator } from "./ResumeStrengthIndicator";
 
 interface QuizFlowProps {
   resumeId: string;
@@ -41,7 +43,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const isMobile = useIsMobile();
-  
+
   const [formData, setFormData] = useState<ResumeData>({
     personal_info: {
       fullName: "",
@@ -64,7 +66,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   });
 
   const navigate = useNavigate();
-  
+
   // Find the first professional summary question index (to start at job title)
   const firstProfessionalSummaryIndex = questions.findIndex(q => q.type === "professional_summary");
 
@@ -73,26 +75,26 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
     queryKey: ["selected-profile"],
     queryFn: async () => {
       if (!user) return null;
-      
+
       const selectedProfileId = localStorage.getItem('selectedProfileId');
       if (!selectedProfileId) return null;
-      
+
       const { data, error } = await supabase
         .from("resume_profiles")
         .select("*")
         .eq("id", selectedProfileId)
         .single();
-        
+
       if (error) {
         console.error("Error fetching selected profile:", error);
         return null;
       }
-      
+
       return data as ResumeProfile;
     },
     enabled: !!user
   });
-  
+
   // Set initial question index
   useEffect(() => {
     // If we have a selected profile, start with professional summary questions
@@ -100,7 +102,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       setCurrentQuestionIndex(firstProfessionalSummaryIndex);
     }
   }, [selectedProfile, firstProfessionalSummaryIndex]);
-  
+
   // Apply selected profile data to form
   useEffect(() => {
     if (selectedProfile && isObject(selectedProfile.personal_info)) {
@@ -117,24 +119,24 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       }));
     }
   }, [selectedProfile]);
-  
+
   // Fetch user profile data
   const { data: profileData } = useQuery({
     queryKey: ["user-profile", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
         .single();
-        
+
       if (error) {
         console.error("Error fetching user profile:", error);
         return null;
       }
-      
+
       return data;
     },
     enabled: !!user
@@ -230,7 +232,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       ]);
 
       if (resumeResponse.error) throw resumeResponse.error;
-      
+
       return {
         resume: resumeResponse.data,
         quizResponses: quizResponse.data || []
@@ -269,14 +271,14 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
 
       const lastResponse = existingData.quizResponses
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-      
+
       if (lastResponse) {
         const questionIndex = questions.findIndex(q => q.field === lastResponse.question_key);
         if (questionIndex !== -1) {
           setCurrentQuestionIndex(questionIndex);
         }
       }
-      
+
       // If resume is already in progress, skip the recipient step
       if (resume.current_step > 1) {
         setShowRecipientStep(false);
@@ -343,7 +345,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         }
       }));
     }
-    
+
     await saveQuizResponse(`${currentQuestion.type}.${currentQuestion.field}`, value);
   };
 
@@ -369,10 +371,10 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             personal_info: formData.personal_info
           })
           .eq('id', resumeId);
-        
+
         // Skip to the next step after personal info
         setShowRecipientStep(false);
-        
+
         // Find the first non-personal-info question
         const firstNonPersonalIndex = questions.findIndex(q => q.type !== "personal_info");
         if (firstNonPersonalIndex > -1) {
@@ -387,13 +389,13 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       }
       return;
     }
-    
+
     // If we're showing the personal info step, move to next step after validating
     if (showPersonalInfoStep) {
       // Validate required fields
       const requiredFields = ["fullName", "email", "phone"];
       const missingFields = requiredFields.filter(field => !formData.personal_info[field as keyof typeof formData.personal_info]);
-      
+
       if (missingFields.length > 0) {
         toast({
           title: "Required Fields Missing",
@@ -402,7 +404,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         });
         return;
       }
-      
+
       // Save all personal info to the database
       await supabase
         .from('resumes')
@@ -410,9 +412,9 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           personal_info: formData.personal_info
         })
         .eq('id', resumeId);
-      
+
       setShowPersonalInfoStep(false);
-      
+
       // Find the first non-personal-info question
       const firstNonPersonalIndex = questions.findIndex(q => q.type !== "personal_info");
       if (firstNonPersonalIndex > -1) {
@@ -422,9 +424,9 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       }
       return;
     }
-    
+
     // Handle the regular quiz questions
-    const currentValue = currentQuestion.type === "professional_summary" 
+    const currentValue = currentQuestion.type === "professional_summary"
       ? formData.professional_summary[currentQuestion.field as keyof typeof formData.professional_summary]
       : formData.personal_info[currentQuestion.field as keyof typeof formData.personal_info];
 
@@ -459,9 +461,9 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
             completion_status: 'enhancing'
           })
           .eq('id', resumeId);
-      
+
         const { data, error } = await supabase.functions.invoke('generate-professional-resume', {
-          body: { 
+          body: {
             resumeData: formData,
             resumeId: resumeId
           }
@@ -544,7 +546,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
       setShowRecipientStep(true);
       return;
     }
-    
+
     if (showPreview) {
       setShowPreview(false);
     } else if (currentQuestionIndex > 0) {
@@ -595,9 +597,9 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           className="p-6"
         >
           <h2 className="text-2xl font-bold mb-4 text-center">Who is this resume for?</h2>
-          
-          <RadioGroup 
-            defaultValue="me" 
+
+          <RadioGroup
+            defaultValue="me"
             className="mt-6 space-y-4"
             onValueChange={(value) => setUseProfileData(value === "me")}
           >
@@ -614,7 +616,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
                     <p className="text-sm text-gray-500 mt-1">
                       Use my personal information stored in my profile
                     </p>
-                    
+
                     {profileData && (
                       <div className="mt-3 bg-gray-50 p-3 rounded-md">
                         <div className="grid grid-cols-1 gap-1 text-sm">
@@ -630,7 +632,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
                 </div>
               </Card>
             </div>
-            
+
             <div>
               <Card className={`p-4 ${!useProfileData ? 'border-primary' : 'border-gray-200'} cursor-pointer hover:border-primary transition-all duration-300`}
                 onClick={() => setUseProfileData(false)}>
@@ -652,7 +654,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         </motion.div>
       );
     }
-    
+
     // When the user chooses to enter new information, show the comprehensive personal info step
     if (showPersonalInfoStep) {
       return (
@@ -663,7 +665,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
           className="p-6"
         >
           <h2 className="text-xl font-bold mb-6 text-center">Personal Information</h2>
-          
+
           <PersonalInfoStep
             formData={formData.personal_info}
             onChange={handlePersonalInfoChange}
@@ -672,7 +674,7 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
         </motion.div>
       );
     }
-    
+
     switch (quizSteps[currentStep].type) {
       case "personal_info":
         // For the "professional_summary" questions, use the QuestionForm component
@@ -748,65 +750,68 @@ export function QuizFlow({ resumeId, onComplete }: QuizFlowProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white overflow-x-hidden">
-      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6">
-        {!showRecipientStep && (
-          <QuizProgress currentStep={currentStep} steps={quizSteps} />
-        )}
+    <ResumeScoreProvider resumeData={formData}>
+      <ResumeStrengthIndicator />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white overflow-x-hidden">
+        <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6">
+          {!showRecipientStep && (
+            <QuizProgress currentStep={currentStep} steps={quizSteps} />
+          )}
 
-        <motion.div
-          className="relative bg-white rounded-xl shadow-xl p-4 sm:p-8 backdrop-blur-sm bg-opacity-90 border border-indigo-100 overflow-hidden"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {renderStep()}
-        </motion.div>
-
-        <motion.div 
-          className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={(currentStep === 0 && currentQuestionIndex === 0 && !showPersonalInfoStep && !showRecipientStep)}
-              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[90px] sm:min-w-[100px]"
-            >
-              <ArrowLeft className="mr-2 w-4 h-4" />
-              Back
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleSaveAndExit}
-              className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[110px] sm:min-w-[120px]"
-            >
-              Save & Exit
-            </Button>
-          </div>
-          <Button 
-            onClick={currentQuestionIndex === questions.length - 1 && !showRecipientStep && !showPersonalInfoStep ? handleStepComplete : handleNext}
-            className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md h-11 min-w-[90px] sm:min-w-[100px] w-full sm:w-auto mt-2 sm:mt-0"
+          <motion.div
+            className="relative bg-white rounded-xl shadow-xl p-4 sm:p-8 backdrop-blur-sm bg-opacity-90 border border-indigo-100 overflow-hidden"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
-            {showRecipientStep || showPersonalInfoStep ? "Continue" : (currentStep === quizSteps.length - 1 ? "Complete" : "Next")}
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-        </motion.div>
+            {renderStep()}
+          </motion.div>
 
-        {!showRecipientStep && (
-          <motion.div 
-            className="mt-4 text-center text-sm text-gray-500"
+          <motion.div
+            className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.4 }}
           >
-            Step {currentStep + 1} of {quizSteps.length}
+            <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={(currentStep === 0 && currentQuestionIndex === 0 && !showPersonalInfoStep && !showRecipientStep)}
+                className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[90px] sm:min-w-[100px]"
+              >
+                <ArrowLeft className="mr-2 w-4 h-4" />
+                Back
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleSaveAndExit}
+                className="transition-all duration-300 hover:shadow-md bg-white border-indigo-200 hover:border-indigo-300 h-11 min-w-[110px] sm:min-w-[120px]"
+              >
+                Save & Exit
+              </Button>
+            </div>
+            <Button
+              onClick={currentQuestionIndex === questions.length - 1 && !showRecipientStep && !showPersonalInfoStep ? handleStepComplete : handleNext}
+              className="bg-primary hover:bg-primary/90 transition-all duration-300 hover:shadow-md h-11 min-w-[90px] sm:min-w-[100px] w-full sm:w-auto mt-2 sm:mt-0"
+            >
+              {showRecipientStep || showPersonalInfoStep ? "Continue" : (currentStep === quizSteps.length - 1 ? "Complete" : "Next")}
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
           </motion.div>
-        )}
+
+          {!showRecipientStep && (
+            <motion.div
+              className="mt-4 text-center text-sm text-gray-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              Step {currentStep + 1} of {quizSteps.length}
+            </motion.div>
+          )}
+        </div>
       </div>
-    </div>
+    </ResumeScoreProvider>
   );
 }

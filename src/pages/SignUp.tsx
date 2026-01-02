@@ -1,12 +1,13 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Mail, User, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, User, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,8 +40,7 @@ const SignUp = () => {
         title: "Account created successfully!",
         description: "Welcome to Rezume.dev",
       });
-      
-      // Auth state change listener will handle navigation
+
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -54,103 +54,103 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 animate-fade-in">
-        <div className="text-center">
-          <Link to="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-primary hover:text-primary-hover transition-colors">
-              Rezume.dev
-            </h1>
-          </Link>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Start crafting your professional resume today
-          </p>
-        </div>
-        
-        <div className="mt-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="fullName">Full Name</Label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <Input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    required
-                    className="pl-10"
-                    placeholder="John Doe"
-                  />
+    <AuthLayout
+      title="Create account"
+      subtitle="Start building your professional resume"
+    >
+      <div className="mt-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-3.5">
+            <div>
+              <Label htmlFor="fullName" className="text-gray-700 font-medium text-sm">Full Name</Label>
+              <div className="mt-1.5 relative group">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                  <User className="h-5 w-5" />
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="pl-10"
-                    placeholder="you@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    className="pl-10"
-                    placeholder="••••••••"
-                    minLength={6}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                    )}
-                  </button>
-                </div>
+                <Input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  required
+                  className="pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all duration-300 h-11"
+                  placeholder="John Doe"
+                />
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create account"}
+            <div>
+              <Label htmlFor="email" className="text-gray-700 font-medium text-sm">Email address</Label>
+              <div className="mt-1.5 relative group">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all duration-300 h-11"
+                  placeholder="name@company.com"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="password" className="text-gray-700 font-medium text-sm">Password</Label>
+              <div className="mt-1.5 relative group">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="pl-10 pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all duration-300 h-11"
+                  placeholder="••••••••"
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-1">
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary-hover text-white h-11 font-medium shadow-md hover:shadow-lg transition-all duration-300"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : "Create account"}
             </Button>
+          </div>
 
-            <div className="text-center text-sm">
-              <span className="text-gray-600">Already have an account? </span>
-              <Link to="/login" className="font-medium text-primary hover:text-primary-hover">
-                Sign in
-              </Link>
-            </div>
-          </form>
-        </div>
+          <SocialAuthButtons mode="signup" />
+
+          <div className="text-center text-sm pt-1">
+            <span className="text-gray-500">Already have an account? </span>
+            <Link to="/login" className="font-semibold text-primary hover:text-primary-hover transition-colors">
+              Sign in
+            </Link>
+          </div>
+        </form>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 

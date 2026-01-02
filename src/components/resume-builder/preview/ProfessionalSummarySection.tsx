@@ -8,8 +8,8 @@ interface ProfessionalSummarySectionProps {
   onUpdate?: (summary: string) => void;
 }
 
-export function ProfessionalSummarySection({ 
-  summary, 
+export function ProfessionalSummarySection({
+  summary,
   template,
   isEditing,
   onUpdate
@@ -60,11 +60,11 @@ export function ProfessionalSummarySection({
 
   const currentStyle = styles[template.id as keyof typeof styles] || styles["modern-professional"];
 
-  if (template.id === "modern-professional" || template.id === "professional-navy") {
+  if (template.id === "modern-professional" || template.id === "professional-navy" || template.id === "creative-portfolio") {
     return (
       <div className={currentStyle.section}>
         <SectionHeader title="Professional Summary" type="summary" template={template} />
-        <div 
+        <div
           className={`${currentStyle.content} outline-none`}
           contentEditable={isEditing}
           suppressContentEditableWarning
@@ -82,7 +82,7 @@ export function ProfessionalSummarySection({
       <h3 className={currentStyle.title}>
         Professional Summary
       </h3>
-      <div 
+      <div
         className={`${currentStyle.content} outline-none`}
         contentEditable={isEditing}
         suppressContentEditableWarning

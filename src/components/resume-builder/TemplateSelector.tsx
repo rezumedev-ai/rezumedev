@@ -24,7 +24,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   // Get the selected profile ID from localStorage
   const selectedProfileId = localStorage.getItem('selectedProfileId');
 
@@ -95,8 +95,8 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
     }
   }, [user, selectedProfileId, navigate]);
 
-  const hasActiveSubscription = profile && 
-    profile.subscription_plan && 
+  const hasActiveSubscription = profile &&
+    profile.subscription_plan &&
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
   // Update this logic to allow creating the first resume even without subscription
@@ -140,7 +140,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
 
     try {
       setIsLoading(true);
-      console.log("Creating resume with template:", selectedTemplate);
+
 
       const { data: resume, error: resumeError } = await supabase
         .from('resumes')
@@ -166,7 +166,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
         throw new Error("No resume ID returned from database");
       }
 
-      console.log("Resume created successfully:", resume.id);
+
       navigate(`/resume-builder/${resume.id}`);
     } catch (error) {
       console.error('Error creating resume:', error);
@@ -214,7 +214,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <motion.div 
+      <motion.div
         className="flex justify-between items-center mb-8"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -228,7 +228,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
             Select a professional template for your resume
           </p>
         </div>
-        
+
         {resumeProfile && (
           <Button
             variant="outline"
@@ -241,7 +241,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
         )}
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         variants={containerVariants}
         initial="hidden"
@@ -263,14 +263,14 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
         ))}
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="mt-12 flex justify-end"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
       >
-        <Button 
-          onClick={handleContinue} 
+        <Button
+          onClick={handleContinue}
           className="min-w-[200px] py-6 text-lg transition-all duration-300 hover:shadow-lg hover:scale-105"
           disabled={isLoading}
         >
@@ -300,7 +300,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
               Subscription Required
             </DialogTitle>
             <DialogDescription>
-              {resumeCount && resumeCount > 0 
+              {resumeCount && resumeCount > 0
                 ? "You've reached the limit for free resumes. Subscribe to create more."
                 : "Creating resumes requires an active subscription plan."}
             </DialogDescription>
@@ -318,7 +318,7 @@ export function TemplateSelector({ onTemplateSelect }: TemplateSelectorProps = {
             >
               Maybe Later
             </Button>
-            <Button 
+            <Button
               onClick={navigateToPricing}
               className="sm:w-auto w-full bg-gradient-to-r from-primary to-primary-hover"
             >

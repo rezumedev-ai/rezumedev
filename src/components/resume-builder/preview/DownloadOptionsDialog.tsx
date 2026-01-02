@@ -43,18 +43,18 @@ export function DownloadOptionsDialog({
     enabled: !!user
   });
 
-  const hasActiveSubscription = profile && 
-    profile.subscription_plan && 
+  const hasActiveSubscription = profile &&
+    profile.subscription_plan &&
     (profile.subscription_status === 'active' || profile.subscription_status === 'canceled');
 
   const handleDownloadPDF = async () => {
     setOpen(false);
-    
+
     if (!hasActiveSubscription) {
       setShowSubscriptionDialog(true);
       return;
     }
-    
+
     try {
       const resumeElement = document.getElementById('resume-content');
       if (!resumeElement) {
@@ -70,81 +70,132 @@ export function DownloadOptionsDialog({
       // Get the exact dimensions of the original element
       const originalWidth = resumeElement.offsetWidth;
       const originalHeight = resumeElement.offsetHeight;
-      
+
       // Get template ID to apply template-specific optimizations
       const templateId = resumeElement.getAttribute('data-template-id') || 'minimal-clean';
-      
+
       // Create a clone with exact A4 proportions to ensure consistency
       const clonedResume = resumeElement.cloneNode(true) as HTMLElement;
       clonedResume.id = 'pdf-preparation-div';
       clonedResume.style.position = 'absolute';
       clonedResume.style.left = '-9999px';
-      // Set exact dimensions to match A4 aspect ratio while preserving content
+      // Use original dimensions to prevent content cutoff
       clonedResume.style.width = `${originalWidth}px`;
-      clonedResume.style.height = `${originalHeight}px`;
+      clonedResume.style.height = 'auto'; // Allow height to grow with content
+      clonedResume.style.minHeight = `${originalHeight}px`;
       clonedResume.style.margin = '0';
-      clonedResume.style.padding = '0';
-      clonedResume.style.overflow = 'hidden';
+      // Don't reset padding for Ivy template - preserve preview styling
+      if (templateId !== 'ivy-league') {
+        clonedResume.style.padding = '0';
+      }
+      clonedResume.style.overflow = 'visible'; // Changed from hidden to visible
+      clonedResume.style.transform = 'none';
+      clonedResume.style.scale = '1';
       clonedResume.className = resumeElement.className + ' pdf-mode';
-      
+
       document.body.appendChild(clonedResume);
 
-      // First check if we need to adjust font sizes for problematic templates
-      if (['minimal-elegant', 'executive-clean'].includes(templateId)) {
-        // Find sections that might cause overflow issues
-        const skillsSection = clonedResume.querySelector('[data-section="skills"]');
-        const certSection = clonedResume.querySelector('[data-section="certifications"]');
-        
-        if (skillsSection) {
-          // Adjust skills section font sizes if needed
-          const skillHeadings = skillsSection.querySelectorAll('h4');
-          skillHeadings.forEach(heading => {
-            const headingElem = heading as HTMLElement;
-            if (headingElem.style.fontSize) {
-              const currentSize = parseFloat(headingElem.style.fontSize);
-              headingElem.style.fontSize = `${Math.max(currentSize * 0.85, 10)}px`;
-            }
+      // Creative template-specific fixes for pixel-perfect PDF export
+      if (templateId === 'creative-portfolio') {
+        // Reset padding to use full page width
+        clonedResume.style.padding = '0.5in';
+        clonedResume.style.paddingLeft = '0.5in';
+        clonedResume.style.paddingRight = '0.5in';
+
+        // Fix title font rendering
+        const titleElements = clonedResume.querySelectorAll('h1');
+        titleElements.forEach(title => {
+          const el = title as HTMLElement;
+          if (el.className.includes('text-5xl') || el.className.includes('text-indigo')) {
+            el.style.fontSize = '48px';
+            el.style.fontWeight = '900';
+            el.style.letterSpacing = '-0.05em';
+            el.style.lineHeight = '1';
+            el.style.color = '#4338ca'; // indigo-700
+          }
+        });
+
+        // Fix section headers - apply to ALL h3 elements for consistency
+        const sectionHeaders = clonedResume.querySelectorAll('h3');
+        sectionHeaders.forEach(header => {
+          const el = header as HTMLElement;
+          // Apply consistent styling to all section headers
+          el.style.fontSize = '24px';
+          el.style.fontWeight = '900';
+          el.style.color = '#4F46E5'; // indigo-600
+          el.style.letterSpacing = '-0.025em';
+          el.style.marginBottom = '1.5rem';
+
+          // Also style any spans/divs inside the h3 to ensure they inherit the size
+          const headerContent = el.querySelectorAll('span, div');
+          headerContent.forEach(content => {
+            const contentEl = content as HTMLElement;
+            contentEl.style.fontSize = '24px';
+            contentEl.style.fontWeight = '900';
+            contentEl.style.color = '#4F46E5';
           });
-          
-          // Find skill lists and adjust their text size
-          const skillLists = skillsSection.querySelectorAll('.pdf-bullet-list');
-          skillLists.forEach(list => {
-            const listElem = list as HTMLElement;
-            const items = listElem.querySelectorAll('li');
-            items.forEach(item => {
-              const itemElem = item as HTMLElement;
-              itemElem.style.fontSize = '10px';
-              itemElem.style.lineHeight = '1.2';
-              itemElem.style.marginBottom = '2px';
-            });
-          });
-        }
-        
-        if (certSection) {
-          // Adjust certification section font sizes
-          const certItems = certSection.querySelectorAll('div');
-          certItems.forEach(item => {
-            const itemElem = item as HTMLElement;
-            // Only adjust actual certification items, not containers
-            if (itemElem.classList.contains('flex')) {
-              const textElements = itemElem.querySelectorAll('span');
-              textElements.forEach(span => {
-                const spanElem = span as HTMLElement;
-                spanElem.style.fontSize = '10px';
-              });
-            }
-          });
-        }
-        
-        // Check for any education section that might need adjustment
-        const educationSection = clonedResume.querySelector('[data-section="education"]');
-        if (educationSection) {
-          const dateTexts = educationSection.querySelectorAll('.text-gray-500');
-          dateTexts.forEach(date => {
-            const dateElem = date as HTMLElement;
-            dateElem.style.fontSize = '10px';
-          });
-        }
+        });
+
+        // Fix grid containers
+        const gridContainers = clonedResume.querySelectorAll('[class*="grid-cols-12"]');
+        gridContainers.forEach(container => {
+          const el = container as HTMLElement;
+          el.style.display = 'grid';
+          el.style.gridTemplateColumns = 'repeat(12, 1fr)';
+          el.style.gap = '2rem';
+        });
+
+        // Fix body text - but exclude spans/divs inside h3 elements
+        const bodyText = clonedResume.querySelectorAll('p, li');
+        bodyText.forEach(text => {
+          const el = text as HTMLElement;
+          el.style.fontSize = '15px';
+          el.style.lineHeight = '1.6';
+        });
+
+        // Fix spans that are NOT inside h3 elements
+        const allSpans = clonedResume.querySelectorAll('span');
+        allSpans.forEach(span => {
+          const el = span as HTMLElement;
+          // Only apply if not inside an h3
+          if (!el.closest('h3')) {
+            el.style.fontSize = '15px';
+            el.style.lineHeight = '1.6';
+          }
+        });
+      }
+
+      // ----------------------------------------------------------------------
+      // GLOBAL SAFEGUARDS: Margin & Padding Logic
+      // ----------------------------------------------------------------------
+
+      // 1. Templates needing specific padding/margins for A4 pdf stability
+      // (Minimal Elegant, Executive Clean, Creative Portfolio, Ivy League)
+      const templatesNeedingSafetyPadding = ['minimal-elegant', 'executive-clean', 'creative-portfolio', 'ivy-league'];
+
+      if (templatesNeedingSafetyPadding.includes(templateId)) {
+        // Reset overrides first to be safe
+        clonedResume.style.border = 'none';
+
+        // Force width to standard A4 pixel width to avoid scaling issues
+        clonedResume.style.width = '816px';
+        clonedResume.style.boxSizing = 'border-box';
+        clonedResume.style.margin = '0';
+
+        // Force 0.4in padding to prevent edge cutoff
+        const paddingVal = '0.4in';
+        clonedResume.style.setProperty('padding-left', paddingVal, 'important');
+        clonedResume.style.setProperty('padding-right', paddingVal, 'important');
+        clonedResume.style.setProperty('padding-top', paddingVal, 'important');
+        clonedResume.style.setProperty('padding-bottom', paddingVal, 'important');
+      }
+
+      // 2. Modern Professional (Custom handling - keep existing preference + add top padding)
+      if (templateId === 'modern-professional') {
+        clonedResume.style.paddingLeft = '0.6in';
+        clonedResume.style.paddingRight = '0.6in';
+        // Add extra top padding to increase white space from top
+        clonedResume.style.setProperty('padding-top', '0.5in', 'important');
       }
 
       // Find all hyperlinks in the cloned resume to add them to the PDF later
@@ -155,13 +206,13 @@ export function DownloadOptionsDialog({
         // Replace link tag with span to avoid issues with html2canvas
         const linkUrl = element.getAttribute('href') || '';
         const linkText = element.textContent || '';
-        
+
         // Collect link info for later
         const rect = element.getBoundingClientRect();
         const offsetTop = element.offsetTop;
         const offsetLeft = element.offsetLeft;
         const parent = element.parentElement;
-        
+
         // Store link details
         links.push({
           url: linkUrl,
@@ -170,7 +221,7 @@ export function DownloadOptionsDialog({
           width: rect.width,
           height: rect.height
         });
-        
+
         // Replace link with span
         const span = document.createElement('span');
         span.innerText = linkText;
@@ -178,7 +229,7 @@ export function DownloadOptionsDialog({
         span.style.color = '#0000EE'; // Standard link blue color
         span.style.textDecoration = 'underline';
         span.dataset.linkIndex = index.toString();
-        
+
         if (parent) {
           parent.replaceChild(span, element);
         }
@@ -187,47 +238,27 @@ export function DownloadOptionsDialog({
       const contactIcons = clonedResume.querySelectorAll('[data-pdf-contact-icon="true"]');
       contactIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
-        const svg = iconElement.querySelector('svg');
+        // Check if the element itself is an SVG (which is true for Lucide icons) 
+        // or if it contains one (legacy/wrapped)
+        let svg = iconElement.tagName.toLowerCase() === 'svg' ? iconElement : iconElement.querySelector('svg');
+
         if (svg) {
-          const iconType = svg.getAttribute('data-lucide') || '';
-          let iconSymbol = '';
-          
-          switch (iconType.toLowerCase()) {
-            case 'mail': iconSymbol = '✉'; break;
-            case 'phone': iconSymbol = '☎'; break;
-            case 'linkedin': iconSymbol = 'in'; break;
-            case 'globe': iconSymbol = '🌐'; break;
-            default: iconSymbol = '•'; break;
-          }
-          
-          const iconSpan = document.createElement('span');
-          iconSpan.textContent = iconSymbol;
-          iconSpan.className = 'pdf-icon-text';
-          iconSpan.style.marginRight = '6px';
-          iconSpan.style.fontSize = '14px';
-          iconSpan.style.display = 'inline-block';
-          iconSpan.style.verticalAlign = 'middle';
-          iconSpan.style.lineHeight = '1';
-          
-          if (iconElement.contains(svg)) {
-            iconElement.replaceChild(iconSpan, svg);
-          }
+          // Instead of replacing with text, we apply the alignment fix directly to the SVG
+          // This keeps the professional vector look while fixing the vertical alignment
+          svg.style.position = 'relative';
+          svg.style.transform = 'translateY(2px)';
+          svg.style.display = 'inline-block';
         }
       });
 
-      const bulletPoints = clonedResume.querySelectorAll('[data-pdf-bullet="true"]');
-      bulletPoints.forEach(bullet => {
-        const bulletElement = bullet as HTMLElement;
-        bulletElement.textContent = '•';
-        bulletElement.style.width = 'auto';
-        bulletElement.style.height = 'auto';
-        bulletElement.style.display = 'inline-block';
-        bulletElement.style.marginRight = '6px';
-        bulletElement.style.marginTop = '0';
-        bulletElement.style.fontSize = '16px';
-        bulletElement.style.lineHeight = '1';
-        bulletElement.style.verticalAlign = 'middle';
-        bulletElement.className = 'pdf-bullet-char';
+      // Force alignment fix for html2canvas
+      // "Still High" with 4.5px -> Push it DOWN MORE.
+      // Increasing to 6px to force it to line center.
+      const bulletWrappers = clonedResume.querySelectorAll('[data-pdf-wrapper="true"]');
+      bulletWrappers.forEach(wrapper => {
+        const el = wrapper as HTMLElement;
+        el.style.position = 'relative';
+        el.style.top = '10px'; // Increased from 6px to fix alignment issues where bullets sit too high
       });
 
       const bulletLists = clonedResume.querySelectorAll('[data-pdf-bullet-list="true"]');
@@ -241,65 +272,143 @@ export function DownloadOptionsDialog({
       const bulletItems = clonedResume.querySelectorAll('.pdf-bullet-item');
       bulletItems.forEach(item => {
         const itemElement = item as HTMLElement;
+        // Explicitly enforce flex-start to ensure the line-height wrapper sits at the top
         itemElement.style.display = 'flex';
-        itemElement.style.alignItems = 'center';
+        itemElement.style.alignItems = 'flex-start';
         itemElement.style.marginBottom = '4px';
       });
+
+      // SMART COMPRESSION: Auto-fit content to A4 page height for Ivy template
+      // Only apply this logic if the template is Ivy League and content is taller than A4
+      // A4 height in pixels at 96 DPI is approx 1123px (11in * 96)
+      const A4_HEIGHT_PX = 1080; // slightly less than 1123 for safety buffer
+
+      const excludedFromCompression = ['modern-professional', 'professional-navy', 'creative-portfolio'];
+
+      if (!excludedFromCompression.includes(templateId) && clonedResume.scrollHeight > A4_HEIGHT_PX) {
+        console.log(`[${templateId}] Content too tall for A4 (${clonedResume.scrollHeight}px), applying global smart vertical compression...`);
+
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        // Loop to progressively compress content until it fits
+        while (clonedResume.scrollHeight > A4_HEIGHT_PX && attempts < maxAttempts) {
+          console.log(`Compression Level ${attempts + 1}: Current Height = ${clonedResume.scrollHeight}px`);
+
+          if (attempts === 0) {
+            // Level 1: Reduce section gaps slightly
+            const sections = clonedResume.querySelectorAll('h3');
+            sections.forEach(el => {
+              (el as HTMLElement).style.marginBottom = '8px';
+            });
+            const margins = clonedResume.querySelectorAll('.mb-4, .mb-6, .mb-8');
+            margins.forEach(el => {
+              (el as HTMLElement).style.marginBottom = '8px';
+            });
+          }
+          else if (attempts === 1) {
+            // Level 2: Reduce top/bottom page padding
+            clonedResume.style.setProperty('padding-top', '0.3in', 'important');
+            clonedResume.style.setProperty('padding-bottom', '0.3in', 'important');
+          }
+          else if (attempts === 2) {
+            // Level 3: Reduce line heights for body text
+            const textElements = clonedResume.querySelectorAll('p, li, span, div');
+            textElements.forEach(el => {
+              if (window.getComputedStyle(el).fontSize.includes('px')) {
+                (el as HTMLElement).style.lineHeight = '1.3';
+              }
+            });
+          }
+          else if (attempts === 3) {
+            // Level 4: Reduce font size to 13px
+            const textElements = clonedResume.querySelectorAll('p, li');
+            textElements.forEach(el => {
+              (el as HTMLElement).style.fontSize = '13px';
+            });
+          }
+          else if (attempts === 4) {
+            // Level 5: Aggressive padding reduction
+            clonedResume.style.setProperty('padding-top', '0.25in', 'important');
+            clonedResume.style.setProperty('padding-bottom', '0.25in', 'important');
+          }
+          else if (attempts === 5) {
+            // Level 6: Tighter section margins
+            const sections = clonedResume.querySelectorAll('h3');
+            sections.forEach(el => {
+              (el as HTMLElement).style.marginBottom = '4px';
+            });
+            const margins = clonedResume.querySelectorAll('.mb-4, .mb-6, .mb-8');
+            margins.forEach(el => {
+              (el as HTMLElement).style.marginBottom = '4px';
+            });
+          }
+          else if (attempts === 6) {
+            // Level 7: Tighter line height
+            const textElements = clonedResume.querySelectorAll('p, li, span, div');
+            textElements.forEach(el => {
+              if (window.getComputedStyle(el).fontSize.includes('px')) {
+                (el as HTMLElement).style.lineHeight = '1.2';
+              }
+            });
+          }
+          else if (attempts === 7) {
+            // Level 8: Reduce font size to 12px
+            const textElements = clonedResume.querySelectorAll('p, li');
+            textElements.forEach(el => {
+              (el as HTMLElement).style.fontSize = '12px';
+            });
+          }
+          else if (attempts === 8) {
+            // Level 9: Minimal padding (0.15in)
+            clonedResume.style.setProperty('padding-top', '0.15in', 'important');
+            clonedResume.style.setProperty('padding-bottom', '0.15in', 'important');
+          }
+          else if (attempts === 9) {
+            // Level 10: Reduce font size to 11px (Last Resort)
+            const textElements = clonedResume.querySelectorAll('p, li');
+            textElements.forEach(el => {
+              (el as HTMLElement).style.fontSize = '11px';
+            });
+          }
+
+          attempts++;
+        }
+      }
 
       const sectionIcons = clonedResume.querySelectorAll('[data-pdf-section-icon="true"]');
       sectionIcons.forEach(icon => {
         const iconElement = icon as HTMLElement;
         const svg = iconElement.querySelector('svg');
         if (svg) {
-          const iconType = svg.getAttribute('data-lucide') || '';
-          let iconSymbol = '';
-          
-          switch (iconType.toLowerCase()) {
-            case 'briefcase': iconSymbol = '💼'; break;
-            case 'graduation-cap': iconSymbol = '🎓'; break;
-            case 'award': iconSymbol = '🏆'; break;
-            case 'code': iconSymbol = '💻'; break;
-            case 'file-text': iconSymbol = '📄'; break;
-            case 'user': iconSymbol = '👤'; break;
-            case 'folder-kanban': iconSymbol = '📂'; break;
-            default: iconSymbol = '•'; break;
-          }
-          
-          const iconSpan = document.createElement('span');
-          iconSpan.textContent = iconSymbol;
-          iconSpan.className = 'pdf-icon-text';
-          iconSpan.style.marginRight = '8px';
-          iconSpan.style.fontSize = '14px';
-          iconSpan.style.display = 'inline-block';
-          iconSpan.style.verticalAlign = 'middle';
-          iconSpan.style.lineHeight = '1';
-          
-          if (iconElement.contains(svg)) {
-            iconElement.replaceChild(iconSpan, svg);
-          }
+          // Apply same alignment fix to section icons, keeping the SVG
+          // Section icons usually sit inside a wrapper div
+          svg.style.position = 'relative';
+          svg.style.transform = 'translateY(2px)';
+          svg.style.display = 'inline-block';
         }
       });
-      
+
       // Check if we need to apply content length optimizations
       const contentOptimization = () => {
         // Find sections that might contain a lot of content
         const experienceSection = clonedResume.querySelector('[data-section="experience"]');
         if (experienceSection) {
           const experienceItems = experienceSection.querySelectorAll('[data-experience-item="true"]');
-          
+
           // If there are many experience items, we need to adjust spacing
           if (experienceItems.length > 3) {
             experienceItems.forEach(item => {
               const itemElem = item as HTMLElement;
               // Reduce margins between items
               itemElem.style.marginBottom = '6px';
-              
+
               // Find responsibility lists and adjust their spacing
               const respList = itemElem.querySelector('ul');
               if (respList) {
                 const respListElem = respList as HTMLElement;
                 respListElem.style.marginTop = '2px';
-                
+
                 // Make responsibility text smaller
                 const listItems = respListElem.querySelectorAll('li');
                 listItems.forEach(li => {
@@ -312,7 +421,7 @@ export function DownloadOptionsDialog({
             });
           }
         }
-        
+
         // Handle long skills lists
         const skillsList = clonedResume.querySelectorAll('[data-skill-item="true"]');
         if (skillsList.length > 15) {
@@ -323,15 +432,17 @@ export function DownloadOptionsDialog({
           });
         }
       };
-      
+
       // Apply content-based optimizations
       contentOptimization();
 
       // Improved canvas capture settings with higher resolution and quality
       const pixelRatio = window.devicePixelRatio || 1;
-      
+      // Use higher scale for creative and ivy templates to capture fine details
+      const scaleMultiplier = (templateId === 'creative-portfolio' || templateId === 'ivy-league') ? 4 : 3;
+
       const captureSettings = {
-        scale: pixelRatio * 3, // Increased scale for better quality
+        scale: pixelRatio * scaleMultiplier, // Increased scale for better quality
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
@@ -353,13 +464,13 @@ export function DownloadOptionsDialog({
       };
 
       const canvas = await html2canvas(clonedResume, captureSettings);
-      
+
       document.body.removeChild(clonedResume);
 
       // A4 dimensions in mm
       const pdfWidth = 210; // A4 width in mm
       const pdfHeight = 297; // A4 height in mm
-      
+
       const pdf = new jsPDF({
         format: 'a4',
         unit: 'mm',
@@ -368,26 +479,20 @@ export function DownloadOptionsDialog({
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      
+
       // Calculate the correct scaling from canvas to PDF to maintain aspect ratio
       // and ensure content fills the width without unnecessary white space
       const canvasAspectRatio = canvas.width / canvas.height;
       const a4AspectRatio = pdfWidth / pdfHeight;
-      
+
       // Check if content is too tall for A4 height
+      // Force content to fit page width (A4 width)
+      // This prevents "shrink to fit height" behavior which creates side margins
       let imgWidth, imgHeight, offsetX = 0;
-      
-      if (canvasAspectRatio < a4AspectRatio) {
-        // Content is taller than A4 proportions - we need to scale to fit height
-        imgHeight = pdfHeight;
-        imgWidth = imgHeight * canvasAspectRatio;
-        offsetX = (pdfWidth - imgWidth) / 2; // Center horizontally
-      } else {
-        // Content fits within A4 proportions or is wider - use full width
-        imgWidth = pdfWidth;
-        imgHeight = imgWidth / canvasAspectRatio;
-      }
-      
+      imgWidth = pdfWidth;
+      imgHeight = imgWidth / canvasAspectRatio;
+      offsetX = 0; // No horizontal offset needed as we fill width
+
       pdf.addImage(
         imgData,
         'JPEG',
@@ -404,21 +509,21 @@ export function DownloadOptionsDialog({
         // Calculate scale ratio between canvas and PDF
         const scaleX = imgWidth / originalWidth;
         const scaleY = imgHeight / originalHeight;
-        
+
         links.forEach(link => {
           // Convert link position from original coordinates to PDF coordinates
           const pdfX = offsetX + (link.left * scaleX);
           const pdfY = link.top * scaleY;
           const pdfWidth = link.width * scaleX;
           const pdfHeight = link.height * scaleY;
-          
+
           // Add clickable link area to the PDF
           pdf.link(pdfX, pdfY, pdfWidth, pdfHeight, { url: link.url });
         });
       }
 
       pdf.save('resume.pdf');
-      
+
       toast.dismiss(loadingToast);
       toast.success("PDF downloaded successfully!");
     } catch (error) {
@@ -435,8 +540,8 @@ export function DownloadOptionsDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           size="sm"
           onClick={() => setOpen(true)}
           disabled={isDownloading}
@@ -450,8 +555,8 @@ export function DownloadOptionsDialog({
             <DialogTitle>Download Resume</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               onClick={handleDownloadPDF}
               disabled={isDownloading}
             >
@@ -485,7 +590,7 @@ export function DownloadOptionsDialog({
             >
               Maybe Later
             </Button>
-            <Button 
+            <Button
               onClick={navigateToPricing}
               className="sm:w-auto w-full bg-gradient-to-r from-primary to-primary-hover"
             >

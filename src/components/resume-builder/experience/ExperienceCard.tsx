@@ -2,9 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Trash2, Briefcase } from "lucide-react";
+import { Trash2, Briefcase, CalendarIcon } from "lucide-react";
 import { WorkExperience } from "@/types/resume";
 import { ResponsibilitiesSection } from "./ResponsibilitiesSection";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface ExperienceCardProps {
   experience: WorkExperience;
@@ -14,12 +18,12 @@ interface ExperienceCardProps {
   hideResponsibilities?: boolean;
 }
 
-export function ExperienceCard({ 
-  experience, 
-  index, 
-  onUpdate, 
+export function ExperienceCard({
+  experience,
+  index,
+  onUpdate,
   onRemove,
-  hideResponsibilities = false 
+  hideResponsibilities = false
 }: ExperienceCardProps) {
   return (
     <Card className="p-6 relative space-y-4 animate-fade-up" style={{ animationDelay: `${index * 100}ms` }}>
@@ -69,29 +73,105 @@ export function ExperienceCard({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex flex-col">
           <label className="text-sm font-medium text-gray-700">
             Start Date <span className="text-red-500">*</span>
           </label>
-          <Input
-            type="month"
-            value={experience.startDate}
-            onChange={(e) => onUpdate("startDate", e.target.value)}
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full pl-3 text-left font-normal border-gray-200 bg-white hover:bg-gray-50",
+                  !experience.startDate && "text-muted-foreground"
+                )}
+              >
+                {experience.startDate ? (
+                  format(new Date(experience.startDate), "PPP")
+                ) : (
+                  <span>Pick a date</span>
+                )}
+                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-white" align="start">
+              <Calendar
+                mode="single"
+                selected={experience.startDate ? new Date(experience.startDate) : undefined}
+                onSelect={(date) => date && onUpdate("startDate", date.toISOString())}
+                disabled={(date) =>
+                  date > new Date() || date < new Date("1900-01-01")
+                }
+                captionLayout="dropdown-buttons"
+                fromYear={1960}
+                toYear={new Date().getFullYear()}
+                initialFocus
+                className="rounded-md border shadow-lg bg-white"
+                classNames={{
+                  caption_dropdowns: "flex justify-center gap-3 pt-1 items-center",
+                  dropdown: "h-9 border-gray-200 rounded-md px-2 py-1 text-sm bg-gray-50 hover:bg-white focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer font-medium transition-colors",
+                  nav: "hidden"
+                }}
+                labels={{
+                  labelMonthDropdown: () => null,
+                  labelYearDropdown: () => null
+                }}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex flex-col">
           <label className="text-sm font-medium text-gray-700">
             End Date {!experience.isCurrentJob && <span className="text-red-500">*</span>}
           </label>
-          <Input
-            type="month"
-            value={experience.endDate}
-            onChange={(e) => onUpdate("endDate", e.target.value)}
-            disabled={experience.isCurrentJob}
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                disabled={experience.isCurrentJob}
+                className={cn(
+                  "w-full pl-3 text-left font-normal border-gray-200 bg-white hover:bg-gray-50",
+                  !experience.endDate && "text-muted-foreground",
+                  experience.isCurrentJob && "opacity-50 cursor-not-allowed bg-gray-50"
+                )}
+              >
+                {experience.isCurrentJob ? (
+                  <span>Present</span>
+                ) : experience.endDate ? (
+                  format(new Date(experience.endDate), "PPP")
+                ) : (
+                  <span>Pick a date</span>
+                )}
+                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-white" align="start">
+              <Calendar
+                mode="single"
+                selected={experience.endDate ? new Date(experience.endDate) : undefined}
+                onSelect={(date) => date && onUpdate("endDate", date.toISOString())}
+                disabled={(date) =>
+                  date > new Date() || date < new Date("1900-01-01")
+                }
+                captionLayout="dropdown-buttons"
+                fromYear={1960}
+                toYear={new Date().getFullYear()}
+                initialFocus
+                className="rounded-md border shadow-lg bg-white"
+                classNames={{
+                  caption_dropdowns: "flex justify-center gap-3 pt-1 items-center",
+                  dropdown: "h-9 border-gray-200 rounded-md px-2 py-1 text-sm bg-gray-50 hover:bg-white focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer font-medium transition-colors",
+                  nav: "hidden"
+                }}
+                labels={{
+                  labelMonthDropdown: () => null,
+                  labelYearDropdown: () => null
+                }}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
-
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
@@ -105,10 +185,10 @@ export function ExperienceCard({
           </label>
         </div>
       </div>
-      
+
       {!hideResponsibilities && (
-        <ResponsibilitiesSection 
-          responsibilities={experience.responsibilities} 
+        <ResponsibilitiesSection
+          responsibilities={experience.responsibilities}
           onUpdate={(value) => onUpdate("responsibilities", value)}
           jobTitle={experience.jobTitle}
         />

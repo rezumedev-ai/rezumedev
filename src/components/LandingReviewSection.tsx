@@ -14,19 +14,19 @@ export const LandingReviewSection = () => (
           ))}
         </div>
         <blockquote className="font-semibold text-xl md:text-3xl text-[#1A1F2C] leading-relaxed mb-8">
-          Rezume.dev is a truly powerful AI resume builder that offers ATS-friendly templates and actionable suggestions to land more interviews. It's the perfect jumpstart to creating your professional resume with confidence.
+          "I reject 90% of resumes due to bad formatting. Rezume.dev is different—it builds ATS-optimized layouts that recruiters actually love to read. It's the unfair advantage you need."
         </blockquote>
         {/* Reviewer Row */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <img
-            src="/lovable-uploads/086e725c-a5de-402d-bfd0-4a1a620b0b4f.png"
+            src="/uploads/086e725c-a5de-402d-bfd0-4a1a620b0b4f.png"
             alt="Jessica Lee - HR Thought Leader"
             className="rounded-full w-14 h-14 object-cover border-4 border-accent"
             style={{ boxShadow: "0 0 0 4px #E5DEFF" }}
           />
           <div className="flex flex-col items-center sm:items-start">
             <span className="font-semibold text-base text-[#221F26]">Jessica Lee</span>
-            <span className="text-xs text-gray-500">HR Thought Leader</span>
+            <span className="text-xs text-gray-500">Senior Tech Recruiter & Career Coach</span>
           </div>
           {/* "Featured on Rezume.dev" (instead of a logo, brand site theme) */}
           <span className="ml-0 sm:ml-6 mt-3 sm:mt-0 font-bold text-primary text-lg px-3 py-1 rounded bg-accent/60 border border-accent/20">

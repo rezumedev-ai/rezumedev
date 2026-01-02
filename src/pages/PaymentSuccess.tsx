@@ -29,7 +29,7 @@ const PaymentSuccess = () => {
         value: 1.00
       });
     }
-    
+
     // Trigger confetti animation
     const launchConfetti = () => {
       const duration = 3 * 1000;
@@ -43,7 +43,7 @@ const PaymentSuccess = () => {
           origin: { x: 0 },
           colors: ['#6366F1', '#8B5CF6', '#D946EF']
         });
-        
+
         confetti({
           particleCount: 2,
           angle: 120,
@@ -56,44 +56,72 @@ const PaymentSuccess = () => {
           requestAnimationFrame(runConfetti);
         }
       };
-      
+
       runConfetti();
     };
 
     launchConfetti();
 
+    // Complete onboarding if user came from onboarding flow
+    const completeOnboardingAfterPayment = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('onboarding_completed')
+            .eq('id', user.id)
+            .single();
+
+          if (profile && !profile.onboarding_completed) {
+            await supabase
+              .from('profiles')
+              .update({ onboarding_completed: true })
+              .eq('id', user.id);
+
+            console.log('Onboarding completed after payment');
+          }
+        }
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
+      }
+    };
+
+    completeOnboardingAfterPayment();
+
     // Fetch user's subscription details
     const fetchSubscriptionDetails = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (user) {
           const { data: profileData } = await supabase
             .from('profiles')
             .select('subscription_plan, subscription_status, updated_at')
             .eq('id', user.id)
             .single();
-          
+
           if (profileData) {
             // Format plan name to be more user-friendly
             let planName = "Premium";
             if (profileData.subscription_plan === "monthly") planName = "Monthly Premium";
             if (profileData.subscription_plan === "yearly") planName = "Yearly Premium";
             if (profileData.subscription_plan === "lifetime") planName = "Lifetime Premium";
-            
+
             // Calculate renewal date if not lifetime
             let renewalDate = "";
             if (profileData.subscription_plan !== "lifetime") {
               const renewalDateObj = new Date(profileData.updated_at);
-              renewalDateObj.setMonth(renewalDateObj.getMonth() + 
+              renewalDateObj.setMonth(renewalDateObj.getMonth() +
                 (profileData.subscription_plan === "yearly" ? 12 : 1));
-              renewalDate = renewalDateObj.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+              renewalDate = renewalDateObj.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
               });
             }
-            
+
             setSubscriptionDetails({
               plan: planName,
               renewalDate: renewalDate,
@@ -117,7 +145,7 @@ const PaymentSuccess = () => {
         text: 'I just upgraded my Rezume.dev account to access premium resume templates and AI features!',
         url: 'https://rezume.dev',
       })
-      .catch((error) => console.log('Sharing failed', error));
+        .catch((error) => console.log('Sharing failed', error));
     } else {
       toast({
         title: "Sharing not supported",
@@ -135,7 +163,7 @@ const PaymentSuccess = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-white to-accent/10">
       <Header />
-      
+
       <main className="flex-grow flex items-center justify-center p-4 py-12">
         <div className="max-w-4xl w-full space-y-8">
           {/* Main success card */}
@@ -147,7 +175,7 @@ const PaymentSuccess = () => {
             <Card className="overflow-hidden border-accent shadow-lg">
               {/* Colored header stripe */}
               <div className="h-2 bg-gradient-to-r from-primary via-purple-500 to-pink-500" />
-              
+
               <CardHeader className="text-center pb-2">
                 <div className="flex justify-center mb-6">
                   <motion.div
@@ -163,7 +191,7 @@ const PaymentSuccess = () => {
                   Thank you for upgrading your Rezume.dev account
                 </CardDescription>
               </CardHeader>
-              
+
               <CardContent className="space-y-6">
                 {/* Subscription details */}
                 <div className="rounded-xl bg-accent/30 p-6 backdrop-blur-sm">
@@ -173,7 +201,7 @@ const PaymentSuccess = () => {
                     </span>
                     Your Subscription Details
                   </h3>
-                  
+
                   {subscriptionDetails.loading ? (
                     <div className="flex items-center justify-center h-16">
                       <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -184,7 +212,7 @@ const PaymentSuccess = () => {
                         <span className="text-muted-foreground">Plan:</span>
                         <span className="font-medium">{subscriptionDetails.plan}</span>
                       </div>
-                      
+
                       {subscriptionDetails.renewalDate && (
                         <div className="flex justify-between items-center">
                           <span className="text-muted-foreground">Next Renewal:</span>
@@ -194,7 +222,7 @@ const PaymentSuccess = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Premium features */}
                 <div>
                   <h3 className="text-lg font-medium mb-4">Features Now Available</h3>
@@ -220,7 +248,7 @@ const PaymentSuccess = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 {/* Action buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                   <Button asChild variant="outline" size="lg">
@@ -229,26 +257,26 @@ const PaymentSuccess = () => {
                       Go to Dashboard
                     </Link>
                   </Button>
-                  
+
                   <Button asChild size="lg" className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary-hover hover:to-purple-700 transition-all duration-300">
                     <Link to="/new-resume">
                       Create a Resume
                     </Link>
                   </Button>
                 </div>
-                
+
                 {/* Additional actions */}
                 <div className="flex items-center justify-center gap-6 mt-4 text-sm">
-                  <button 
+                  <button
                     onClick={handleShare}
                     className="text-muted-foreground hover:text-primary flex items-center transition-colors"
                   >
                     <Share2 className="mr-1 h-4 w-4" />
                     Share
                   </button>
-                  
-                  <Link 
-                    to="/settings" 
+
+                  <Link
+                    to="/settings"
                     className="text-muted-foreground hover:text-primary flex items-center transition-colors"
                   >
                     <Download className="mr-1 h-4 w-4" />
@@ -258,7 +286,7 @@ const PaymentSuccess = () => {
               </CardContent>
             </Card>
           </motion.div>
-          
+
           {/* Testimonial */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -284,7 +312,7 @@ const PaymentSuccess = () => {
           </motion.div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

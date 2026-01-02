@@ -51,7 +51,7 @@ export const Features = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-accent to-white sm:py-32">
+    <section className="py-20 bg-slate-50 sm:py-32">
       <div className="container px-4 mx-auto">
         <div className="max-w-3xl mx-auto mb-16 text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-secondary sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover">
@@ -70,12 +70,12 @@ export const Features = () => {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className={`absolute inset-0 opacity-0 bg-gradient-to-br ${feature.gradient} group-hover:opacity-100 transition-opacity`} />
-              
+
               <div className="relative z-10">
                 <div className="flex items-center justify-center w-14 h-14 mb-6 text-white transition-transform bg-primary rounded-xl group-hover:scale-110 group-hover:rotate-3">
                   <feature.icon className="w-7 h-7" />
                 </div>
-                
+
                 <h3 className="mb-3 text-xl font-semibold text-secondary group-hover:text-primary transition-colors">
                   {feature.title}
                   {feature.upcoming && (
@@ -84,7 +84,7 @@ export const Features = () => {
                     </span>
                   )}
                 </h3>
-                
+
                 <p className="mb-6 text-muted-foreground">
                   {feature.description}
                 </p>

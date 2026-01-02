@@ -1,8 +1,11 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Award } from "lucide-react";
+import { Plus, Trash2, Award, CalendarIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Certification {
   name: string;
@@ -82,15 +85,52 @@ export function CertificationsStep({ formData, onChange }: CertificationsStepPro
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col">
               <label className="text-sm font-medium text-gray-700">
                 Completion Date <span className="text-red-500">*</span>
               </label>
-              <Input
-                type="month"
-                value={certification.completionDate}
-                onChange={(e) => updateCertification(index, "completionDate", e.target.value)}
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full pl-3 text-left font-normal border-gray-200 bg-white hover:bg-gray-50",
+                      !certification.completionDate && "text-muted-foreground"
+                    )}
+                  >
+                    {certification.completionDate ? (
+                      format(new Date(certification.completionDate), "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={certification.completionDate ? new Date(certification.completionDate) : undefined}
+                    onSelect={(date) => date && updateCertification(index, "completionDate", date.toISOString())}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    captionLayout="dropdown-buttons"
+                    fromYear={1960}
+                    toYear={new Date().getFullYear()}
+                    initialFocus
+                    className="rounded-md border shadow-lg bg-white"
+                    classNames={{
+                      caption_dropdowns: "flex justify-center gap-3 pt-1 items-center",
+                      dropdown: "h-9 border-gray-200 rounded-md px-2 py-1 text-sm bg-gray-50 hover:bg-white focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer font-medium transition-colors",
+                      nav: "hidden"
+                    }}
+                    labels={{
+                      labelMonthDropdown: () => null,
+                      labelYearDropdown: () => null
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </Card>

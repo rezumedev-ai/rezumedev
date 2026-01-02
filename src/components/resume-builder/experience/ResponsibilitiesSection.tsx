@@ -10,10 +10,10 @@ export interface ResponsibilitiesSectionProps {
   jobTitle: string;
 }
 
-export function ResponsibilitiesSection({ 
-  responsibilities, 
+export function ResponsibilitiesSection({
+  responsibilities,
   onUpdate,
-  jobTitle 
+  jobTitle
 }: ResponsibilitiesSectionProps) {
   const handleAddResponsibility = () => {
     onUpdate([...responsibilities, ""]);
@@ -59,6 +59,7 @@ export function ResponsibilitiesSection({
               key={index}
               value={responsibility}
               index={index}
+              jobTitle={jobTitle}
               onChange={handleChangeResponsibility}
               onRemove={handleRemoveResponsibility}
             />

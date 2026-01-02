@@ -12,40 +12,54 @@ export const ResumeTemplates = () => {
     {
       id: "executive-clean",
       name: "Executive Clean",
-      image: "/lovable-uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
+      image: "/uploads/cd8ab216-33bc-47d9-95d1-0a835652b8c6.png",
       description: "Commanding resume design for C-suite executives and senior leaders, highlighting strategic achievements and board experience",
       color: "from-blue-500 to-blue-700"
     },
     {
       id: "professional-executive",
       name: "Professional Executive",
-      image: "/lovable-uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
+      image: "/uploads/bcfce93e-6b2d-45f7-ba7e-8db1099ba81e.png",
       description: "Bold modern layout with clean typography, perfect for senior managers and directors",
       color: "from-purple-500 to-purple-700"
     },
     {
       id: "professional-navy",
       name: "Professional Navy",
-      image: "/lovable-uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
+      image: "/uploads/d77e5ddd-e95d-4a02-8335-2bbd49bcd257.png",
       description: "Elegant two-column layout with navy header and modern typography, perfect for corporate professionals",
       color: "from-blue-700 to-indigo-900"
     },
     {
       id: "modern-professional",
       name: "Modern Professional",
-      image: "/lovable-uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
+      image: "/uploads/a41674ee-049d-4ade-88a0-17f53696a879.png",
       description: "Contemporary design with creative accents, ideal for forward-thinking professionals in modern industries",
       color: "from-teal-500 to-teal-700"
+    },
+    {
+      id: "ivy-league",
+      name: "The Ivy",
+      image: "/uploads/ivy-preview-new.png",
+      description: "Prestigious academic layout with serif typography and dense content structure, perfect for academia and research positions",
+      color: "from-gray-700 to-gray-900"
+    },
+    {
+      id: "creative-portfolio",
+      name: "The Creative",
+      image: "/uploads/creative-preview-new.png",
+      description: "Bold, high-impact design with accent colors for creative professionals in design, marketing, and tech industries",
+      color: "from-indigo-500 to-indigo-700"
     }
   ];
 
   // Reference for the template section
   const sectionRef = useRef<HTMLDivElement>(null);
-  
+
   // Mouse position for spotlight effect
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  
+
   // Smoothed versions of mouse coordinates
   const smoothX = useSpring(mouseX, { damping: 50, stiffness: 300 });
   const smoothY = useSpring(mouseY, { damping: 50, stiffness: 300 });
@@ -110,7 +124,7 @@ export const ResumeTemplates = () => {
   }));
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       className="py-24 relative overflow-hidden"
@@ -142,10 +156,10 @@ export const ResumeTemplates = () => {
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-16"
         >
-          <GradientHeading 
-            variant="primary" 
-            weight="bold" 
-            size="lg" 
+          <GradientHeading
+            variant="primary"
+            weight="bold"
+            size="lg"
             className="mb-4"
           >
             Professional Resume Templates
@@ -164,7 +178,7 @@ export const ResumeTemplates = () => {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {resumeTemplates.map((template, index) => (
-              <TemplateCard 
+              <TemplateCard
                 key={template.id}
                 template={template}
                 index={index}
@@ -236,11 +250,11 @@ interface TemplateCardProps {
 
 const TemplateCard = ({ template, index }: TemplateCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   // Values for the 3D rotation effect
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  
+
   // Transform mouse movement to rotation values
   const rotateX = useTransform(y, [-100, 100], [10, -10]);
   const rotateY = useTransform(x, [-100, 100], [-10, 10]);
@@ -252,10 +266,10 @@ const TemplateCard = ({ template, index }: TemplateCardProps) => {
     const height = rect.height;
     const centerX = rect.left + width / 2;
     const centerY = rect.top + height / 2;
-    
+
     const mouseX = e.clientX - centerX;
     const mouseY = e.clientY - centerY;
-    
+
     x.set(mouseX);
     y.set(mouseY);
   };
@@ -278,42 +292,42 @@ const TemplateCard = ({ template, index }: TemplateCardProps) => {
       onMouseLeave={handleMouseLeave}
       className="h-full"
     >
-      <motion.div 
+      <motion.div
         style={{ rotateX, rotateY, perspective: 1000 }}
         className={`h-full rounded-2xl overflow-hidden backdrop-blur-sm border border-gray-100 hover:border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform
           ${isHovered ? 'scale-[1.02]' : 'scale-100'}`}
       >
         <div className={`bg-gradient-to-b ${template.color} h-8 rounded-t-xl transition-height duration-300 ${isHovered ? 'h-12' : ''}`} />
-        
+
         <div className="bg-white p-5">
           {/* Template preview with 3D effect */}
           <div className="relative rounded-lg overflow-hidden bg-gray-100 mb-4">
-            <AspectRatio ratio={8.5/11} className="relative">
+            <AspectRatio ratio={8.5 / 11} className="relative">
               <div className="absolute top-2 right-2 z-20">
                 <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                   <span className="text-xs font-medium text-white">Premium</span>
                 </div>
               </div>
-              
+
               <img
                 src={template.image}
                 alt={`${template.name} Resume Template`}
                 className="w-full h-full object-contain hover:scale-[1.03] transition-transform duration-300"
                 loading="lazy"
               />
-              
+
               {/* Overlay with actions */}
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-8"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isHovered ? 1 : 0 }}
                 transition={{ duration: 0.3 }}
               >
                 <Link to="/signup">
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     className="font-medium gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                   >
                     Use Template <ExternalLink className="w-3.5 h-3.5" />
@@ -322,9 +336,9 @@ const TemplateCard = ({ template, index }: TemplateCardProps) => {
               </motion.div>
             </AspectRatio>
           </div>
-          
+
           {/* Template details with animated border */}
-          <div 
+          <div
             className={`relative p-4 rounded-xl border ${isHovered ? 'border-primary/20 bg-primary/5' : 'border-gray-100'} transition-colors duration-300`}
           >
             <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 text-white bg-gradient-to-r ${template.color}`}>

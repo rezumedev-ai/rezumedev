@@ -41,8 +41,8 @@ export function PersonalSection({
   // Function to format URLs properly with https:// if missing
   const formatUrl = (url: string): string => {
     if (!url) return '';
-    return url.startsWith('http://') || url.startsWith('https://') 
-      ? url 
+    return url.startsWith('http://') || url.startsWith('https://')
+      ? url
       : `https://${url}`;
   };
 
@@ -86,6 +86,22 @@ export function PersonalSection({
       contactContainer: "flex flex-wrap gap-4 mt-3 text-sm text-white",
       imageContainer: "col-span-3 flex justify-center items-center",
       infoContainer: "col-span-9"
+    },
+    // Phase 4: Ivy League Template (Academic/Classic)
+    "ivy-league": {
+      container: "mb-8 pb-6 border-b-2 border-black text-center",
+      name: "text-4xl font-serif font-bold tracking-tight text-gray-900",
+      title: "text-xl font-serif text-gray-700 mt-2 italic",
+      contactContainer: "flex flex-wrap justify-center gap-6 mt-4 text-sm font-serif text-gray-800"
+    },
+    // Phase 4: Creative Portfolio (Design/Bold)
+    "creative-portfolio": {
+      container: "col-span-12 mb-8",
+      name: "text-5xl font-black tracking-tighter text-indigo-700 leading-none",
+      title: "text-2xl font-bold text-gray-900 mt-2",
+      contactContainer: "flex flex-wrap gap-6 mt-6 text-base font-medium text-gray-600",
+      imageContainer: "hidden", // Creative often pushes image to side or omits in header
+      infoContainer: "col-span-12"
     }
   };
 
@@ -101,8 +117,8 @@ export function PersonalSection({
   } = useDraggableImage(imageDraggable);
 
   // Define common link style for hyperlinks
-  const linkStyle = template.id === "professional-navy" 
-    ? "hover:underline text-white text-opacity-90 hover:text-opacity-100" 
+  const linkStyle = template.id === "professional-navy"
+    ? "hover:underline text-white text-opacity-90 hover:text-opacity-100"
     : "hover:underline text-gray-600 hover:text-gray-900";
 
   if (template.id === "professional-navy") {
@@ -130,9 +146,9 @@ export function PersonalSection({
                     : "Profile image"
                 }
               >
-                <img 
-                  src={profileImageUrl} 
-                  alt={`${fullName}'s profile`} 
+                <img
+                  src={profileImageUrl}
+                  alt={`${fullName}'s profile`}
                   className="w-full h-full object-cover"
                   style={{
                     aspectRatio: "1/1",
@@ -167,17 +183,17 @@ export function PersonalSection({
             )}
             {isEditing && onImageUpdate && resumeId && (
               <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                <ImageUploadButton 
-                  resumeId={resumeId} 
-                  currentImageUrl={profileImageUrl} 
-                  onImageUpdate={onImageUpdate} 
+                <ImageUploadButton
+                  resumeId={resumeId}
+                  currentImageUrl={profileImageUrl}
+                  onImageUpdate={onImageUpdate}
                 />
               </div>
             )}
           </div>
         </div>
         <div className={styles["professional-navy"].infoContainer}>
-          <h1 
+          <h1
             className={`${currentStyle.name} outline-none`}
             contentEditable={isEditing}
             suppressContentEditableWarning
@@ -185,7 +201,7 @@ export function PersonalSection({
           >
             {fullName}
           </h1>
-          <div 
+          <div
             className={`${currentStyle.title} outline-none`}
             contentEditable={isEditing}
             suppressContentEditableWarning
@@ -195,29 +211,49 @@ export function PersonalSection({
           </div>
           <div className={currentStyle.contactContainer}>
             <div>
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("email", e)}
-              >
-                {email}
-              </span>
+              {isEditing ? (
+                <span
+                  className="outline-none"
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("email", e)}
+                >
+                  {email}
+                </span>
+              ) : (
+                <a
+                  href={`mailto:${email}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {email}
+                </a>
+              )}
             </div>
             <div>
-              <span 
-                className="outline-none"
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("phone", e)}
-              >
-                {phone}
-              </span>
+              {isEditing ? (
+                <span
+                  className="outline-none"
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("phone", e)}
+                >
+                  {phone}
+                </span>
+              ) : (
+                <a
+                  href={`tel:${phone}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {phone}
+                </a>
+              )}
             </div>
             {linkedin && (
               <div>
                 {isEditing ? (
-                  <span 
+                  <span
                     className="outline-none"
                     contentEditable={true}
                     suppressContentEditableWarning
@@ -226,7 +262,7 @@ export function PersonalSection({
                     {linkedin}
                   </span>
                 ) : (
-                  <a 
+                  <a
                     href={formatUrl(linkedin)}
                     className={linkStyle}
                     target="_blank"
@@ -241,7 +277,7 @@ export function PersonalSection({
             {website && (
               <div>
                 {isEditing ? (
-                  <span 
+                  <span
                     className="outline-none"
                     contentEditable={true}
                     suppressContentEditableWarning
@@ -250,7 +286,7 @@ export function PersonalSection({
                     {website}
                   </span>
                 ) : (
-                  <a 
+                  <a
                     href={formatUrl(website)}
                     className={linkStyle}
                     target="_blank"
@@ -293,9 +329,9 @@ export function PersonalSection({
                     : "Profile image"
                 }
               >
-                <img 
-                  src={profileImageUrl} 
-                  alt={`${fullName}'s profile`} 
+                <img
+                  src={profileImageUrl}
+                  alt={`${fullName}'s profile`}
                   className="w-full h-full object-cover"
                   style={{
                     aspectRatio: "1/1",
@@ -330,17 +366,17 @@ export function PersonalSection({
             )}
             {isEditing && onImageUpdate && resumeId && (
               <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                <ImageUploadButton 
-                  resumeId={resumeId} 
-                  currentImageUrl={profileImageUrl} 
-                  onImageUpdate={onImageUpdate} 
+                <ImageUploadButton
+                  resumeId={resumeId}
+                  currentImageUrl={profileImageUrl}
+                  onImageUpdate={onImageUpdate}
                 />
               </div>
             )}
           </div>
         </div>
         <div className={styles["modern-professional"].infoContainer}>
-          <h1 
+          <h1
             className={`${currentStyle.name} outline-none`}
             contentEditable={isEditing}
             suppressContentEditableWarning
@@ -348,7 +384,7 @@ export function PersonalSection({
           >
             {fullName}
           </h1>
-          <div 
+          <div
             className={`${currentStyle.title} outline-none`}
             contentEditable={isEditing}
             suppressContentEditableWarning
@@ -358,24 +394,44 @@ export function PersonalSection({
           </div>
           <div className={currentStyle.contactContainer}>
             <div>
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("email", e)}
-                className="outline-none"
-              >
-                {email}
-              </span>
+              {isEditing ? (
+                <span
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("email", e)}
+                  className="outline-none"
+                >
+                  {email}
+                </span>
+              ) : (
+                <a
+                  href={`mailto:${email}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {email}
+                </a>
+              )}
             </div>
             <div>
-              <span
-                contentEditable={isEditing}
-                suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("phone", e)}
-                className="outline-none"
-              >
-                {phone}
-              </span>
+              {isEditing ? (
+                <span
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("phone", e)}
+                  className="outline-none"
+                >
+                  {phone}
+                </span>
+              ) : (
+                <a
+                  href={`tel:${phone}`}
+                  className={linkStyle}
+                  data-pdf-link="true"
+                >
+                  {phone}
+                </a>
+              )}
             </div>
             {linkedin && (
               <div>
@@ -389,7 +445,7 @@ export function PersonalSection({
                     {linkedin}
                   </span>
                 ) : (
-                  <a 
+                  <a
                     href={formatUrl(linkedin)}
                     className={linkStyle}
                     target="_blank"
@@ -413,7 +469,7 @@ export function PersonalSection({
                     {website}
                   </span>
                 ) : (
-                  <a 
+                  <a
                     href={formatUrl(website)}
                     className={linkStyle}
                     target="_blank"
@@ -434,7 +490,7 @@ export function PersonalSection({
   if (template.id === "modern-split") {
     return (
       <div className={currentStyle.container}>
-        <h1 
+        <h1
           className={`${currentStyle.name} outline-none`}
           contentEditable={isEditing}
           suppressContentEditableWarning
@@ -442,7 +498,7 @@ export function PersonalSection({
         >
           {fullName}
         </h1>
-        <div 
+        <div
           className={`${currentStyle.title} outline-none`}
           contentEditable={isEditing}
           suppressContentEditableWarning
@@ -453,31 +509,51 @@ export function PersonalSection({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
           <div className="flex items-center gap-1">
             <Mail className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
-            <span 
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-            >
-              {email}
-            </span>
+            {isEditing ? (
+              <span
+                className="text-xs text-gray-600 outline-none"
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+              >
+                {email}
+              </span>
+            ) : (
+              <a
+                href={`mailto:${email}`}
+                className={`text-xs text-gray-600 ${linkStyle}`}
+                data-pdf-link="true"
+              >
+                {email}
+              </a>
+            )}
           </div>
           <div className="flex items-center gap-1">
             <Phone className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
-            <span 
-              className="text-xs text-gray-600 outline-none"
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-            >
-              {phone}
-            </span>
+            {isEditing ? (
+              <span
+                className="text-xs text-gray-600 outline-none"
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+              >
+                {phone}
+              </span>
+            ) : (
+              <a
+                href={`tel:${phone}`}
+                className={`text-xs text-gray-600 ${linkStyle}`}
+                data-pdf-link="true"
+              >
+                {phone}
+              </a>
+            )}
           </div>
           {linkedin && (
             <div className="flex items-center gap-1">
               <Linkedin className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
               {isEditing ? (
-                <span 
+                <span
                   className="text-xs text-gray-600 outline-none"
                   contentEditable={true}
                   suppressContentEditableWarning
@@ -486,7 +562,7 @@ export function PersonalSection({
                   {linkedin}
                 </span>
               ) : (
-                <a 
+                <a
                   href={formatUrl(linkedin)}
                   className="text-xs text-gray-600 hover:underline hover:text-gray-900"
                   target="_blank"
@@ -502,7 +578,7 @@ export function PersonalSection({
             <div className="flex items-center gap-1">
               <Globe className="w-3 h-3 text-gray-500 pdf-contact-icon" data-pdf-contact-icon="true" />
               {isEditing ? (
-                <span 
+                <span
                   className="text-xs text-gray-600 outline-none"
                   contentEditable={true}
                   suppressContentEditableWarning
@@ -511,7 +587,7 @@ export function PersonalSection({
                   {website}
                 </span>
               ) : (
-                <a 
+                <a
                   href={formatUrl(website)}
                   className="text-xs text-gray-600 hover:underline hover:text-gray-900"
                   target="_blank"
@@ -533,24 +609,44 @@ export function PersonalSection({
       return (
         <div className={currentStyle.contactContainer}>
           <div>
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
-            >
-              {email}
-            </span>
+            {isEditing ? (
+              <span
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+                className="outline-none"
+              >
+                {email}
+              </span>
+            ) : (
+              <a
+                href={`mailto:${email}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {email}
+              </a>
+            )}
           </div>
           <div>
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
-            >
-              {phone}
-            </span>
+            {isEditing ? (
+              <span
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+                className="outline-none"
+              >
+                {phone}
+              </span>
+            ) : (
+              <a
+                href={`tel:${phone}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {phone}
+              </a>
+            )}
           </div>
           {linkedin && (
             <div>
@@ -564,7 +660,7 @@ export function PersonalSection({
                   {linkedin}
                 </span>
               ) : (
-                <a 
+                <a
                   href={formatUrl(linkedin)}
                   className="hover:underline text-black"
                   target="_blank"
@@ -588,7 +684,7 @@ export function PersonalSection({
                   {website}
                 </span>
               ) : (
-                <a 
+                <a
                   href={formatUrl(website)}
                   className="hover:underline text-black"
                   target="_blank"
@@ -608,24 +704,44 @@ export function PersonalSection({
       return (
         <div className={currentStyle.contactContainer}>
           <div>
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("email", e)}
-              className="outline-none"
-            >
-              {email}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("email", e)}
+                className="outline-none"
+              >
+                {email}
+              </div>
+            ) : (
+              <a
+                href={`mailto:${email}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {email}
+              </a>
+            )}
           </div>
           <div>
-            <div
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleContentEdit("phone", e)}
-              className="outline-none"
-            >
-              {phone}
-            </div>
+            {isEditing ? (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning
+                onBlur={(e) => handleContentEdit("phone", e)}
+                className="outline-none"
+              >
+                {phone}
+              </div>
+            ) : (
+              <a
+                href={`tel:${phone}`}
+                className={linkStyle}
+                data-pdf-link="true"
+              >
+                {phone}
+              </a>
+            )}
           </div>
           {linkedin && (
             <div>
@@ -639,7 +755,7 @@ export function PersonalSection({
                   {linkedin}
                 </div>
               ) : (
-                <a 
+                <a
                   href={formatUrl(linkedin)}
                   className="hover:underline text-gray-600"
                   target="_blank"
@@ -663,7 +779,7 @@ export function PersonalSection({
                   {website}
                 </div>
               ) : (
-                <a 
+                <a
                   href={formatUrl(website)}
                   className="hover:underline text-gray-600"
                   target="_blank"
@@ -681,78 +797,100 @@ export function PersonalSection({
 
     return (
       <div className={currentStyle.contactContainer}>
-        <div className="flex items-center gap-1.5">
-          <Mail className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("email", e)}
-            className="outline-none"
-          >
-            {email}
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Phone className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
-          <div
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onBlur={(e) => handleContentEdit("phone", e)}
-            className="outline-none"
-          >
-            {phone}
-          </div>
-        </div>
-        {linkedin && (
+        <div className={currentStyle.contactContainer}>
           <div className="flex items-center gap-1.5">
-            <Linkedin className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
+            <Mail className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="mail" />
             {isEditing ? (
               <div
                 contentEditable={true}
                 suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("linkedin", e)}
+                onBlur={(e) => handleContentEdit("email", e)}
                 className="outline-none"
               >
-                {linkedin}
+                {email}
               </div>
             ) : (
-              <a 
-                href={formatUrl(linkedin)}
-                className="hover:underline text-gray-600"
-                target="_blank"
-                rel="noopener noreferrer"
+              <a
+                href={`mailto:${email}`}
+                className={linkStyle}
                 data-pdf-link="true"
               >
-                {linkedin}
+                {email}
               </a>
             )}
           </div>
-        )}
-        {website && (
           <div className="flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" />
+            <Phone className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="phone" />
             {isEditing ? (
               <div
                 contentEditable={true}
                 suppressContentEditableWarning
-                onBlur={(e) => handleContentEdit("website", e)}
+                onBlur={(e) => handleContentEdit("phone", e)}
                 className="outline-none"
               >
-                {website}
+                {phone}
               </div>
             ) : (
-              <a 
-                href={formatUrl(website)}
-                className="hover:underline text-gray-600"
-                target="_blank"
-                rel="noopener noreferrer"
+              <a
+                href={`tel:${phone}`}
+                className={linkStyle}
                 data-pdf-link="true"
               >
-                {website}
+                {phone}
               </a>
             )}
           </div>
-        )}
+          {linkedin && (
+            <div className="flex items-center gap-1.5">
+              <Linkedin className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="linkedin" />
+              {isEditing ? (
+                <div
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("linkedin", e)}
+                  className="outline-none"
+                >
+                  {linkedin}
+                </div>
+              ) : (
+                <a
+                  href={formatUrl(linkedin)}
+                  className="hover:underline text-gray-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {linkedin}
+                </a>
+              )}
+            </div>
+          )}
+          {website && (
+            <div className="flex items-center gap-1.5">
+              <Globe className="w-4 h-4 text-gray-400 pdf-contact-icon" data-pdf-contact-icon="true" data-lucide="globe" />
+              {isEditing ? (
+                <div
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleContentEdit("website", e)}
+                  className="outline-none"
+                >
+                  {website}
+                </div>
+              ) : (
+                <a
+                  href={formatUrl(website)}
+                  className="hover:underline text-gray-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-pdf-link="true"
+                >
+                  {website}
+                </a>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -760,7 +898,8 @@ export function PersonalSection({
   return (
     <div className={currentStyle.container}>
       <div className={template.id === "minimal-elegant" ? "text-center" : ""}>
-        <h1 
+        <h1
+          data-resume-title="true"
           className={`${currentStyle.name} outline-none`}
           contentEditable={isEditing}
           suppressContentEditableWarning
@@ -768,7 +907,7 @@ export function PersonalSection({
         >
           {fullName}
         </h1>
-        <div 
+        <div
           className={`${currentStyle.title} outline-none`}
           contentEditable={isEditing}
           suppressContentEditableWarning
@@ -777,7 +916,7 @@ export function PersonalSection({
           {title}
         </div>
       </div>
-      
+
       {renderContact()}
     </div>
   );
