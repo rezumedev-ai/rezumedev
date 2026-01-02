@@ -21,12 +21,12 @@ export default function ResumePreview() {
         .single();
 
       if (error) throw error;
-      
+
       // Ensure certifications is always an array, even if null/undefined
       if (!data.certifications) {
         data.certifications = [];
       }
-      
+
       return data;
     }
   });
@@ -34,7 +34,7 @@ export default function ResumePreview() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -61,7 +61,7 @@ export default function ResumePreview() {
   // Extract data from resume safely
   const personalInfo = isObject(resume.personal_info) ? resume.personal_info : {};
   const professionalSummary = isObject(resume.professional_summary) ? resume.professional_summary : {};
-  
+
   // Get name and position for title
   const name = getStringProperty(personalInfo, 'fullName', "Your Professional Resume");
   const position = getStringProperty(professionalSummary, 'title', "Resume");
@@ -74,19 +74,15 @@ export default function ResumePreview() {
     <div className="relative bg-white min-h-screen">
       <Helmet>
         <title>{`${name}'s ${position} | Rezume.dev`}</title>
-        <meta 
-          name="description" 
-          content={`Professional resume for ${name}${metaDescription ? ` - ${metaDescription}` : ''}`} 
-        />
-        <meta 
-          name="viewport" 
-          content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" 
+        <meta
+          name="description"
+          content={`Professional resume for ${name}${metaDescription ? ` - ${metaDescription}` : ''}`}
         />
         <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
         <link rel="icon" type="image/x-icon" href="/favicon1.ico" />
         <link rel="apple-touch-icon" href="/custom-favicon.svg" />
       </Helmet>
-      
+
       <FinalResumePreview
         resumeData={resume as unknown as ResumeData}
         resumeId={id as string}
