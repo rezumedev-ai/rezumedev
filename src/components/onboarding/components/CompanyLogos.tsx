@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 
 const companies = [
-    { name: 'Google', color: '#4285F4' },
-    { name: 'Meta', color: '#0081FB' },
-    { name: 'Amazon', color: '#FF9900' },
-    { name: 'Microsoft', color: '#00A4EF' },
-    { name: 'Apple', color: '#000000' },
-    { name: 'Netflix', color: '#E50914' }
+    { name: 'Google', logo: '/logos/google.svg', height: 'h-8' },
+    { name: 'Meta', logo: '/logos/meta.svg', height: 'h-7' },
+    { name: 'Amazon', logo: '/logos/amazon.svg', height: 'h-8' },
+    { name: 'Microsoft', logo: '/logos/microsoft.svg', height: 'h-7' },
+    { name: 'Apple', logo: '/logos/apple.svg', height: 'h-9' },
+    { name: 'Netflix', logo: '/logos/netflix.svg', height: 'h-6' }
 ];
 
 export const CompanyLogos = () => {
@@ -43,18 +43,14 @@ export const CompanyLogos = () => {
                             whileHover={{ scale: 1.1, y: -5 }}
                             className="group relative"
                         >
-                            {/* Hover glow effect */}
-                            <div
-                                className="absolute inset-0 rounded-lg blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-                                style={{ backgroundColor: company.color }}
-                            />
+                            {/* Subtle glow on hover */}
+                            <div className="absolute inset-0 rounded-lg blur-lg opacity-0 group-hover:opacity-20 bg-primary transition-opacity duration-300" />
 
-                            <span
-                                className="relative text-2xl md:text-3xl font-bold transition-all duration-300 opacity-70 group-hover:opacity-100"
-                                style={{ color: company.color }}
-                            >
-                                {company.name}
-                            </span>
+                            <img
+                                src={company.logo}
+                                alt={company.name}
+                                className={`relative ${company.height} w-auto opacity-60 group-hover:opacity-100 transition-all duration-300 filter grayscale group-hover:grayscale-0`}
+                            />
                         </motion.div>
                     ))}
                 </div>
