@@ -66,12 +66,12 @@ export const DidYouKnowTab = () => {
     };
 
     return (
-        <div className="w-full p-4 bg-gradient-to-t from-white via-white to-transparent">
-            <div className="container mx-auto max-w-3xl">
+        <div className="w-full bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+            <div className="container mx-auto px-4 py-4 max-w-3xl">
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="relative bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-primary/10 overflow-hidden"
+                    className="relative bg-secondary/30 rounded-xl border border-primary/10 overflow-hidden"
                 >
                     {/* Progress Bar for Fact Timer */}
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
