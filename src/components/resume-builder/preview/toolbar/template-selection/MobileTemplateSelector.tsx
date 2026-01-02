@@ -86,13 +86,13 @@ export function MobileTemplateSelector({
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
-                        <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-6 shadow-lg">
+                        <div className="bg-gradient-to-r from-primary to-primary/90 px-4 py-6 shadow-lg">
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
                                     <h2 className="text-2xl font-bold text-white mb-1">
                                         Choose Your Template
                                     </h2>
-                                    <p className="text-sm text-emerald-100">
+                                    <p className="text-sm text-white/80">
                                         Select the perfect design for your resume
                                     </p>
                                 </div>
@@ -138,7 +138,7 @@ export function MobileTemplateSelector({
                                             "relative cursor-pointer rounded-xl overflow-hidden bg-white shadow-md transition-all duration-200",
                                             "active:shadow-lg",
                                             selectedId === template.id
-                                                ? "ring-4 ring-emerald-500 shadow-xl"
+                                                ? "ring-4 ring-primary shadow-xl"
                                                 : "hover:shadow-lg"
                                         )}
                                     >
@@ -156,7 +156,7 @@ export function MobileTemplateSelector({
                                                 <motion.div
                                                     initial={{ scale: 0, opacity: 0 }}
                                                     animate={{ scale: 1, opacity: 1 }}
-                                                    className="absolute top-3 right-3 bg-emerald-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg"
+                                                    className="absolute top-3 right-3 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg"
                                                 >
                                                     ✓ Selected
                                                 </motion.div>
@@ -168,7 +168,7 @@ export function MobileTemplateSelector({
                                             <h3 className={cn(
                                                 "font-semibold text-center text-sm",
                                                 selectedId === template.id
-                                                    ? "text-emerald-700"
+                                                    ? "text-primary"
                                                     : "text-gray-900"
                                             )}>
                                                 {template.name}
