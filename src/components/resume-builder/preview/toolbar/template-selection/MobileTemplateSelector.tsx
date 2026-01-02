@@ -20,10 +20,32 @@ export function MobileTemplateSelector({
     onTemplateChange
 }: MobileTemplateSelectorProps) {
     const [selectedId, setSelectedId] = useState(currentTemplateId);
+    const [dimensions, setDimensions] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight
+    });
 
     useEffect(() => {
         setSelectedId(currentTemplateId);
     }, [currentTemplateId]);
+
+    // Update dimensions on window resize or orientation change
+    useEffect(() => {
+        const updateDimensions = () => {
+            setDimensions({
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        };
+
+        window.addEventListener('resize', updateDimensions);
+        window.addEventListener('orientationchange', updateDimensions);
+
+        return () => {
+            window.removeEventListener('resize', updateDimensions);
+            window.removeEventListener('orientationchange', updateDimensions);
+        };
+    }, []);
 
     // Prevent body scroll when open
     useEffect(() => {
@@ -75,6 +97,13 @@ export function MobileTemplateSelector({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+                    style={{
+                        width: `${dimensions.width}px`,
+                        height: `${dimensions.height}px`,
+                        position: 'fixed',
+                        top: 0,
+                        left: 0
+                    }}
                     onClick={handleClose}
                 >
                     <motion.div
@@ -82,17 +111,13 @@ export function MobileTemplateSelector({
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                        className="fixed inset-0 bg-gradient-to-br from-gray-50 to-white overflow-hidden flex flex-col"
+                        className="bg-gradient-to-br from-gray-50 to-white overflow-hidden flex flex-col"
                         style={{
-                            width: '100vw',
-                            height: '100vh',
-                            maxWidth: '100vw',
-                            maxHeight: '100vh',
+                            width: `${dimensions.width}px`,
+                            height: `${dimensions.height}px`,
                             position: 'fixed',
                             top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0
+                            left: 0
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
