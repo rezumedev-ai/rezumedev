@@ -799,12 +799,14 @@ CRITICAL CONSTRAINTS:
     }
 
     const summaryData = await summaryResponse.json();
+    console.log('GPT-5 mini full response:', JSON.stringify(summaryData, null, 2));
     const enhancedSummary = summaryData.choices[0].message.content.trim();
 
     // Sanitize summary by removing all "**" markdown formatting
     const cleanSummary = enhancedSummary.replace(/\*\*/g, '').trim();
     console.log('GPT-5 generated summary:', cleanSummary);
     console.log('Summary word count:', cleanSummary.split(/\s+/).length);
+    console.log('Summary length (chars):', cleanSummary.length);
 
     const enhancedExperiences = [];
     const usedActionVerbs = new Set<string>();
