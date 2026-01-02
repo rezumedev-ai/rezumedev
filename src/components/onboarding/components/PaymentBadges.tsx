@@ -1,5 +1,11 @@
 import { motion } from 'framer-motion';
-import { Lock, CreditCard, Shield } from 'lucide-react';
+import { Lock, Shield } from 'lucide-react';
+
+const paymentMethods = [
+    { name: 'Visa', logo: '/logos/visa.svg' },
+    { name: 'Mastercard', logo: '/logos/mastercard.svg' },
+    { name: 'Amex', logo: '/logos/amex.svg' }
+];
 
 export const PaymentBadges = () => {
     return (
@@ -18,25 +24,28 @@ export const PaymentBadges = () => {
                         <Lock className="w-4 h-4 text-green-600" />
                     </motion.div>
                     <span className="font-medium">Secure payment powered by</span>
-                    <span className="font-bold text-primary">Stripe</span>
+                    <img
+                        src="/logos/stripe.svg"
+                        alt="Stripe"
+                        className="h-5 w-auto"
+                    />
                 </div>
 
-                <div className="flex items-center gap-6">
-                    {[
-                        { name: "Visa", icon: CreditCard },
-                        { name: "Mastercard", icon: CreditCard },
-                        { name: "Amex", icon: CreditCard }
-                    ].map((payment, index) => (
+                <div className="flex items-center gap-4">
+                    {paymentMethods.map((payment, index) => (
                         <motion.div
                             key={payment.name}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 1.1 + index * 0.1 }}
                             whileHover={{ scale: 1.1, y: -2 }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-gray-200 shadow-sm"
+                            className="flex items-center justify-center px-3 py-2 bg-white rounded-lg border border-gray-200 shadow-sm"
                         >
-                            <payment.icon className="w-4 h-4 text-gray-600" />
-                            <span className="text-xs font-medium text-gray-700">{payment.name}</span>
+                            <img
+                                src={payment.logo}
+                                alt={payment.name}
+                                className="h-6 w-auto"
+                            />
                         </motion.div>
                     ))}
                 </div>
