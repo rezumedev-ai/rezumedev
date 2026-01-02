@@ -3,6 +3,9 @@ import { OnboardingData } from '@/types/onboarding';
 import { CheckoutButton, PlanType } from '@/components/payment/CheckoutButton';
 import { Check, Sparkles, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TrustSignals } from '../components/TrustSignals';
+import { EnhancedGuarantee } from '../components/EnhancedGuarantee';
+import { PaymentBadges } from '../components/PaymentBadges';
 
 interface SubscriptionStepProps {
     data: OnboardingData;
@@ -34,6 +37,9 @@ export const SubscriptionStep = ({ data, updateData, onContinue, onBack }: Subsc
                     All plans include our core AI-powered resume features
                 </p>
             </div>
+
+            {/* Trust-Building Elements */}
+            <TrustSignals />
 
             <div className="grid md:grid-cols-3 gap-6 mb-8">
                 {/* Monthly Plan */}
@@ -193,14 +199,11 @@ export const SubscriptionStep = ({ data, updateData, onContinue, onBack }: Subsc
                 </motion.div>
             </div>
 
-            {/* Guarantee */}
-            <div className="text-center mb-6">
-                <div className="inline-flex items-center p-4 rounded-xl bg-gray-50">
-                    <p className="text-sm text-gray-600">
-                        <span className="font-medium">14-day money-back guarantee</span> · Secure SSL checkout
-                    </p>
-                </div>
-            </div>
+            {/* Enhanced Guarantee */}
+            <EnhancedGuarantee />
+
+            {/* Payment Security Badges */}
+            <PaymentBadges />
 
             {/* Navigation */}
             <div className="flex gap-4 justify-center">
