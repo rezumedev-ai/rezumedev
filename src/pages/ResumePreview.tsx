@@ -78,10 +78,6 @@ export default function ResumePreview() {
           name="description"
           content={`Professional resume for ${name}${metaDescription ? ` - ${metaDescription}` : ''}`}
         />
-        <meta
-          name="viewport"
-          content="width=793, initial-scale=1.0, user-scalable=yes"
-        />
         <link rel="icon" type="image/svg+xml" href="/custom-favicon.svg" />
         <link rel="icon" type="image/x-icon" href="/favicon1.ico" />
         <link rel="apple-touch-icon" href="/custom-favicon.svg" />
