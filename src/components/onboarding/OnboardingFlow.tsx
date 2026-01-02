@@ -8,6 +8,8 @@ import { AIPreviewStep } from './steps/AIPreviewStep';
 import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { SubscriptionStep } from './steps/SubscriptionStep';
 
+import { DidYouKnowTab } from './components/DidYouKnowTab';
+
 export const OnboardingFlow = () => {
     const {
         currentStep,
@@ -89,11 +91,16 @@ export const OnboardingFlow = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-32">
             <ProgressBar current={currentStep} total={totalSteps} progress={progress} />
             <div className="container mx-auto px-4 py-8">
                 {renderStep()}
             </div>
+
+            {/* Did You Know Tab - Visible on all steps except Welcome (optional) or maybe all steps */}
+            {/* Adding padding-bottom to body/wrapper to prevent overlap is handled by pb-32 above */}
+            <DidYouKnowTab />
         </div>
     );
 };
+
